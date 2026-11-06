@@ -48,3 +48,8 @@ body:
       placeholder: T-1.1
     validations:
       required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Files this Issue will change
+      description: Expected files. Flag busy ones (database schema, package.json, route index) so we can check for clashing PRs.

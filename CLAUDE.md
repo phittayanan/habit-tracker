@@ -5,6 +5,8 @@ Two students build this CPE 334 group project with Claude Code. The product live
 ## Branches and PRs
 - One Issue -> one branch -> one PR. Branch from `staging` and name it `feat/|fix/|docs/|chore/<issue-number>-<slug>`.
 - Open the PR into `staging`. Only the release PR goes from `staging` into `main`, with a tag.
+- Commit titles use Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:`. GitHub's merge-commit titles are exempt.
+- Busy files (database schema, `package.json`, route index): before asking for review, check for another open PR on the same file and update your branch from `staging`.
 - Never push to `main` or `staging`. Never force push. Push only your own branch.
 - Never merge or approve your own PR. The teammate reviews it, and the review must state a specific check, question, finding or reason ("LGTM" does not count).
 - Fill in every part of the PR template: Issue link, feature/AC IDs, what changed, tests run with output, reviewer check.
@@ -15,8 +17,13 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - No Issue, no work: if the task has no Issue, ask the human to create one.
 
 ## Decisions
-- Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record the answer in `docs/decisions.md`.
+- Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record each decision as its own file in `docs/adr/` (`NNN-short-name.md`).
 - Do not run ahead: finish the current step, open the PR, and stop for review.
+
+## Releases
+- After each release PR from `staging` into `main`, tag `main` `vS.N` (Sprint 1 = `v1.0`).
+- A fix goes `fix/*` -> `staging` -> a new release, never straight to `main`.
+- Never move the submitted tag.
 
 ## AI use
 - Record AI use in `docs/ai-use.md`: what the AI did, what the human checked or changed.
@@ -26,7 +33,7 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - `.claude/settings.local.json` is personal and stays out of git.
 
 ## Where things are
-- Product and design: `docs/` (`srs.md`, `features.md`, `traceability.md`, `system-sds.md`, `decisions.md`, `ai-use.md`, `report.md`, `sprints/`).
+- Product and design: `docs/` (`srs.md`, `features.md`, `traceability.md`, `system-sds.md`, `adr/`, `ai-use.md`, `report.md`, `sprints/`).
 - Issue and PR forms: `.github/`.
 
 ## Agent skills
