@@ -8,9 +8,9 @@ Part B of Deliverable 1 (Issue #5). Each feature groups SRS requirements (`docs/
 |---|---|---|---|---|---|
 | F-01 | Login, logout and session | A seeded user logs in and out. The session is a database row with an HTTP-only cookie, ends after 8 hours, and the user can retrieve who they are. | FR-01, FR-02, FR-03, FR-04, NFR-01, NFR-04 | none | 1 |
 | F-02 | Role layout and endpoint protection | One layout for everyone; menu items follow the role. Every protected endpoint is checked on the backend: 401 without a session, 403 for the wrong role. | FR-22, NFR-02 | F-01 | 1 |
-| F-03 | Template creation and Manager list | A Manager creates a template (name, unit, minimum, maximum) and sees the template table. | FR-05, FR-06, BR-03 (minimum below maximum) | F-01, F-02 | 1 |
+| F-03 | Template creation and Manager list | A Manager creates a template (name, unit, minimum, maximum) and sees the template table with New and Edit actions (no Retire control in Sprint 1). | FR-05, FR-06, BR-03 (minimum below maximum) | F-01, F-02 | 1 |
 | F-04 | Template edit | A Manager edits a template only while no goal uses it. | FR-07, BR-08 (edit part) | F-03, F-07 | 1 |
-| F-05 | Template retire | A Manager retires a template. It leaves the new-goal list; existing goals continue. | FR-08, BR-08 (retire part) | F-03, F-07 | 2 |
+| F-05 | Template retire | A Manager retires a template; the Retire control appears in the table with this feature. It leaves the new-goal list; existing goals continue. | FR-08, BR-08 (retire part) | F-03, F-07 | 2 |
 | F-06 | Participant template view and write refusal | A Participant sees active templates read-only. A Participant's create, edit or retire request is refused with 403. | FR-09, FR-23, BR-09 | F-01, F-02, F-03 | 1 |
 | F-07 | Goal creation | A Participant creates a goal on a template with a daily target and start and end dates. One active goal per template; the state (Active or Ended) is derived from dates. | FR-10, BR-05, BR-06 | F-03, F-06 | 1 |
 | F-08 | Daily entry recording | A Participant records a day's value. Date, value-range and one-entry-per-day rules are enforced on the backend with clear messages. | FR-11, BR-01, BR-02, BR-03, BR-04, BR-06 | F-07 | 1 |
@@ -53,7 +53,7 @@ Nothing below is decided. Each needs an answer from the students (or the TA).
 - **O-1 Feature grouping.** The SRS fixes requirements and sprints, not features. The grouping in F-01 to F-17 is a proposal to confirm or change; for example whether F-03 and F-04 are one feature, and whether F-11 and F-12 are one.
 - **O-2 Feature ID scheme.** `F-nn` is used here. Confirm, or name another scheme (it would also fix the branch and Issue naming per feature).
 - **O-3 Test ID scheme and AC.** Test IDs `TC-nn` in `docs/traceability.md` are provisional names only. The Part E test specification should set final IDs and the AC they cover.
-- **O-4 SRS: Retire in Sprint 1 screen.** FR-06 (Sprint 1) says the Manager's table has a Retire action, but FR-08 builds retire in Sprint 2. Does Sprint 1 show a disabled or absent Retire control? The SRS does not say. Not fixed here.
+- **O-4 Retire control in Sprint 1. Resolved (owner, 2026-11-07): hide.** In Sprint 1 the Manager template table shows no Retire control; it appears with FR-08 in Sprint 2. FR-06 in `docs/srs.md` was corrected to match (one wording change).
 - **O-5 SRS: FR-23 and retire.** FR-23 is Sprint 1 and covers create, edit and retire, but retire does not exist until Sprint 2. In Sprint 1 only create and edit refusals can be tested; the retire refusal is tested in Sprint 2 (TC-19).
 - **O-6 Feature F-04 depends on F-07.** "Refused once a goal uses it" needs a goal to exist, so the F-04 test needs F-07 built in the same sprint. Sprint 1 order is a Part D matter, not decided here.
 - **O-7 Sprint 1 completion of BR-04.** A-11 (SRS) already lists the Sprint 1 limit on correcting a same-day entry. The feature F-08 inherits it; no change here.

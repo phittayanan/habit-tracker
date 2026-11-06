@@ -88,7 +88,7 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-03 | A logged-in user can retrieve who they are (name and role). A request with no valid session to a protected path is refused with 401. | ADR 0027; GWS §5.2 | 1 |
 | FR-04 | A session ends 8 hours after login. After that, protected requests are refused with 401. | ADR 0028 | 1 |
 | FR-05 | A Manager creates a template with a name, a free-text unit, and a minimum and maximum per entry. A minimum not below the maximum is rejected. | ADR 0007, ADR 0043 | 1 |
-| FR-06 | A Manager sees a table of templates (name, unit, min-max, active or retired) with New, Edit and Retire actions. | ADR 0043 | 1 (see A-2) |
+| FR-06 | A Manager sees a table of templates (name, unit, min-max, active or retired) with New and Edit actions. The Retire action appears with FR-08 in Sprint 2 and is hidden in Sprint 1. | ADR 0043 | 1 (see A-2) |
 | FR-07 | A Manager edits a template's name, unit or range while no goal uses it, and is refused once a goal uses it. | ADR 0017 | 1 (see A-2) |
 | FR-08 | A Manager retires a template. It no longer appears for new goals; goals already using it keep working. | ADR 0017 | 2 (see A-2) |
 | FR-09 | A Participant sees all active templates, read-only. | ADR 0018 | 1 |
