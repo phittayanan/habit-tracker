@@ -1,0 +1,25 @@
+name: PR issue link
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches: [staging]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  pr-issue-link:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Check the PR closes its own Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+        run: bash .github/scripts/check-pr-issue-link.sh
