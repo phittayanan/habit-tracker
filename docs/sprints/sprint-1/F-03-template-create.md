@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | F-01, F-02 |
 | Needed by | F-04, F-06, F-07 (a goal needs a template), F-09 (TC-59 journey) |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft |
+| Status | Draft, review round 1 applied |
 
 ## 2. Behaviour and workflow
 
@@ -133,15 +133,15 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-03.1 | Is the unique name compared with or without case ("Sleep" and "sleep") | Open (proposal): exact match after trimming, as the database unique constraint compares; case-insensitive would need a functional index |
-| OP-03.2 | Length limits for `name` and `unit` | Open (proposal): name 1 to 100 characters, unit 1 to 30, after trimming |
-| OP-03.3 | A number with more than 2 decimal places: refuse or round. The scale was decided on PR #29 (OP-07.8); the handling of extra places was not, and F-07 and F-08 do not say it either | Open (proposal): refuse with `400 VALIDATION_ERROR`, never round silently. The same answer should apply to `dailyTarget` and `value` (note for F-07 and F-08 on this PR) |
-| OP-03.4 | Precision of the four decimal columns (SDS S-2 sets "a fixed precision") | Open (proposal): `Decimal(10, 2)`, so values up to 99,999,999.99; a value outside it gets `400 VALIDATION_ERROR` |
-| OP-03.5 | May a minimum be negative | Open (proposal): yes; ADR 0007 sets no lower bound and units are free text |
-| OP-03.6 | Message wording | Open (proposal): the texts in section 4 |
-| OP-03.7 | Order of `GET /api/templates` | Open (proposal): name A to Z (no ADR sets it) |
-| OP-03.8 | Code for a minimum not below the maximum (BR-03). SDS S-16 proposes 400 for BR-03 but no code name | Open (proposal): `400 MIN_NOT_BELOW_MAX` |
-| OP-03.9 | Code for a duplicate name (SDS S-4 fixes 409, not the code) | Open (proposal): `409 TEMPLATE_NAME_EXISTS` |
+| OP-03.1 | Is the unique name compared with or without case ("Sleep" and "sleep") | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): exact match after trimming, as the database unique constraint compares; case-insensitive would need a functional index |
+| OP-03.2 | Length limits for `name` and `unit` | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): name 1 to 100 characters, unit 1 to 30, after trimming |
+| OP-03.3 | A number with more than 2 decimal places: refuse or round. The scale was decided on PR #29 (OP-07.8); the handling of extra places was not, and F-07 and F-08 do not say it either | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): refuse with `400 VALIDATION_ERROR`, never round silently. The same answer should apply to `dailyTarget` and `value` (note for F-07 and F-08 on this PR) |
+| OP-03.4 | Precision of the four decimal columns (SDS S-2 sets "a fixed precision") | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `Decimal(10, 2)`, so values up to 99,999,999.99; a value outside it gets `400 VALIDATION_ERROR` |
+| OP-03.5 | May a minimum be negative | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): yes; ADR 0007 sets no lower bound and units are free text |
+| OP-03.6 | Message wording | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the texts in section 4 |
+| OP-03.7 | Order of `GET /api/templates` | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): name A to Z (no ADR sets it) |
+| OP-03.8 | Code for a minimum not below the maximum (BR-03). SDS S-16 proposes 400 for BR-03 but no code name | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `400 MIN_NOT_BELOW_MAX` |
+| OP-03.9 | Code for a duplicate name (SDS S-4 fixes 409, not the code) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `409 TEMPLATE_NAME_EXISTS` |
 | OP-07.7 | Unknown body fields | Decided on PR #29 (Q3): stripped, the request is accepted |
 | OP-07.8 | Decimal scale | Decided on PR #29 (Q8): 2 decimal places for all four decimal columns; JSON numbers |
 
@@ -150,3 +150,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
+| 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): record partner agreement on existing proposals | pending (partner re-check) |

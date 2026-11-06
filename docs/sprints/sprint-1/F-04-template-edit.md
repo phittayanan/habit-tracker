@@ -8,12 +8,12 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 |---|---|
 | Feature | F-04 Template edit |
 | Sprint | 1 |
-| Requirements | FR-07; BR-08 (edit part) |
+| Requirements | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) |
 | Related | BR-03 (range after the edit), SDS S-4, S-5, S-16; SRS A-2 (edit stays in Sprint 1); features O-6 (needs F-07 to test); NFR-05, NFR-06 |
 | Depends on | F-03 (the template and its form), F-07 (a goal that uses the template) |
-| Needed by | F-06 (the Participant edit refusal, TC-18) |
+| Needed by | no later Sprint 1 feature; owns the Participant edit refusal (TC-18), after F-07 exists |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft |
+| Status | Draft, review round 1 applied |
 
 ## 2. Behaviour and workflow
 
@@ -42,7 +42,7 @@ Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403
 | Order | Case | Result | Error code | Message (OP-04.5) |
 |---|---|---|---|---|
 | 1 | No valid session | 401 | `UNAUTHENTICATED` | F-01 |
-| 2 | Caller is a Participant | 403 | `FORBIDDEN` | F-02 (tested in F-06) |
+| 2 | Caller is a Participant | 403 | `FORBIDDEN` | F-02 (tested here in TC-18) |
 | 3 | `:id` not a positive integer; body has none of `name`, `unit`, `minValue`, `maxValue` (OP-04.2); a field present with a wrong type, empty, too long or with more than 2 decimal places (as F-03 section 4) | 400 | `VALIDATION_ERROR` | names the field |
 | 4 | No template with this id | 404 | `TEMPLATE_NOT_FOUND` | "Template not found." |
 | 5 | A goal uses the template | 409 | `TEMPLATE_IN_USE` | "This template is used by a goal and cannot be edited." |
@@ -105,6 +105,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4.
 | AC-04.4 | An empty body, a field with a wrong type or more than 2 decimal places, and a non-integer id get `400 VALIDATION_ERROR`; an unknown id gets `404 TEMPLATE_NOT_FOUND`; an anonymous edit gets `401 UNAUTHENTICATED`; nothing changes |
 | AC-04.5 | An edit of a used template that also breaks the range rule gets `409 TEMPLATE_IN_USE` |
 | AC-04.6 | In the browser, Edit opens the filled form, a valid change shows in the table, and a refused change shows the API message and keeps the typed values |
+| AC-04.7 | A Participant's `PATCH /api/templates/:id` gets `403 FORBIDDEN`, for an existing and for an unknown id, and the template is unchanged |
 
 ## 10. Test specification
 
@@ -117,6 +118,7 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-71 | AC-04.4 | API | Unused template T; no template with id 99999 | `PATCH` T with `{}`; `{ "minValue": "abc" }`; `{ "maxValue": 10.555 }`; `PATCH /api/templates/abc` with a valid body; `PATCH /api/templates/99999` with a valid body; `PATCH` T with no session | `{}`, "abc", 10.555 and the id "abc" get `400 VALIDATION_ERROR`; 99999 gets `404 TEMPLATE_NOT_FOUND`; anonymous gets `401 UNAUTHENTICATED`; T is unchanged |
 | TC-72 | AC-04.3 | Unit and API | Unused templates "Walk" (0 to 100) and "Swim" (0 to 50) | Unit: the merged range for stored (0, 100) with sent `minValue` 100. API: `PATCH` "Walk" `{ "minValue": 100 }`; `PATCH` "Walk" `{ "name": "Swim" }`; `PATCH` "Walk" `{ "name": "Walk", "unit": "steps" }` | Unit: refused. API: `400 MIN_NOT_BELOW_MAX`; `409 TEMPLATE_NAME_EXISTS`; 200 with unit "steps". "Walk" keeps min 0 and max 100 after the first two |
 | TC-73 | AC-04.6 | Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
+| TC-18 | AC-04.7 | API | A logged in; template "Sleep" (hours, 0 to 24); no template with id 99999 | As A: `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH /api/templates/99999` `{ "unit": "x" }` | Both get `403 FORBIDDEN`; "Sleep" still has max 24 |
 
 ## 11. Definition of done
 
@@ -129,17 +131,18 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-04.1 | Does an Ended goal still "use" a template (ADR 0017, BR-08 say "while no goal uses it") | Open (proposal): yes, any goal row counts, so saved entries never fall outside a changed range (the reason in ADR 0017) |
-| OP-04.2 | Partial edit or full replace; an empty body | Open (proposal): `PATCH` with any non-empty subset of the four fields; `{}` gets `400 VALIDATION_ERROR` |
-| OP-04.3 | Which code wins when an edit breaks several rules | Open (proposal): the order in section 4: `TEMPLATE_NOT_FOUND`, then `TEMPLATE_IN_USE`, then `MIN_NOT_BELOW_MAX`, then `TEMPLATE_NAME_EXISTS`. A used template is refused first because no edit of it can succeed |
-| OP-04.4 | Race between an edit and a new goal on the same template (SDS S-6 puts BR-05 in a transaction but says nothing about this pair) | Open (proposal): both the edit (here) and goal creation (F-07) lock the template row (`SELECT ... FOR UPDATE`) inside their transactions, so a goal cannot be created between the in-use check and the update. F-07 does not say this yet; note on this PR for F-07's author |
-| OP-04.5 | Message wording | Open (proposal): the texts in section 4 |
-| OP-04.6 | Hide or disable Edit on a used template | Open (proposal): keep it shown and let the API refuse; hiding it would need an "in use" field in `GET /api/templates` |
-| OP-04.7 | Code for an unknown template id | Open (proposal): `404 TEMPLATE_NOT_FOUND`. A template is not private (SDS 3.3), so 404 here reveals nothing |
-| OP-04.8 | Editing a Retired template that no goal uses | Not reachable in Sprint 1 (retire is Sprint 2); decided in the F-05 contract |
+| OP-04.1 | Does an Ended goal still "use" a template (ADR 0017, BR-08 say "while no goal uses it") | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): yes, any goal row counts, so saved entries never fall outside a changed range (the reason in ADR 0017) |
+| OP-04.2 | Partial edit or full replace; an empty body | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `PATCH` with any non-empty subset of the four fields; `{}` gets `400 VALIDATION_ERROR` |
+| OP-04.3 | Which code wins when an edit breaks several rules | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the order in section 4: `TEMPLATE_NOT_FOUND`, then `TEMPLATE_IN_USE`, then `MIN_NOT_BELOW_MAX`, then `TEMPLATE_NAME_EXISTS`. A used template is refused first because no edit of it can succeed |
+| OP-04.4 | Race between an edit and a new goal on the same template (SDS S-6 puts BR-05 in a transaction but says nothing about this pair) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): both the edit (here) and goal creation (F-07) lock the template row (`SELECT ... FOR UPDATE`) inside their transactions, so a goal cannot be created between the in-use check and the update. F-07 does not say this yet; note on this PR for F-07's author |
+| OP-04.5 | Message wording | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the texts in section 4 |
+| OP-04.6 | Hide or disable Edit on a used template | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): keep it shown and let the API refuse; hiding it would need an "in use" field in `GET /api/templates` |
+| OP-04.7 | Code for an unknown template id | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `404 TEMPLATE_NOT_FOUND`. A template is not private (SDS 3.3), so 404 here reveals nothing |
+| OP-04.8 | Editing a Retired template that no goal uses | Not reachable in Sprint 1 (retire is Sprint 2); decided in the F-05 contract; scope confirmed in the [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) |
 
 ## 13. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
+| 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): own Participant edit refusal as AC-04.7 / TC-18; remove circular dependency; record partner agreement on existing proposals | pending (partner re-check) |

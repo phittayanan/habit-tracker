@@ -48,7 +48,7 @@ Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No tes
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
 | none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #9 |
-| BR-09 | FR-23 | F-06 | AC-06.3, AC-06.4 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #9 |
+| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #9 |
 
 ## NFR -> Feature -> Verification -> Test
 
@@ -58,8 +58,8 @@ Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No tes
 | NFR-02 | F-02 | API test per endpoint (role matrix, AC-02.2, AC-02.3) | TC-08, TC-66, TC-34 (goal and entry endpoints, AC-10.4) | 1 (rechecked later) |
 | NFR-03 | F-10 | API tests, two Participants and one Manager | TC-33, TC-34, TC-57 | 1 (rechecked in 2 and 3) |
 | NFR-04 | F-01 | API and unit tests: cookie flag, aged session, logged-out session (AC-01.1, AC-01.4, AC-01.7) | TC-06, TC-46, TC-03, TC-63 | 1 |
-| NFR-05 | Sprint 1 screens of F-03, F-04, F-06 to F-09; later screens | Playwright at 375 px and 1280 px | TC-47 | 1; 2 and 3 for later screens |
-| NFR-06 | Same screens; F-12 markup | Playwright keyboard run; markup review | TC-48, TC-49 | 1; 2 and 3 for later screens |
+| NFR-05 | Sprint 1 screens of F-01 (login), F-03, F-04, F-06 to F-09; later screens | Playwright at 375 px and 1280 px | TC-47 | 1; 2 and 3 for later screens |
+| NFR-06 | Same screens, including F-01 (login); F-12 markup | Playwright keyboard run; markup review | TC-48, TC-49 | 1; 2 and 3 for later screens |
 | NFR-07 | System: setup commands and docs | Timed clean-clone run | TC-50 | 1 documented; timed in Lab 5 |
 | NFR-08 | F-07, F-08, F-09 (rule code) | Coverage report | TC-51 | 1; 3 |
 | NFR-09 | System: CI | CI run on a PR | TC-52 | 1 locally; CI from Lab 5 |
@@ -77,7 +77,7 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 | TC-05 | Protected path with no valid session returns 401 | API |
 | TC-06 | Session older than 8 hours returns 401 | API |
 | TC-07 | Menu items change with role; layout is the same | Browser |
-| TC-08 | Role matrix: each protected endpoint returns 401 without a session and 403 for the wrong role | API |
+| TC-08 | Role matrix grows with each implemented endpoint: 401 without a session and 403 for the wrong role | API |
 | TC-09 | Manager creates a template | API |
 | TC-10 | Minimum not below maximum is rejected | Unit and API |
 | TC-11 | Manager table shows name, unit, range, state, with actions | Browser |
@@ -87,7 +87,7 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 | TC-15 | New goal on a retired template refused; existing goal still takes entries | API |
 | TC-16 | Participant sees active templates read-only | API and browser |
 | TC-17 | Participant create-template request returns 403, nothing changes | API |
-| TC-18 | Participant edit-template request returns 403, nothing changes | API |
+| TC-18 | F-04 (AC-04.7): Participant edit-template request returns 403, nothing changes | API |
 | TC-19 | Participant retire-template request returns 403, nothing changes | API |
 | TC-20 | Participant creates a goal | API |
 | TC-21 | Second active goal on the same template rejected | API |
@@ -133,9 +133,9 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 | TC-61 | Entry form shows the API message for a rejected value and keeps the typed value | Browser |
 | TC-62 | Login input validation: non-JSON body, missing, empty or non-string username or password; no cookie, no session | API |
 | TC-63 | Session expiry with the instant passed in: valid at login plus 7:59:59, expired at plus 8:00:00 | Unit |
-| TC-64 | Origin check: login and logout with a foreign `Origin` refused with 403 and change nothing; same-origin and no-Origin login accepted | API |
+| TC-64 | Origin check: login and logout with a foreign `Origin` refused with 403 and change nothing; matching-host and no-Origin login accepted, including HTTP upstream with `X-Forwarded-Proto: https` | API |
 | TC-65 | Login screen: wrong password message, username kept; login opens the role's first page; logout shows the login screen | Browser |
-| TC-66 | Check order and identity: anonymous gets 401 before 403; a Participant's invalid or unknown-id template write gets 403; a role in the body or a header changes nothing | API |
+| TC-66 | Check order and identity: anonymous gets 401 before 403; a Participant's invalid or unknown-id request to a test-only Manager route gets 403; a role in the body or a header changes nothing | API |
 | TC-67 | No session shows the login screen; a 401 during use returns to the login screen | Browser |
 | TC-68 | Template input validation (name, unit, numbers, 2 decimal places) and anonymous create and list refused; nothing stored | API |
 | TC-69 | Duplicate template name returns 409; a range error wins over a duplicate name; two creates at once store one | API |

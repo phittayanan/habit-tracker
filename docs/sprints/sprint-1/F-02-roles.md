@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | F-01 (the session user and role) |
 | Needed by | F-03, F-04, F-06, F-07, F-08, F-09, F-10 (every protected endpoint uses these checks) |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft |
+| Status | Draft, review round 1 applied |
 
 ## 2. Behaviour and workflow
 
@@ -96,20 +96,20 @@ with status 403.
 |---|---|
 | AC-02.1 | A Manager and a Participant see the same top bar (display name, "Log out"); the Manager's menu shows "Templates" only, the Participant's "Goals" and "Templates" |
 | AC-02.2 | Each protected endpoint in section 5 gets `401 UNAUTHENTICATED` with no session, and each role-restricted endpoint gets `403 FORBIDDEN` for the wrong role, with nothing stored or returned |
-| AC-02.3 | An anonymous request to a Manager-only route gets `401 UNAUTHENTICATED`, not 403; a Participant's `POST /api/templates` with an invalid body and `PATCH /api/templates/99999` each get `403 FORBIDDEN`, not 400 or 404 |
-| AC-02.4 | A Participant who sends `"role": "MANAGER"` in the body or an `X-Role: MANAGER` header to `POST /api/templates` still gets `403 FORBIDDEN`, and nothing is stored |
+| AC-02.3 | On a Manager-only route, an anonymous request gets `401 UNAUTHENTICATED`; a Participant gets `403 FORBIDDEN` even with an invalid body or an unknown id, before validation or existence checks |
+| AC-02.4 | A Participant who sends `"role": "MANAGER"` in the body or an `X-Role: MANAGER` header to a Manager-only route still gets `403 FORBIDDEN`; its handler never runs and nothing is stored |
 | AC-02.5 | In the browser, with no session any page shows the login screen; when the session ends during use, the next API call returns the user to the login screen |
 
 ## 10. Test specification
 
-Fixtures: one Manager and Participants A and B created by each test with test-only passwords; a template T and a goal of A on T where an endpoint needs one (created through the API; dates relative to `D`, today in Asia/Bangkok, as decided on PR #29, OP-07.9).
+Fixtures: one Manager and Participants A and B created by each test with test-only passwords. At the F-02 build step, register `POST /api/test/manager/:id` only in the test app with the real session and Manager-role middleware, followed by a body validator, an existence check and a handler spy. Register a test-only page `/test/protected` using the real layout and API client; it calls `GET /api/auth/me`. Neither test route is shipped. Before feature pages exist, TC-07 checks the role layout mounted on this test page; it does not load template or goal data. Later TC-08 adds feature fixtures through their APIs as each route is built; goal dates are relative to the Bangkok today (PR #29, OP-07.9).
 
 | Test | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
 | TC-07 | AC-02.1 | Browser | App on the test database; Manager and A exist | Log in as the Manager and read the top bar; log out; log in as A and read it | Both bars show the display name and "Log out"; the Manager's menu is exactly "Templates", A's is exactly "Goals", "Templates" |
-| TC-08 | AC-02.2 | API | T; A's goal G on T | Table-driven over every row of section 5: call each protected endpoint with no cookie, then as the wrong role, with a valid body | Every no-session call gets `401 UNAUTHENTICATED`; every wrong-role call gets `403 FORBIDDEN`; row counts of Template, Goal and Entry unchanged |
-| TC-66 | AC-02.3, AC-02.4 | API | T exists | Anonymous `POST /api/templates`; as A: `POST /api/templates` with `{}`; `PATCH /api/templates/99999`; `POST /api/templates` with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; no template is added or changed |
-| TC-67 | AC-02.5 | Browser | App on the test database; A exists | Open `/goals` with no session; log in as A; delete A's session row in the test database; reload `/goals` | The first visit shows the login screen; after the reload `GET /api/goals` answers `401 UNAUTHENTICATED` and the login screen is shown |
+| TC-08 | AC-02.2 | API | F-02: auth routes and the test-only Manager route; later: fixtures required by each implemented feature route | Table-driven over the implemented protected routes in section 5 plus the test-only route: call each with no cookie, then as the wrong role where restricted, with a valid body | Every no-session call gets `401 UNAUTHENTICATED`; every wrong-role call gets `403 FORBIDDEN`; no protected handler runs and no data changes. Start with F-01 routes and the test-only route; each feature PR adds its routes until every protected row in section 5 is covered |
+| TC-66 | AC-02.3, AC-02.4 | API | Test-only Manager route registered as above; id 1 exists, 99999 does not; validator, existence check and handler are spies | Anonymous `POST /api/test/manager/1`; as A: POST id 1 with `{}`; POST id 99999; POST id 1 with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; validator, existence check and handler never run; no data changes |
+| TC-67 | AC-02.5 | Browser | App on the test database; A exists; test-only protected page registered as above | Open `/test/protected` with no session; log in as A and open that page; delete A's session row in the test database; reload the page | The first visit shows the login screen; after the reload `GET /api/auth/me` answers `401 UNAUTHENTICATED` and the login screen is shown |
 
 ## 11. Definition of done
 
@@ -122,11 +122,11 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-02.1 | Menu item names and each role's first page in Sprint 1. ADR 0043 sets the Manager's first screen (the template list); ADR 0037 puts the calendar first for a Participant, but the calendar is Sprint 2 (SRS A-3) | Open (proposal): Manager "Templates", first page the template list; Participant "Goals" and "Templates", first page the goals page until the calendar arrives |
-| OP-02.2 | What a Participant sees on a Manager-only page address | Open (proposal): the sentence "This page is not available for your role." with the top bar; no redirect |
-| OP-02.3 | Page addresses | Open (proposal): `/login`, `/templates`, `/templates/new`, `/templates/:id/edit`, `/goals` |
-| OP-02.4 | Message wording for 401 and 403 | Open (proposal): the texts in section 4 |
-| OP-02.5 | An unknown `/api` path | Open (proposal): `404 NOT_FOUND` with the standard error body, with or without a session |
+| OP-02.1 | Menu item names and each role's first page in Sprint 1. ADR 0043 sets the Manager's first screen (the template list); ADR 0037 puts the calendar first for a Participant, but the calendar is Sprint 2 (SRS A-3) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): Manager "Templates", first page the template list; Participant "Goals" and "Templates", first page the goals page until the calendar arrives |
+| OP-02.2 | What a Participant sees on a Manager-only page address | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the sentence "This page is not available for your role." with the top bar; no redirect |
+| OP-02.3 | Page addresses | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `/login`, `/templates`, `/templates/new`, `/templates/:id/edit`, `/goals` |
+| OP-02.4 | Message wording for 401 and 403 | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the texts in section 4 |
+| OP-02.5 | An unknown `/api` path | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `404 NOT_FOUND` with the standard error body, with or without a session |
 | OP-10.1 | F-10 repeats the 401 and 403 checks for goal and entry endpoints in TC-34 | Open on PR #29 (proposal there: yes). TC-08 here covers every endpoint either way |
 
 ## 13. Revision history
@@ -134,3 +134,4 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
+| 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): test-only protected route and page for TC-66/67; TC-08 grows with implemented endpoints; record partner agreement on existing proposals | pending (partner re-check) |

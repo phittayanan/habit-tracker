@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | none |
 | Needed by | every other feature (F-02 to F-10 read the session user) |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft |
+| Status | Draft, review round 1 applied |
 
 ## 2. Behaviour and workflow
 
@@ -36,7 +36,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Cookie | HTTP-only, `SameSite=Lax`, path `/`, `Secure` in production, and it holds only the session ID | SRS NFR-04; SDS 6.3, S-10 |
 | Session ID | Random, at least 128 bits, not guessable | SDS 3.2 |
 | Passwords | Stored only as bcrypt hashes (`bcryptjs`). No plaintext password in code, Git, logs, screens or any response | SRS NFR-01; ADR 0029; SDS 6.1 |
-| Cross-site | A state-changing request whose `Origin` is not the app's own origin is refused (OP-01.2). Bodies are JSON only | SDS 6.8, S-12 |
+| Cross-site | A state-changing request whose parsed `Origin` host differs from the `Host` header (OP-01.2) is refused (OP-01.2). Bodies are JSON only | SDS 6.8, S-12 |
 
 ## 4. Validation and failure cases
 
@@ -44,7 +44,7 @@ Login is the only Sprint 1 endpoint that needs no session. On every state-changi
 
 | Order | Case | Result | Error code | Message (OP-01.9) |
 |---|---|---|---|---|
-| 1 | State-changing request with an `Origin` header that is not the app's own origin | 403 | `ORIGIN_NOT_ALLOWED` | "This request is not allowed from another site." |
+| 1 | State-changing request with a malformed `Origin` or a parsed Origin host that differs from the `Host` header (OP-01.2) | 403 | `ORIGIN_NOT_ALLOWED` | "This request is not allowed from another site." |
 | 2 | Protected request with no cookie, an unknown session ID, a deleted session, or a session at or past `expires_at` | 401 | `UNAUTHENTICATED` | "Please log in." |
 | 3 | Login body not JSON; `username` or `password` missing, not a string, or empty after trimming the username | 400 | `VALIDATION_ERROR` | "Enter your username and password." |
 | 4 | Login with an unknown username, or a known username and a wrong password | 401 | `INVALID_CREDENTIALS` | "Username or password is incorrect." (the same for both) |
@@ -131,11 +131,11 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | TC-02 | AC-01.2 | API | A exists; no user named `nobody` | Log in as `nobody` with any password; log in as A with a wrong password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; Session table still empty |
 | TC-03 | AC-01.4 | API | A logged in; cookie saved | `POST /api/auth/logout`; replay the saved cookie on `GET /api/auth/me`; call logout again with no cookie | 204 and a clearing `Set-Cookie`; A's session row is gone; the replay gets `401 UNAUTHENTICATED`; the cookieless logout gets `401 UNAUTHENTICATED` |
 | TC-04 | AC-01.5 | API | Manager and A logged in | `GET /api/auth/me` as each | 200 with `displayName` and role `MANAGER`, then `PARTICIPANT`; no `password`, `passwordHash` or session ID in either body (also checked on the login body) |
-| TC-05 | AC-01.6 | API | A logged in, then A's session row deleted in the test database | `GET /api/auth/me` and `GET /api/goals` with no cookie, with `sid=abc`, and with A's deleted session ID | Each gets `401 UNAUTHENTICATED` |
+| TC-05 | AC-01.6 | API | A logged in, then A's session row deleted in the test database | `GET /api/auth/me` with no cookie, with `sid=abc`, and with A's deleted session ID | Each gets `401 UNAUTHENTICATED` |
 | TC-06 | AC-01.7 | API | A logged in; A makes one request and the test reads `expires_at` | Move A's session `created_at` and `expires_at` back by 8 hours in the test database; `GET /api/auth/me` | `expires_at` did not change after the first request; the aged session gets `401 UNAUTHENTICATED`; the row is deleted |
 | TC-62 | AC-01.3 | API | A exists | Log in with: a form-encoded body; `{}`; no `password`; `"password": 123`; `"password": ""`; `"username": "   "` | Each gets `400 VALIDATION_ERROR`; no `Set-Cookie`; no Session row |
 | TC-63 | AC-01.7 | Unit | Session created at 2026-11-10T01:00:00Z; the instant is passed as an argument | Check the session at 08:59:59Z and at 09:00:00Z | Valid at 08:59:59Z; expired at 09:00:00Z |
-| TC-64 | AC-01.9 | API | A exists; A logged in on a second client | Log in as A with `Origin: https://evil.example`; log out the second client with the same `Origin`; then log in with the app's own `Origin`, and with no `Origin` | The two foreign requests get `403 ORIGIN_NOT_ALLOWED`; no session is added and the second client's session still gets 200 on `me`; the same-origin and no-Origin logins get 200 |
+| TC-64 | AC-01.9 | API | A exists; A logged in on a second client; request `Host: app.example` | Log in as A with `Origin: https://evil.example`; log out the second client with the same Origin; log in with `Origin: https://app.example`; log in with no Origin. On an HTTP connection to Express repeat the matching-host login with `Origin: https://app.example` and `X-Forwarded-Proto: https`, then repeat with the foreign Origin and that forwarded header | Foreign requests get `403 ORIGIN_NOT_ALLOWED`; they add no session and the second client still gets 200 on `me`. Matching-host and no-Origin logins get 200, including the HTTP upstream / HTTPS forwarded case; the forwarded header does not allow the foreign Origin |
 | TC-44 | AC-01.8 | API | Seed run with test passwords | Read every `password_hash` in the user table | Each matches the bcrypt format and verifies with `bcryptjs` against its test password; none equals the plaintext |
 | TC-45 | AC-01.8 | Script | Seed password values from the environment | Search the Git-tracked files for each value | No match |
 | TC-46 | AC-01.1 | API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
@@ -154,17 +154,18 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-01.1 | Code for a failed login. SDS 6.2 fixes 401 and one message for both cases, not the code | Open (proposal): `401 INVALID_CREDENTIALS`, kept apart from `UNAUTHENTICATED` so the UI can tell "wrong password" from "session ended" |
-| OP-01.2 | The exact Origin check (SDS 6.8 leaves it to this contract) | Open (proposal): on `POST`, `PATCH`, `PUT` and `DELETE`, refuse with `403 ORIGIN_NOT_ALLOWED` when an `Origin` header is present and differs from the request's own scheme and host; a request with no `Origin` passes (a browser sends `Origin` on cross-site requests, and `SameSite=Lax` keeps the cookie off cross-site posts). Runs before the session check. No new environment variable |
-| OP-01.3 | A non-JSON body | Open (proposal): `400 VALIDATION_ERROR`, so every Sprint 1 error stays inside the SDS 4.3 status list (no 415) |
-| OP-01.4 | Logging in while already logged in | Open (proposal): a new session is created and the cookie replaced; the session named by an incoming cookie, if any, is deleted |
-| OP-01.5 | Session ID format and cookie name | Open (proposal): 32 random bytes from Node `crypto`, base64url; cookie name `sid`; `Max-Age=28800` (SDS 6.3 allows no more than 8 hours) |
-| OP-01.6 | Expiry boundary: is a session at exactly `expires_at` still valid | Open (proposal): no; valid only while now is before `expires_at` (TC-63) |
-| OP-01.7 | Seeded account names (SRS A-9) | Open (proposal): `manager1`, `participant1`, `participant2`, with display names "Manager One", "Participant One", "Participant Two". Passwords are shared privately (SDS 7.2) |
-| OP-01.8 | Seed when a password variable is missing; second seed run | Open (proposal): stop with an error and create nothing (no default password); a second run upserts by `username` and sets the hash from the current variable |
-| OP-01.9 | Message wording (SDS 4.2 leaves it to each contract) | Open (proposal): the texts in section 4 |
-| OP-01.10 | bcrypt cost factor | Open (proposal): 10 |
-| OP-01.11 | Limiting repeated failed logins. No SRS line or ADR asks for it | Open (proposal): not built in Sprint 1; listed here so the choice is visible |
+| OP-01.1 | Code for a failed login. SDS 6.2 fixes 401 and one message for both cases, not the code | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `401 INVALID_CREDENTIALS`, kept apart from `UNAUTHENTICATED` so the UI can tell "wrong password" from "session ended" |
+| OP-01.2 | The exact Origin check (SDS 6.8 leaves it to this contract) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1), host-only option: on `POST`, `PATCH`, `PUT` and `DELETE`, parse a present `Origin` as a URL and compare its host (including any port) against the `Host` header. A malformed or non-matching Origin gets `403 ORIGIN_NOT_ALLOWED`; no Origin passes. Runs before the session check. Compare hosts without the scheme because Cloud Run terminates HTTPS before Express, which may see HTTP; `X-Forwarded-Proto` does not change this comparison. No new environment variable |
+| OP-01.3 | A non-JSON body | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `400 VALIDATION_ERROR`, so every Sprint 1 error stays inside the SDS 4.3 status list (no 415) |
+| OP-01.4 | Logging in while already logged in | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): a new session is created and the cookie replaced; the session named by an incoming cookie, if any, is deleted |
+| OP-01.5 | Session ID format and cookie name | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): 32 random bytes from Node `crypto`, base64url; cookie name `sid`; `Max-Age=28800` (SDS 6.3 allows no more than 8 hours) |
+| OP-01.6 | Expiry boundary: is a session at exactly `expires_at` still valid | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): no; valid only while now is before `expires_at` (TC-63) |
+| OP-01.7 | Seeded account names (SRS A-9) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `manager1`, `participant1`, `participant2`, with display names "Manager One", "Participant One", "Participant Two". Passwords are shared privately (SDS 7.2) |
+| OP-01.8 | Seed when a password variable is missing; second seed run | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): stop with an error and create nothing (no default password); a second run upserts by `username` and sets the hash from the current variable |
+| OP-01.9 | Message wording (SDS 4.2 leaves it to each contract) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the texts in section 4 |
+| OP-01.10 | bcrypt cost factor | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): 10 |
+| OP-01.11 | Limiting repeated failed logins. No SRS line or ADR asks for it | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): not built in Sprint 1; listed here so the choice is visible |
+| OP-01.12 | Unknown username can return faster than a wrong password | Open (proposal from the corrected round-1 review): compare the supplied password against a precomputed dummy bcrypt hash with the same cost when the username is unknown, then return the same `401 INVALID_CREDENTIALS` body and no session. This adds comparable bcrypt work without promising identical response times; pending agreement |
 | OP-07.7 | Unknown body fields | Decided on PR #29 (Q3): stripped, the request is accepted. Applies to every Sprint 1 contract |
 | OP-07.9 | How tests fix "today" and the clock | Decided on PR #29 (Q2): unit tests pass the instant as an argument; tests through the server need no clock hook |
 
@@ -173,3 +174,4 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
+| 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): TC-05 uses auth only; host-only Origin check and forwarded HTTPS case in TC-64; login timing proposal OP-01.12; record partner agreement on existing proposals | pending (partner re-check) |
