@@ -7,7 +7,7 @@ if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.
 }
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
 const vite = await createServer({ server: { middlewareMode: true }, appType: 'spa' });
-const app = createApp({ db });
+const app = createApp({ db, serveClient: false });
 // Test-only HTML entry imports the real app and enables only the contract test page.
 app.get('/test/protected', async (req, res, next) => {
   try {
