@@ -16,7 +16,7 @@ Part B of Deliverable 1 (Issue #5). Each feature groups SRS requirements (`docs/
 | F-08 | Daily entry recording | A Participant records a day's value. Date, value-range and one-entry-per-day rules are enforced on the backend with clear messages. | FR-11, BR-01, BR-02, BR-03, BR-04, BR-06 | F-07 | 1 |
 | F-09 | Progress (days met) | A Participant sees days met out of days so far for a goal. | FR-12, BR-07 | F-08 | 1 |
 | F-10 | Participant data privacy | A Participant sees only their own goals, entries and progress. Another Participant and any Manager are refused. | FR-13, FR-14, BR-10, NFR-03 | F-01, F-07, F-08 | 1 |
-| F-11 | Month calendar and side panel | After login a Participant sees this month's calendar, and a side panel for the chosen day with each goal's number box and streak. | FR-15 | F-08, F-09 | 2 |
+| F-11 | Month calendar and side panel | After login a Participant sees this month's calendar, and a side panel for the chosen day with each goal's number box (no streak until Sprint 3, F-16; decided on PR #23). | FR-15 | F-08, F-09 | 2 |
 | F-12 | Calendar day colours | Each calendar day is green, yellow, red or grey. | FR-16, BR-15 | F-11 | 2 |
 | F-13 | Entry edit and delete | A Participant edits or deletes an entry on any day inside the goal period; progress is recomputed. | FR-17, BR-11 | F-08, F-09 | 2 |
 | F-14 | Goal change | A Participant changes a goal's target from today on; earlier days keep the old target. | FR-18, BR-12 | F-07, F-09 | 2 |
@@ -57,4 +57,4 @@ Nothing below is decided. Each needs an answer from the students (or the TA).
 - **O-5 SRS: FR-23 and retire.** FR-23 is Sprint 1 and covers create, edit and retire, but retire does not exist until Sprint 2. In Sprint 1 only create and edit refusals can be tested; the retire refusal is tested in Sprint 2 (TC-19).
 - **O-6 Feature F-04 depends on F-07.** "Refused once a goal uses it" needs a goal to exist, so the F-04 test needs F-07 built in the same sprint. Sprint 1 order is a Part D matter, not decided here.
 - **O-7 Sprint 1 completion of BR-04.** A-11 (SRS) already lists the Sprint 1 limit on correcting a same-day entry. The feature F-08 inherits it; no change here.
-- **O-8 Open points from the SRS** (A-1 to A-11, T-1 to T-10) still apply to the features they affect: A-1 (days so far) to F-09; A-2 to F-03, F-04, F-05; A-3 to F-11, F-12; A-4 to F-07; A-5 to F-05, F-06; A-10 to F-16.
+- **O-8 Open points from the SRS** (A-1 to A-11, T-1 to T-10) still apply to the features they affect: A-1 (days so far) to F-09; A-2 to F-03, F-04, F-05; A-3 to F-11, F-12; A-4 (decided on PR #23) to F-07; A-5 to F-05, F-06; A-10 to F-16.

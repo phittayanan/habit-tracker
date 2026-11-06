@@ -130,7 +130,7 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 - Test IDs are provisional and no test is written or run, so no result is shown. Nothing is marked done.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
-- Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-4 (FR-10), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.
+- Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.
 
 ## Approved Changes
 
