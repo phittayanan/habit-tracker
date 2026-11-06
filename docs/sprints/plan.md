@@ -47,7 +47,7 @@ The rows run in build order, taken from the Depends-on column. F-04 follows F-07
 - Out of Sprint 1: the Retire control and FR-08 (features O-4, decided by the owner on 2026-11-07), entry edit and delete (FR-17), so a wrong same-day entry cannot be fixed yet (SRS A-11), Docker, CI and GCP (Lab 5, not D1; `docs/assignment.md` 4.2).
 - Out of the project: the exclusions in SRS 1.3 and ADR 0004.
 
-**Tests planned.** TC-01 to TC-13, TC-16 to TC-18, TC-20 to TC-35, TC-44 to TC-48, TC-50 to TC-52 and TC-53 to TC-61 (NFR-07 documented, NFR-09 run locally; TC-53 to TC-61 were added by the F-07 to F-10 contracts, Issue #28). The negative and boundary cases include TC-02, TC-05, TC-06, TC-10, TC-13, TC-17, TC-18, TC-21, TC-24 to TC-30, TC-33 and TC-34. AC are written in each feature's contract (Part E, `docs/sprints/sprint-1/`); until then the AC column of the traceability matrix says "Part E".
+**Tests planned.** TC-01 to TC-13, TC-16 to TC-18, TC-20 to TC-35, TC-44 to TC-48, TC-50 to TC-52, TC-53 to TC-61 and TC-62 to TC-73 (NFR-07 documented, NFR-09 run locally; TC-53 to TC-61 were added by the F-07 to F-10 contracts, Issue #28, and TC-62 to TC-73 by the F-01 to F-04 and F-06 contracts, Issue #30). The negative and boundary cases include TC-02, TC-05, TC-06, TC-10, TC-13, TC-17, TC-18, TC-21, TC-24 to TC-30, TC-33 and TC-34. AC are written in each feature's contract (Part E, `docs/sprints/sprint-1/`), and the AC column of the traceability matrix lists them.
 
 **Completion outcome.** The increment the handout requires is on `main` with documented local setup (`docs/assignment.md` 4.2):
 - a full journey through the UI, the API and the database: a Manager creates a template, a Participant sets a goal, records an entry and reads the saved progress;
