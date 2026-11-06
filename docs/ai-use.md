@@ -24,3 +24,4 @@
 | 2026-11-07 | #3 | Wrote `docs/design-questions.md` and `.claude/skills/design-interview/SKILL.md` | Pending review: reviewer checks that no option is worded as a recommendation and that no section 10 question was dropped |
 | 2026-11-07 | #19 | Wrote ADRs 0002 to 0049 from the agreed design answers | Pending review: reviewer compares each ADR's decision and provenance line with the answers on Issue #3 |
 | 2026-11-07 | #4 | Wrote `docs/srs.md` and the BR to FR table | Pending review: reviewer compares each requirement with its cited ADR and confirms or changes the open points and NFR targets |
+| 2026-11-07 | #4 | Review round 1: set NFR-07 and NFR-08 numbers, moved FR-08, FR-15 and FR-16 to Sprint 2, stated the BR-04 Sprint 1 limit, added FR-23 (403 for Participant template writes) | Pending review: partner re-checks the four points against the owner's answers |
