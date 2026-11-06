@@ -1,0 +1,25 @@
+{
+  "name": "habit-tracker-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "dev": "node --env-file-if-exists=.env src/index.js",
+    "build": "node scripts/build.js",
+    "test": "node --env-file-if-exists=.env --test --test-concurrency=1 test/*.test.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "node --env-file-if-exists=.env prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.3.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3",
+    "supertest": "^7.3.1"
+  }
+}
