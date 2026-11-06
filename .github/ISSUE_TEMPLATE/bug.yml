@@ -1,0 +1,28 @@
+name: Bug
+description: Something does not work as specified
+title: "[Bug] "
+labels: []
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Files this Issue will change
+      description: Expected files. Flag busy ones (database schema, package.json, route index) so we can check for clashing PRs.
