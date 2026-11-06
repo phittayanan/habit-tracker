@@ -28,7 +28,9 @@ npm run build
 Copied server source to dist; exit 0.
 ```
 
-The tested implementation was uncommitted at this run; its committed revision will be recorded after the backend checkpoint commit is verified. The connection URL is intentionally omitted here; local usernames and passwords are deployment configuration.
+Tested backend commit: `88ce7eb` (`feat: implement database auth and shared role protection`). The full suite was rerun on that committed revision: 15 passed, 0 failed, 0 skipped. The connection URL is intentionally omitted here; local usernames and passwords are deployment configuration.
+
+The built server was also started with `PORT=33132 DATABASE_URL=<disposable-test-database-url> npm start`. Assertions against that process returned `/api/health` 200, `/api/ready` 200, `/api/auth/me` 401, and `/api/test/manager/1` 404. The process was stopped after verification. These are backend HTTP assertions, not browser checks.
 
 | Acceptance criteria | Implemented tests | Status at backend checkpoint |
 |---|---|---|
