@@ -22,14 +22,14 @@
 
 ## FR -> Feature -> Acceptance Criteria -> Test
 
-Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No test code exists yet. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 build Issue; no PR exists yet. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 are new planned tests added by the first four contracts, and TC-62 to TC-73 by the other five.
+Test IDs (`TC-nn`) map to the list below. Auth backend tests now exist under `server/test/` for implementation Issue #32; browser tests and other features remain planned. See [Auth implementation evidence](auth-implementation-evidence.md) for commands, results and remaining gaps. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 parent build Issue; no Auth implementation PR exists yet. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 were added by the first four contracts, and TC-62 to TC-73 by the other five.
 
 | BR | FR | Feature | AC | Test ID | Sprint | Issue / PR |
 |---|---|---|---|---|---|---|
-| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #9 |
-| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #9 |
-| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #9 |
-| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #9 |
+| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #32, #9 |
+| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9 |
+| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9 |
+| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9 |
 | BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #9 |
 | BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #9 |
 | BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #9 |
@@ -47,7 +47,7 @@ Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No tes
 | none | FR-19 | F-15 | later | TC-40 | 2 | none yet |
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
-| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #9 |
+| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9 |
 | BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #9 |
 
 ## NFR -> Feature -> Verification -> Test
@@ -66,7 +66,7 @@ Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No tes
 
 ## Planned tests
 
-Names only, from the "Tested by" and "Verification" columns of the SRS.
+Names from the "Tested by" and "Verification" columns of the SRS. Auth backend implementation and results are linked above; other tests are still planned.
 
 | Test ID | Planned test | Level |
 |---|---|---|
@@ -148,7 +148,7 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
 - AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). Sprint 2 and 3 rows have none by design.
-- Test IDs are provisional and no test is written or run, so no result is shown. Nothing is marked done.
+- Auth backend tests have been written and run for Issue #32; Auth UI/browser/accessibility checks remain pending. Other features' tests remain planned. No complete feature is marked done.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.

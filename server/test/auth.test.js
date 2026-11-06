@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import bcrypt from 'bcryptjs';
+import express from 'express';
 import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { createApp, protectedRoutes } from '../src/app.js';
@@ -29,7 +30,7 @@ beforeEach(async () => {
   participant = await db.user.findUnique({ where: { username: 'participant1' } });
   calls = [];
   app = createApp({ db, registerTestRoutes(router) {
-    router.post('/api/test/manager/:id', requireSession(db), requireRole('MANAGER'),
+    router.post('/api/test/manager/:id', requireSession(db), requireRole('MANAGER'), express.json(),
       (req, res, next) => { calls.push('validate'); if (!req.body?.name) return res.status(400).end(); next(); },
       (req, res, next) => { calls.push('exists'); if (req.params.id !== '1') return res.status(404).end(); next(); },
       (req, res) => { calls.push('handler'); res.status(204).end(); });
@@ -227,7 +228,7 @@ test('TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomical
   const participantPassword = randomBytes(24).toString('base64url');
   const env = { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL,
     SEED_MANAGER_PASSWORD: managerPassword, SEED_PARTICIPANT_PASSWORD: participantPassword };
-  for (let run = 0; run < 2; run++) execFileSync(process.execPath, ['prisma/seed.js'], { env, stdio: 'pipe' });
+  for (let run = 0; run < 2; run++) execFileSync('npm', ['run', 'prisma:seed'], { env, stdio: 'pipe' });
   assert.equal(await db.user.count(), 3);
   for (const user of await db.user.findMany()) {
     const plain = user.role === 'MANAGER' ? managerPassword : participantPassword;
