@@ -11,6 +11,21 @@ body:
       placeholder: FR-1, BR-1
     validations:
       required: true
+  - type: input
+    id: feature_id
+    attributes:
+      label: Feature ID
+      description: ID from docs/features.md.
+      placeholder: F-1
+    validations:
+      required: true
+  - type: input
+    id: sprint
+    attributes:
+      label: Sprint
+      placeholder: Sprint 1
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
@@ -23,5 +38,13 @@ body:
       label: Acceptance criteria
       description: One testable criterion per line, with an ID.
       placeholder: "- AC-1.1: ..."
+    validations:
+      required: true
+  - type: input
+    id: test_id
+    attributes:
+      label: Test ID
+      description: Test IDs that verify the acceptance criteria (from the sprint test specification).
+      placeholder: T-1.1
     validations:
       required: true

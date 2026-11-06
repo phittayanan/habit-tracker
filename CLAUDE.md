@@ -26,5 +26,5 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - `.claude/settings.local.json` is personal and stays out of git.
 
 ## Where things are
-- Product and design: `docs/` (`srs.md`, `features.md`, `traceability.md`, `system-sds.md`, `decisions.md`, `ai-use.md`, `sprints/`).
+- Product and design: `docs/` (`srs.md`, `features.md`, `traceability.md`, `system-sds.md`, `decisions.md`, `ai-use.md`, `report.md`, `sprints/`).
 - Issue and PR forms: `.github/`.
