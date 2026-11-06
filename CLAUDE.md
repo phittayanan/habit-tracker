@@ -28,3 +28,17 @@ Two students build this CPE 334 group project with Claude Code. The product live
 ## Where things are
 - Product and design: `docs/` (`srs.md`, `features.md`, `traceability.md`, `system-sds.md`, `decisions.md`, `ai-use.md`, `report.md`, `sprints/`).
 - Issue and PR forms: `.github/`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues (`gh` CLI). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
