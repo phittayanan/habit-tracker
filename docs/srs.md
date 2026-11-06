@@ -97,7 +97,7 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-12 | A Participant sees computed progress for a goal: days met out of days so far. | ADR 0013 | 1 |
 | FR-13 | A Participant sees only their own goals, entries and progress. Requests for another Participant's data are refused. | ADR 0019 | 1 |
 | FR-14 | A Manager's request for any Participant's goals or entries is refused. | ADR 0019 | 1 |
-| FR-15 | After login a Participant sees this month's calendar first. On desktop the calendar is on the left and a side panel on the right shows the chosen day (today at start): every goal with a number box and its current streak. | ADR 0037, ADR 0047, ADR 0045 | 2 (see A-3) |
+| FR-15 | After login a Participant sees this month's calendar first. On desktop the calendar is on the left and a side panel on the right shows the chosen day (today at start): every goal with a number box. The streak is not shown here; it comes in Sprint 3 with FR-20 (decided on PR #23). | ADR 0037, ADR 0047, ADR 0045 | 2 (see A-3) |
 | FR-16 | The calendar colours each day green, yellow, red or grey per BR-15. | ADR 0040, ADR 0045, ADR 0046 | 2 (see A-3) |
 | FR-17 | A Participant edits or deletes an entry on any day inside the goal period. | ADR 0009 | 2 |
 | FR-18 | A Participant changes a goal's target from today on. Earlier days keep the old target. | ADR 0011 | 2 |
@@ -157,7 +157,7 @@ No ADR settles these. Each is left open and needs a decision before the requirem
 | A-1 | "Days so far" for progress: assumed to run from the goal's start date to today, or to the end date if the goal has ended. Confirm. | BR-07, FR-12 |
 | A-2 | Which sprint builds template edit and retire. The handout's Sprint 1 example only requires defining a template. Template edit (FR-07) stays in Sprint 1 because the handout's "Participant cannot edit a template" test needs it. Retire (FR-08, and the retire part of BR-08) moves to Sprint 2, as the partner's review listed. | BR-08, FR-06 to FR-08 |
 | A-3 | Which sprint builds the coloured calendar and the side panel. ADR 0037 puts the calendar first for the Participant, but no ADR says which of ADR 0040 to 0049 land in Sprint 1. Sprint 1 is the handout's slice, so Sprint 1 has only a plain page for goals and progress (FR-10 to FR-12). The month calendar and side panel (FR-15) and the colours (FR-16, BR-15) move to Sprint 2, as the partner's review listed. | BR-15, FR-15, FR-16 |
-| A-4 | Whether a goal's daily target must itself lie within the template's range. | FR-10 |
+| A-4 | Decided on PR #23: a goal's daily target is greater than 0 and not above the template's maximum (`max_value`), so every target can be met. | FR-10 |
 | A-5 | Whether Participants can see template names after retirement on their existing goals, and what the Manager's table shows for them. | FR-08, FR-09 |
 | A-6 | Whether native or mobile apps are out of scope. ADR 0038 says the design covers phone and desktop screens, which this SRS reads as a browser app only. | 1.3 |
 | A-7 | Whether email verification is excluded for the whole project. Only self-registration and password recovery are (ADR 0004). | 1.3 |
