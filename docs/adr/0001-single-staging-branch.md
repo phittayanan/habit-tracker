@@ -10,3 +10,6 @@ The team uses one `staging` branch for all sprints. Each sprint ends with a rele
 
 ## Consequences
 `CLAUDE.md` and the branch rules name `staging` directly. If a TA requires one branch per sprint, update this ADR and `CLAUDE.md`.
+
+## Default branch
+`staging` is the repository's default branch, so `Closes #N` in a PR into `staging` links and closes the Issue. `main` holds only tagged releases.
