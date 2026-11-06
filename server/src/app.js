@@ -23,7 +23,7 @@ export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
   if (serveClient && existsSync(clientDir)) {
     app.use(express.static(clientDir));
     app.get(['/login', '/', '/templates', '/templates/new', '/templates/:id/edit', '/goals'], (req, res) => {
-      res.set('Cache-Control', 'no-store').sendFile(`${clientDir}index.html`);
+      res.set('Cache-Control', 'no-store').sendFile('index.html', { root: clientDir });
     });
   }
   app.use((err, req, res, next) => {
