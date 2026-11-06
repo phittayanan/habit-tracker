@@ -22,7 +22,7 @@
 
 ## FR -> Feature -> Acceptance Criteria -> Test
 
-Test IDs (`TC-nn`) map to the list below. Auth backend tests now exist under `server/test/` for implementation Issue #32; browser tests and other features remain planned. See [Auth implementation evidence](auth-implementation-evidence.md) for commands, results and remaining gaps. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 parent build Issue; no Auth implementation PR exists yet. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 were added by the first four contracts, and TC-62 to TC-73 by the other five.
+Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` and `client/test/` for implementation Issue #32; other feature tests remain planned. See [Auth implementation evidence](auth-implementation-evidence.md) for red/green commands, tested commits, AC results and limits. Auth API/unit checks pass 16/16 and Playwright checks pass 12/12 at 375px and 1280px; teammate review remains pending. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 parent build Issue. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 were added by the first four contracts, and TC-62 to TC-73 by the other five.
 
 | BR | FR | Feature | AC | Test ID | Sprint | Issue / PR |
 |---|---|---|---|---|---|---|
@@ -66,7 +66,7 @@ Test IDs (`TC-nn`) map to the list below. Auth backend tests now exist under `se
 
 ## Planned tests
 
-Names from the "Tested by" and "Verification" columns of the SRS. Auth backend implementation and results are linked above; other tests are still planned.
+Names from the "Tested by" and "Verification" columns of the SRS. Auth implementation and API/unit/browser results are linked above; other tests are still planned.
 
 | Test ID | Planned test | Level |
 |---|---|---|
@@ -148,7 +148,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth backend i
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
 - AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). Sprint 2 and 3 rows have none by design.
-- Auth backend tests have been written and run for Issue #32; Auth UI/browser/accessibility checks remain pending. Other features' tests remain planned. No complete feature is marked done.
+- Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Other features' tests remain planned. TC-08 currently covers only Auth endpoints and the contract test route; each later feature must extend its endpoint list. Implementation review and merge remain pending.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.

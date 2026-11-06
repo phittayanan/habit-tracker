@@ -5,7 +5,7 @@
 - Codex, used for Issue #32 implementation.
 
 ## What the AI Did
-- Issue #32: Codex committed Auth API/unit contract tests before implementation, added the User/Session Prisma migration and idempotent seed, implemented shared Origin/session/role checks and auth routes, ran local PostgreSQL checks, and documented backend setup and factual evidence. Auth UI design was handed to firstmate; UI/browser work is pending. No open product proposal was adopted.
+- Issue #32: Codex committed Auth API/unit and Playwright tests before implementation, added the User/Session migration and seed, shared Origin/session/role checks, auth routes and the React/Vite login and role bar. After the owner selected package A through firstmate, Codex recorded ADR 0050 and implemented that approved UI, ran real PostgreSQL and browser checks, captured base/head comparisons, investigated the Prisma audit findings and documented factual evidence. A production-serving failure found after the Vite tests received a separate red regression-test commit and fix. No open product proposal was adopted.
 - Issue #12: read the course handouts and the Lab 5 starter kit, and wrote `docs/assignment.md` (dates, per-handout requirements, limits on design and stack, design questions, open points).
 - Issue #17: wrote the `pr-issue-link` GitHub Actions check (`.github/workflows/pr-issue-link.yml`), its parsing script and a test script.
 - Issue #3: wrote `docs/design-questions.md` (35 decision questions with neutral options, from `docs/assignment.md` sections 10 and 11) and the `/design-interview` skill. The AI answered no question.
@@ -17,7 +17,7 @@
 - Issue #30 (phittayanan's session): drafted the Sprint 1 contracts `docs/sprints/sprint-1/F-01-login.md`, `F-02-roles.md`, `F-03-template-create.md`, `F-04-template-edit.md` and `F-06-template-view.md` from the merged SRS, SDS, features, traceability, ADRs and the F-07 to F-10 contracts, and added AC IDs and twelve new planned tests (TC-62 to TC-73) to `docs/traceability.md` and `docs/sprints/plan.md`. Points the documents do not settle are open points (OP-01.1 onward) with a proposal; the AI decided none of them and applied only the decisions already recorded on PR #29.
 
 ## What We Checked or Changed
-- Issue #32: pending projectnewy review. Automated backend checks are recorded in `docs/auth-implementation-evidence.md`; they are not a human review or a complete Auth acceptance result.
+- Issue #32: owner selected the complete UI package A on 2026-11-07. projectnewy's implementation review is pending. Automated backend/browser checks and their limits are recorded in `docs/auth-implementation-evidence.md`; they are not a human review.
 - Issue #12: pending. The reviewer checks `docs/assignment.md` against the handouts, and both students read it before Issue #3 starts. Record what was checked or changed here.
 - Issue #19: pending. The reviewer checks each ADR against phittayanan's answers on Issue #3. Record what was checked or changed here.
 - Issue #17: pending. The reviewer reads the script and tests, and checks the check on the PR itself.

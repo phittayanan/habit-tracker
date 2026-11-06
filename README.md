@@ -8,11 +8,18 @@ Two students build this project with Claude Code. The team rules (Issues, branch
 
 ## Setup
 
-Auth backend is implemented for Issue #32 using Node.js, Express, Prisma and PostgreSQL 16. The React/Vite auth UI is pending design agreement; this is not yet the complete Sprint 1 application.
+Auth F-01/F-02 is implemented for Issue #32 using React/Vite, Node.js, Express, Prisma and PostgreSQL 16. The approved package A provides login and the shared role bar. Templates and Goals are auth-only destination headings; domain features come in later Issues.
 
 Use Node.js 22.16+ (or a newer supported release) and npm. Local verification so far used Node.js 26.8.1, npm 11.19.0 and PostgreSQL 16.15. Use a local PostgreSQL 16 instance; the SDS specifies the starter kit's Compose service, whose Docker delivery belongs to Lab 5. An already running local PostgreSQL 16 also works for this backend verification.
 
-From `server/`:
+First, from `client/`:
+
+```sh
+npm ci
+npm run build
+```
+
+Then, from `server/`:
 
 ```sh
 npm ci
@@ -30,7 +37,7 @@ npm run build
 npm start
 ```
 
-The API listens on `PORT` (default 3000). `GET /api/health` checks the process; `GET /api/ready` checks PostgreSQL. The seed upserts `manager1`, `participant1`, `participant2`; it requires both seed-password variables, stores only bcrypt hashes, and updates hashes from the current environment on a second run. It creates no templates or other domain data.
+Open `http://localhost:3000/login` (or your configured `PORT`). The API serves the built client and supports direct visits to the contracted page addresses. `GET /api/health` checks the process; `GET /api/ready` checks PostgreSQL. The seed upserts `manager1`, `participant1`, `participant2`; it requires both seed-password variables, stores only bcrypt hashes, and updates hashes from the current environment on a second run. It creates no templates or other domain data.
 
 For API/unit tests, use a **separate disposable database**: each API test deletes its User and Session rows and creates its own Manager and two Participants. Tests generate their passwords at runtime. Migrate that database before running tests (substitute its URL below):
 
@@ -39,6 +46,17 @@ DATABASE_URL='postgresql://YOUR_LOCAL_ROLE@localhost:5432/habit_tracker_test' np
 npm test
 ```
 
-`npm test` uses `TEST_DATABASE_URL` from the environment or `.env` and refuses an absent URL or a URL identical to `DATABASE_URL`. Do not point it at an application database. `npm run dev` starts the source backend. Build output contains only server source, never test fixtures. Client install/build, browser tests and screenshots will be documented after the auth UI is approved and implemented.
+`npm test` uses `TEST_DATABASE_URL` from the environment or `.env` and refuses an absent URL or a URL identical to `DATABASE_URL`. Do not point it at an application database. Build the client before server tests: the production-serving regression test checks actual built HTML. `npm run dev` starts the source backend. Build output contains only server source and client production assets, never test fixtures.
+
+For Playwright, from `client/`, with the same migrated disposable test database:
+
+```sh
+npx playwright install chromium
+TEST_DATABASE_URL='postgresql://YOUR_LOCAL_ROLE@localhost:5432/habit_tracker_test' npm test
+```
+
+The tests use Playwright's downloaded Chromium by default; set `PLAYWRIGHT_CHANNEL=chrome` to use installed Chrome (the locally verified browser). They start their own test server on port 33132, reset the test database between cases, and run at 375px and 1280px. Run server and client suites sequentially because they reset the same database. No plaintext fixture passwords are stored. Test results go to `/tmp/habit-auth-playwright` by default, or `PLAYWRIGHT_OUTPUT_DIR`.
+
+For development, keep `npm run dev` in `server/` on port 3000 and run `npm run dev` in `client/`; Vite proxies `/api` to that backend. Production uses the built client served by Express, without Vite.
 
 Open limitations: failed-login limiting is excluded from Sprint 1 (OP-01.11); unknown-user timing mitigation OP-01.12 remains unapproved and unimplemented; OP-10.1 belongs to later privacy testing. Docker, CI and GCP verification are deferred to Lab 5. See [Auth implementation evidence](docs/auth-implementation-evidence.md) for actual checks and their limits.
