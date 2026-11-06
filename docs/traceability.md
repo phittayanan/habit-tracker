@@ -136,4 +136,4 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 
 | Date | Change | Affected IDs | Approved by |
 |---|---|---|---|
-| none yet | | | |
+| 2026-11-07 | No new Sprint 3 summary feature. Progress (F-09) and the calendar colours (F-12) cover the "summaries" named in ADR 0021 and SRS 1.2. Sprint plan open point O-1 | F-09, F-12, FR-12, FR-16 | phittayanan (answer to the PR #26 review) |
