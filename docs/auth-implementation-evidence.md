@@ -1,8 +1,8 @@
 # Auth implementation evidence — Issue #32
 
-Scope: F-01/F-02 only, implementation Issue #32, Part of #9. The owner selected package A on 2026-11-07 through firstmate, recorded in ADR 0050. This records local implementation evidence; teammate review and merge remain pending.
+Scope: F-01/F-02 only, implementation Issue #32, Part of #9. The owner selected package A on 2026-11-07 through firstmate, recorded in ADR 0050. This records local implementation evidence; teammate re-review and merge remain pending.
 
-Implementation review: [https://github.com/phittayanan/habit-tracker/pull/33](https://github.com/phittayanan/habit-tracker/pull/33), targeting `staging`, reviewer projectnewy.
+Implementation review: [https://github.com/phittayanan/habit-tracker/pull/34](https://github.com/phittayanan/habit-tracker/pull/34), targeting `staging`, reviewer projectnewy.
 
 ## Test-first record
 
@@ -65,7 +65,7 @@ Additional tests cover successful login replacing an incoming session, stripped 
 
 The production server ran with `PORT=33134 DATABASE_URL=<test-url> npm start`; the browser comparison used this built app, not the Vite test app. All role destinations are headings only. Test-only page registration/entry stays in `client/test/`, test route injection stays in tests, and neither is bundled or registered by production startup.
 
-Final tested revision: `2e2c4d2` (includes configurable Playwright channel and setup documentation). On that committed revision the server suite passed 16/16 and `PLAYWRIGHT_CHANNEL=chrome TEST_DATABASE_URL=<test-url> npm test` in `client/` passed 12/12. Subsequent commits add only review links and factual evidence.
+Initial-build tested revision: `2e2c4d2` (includes configurable Playwright channel and setup documentation). On that committed revision the server suite passed 16/16 and `PLAYWRIGHT_CHANNEL=chrome TEST_DATABASE_URL=<test-url> npm test` in `client/` passed 12/12. Subsequent initial-build commits add only review links and factual evidence; the current review round below adds bounded test and code corrections.
 
 ## Before/after comparison
 
@@ -83,10 +83,51 @@ Registry checks found latest Prisma 6 is 6.19.3; its config package pins deepmer
 
 ## Remaining limits and open decisions
 
-- OP-01.12 stays open: no dummy bcrypt comparison; unknown usernames may return faster. OP-01.11 excludes failed-login limiting in Sprint 1.
+- OP-01.12 is implemented in the current review round using a cost-10 dummy bcrypt comparison, authorized by the current review and owner brief (ADR 0051). This is comparable bcrypt work, not a guarantee of identical response times. OP-01.11 still excludes failed-login limiting in Sprint 1.
 - OP-10.1 stays open; this Issue does not decide later privacy test duplication.
 - Generic 404 uses “Not found.”; its contracted envelope/code are fixed, but the contract does not prescribe the message text.
 - Local Docker daemon was unavailable; PostgreSQL 16 was already running locally and was used directly. No shared service was started, stopped or reconfigured.
 - The Prisma audit findings remain as investigated above.
 - Docker, deployment, application CI and timed clean-clone TC-50 were not run in this task. Wider TC-47/48 screen coverage and later endpoint rows of TC-08 belong to their feature Issues. Teammate review/merge is not claimed.
-- The existing `pr-issue-link` Actions check ran automatically and failed because the task-mandated `feature/32-habit-auth-build` prefix is outside its allowed `feat|fix|docs|chore|test|refactor` prefixes. Run `42315501649` reports that branch-name rejection; `Closes #32` is valid. No workflow change, branch rename or second PR was made. This workflow conflict is escalated to firstmate before claiming delivery complete.
+- Historical branch failure: run [42315501649](https://github.com/phittayanan/habit-tracker/actions/runs/42315501649) used `feature/32-habit-auth-build` at `8a374d078e088762e7bfe871b791612866727eae`; its branch-name rejection was on the superseded branch, not the canonical PR's own run. The old implementation PR https://github.com/phittayanan/habit-tracker/pull/33 is intentionally retained here as history only. Canonical https://github.com/phittayanan/habit-tracker/pull/34 uses `feat/32-habit-auth-build`. Its own run [42334588859](https://github.com/phittayanan/habit-tracker/actions/runs/42334588859) passed at `e25f30f39c1cf720a307adb45056d17a262ba720`; GitHub's run metadata associates it with this PR. Two older failing check objects at that same SHA came from the superseded `feature/` ref (runs `42315692160`, `42315694172`); an aggregate of three check objects is not three runs on the canonical PR. Fresh post-push run/head evidence is recorded in the PR body.
+
+## Current implementation review round — 2026-11-07
+
+Source: projectnewy's [changes-requested review](https://github.com/phittayanan/habit-tracker/pull/34#pullrequestreview-5810651960), full Issue #32, the preceding https://github.com/phittayanan/habit-tracker/pull/31 discussion, and the owner-authorized current review-fix brief. Package A is unchanged. ADR 0050 records owner approval with teammate agreement pending; no separate teammate layout comment was present when checked. ADR 0051 records current authorization for OP-01.12. The earlier corrected contract review proposed OP-01.12 as an open point and its later approval body was empty; this round does not invent explicit historical approval.
+
+### Red/green evidence
+
+All commands below run from `server/` with `TEST_DATABASE_URL=<disposable-test-url>`. Logs are task-owned proof outside Git at `/Users/phittayanan/dev/agentic-workflow/data/habit-auth-build/review-fixes/`.
+
+| Finding | Red evidence | Green evidence |
+|---|---|---|
+| TC-44/45 launcher portability | `5e3e02c`: `node --test --test-name-pattern=TC-44 test/auth.test.js` fails 1/1, `spawnSync npm ENOENT`, with empty PATH and a different temporary cwd | `22de689`: same command passes 1/1 using `process.execPath` and the actual absolute seed path. The real seed runs twice, checks all three hashes and scans tracked files for generated password values; each missing-password invocation fails with no accounts created. This proves independence from npm lookup/cwd on macOS, not Windows execution |
+| TC-08 independent discovery | `584dacd`: `node --test --test-name-pattern=TC-08 test/auth.test.js` has 1 pass / 1 fail, “Missing expected rejection”: a nested route missing both middleware and coverage entry escaped the old audit | `7a43461`: same command passes 4/4. Discovery walks the real Express tree; test setup records mount paths because Express 5 keeps matchers in closures. Exact public method/path exceptions, nested routers, GET/PATCH and implicit HEAD, path-array mounts, an omitted method, registration without protection, and protected/registered fixtures are exercised. No future domain route was added |
+| TC-02 / OP-01.12 | `eae5319`: `node --test --test-name-pattern=TC-02 test/auth.test.js` fails 1/1: real bcrypt compare count `1 !== 2` | `502789f`: same command passes 2/2. A call-through bcrypt spy verifies both real comparisons use cost 10, and identical 401 bodies, no cookie and no session remain. A separate regression refuses an unknown username even if its dummy comparison reports a match |
+| TC-04 request identity | The initial runs at `135e35f` and `9ea4356` both failed before assertions because Node's mock API could not spy on Prisma's proxy; these are **instrumentation failures, not red evidence**. After steering 005, the repaired observer at `7cc6bfa` was run against a bounded counterfactual: replace only `server/src/middleware/auth.js` with `git show 502789f:server/src/middleware/auth.js`, then `node --test '--test-name-pattern=TC-04 regression' test/auth.test.js`. It fails 1/1 on extra `createdAt` and `passwordHash` keys | The committed selected-field middleware was restored byte for byte in a `finally` block. `node --test '--test-name-pattern=TC-04\|TC-05\|TC-66' test/auth.test.js` passes 4/4 at `7cc6bfa`. The real middleware/real PostgreSQL observer checks exact `req.user` and related user fields, excludes hashes, and is never reached for absent/unknown sessions. Role-order checks still pass. Source inspection confirms Prisma selects only `id`, `username`, `displayName`, `role` |
+| TC-62 shared JSON parser errors | `00c6c55`: `node --test '--test-name-pattern=TC-62 regression' test/auth.test.js` fails 1/1, `500 !== 400` on the existing test-only Manager route | `31746a3`: `node --test '--test-name-pattern=TC-62\|TC-64' test/auth.test.js` passes 3/3. Malformed and oversized JSON outside login get safe `400 VALIDATION_ERROR`; login retains its exact message; Origin/session/role precedence remains. This is shared-handler coverage, not execution of future TC-53/56 domain endpoints |
+
+### Full validation
+
+Application and test revision: `31746a38d475888804702206570196128630e463`. Subsequent evidence edits are documentation only. macOS 27.2, Node.js 26.8.1, npm 11.19.0, Prisma 6.19.3, existing disposable PostgreSQL 16 database; Chrome via Playwright. Windows/Git Bash execution is unavailable and was not claimed. The README explains Git Bash shell syntax and a writable Windows artifact path.
+
+```text
+client/: npm ci; npm run build
+22 packages installed; audit 0 vulnerabilities; build exit 0
+server/: npm ci; npm run prisma:generate; npm run build
+123 packages installed; Prisma Client 6.19.3 generated; build exit 0
+server/: DATABASE_URL=<disposable-test-url> npm run prisma:migrate
+1 migration found; no pending migrations
+server/: DATABASE_URL=<disposable-test-url> node node_modules/prisma/build/index.js migrate status
+Database schema is up to date
+server/: TEST_DATABASE_URL=<disposable-test-url> npm test
+tests 22; pass 22; fail 0; skipped 0
+client/: PLAYWRIGHT_CHANNEL=chrome TEST_DATABASE_URL=<disposable-test-url> npm test
+12 passed (6 cases each at 375x900 and 1280x900)
+```
+
+The existing task database and permissions were reused; no shared service or permission changed. Schema/migration/seed production code was unchanged in this review round. The full server suite actually invokes the seed against PostgreSQL. The initial clean-database migration evidence remains above; this round reran deploy/status on the existing disposable database.
+
+A built production process (`NODE_ENV=production PORT=33134 DATABASE_URL=<test-url> node dist/index.js`) returned health/ready 200, auth/me 401 with the exact envelope, and 404 for `/api/test/manager/1`, `/api/test/identity`, `/api/test/audit/nested/probe/1` and `/test/protected`. Built login/goals/templates pages returned 200 HTML. The process was stopped after checking. Build output scans found no test API/page/entry markers. Tracked-file checks found no `.env` credential file, personal `.Codex/settings.local.json`, or private-key markers; TC-45 also scanned for each generated seed value without printing it.
+
+Clean installs retain the three high Prisma/deepmerge-ts findings investigated above; the client audit is clean. No stack, dependency or workflow change was made. Browser journeys reran successfully; no visible UI redesign or screenshot recreation was needed. Teammate re-review and merge remain pending, and this round does not dismiss the changes-requested review.

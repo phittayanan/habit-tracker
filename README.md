@@ -12,6 +12,8 @@ Auth F-01/F-02 is implemented for Issue #32 using React/Vite, Node.js, Express, 
 
 Use Node.js 22.16+ (or a newer supported release) and npm. Local verification so far used Node.js 26.8.1, npm 11.19.0 and PostgreSQL 16.15. Use a local PostgreSQL 16 instance; the SDS specifies the starter kit's Compose service, whose Docker delivery belongs to Lab 5. An already running local PostgreSQL 16 also works for this backend verification.
 
+The shell examples use POSIX syntax. On Windows, use Git Bash for `cp` and the inline environment assignments shown below; install Windows Node.js/npm and PostgreSQL and put their tools on PATH. Native PowerShell requires its own environment-variable syntax. For browser artifacts on Windows, set `PLAYWRIGHT_OUTPUT_DIR` to a writable absolute path such as `C:/Temp/habit-auth-playwright` instead of relying on `/tmp`. The seed tests use the current Node executable and an absolute seed-file path, avoiding an npm `.cmd` subprocess. Local checks ran on macOS 27.2; Windows and Git Bash execution have **not** been verified.
+
 First, from `client/`:
 
 ```sh
@@ -59,4 +61,4 @@ The tests use Playwright's downloaded Chromium by default; set `PLAYWRIGHT_CHANN
 
 For development, keep `npm run dev` in `server/` on port 3000 and run `npm run dev` in `client/`; Vite proxies `/api` to that backend. Production uses the built client served by Express, without Vite.
 
-Open limitations: failed-login limiting is excluded from Sprint 1 (OP-01.11); unknown-user timing mitigation OP-01.12 remains unapproved and unimplemented; OP-10.1 belongs to later privacy testing. Docker, CI and GCP verification are deferred to Lab 5. See [Auth implementation evidence](docs/auth-implementation-evidence.md) for actual checks and their limits.
+Open limitations: failed-login limiting is excluded from Sprint 1 (OP-01.11); OP-01.12 now performs a cost-10 dummy bcrypt comparison for an unknown username, with the same invalid-credentials response and no session (ADR 0051); comparable bcrypt work does not guarantee identical response times; OP-10.1 belongs to later privacy testing. Docker, CI and GCP verification are deferred to Lab 5. See [Auth implementation evidence](docs/auth-implementation-evidence.md) for actual checks and their limits.

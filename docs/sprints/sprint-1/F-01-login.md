@@ -178,7 +178,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 
 ## 14. Implementation evidence
 
-Issue #32 implements this contract. [Local red/green evidence](../../auth-implementation-evidence.md) maps all AC and test IDs to actual results. The owner's package A UI answer is recorded in [ADR 0050](../../adr/0050-auth-layout.md). OP-01.12 is authorized for implementation in the current review round (ADR 0051); failed-login limiting remains excluded by OP-01.11. Implementation review and merge remain pending.
+Issue #32 implements this contract. [Local red/green evidence](../../auth-implementation-evidence.md) maps all AC and test IDs to actual results. The owner's package A UI answer is recorded in [ADR 0050](../../adr/0050-auth-layout.md). OP-01.12 is implemented under current review-round authorization (ADR 0051); failed-login limiting remains excluded by OP-01.11. Implementation re-review and merge remain pending.
 
 ## 15. Current review regression requirements
 

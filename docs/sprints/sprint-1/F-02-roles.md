@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | F-01 (the session user and role) |
 | Needed by | F-03, F-04, F-06, F-07, F-08, F-09, F-10 (every protected endpoint uses these checks) |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft, review round 1 applied |
+| Status | Merged contract; implementation review corrections specified |
 
 ## 2. Behaviour and workflow
 
