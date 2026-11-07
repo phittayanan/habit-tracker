@@ -22,14 +22,16 @@
 
 ## FR -> Feature -> Acceptance Criteria -> Test
 
+Auth implementation review: [https://github.com/phittayanan/habit-tracker/pull/33](https://github.com/phittayanan/habit-tracker/pull/33), for Issue #32 and parent #9.
+
 Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` and `client/test/` for implementation Issue #32; other feature tests remain planned. See [Auth implementation evidence](auth-implementation-evidence.md) for red/green commands, tested commits, AC results and limits. Auth API/unit checks pass 16/16 and Playwright checks pass 12/12 at 375px and 1280px; teammate review remains pending. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 parent build Issue. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 were added by the first four contracts, and TC-62 to TC-73 by the other five.
 
 | BR | FR | Feature | AC | Test ID | Sprint | Issue / PR |
 |---|---|---|---|---|---|---|
-| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #32, #9 |
-| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9 |
-| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9 |
-| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9 |
+| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/33) |
+| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/33) |
+| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/33) |
+| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/33) |
 | BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #9 |
 | BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #9 |
 | BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #9 |
@@ -47,7 +49,7 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | none | FR-19 | F-15 | later | TC-40 | 2 | none yet |
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
-| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9 |
+| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/33) |
 | BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #9 |
 
 ## NFR -> Feature -> Verification -> Test

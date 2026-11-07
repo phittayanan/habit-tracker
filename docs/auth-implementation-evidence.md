@@ -2,6 +2,8 @@
 
 Scope: F-01/F-02 only, implementation Issue #32, Part of #9. The owner selected package A on 2026-11-07 through firstmate, recorded in ADR 0050. This records local implementation evidence; teammate review and merge remain pending.
 
+Implementation review: [https://github.com/phittayanan/habit-tracker/pull/33](https://github.com/phittayanan/habit-tracker/pull/33), targeting `staging`, reviewer projectnewy.
+
 ## Test-first record
 
 - Red commit: `e4ce130` (`test: specify auth API and session contracts before implementation`).
