@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import bcrypt from 'bcryptjs';
 import express from 'express';
@@ -17,6 +18,7 @@ if (!process.env.TEST_DATABASE_URL) throw new Error('Set TEST_DATABASE_URL to a 
 if (process.env.TEST_DATABASE_URL === process.env.DATABASE_URL) throw new Error('Test and application databases must differ.');
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
 const password = randomBytes(24).toString('base64url');
+const seedPath = fileURLToPath(new URL('../prisma/seed.js', import.meta.url));
 let app;
 let calls;
 let participant;
@@ -235,7 +237,7 @@ test('TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomical
   // This is also useful when npm is a Windows .cmd shim rather than an executable.
   const seedCwd = mkdtempSync(join(tmpdir(), 'habit-seed-'));
   try {
-    for (let run = 0; run < 2; run++) execFileSync('npm', ['run', 'prisma:seed'], {
+    for (let run = 0; run < 2; run++) execFileSync(process.execPath, [seedPath], {
       env: { ...env, PATH: '' }, cwd: seedCwd, stdio: 'pipe',
     });
   } finally { rmSync(seedCwd, { recursive: true, force: true }); }
@@ -255,7 +257,7 @@ test('TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomical
   for (const missing of ['SEED_MANAGER_PASSWORD', 'SEED_PARTICIPANT_PASSWORD']) {
     const missingEnv = { ...env };
     delete missingEnv[missing];
-    const result = spawnSync(process.execPath, ['prisma/seed.js'], { env: missingEnv, encoding: 'utf8' });
+    const result = spawnSync(process.execPath, [seedPath], { env: missingEnv, encoding: 'utf8' });
     assert.notEqual(result.status, 0);
     assert.equal(await db.user.count(), 0);
     assert.ok(!result.stderr.includes(managerPassword));
