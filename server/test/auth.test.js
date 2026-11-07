@@ -193,6 +193,51 @@ test('TC-08 regression: an added nested route missing both middleware and regist
   await assert.rejects(assertProtectedRouteCoverage(fixture, protectedRoutes), /Uncovered API route: get \/api\/test\/audit\/nested\/probe\/:id/);
 });
 
+test('TC-08 regression: registration alone fails; protecting and registering nested methods passes', async () => {
+  let handlerCalls = 0;
+  function fixture(protectedRoute) {
+    return createAuditedApp(() => createApp({ db, registerTestRoutes(app) {
+      const parent = express.Router();
+      const child = express.Router();
+      const handler = (req, res) => { handlerCalls++; res.status(204).end(); };
+      const middleware = protectedRoute ? [requireSession(db)] : [];
+      child.route('/probe/:id').get(...middleware, handler).patch(...middleware, handler);
+      parent.use('/nested', child);
+      app.use('/api/test/audit', parent);
+    } }));
+  }
+  const routes = [...protectedRoutes, ...['get', 'patch'].map(method => ({
+    method, path: '/api/test/audit/nested/probe/:id', requestPath: '/api/test/audit/nested/probe/1',
+  }))];
+  await assert.rejects(assertProtectedRouteCoverage(fixture(false), routes), /expected 401/);
+  assert.equal(handlerCalls, 1);
+  handlerCalls = 0;
+  const secured = fixture(true);
+  await assert.rejects(assertProtectedRouteCoverage(secured, routes.filter(route => route.method !== 'patch')), /Uncovered API route: patch/);
+  await assertProtectedRouteCoverage(secured, routes);
+  assert.equal(handlerCalls, 0);
+  await request(createApp({ db })).get('/api/test/audit/nested/probe/1').expect(404);
+});
+
+test('TC-08 regression: public allowlist matches exact methods and paths, including path-array mounts', async () => {
+  for (const [method, path] of [['post', '/api/health'], ['get', '/api/health/extra'], ['get', '/api/auth/login']]) {
+    const fixture = createAuditedApp(() => createApp({ db, registerTestRoutes(app) {
+      app[method](path, (req, res) => res.status(204).end());
+    } }));
+    await assert.rejects(assertProtectedRouteCoverage(fixture, protectedRoutes), /Uncovered API route/);
+  }
+  const mounted = createAuditedApp(() => createApp({ db, registerTestRoutes(app) {
+    const router = express.Router();
+    router.get(['/one', '/two'], requireSession(db), (req, res) => res.status(204).end());
+    app.use(['/api/test/first', '/api/test/second'], router);
+  } }));
+  const routes = [...protectedRoutes];
+  for (const mount of ['first', 'second']) for (const path of ['one', 'two']) {
+    routes.push({ method: 'get', path: `/api/test/${mount}/${path}` });
+  }
+  await assertProtectedRouteCoverage(mounted, routes);
+});
+
 test('TC-66: session then role, before validation/existence; client roles cannot override', async () => {
   const cookie = cookieOf(await login());
   await request(app).post('/api/test/manager/1').send({}).expect(401);
