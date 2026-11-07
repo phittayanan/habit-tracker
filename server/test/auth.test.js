@@ -12,6 +12,7 @@ import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { createApp, protectedRoutes } from '../src/app.js';
 import { requireSession, requireRole } from '../src/middleware/auth.js';
+import { createAuditedApp, assertProtectedRouteCoverage } from './route-coverage.js';
 
 // An explicitly separate, disposable database is required; never fall back to DATABASE_URL.
 if (!process.env.TEST_DATABASE_URL) throw new Error('Set TEST_DATABASE_URL to a disposable PostgreSQL database.');
@@ -34,12 +35,12 @@ beforeEach(async () => {
   ]) await db.user.create({ data: { username, displayName, role, passwordHash } });
   participant = await db.user.findUnique({ where: { username: 'participant1' } });
   calls = [];
-  app = createApp({ db, registerTestRoutes(router) {
+  app = createAuditedApp(() => createApp({ db, registerTestRoutes(router) {
     router.post('/api/test/manager/:id', requireSession(db), requireRole('MANAGER'), express.json(),
       (req, res, next) => { calls.push('validate'); if (!req.body?.name) return res.status(400).end(); next(); },
       (req, res, next) => { calls.push('exists'); if (req.params.id !== '1') return res.status(404).end(); next(); },
       (req, res) => { calls.push('handler'); res.status(204).end(); });
-  } });
+  } }));
 });
 after(async () => { await db.$disconnect(); });
 const error = (code, message) => ({ error: { code, message } });
@@ -170,22 +171,26 @@ test('TC-64: Origin runs before body/session checks and compares host including 
   }
 });
 
-test('TC-08: one table covers every implemented protected route and the test-only Manager route', async () => {
-  const routes = [...protectedRoutes, { method: 'post', path: '/api/test/manager/1', roles: ['MANAGER'] }];
-  assert.deepEqual(protectedRoutes.map(route => `${route.method} ${route.path}`).sort(), ['get /api/auth/me', 'post /api/auth/logout']);
+const coverageRoutes = () => [...protectedRoutes, {
+  method: 'post', path: '/api/test/manager/:id', requestPath: '/api/test/manager/1', roles: ['MANAGER'],
+}];
+
+test('TC-08: independently audit every implemented API route, then exercise session and role checks', async () => {
   const cookie = cookieOf(await login());
-  for (const route of routes) {
-    const anonymous = await request(app)[route.method](route.path).send({ name: 'valid' });
-    assert.equal(anonymous.status, 401);
-    assert.deepEqual(anonymous.body, unauthenticated);
-    if (route.roles?.length === 1) {
-      const forbidden = await request(app)[route.method](route.path).set('Cookie', cookie).send({ name: 'valid' });
-      assert.equal(forbidden.status, 403);
-      assert.deepEqual(forbidden.body, error('FORBIDDEN', 'You do not have permission to do this.'));
-    }
-  }
+  await assertProtectedRouteCoverage(app, coverageRoutes(), cookie);
   assert.deepEqual(calls, []);
   assert.equal(await db.session.count(), 1);
+});
+
+test('TC-08 regression: an added nested route missing both middleware and registration fails coverage', async () => {
+  const fixture = createAuditedApp(() => createApp({ db, registerTestRoutes(app) {
+    const parent = express.Router();
+    const child = express.Router();
+    child.route('/probe/:id').get((req, res) => res.status(204).end()).patch((req, res) => res.status(204).end());
+    parent.use('/nested', child);
+    app.use('/api/test/audit', parent);
+  } }));
+  await assert.rejects(assertProtectedRouteCoverage(fixture, protectedRoutes), /Uncovered API route: get \/api\/test\/audit\/nested\/probe\/:id/);
 });
 
 test('TC-66: session then role, before validation/existence; client roles cannot override', async () => {
