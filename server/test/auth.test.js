@@ -129,6 +129,31 @@ test('TC-04: both roles expose only the contracted identity, never hash or sessi
   }
 });
 
+test('TC-04 regression: session middleware fetches only public user fields and keeps hashes out of request identity', async t => {
+  const cookie = cookieOf(await login());
+  const query = t.mock.method(db.session, 'findUnique');
+  let identityKeys;
+  let relatedUserKeys;
+  const fixture = createApp({ db, registerTestRoutes(app) {
+    app.get('/api/test/identity', requireSession(db), (req, res) => {
+      identityKeys = Object.keys(req.user).sort();
+      relatedUserKeys = Object.keys(req.session.user).sort();
+      res.json({ user: req.user });
+    });
+  } });
+  const response = await request(fixture).get('/api/test/identity').set('Cookie', cookie);
+  assert.equal(response.status, 200);
+  const fields = ['displayName', 'id', 'role', 'username'];
+  assert.deepEqual(identityKeys, fields);
+  assert.deepEqual(relatedUserKeys, fields);
+  assert.deepEqual(response.body, { user: publicUser(participant) });
+  assert.equal(query.mock.callCount(), 1);
+  assert.deepEqual(query.mock.calls[0].arguments[0].include.user, {
+    select: { id: true, username: true, displayName: true, role: true },
+  });
+  await request(createApp({ db })).get('/api/test/identity').expect(404);
+});
+
 test('TC-05: missing, unknown, deleted and malformed cookies are unauthenticated', async () => {
   const cookie = cookieOf(await login());
   await db.session.deleteMany();
