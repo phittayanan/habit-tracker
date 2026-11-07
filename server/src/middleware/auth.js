@@ -7,7 +7,7 @@ export function sendError(res, status, code, message) {
 export function requireSession(db) {
   return async (req, res, next) => {
     const id = sessionIdFrom(req);
-    const session = id ? await db.session.findUnique({ where: { id }, include: { user: true } }) : null;
+    const session = id ? await db.session.findUnique({ where: { id }, include: { user: { select: { id: true, username: true, displayName: true, role: true } } } }) : null;
     if (session && !isSessionValid(session, new Date())) {
       await db.session.deleteMany({ where: { id } });
     } else if (session) {
