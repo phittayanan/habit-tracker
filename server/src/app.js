@@ -27,7 +27,11 @@ export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
     });
   }
   app.use((err, req, res, next) => {
-    if (req.path === '/api/auth/login' && (err.type === 'entity.parse.failed' || err.type === 'entity.too.large')) return invalidLogin(res);
+    if ((req.path === '/api' || req.path.startsWith('/api/'))
+      && (err.type === 'entity.parse.failed' || err.type === 'entity.too.large')) {
+      if (req.path === '/api/auth/login') return invalidLogin(res);
+      return sendError(res, 400, 'VALIDATION_ERROR', 'Invalid JSON body.');
+    }
     // Do not print ORM errors: they may include sensitive query parameters.
     sendError(res, 500, 'INTERNAL_ERROR', 'Something went wrong. Please try again.');
   });
