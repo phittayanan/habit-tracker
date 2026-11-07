@@ -70,7 +70,8 @@ test('TC-01 / TC-46: login persists fixed eight-hour session and flags, then me 
   assert.deepEqual(me.body, result.body);
 });
 
-test('TC-02: unknown username and wrong password have identical errors and no session', async () => {
+test('TC-02: unknown username and wrong password both perform cost-10 bcrypt work with identical errors', async t => {
+  const compare = t.mock.method(bcrypt, 'compare');
   const responses = [];
   for (const input of [{ username: 'nobody', password }, { username: 'participant1', password: randomBytes(24).toString('hex') }]) {
     const response = await request(app).post('/api/auth/login').send(input);
@@ -81,6 +82,13 @@ test('TC-02: unknown username and wrong password have identical errors and no se
   assert.deepEqual(responses[0], error('INVALID_CREDENTIALS', 'Username or password is incorrect.'));
   assert.deepEqual(responses[1], responses[0]);
   assert.equal(await db.session.count(), 0);
+  assert.equal(compare.mock.callCount(), 2, 'One real bcrypt comparison for each invalid login');
+  for (const call of compare.mock.calls) {
+    assert.equal(bcrypt.getRounds(call.arguments[1]), 10);
+    assert.equal(await call.result, false);
+  }
+  assert.equal(compare.mock.calls[0].arguments[0], password);
+  assert.equal(compare.mock.calls[1].arguments[1], participant.passwordHash);
 });
 
 test('TC-03: logout deletes session and clears cookie; replay and anonymous logout fail', async () => {
