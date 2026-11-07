@@ -201,6 +201,28 @@ test('TC-62: invalid and non-JSON inputs get the same validation error without s
   assert.equal(await db.session.count(), 0);
 });
 
+test('TC-62 regression: JSON parser failures outside login return 400 after session and role checks', async () => {
+  const managerCookie = cookieOf(await login('manager1'));
+  const participantCookie = cookieOf(await login());
+  for (const body of ['{bad json', JSON.stringify({ name: 'x'.repeat(110_000) })]) {
+    const response = await request(app).post('/api/test/manager/1').set('Cookie', managerCookie)
+      .set('Content-Type', 'application/json').send(body);
+    assert.equal(response.status, 400);
+    assert.deepEqual(response.body, error('VALIDATION_ERROR', 'Invalid JSON body.'));
+    assert.equal(response.headers['set-cookie'], undefined);
+  }
+  for (const [cookie, status, code] of [
+    ['', 401, 'UNAUTHENTICATED'], [participantCookie, 403, 'FORBIDDEN'],
+  ]) {
+    const response = await request(app).post('/api/test/manager/1').set('Cookie', cookie)
+      .set('Content-Type', 'application/json').send('{bad json');
+    assert.equal(response.status, status);
+    assert.equal(response.body.error.code, code);
+  }
+  assert.deepEqual(calls, []);
+  assert.equal(await db.session.count(), 2);
+});
+
 test('TC-64: Origin runs before body/session checks and compares host including port', async () => {
   const cookie = cookieOf(await login());
   for (const origin of ['https://evil.example', 'not a URL', 'null', 'https://app.example:8443']) {
