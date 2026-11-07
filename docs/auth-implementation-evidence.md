@@ -88,4 +88,5 @@ Registry checks found latest Prisma 6 is 6.19.3; its config package pins deepmer
 - Generic 404 uses “Not found.”; its contracted envelope/code are fixed, but the contract does not prescribe the message text.
 - Local Docker daemon was unavailable; PostgreSQL 16 was already running locally and was used directly. No shared service was started, stopped or reconfigured.
 - The Prisma audit findings remain as investigated above.
-- Docker, deployment, CI and timed clean-clone TC-50 were not run in this task. Wider TC-47/48 screen coverage and later endpoint rows of TC-08 belong to their feature Issues. Teammate review/merge is not claimed.
+- Docker, deployment, application CI and timed clean-clone TC-50 were not run in this task. Wider TC-47/48 screen coverage and later endpoint rows of TC-08 belong to their feature Issues. Teammate review/merge is not claimed.
+- The existing `pr-issue-link` Actions check ran automatically and failed because the task-mandated `feature/32-habit-auth-build` prefix is outside its allowed `feat|fix|docs|chore|test|refactor` prefixes. Run `42315501649` reports that branch-name rejection; `Closes #32` is valid. No workflow change, branch rename or second PR was made. This workflow conflict is escalated to firstmate before claiming delivery complete.
