@@ -135,3 +135,7 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): test-only protected route and page for TC-66/67; TC-08 grows with implemented endpoints; record partner agreement on existing proposals | pending (partner re-check) |
+
+## 14. Implementation evidence
+
+Issue #32 implements this contract's Auth build step. [Local red/green evidence](../../auth-implementation-evidence.md) records TC-07/08/66/67 and Auth TC-47/48 results. TC-08 currently covers Auth routes and the test-only Manager route; later feature Issues must extend the list. Auth-only destination headings contain no Template or Goal data. OP-10.1 remains open. Implementation review and merge remain pending.

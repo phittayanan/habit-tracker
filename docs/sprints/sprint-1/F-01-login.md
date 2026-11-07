@@ -175,3 +175,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): TC-05 uses auth only; host-only Origin check and forwarded HTTPS case in TC-64; login timing proposal OP-01.12; record partner agreement on existing proposals | pending (partner re-check) |
+
+## 14. Implementation evidence
+
+Issue #32 implements this contract. [Local red/green evidence](../../auth-implementation-evidence.md) maps all AC and test IDs to actual results. The owner's package A UI answer is recorded in [ADR 0050](../../adr/0050-auth-layout.md). OP-01.12 remains open; failed-login limiting remains excluded by OP-01.11. Implementation review and merge remain pending.

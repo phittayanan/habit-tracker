@@ -63,6 +63,8 @@ Additional tests cover successful login replacing an incoming session, stripped 
 
 The production server ran with `PORT=33134 DATABASE_URL=<test-url> npm start`; the browser comparison used this built app, not the Vite test app. All role destinations are headings only. Test-only page registration/entry stays in `client/test/`, test route injection stays in tests, and neither is bundled or registered by production startup.
 
+Final tested revision: `2e2c4d2` (includes configurable Playwright channel and setup documentation). On that committed revision the server suite passed 16/16 and `PLAYWRIGHT_CHANNEL=chrome TEST_DATABASE_URL=<test-url> npm test` in `client/` passed 12/12. Subsequent commits add only review links and factual evidence.
+
 ## Before/after comparison
 
 Local artifact: `/Users/phittayanan/dev/agentic-workflow/data/habit-auth-build/compare/index.html`. Its manifest records base `1c72dbf` and application head `f803b89`. There are 16 rows / 32 PNGs: idle, rejected and loading login; Manager Templates; Participant Goals and Templates; each role's wrong-role screen; each at 375×900 and 1280×900.
