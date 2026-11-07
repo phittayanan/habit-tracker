@@ -23,15 +23,15 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 
 | Feature | Contract | Requirements | AC | Tests | Contract Issue / PR | Build Issue / PR |
 |---|---|---|---|---|---|---|
-| F-01 Login, logout and session | [`F-01-login.md`](F-01-login.md) | FR-01, FR-02, FR-03, FR-04; NFR-01, NFR-04 | AC-01.1 to AC-01.10 (10) | TC-01, TC-02, TC-03, TC-04, TC-05, TC-06, TC-62, TC-63, TC-64, TC-44, TC-45, TC-46, TC-65 | #30 / PR #31 | #32 / PR #34 |
-| F-02 Role layout and endpoint protection | [`F-02-roles.md`](F-02-roles.md) | FR-22; NFR-02 | AC-02.1 to AC-02.5 (5) | TC-07, TC-08, TC-66, TC-67 | #30 / PR #31 | #32 / PR #34 |
-| F-03 Template creation and Manager list | [`F-03-template-create.md`](F-03-template-create.md) | FR-05, FR-06; BR-03 (minimum below maximum) | AC-03.1 to AC-03.7 (7) | TC-09, TC-10, TC-68, TC-69, TC-11, TC-70 | #30 / PR #31 | not opened |
-| F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | not opened |
-| F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | not opened |
-| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.9 (9) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60 | #28 / PR #29 | not opened |
-| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29 | not opened |
-| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | not opened |
-| F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | not opened |
+| F-01 Login, logout and session | [`F-01-login.md`](F-01-login.md) | FR-01, FR-02, FR-03, FR-04; NFR-01, NFR-04 | AC-01.1 to AC-01.10 (10) | TC-01, TC-02, TC-03, TC-04, TC-05, TC-06, TC-62, TC-63, TC-64, TC-44, TC-45, TC-46, TC-65 | #30 / PR #31 | #32 / PR #34 |
+| F-02 Role layout and endpoint protection | [`F-02-roles.md`](F-02-roles.md) | FR-22; NFR-02 | AC-02.1 to AC-02.5 (5) | TC-07, TC-08, TC-66, TC-67 | #30 / PR #31 | #32 / PR #34 |
+| F-03 Template creation and Manager list | [`F-03-template-create.md`](F-03-template-create.md) | FR-05, FR-06; BR-03 (minimum below maximum) | AC-03.1 to AC-03.7 (7) | TC-09, TC-10, TC-68, TC-69, TC-11, TC-70 | #30 / PR #31 | not opened |
+| F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | not opened |
+| F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | not opened |
+| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.9 (9) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60 | #28 / PR #29 | not opened |
+| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29 | not opened |
+| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | not opened |
+| F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | not opened |
 
 Contract Issues and PRs: #30 and PR #31 for F-01 to F-06, #28 and PR #29 for F-07 to F-10. Build Issues follow the five groups in `docs/sprints/plan.md` ("Feasibility"): Auth, Template, Goal, Entry, and Progress with privacy.
 
@@ -220,7 +220,7 @@ Test specification of the system checks:
 
 | Test | AC | Precondition / input | Action | Expected result |
 |---|---|---|---|---|
-| TC-47 | AC-SYS.1 | Built app on the test database; a Manager and a Participant exist | Playwright opens each Sprint 1 screen at 375 px and at 1280 px and uses each control | `document.scrollWidth` does not exceed the viewport width; every control is reachable and works |
+| TC-47 | AC-SYS.1 | Built app on the test database; a Manager and a Participant exist | Playwright opens each Sprint 1 screen at 375 px and at 1280 px and uses each control | `document.documentElement.scrollWidth` is not greater than `window.innerWidth`; every control is reachable and works |
 | TC-48 | AC-SYS.2 | Same | Playwright drives each Sprint 1 action with Tab, Shift+Tab, Enter and Space only | Every action completes; the focused element shows an outline; no state is shown by colour alone |
 | TC-50 | AC-SYS.3 | A clean clone and a machine with the listed tools | Follow only the README and write down each step and the time | The app starts and a seeded user logs in; steps and time are recorded (the 15-minute target is checked in Lab 5) |
 | TC-51 | AC-SYS.4 | Unit tests of the rule code run with coverage on | Run the unit suite with the coverage option and read the report | Every rule BR-01 to BR-07 has a test; line coverage of the rule code is at least 80% |
@@ -263,7 +263,7 @@ The Product Definition of Done comes from handout D1 §3.5 and GWS §8.2. Each l
 | 1 | The required behaviour is implemented on `main` | Each Sprint 1 feature is merged; the journey in `docs/sprints/plan.md` ("Completion outcome") works through the UI, the API and the database; any feature that is cut is in "Approved Changes" |
 | 2 | The planned verification was executed | Every test in the table above, and the five system checks, was run on the released commit; Part F has the command, the counts of passed, failed and skipped tests, and the commit |
 | 3 | The tests are meaningful and pass | No required test is disabled or weakened to pass; failed and skipped tests are reported; the rule tests were seen failing before the code and passing after (red commit before the feature commit) |
-| 4 | Review and integration are complete | Each feature has its own Issue, branch and PR into `staging`, reviewed by the teammate with a specific check; the release PR from `staging` into `main` is reviewed; `main` is tagged `v1.0`; the board shows Done |
+| 4 | Review and integration are complete | Each agreed build group (Auth, Template, Goal, Entry, and Progress with privacy) has its own Issue, branch and teammate-reviewed PR into `staging`; Auth is Issue #32 and PR #34. Every included feature and acceptance criterion is traceable to its tests and implementation. The release PR from `staging` into `main` is reviewed, `main` is tagged `v1.0`, and the board shows Done |
 | 5 | Setup and documents are current | README setup, `.env.example` (fake values only), the contracts, `docs/traceability.md` (AC, Test ID, Issue and PR) and this overview match the released code; seeded passwords are shared privately, never in Git |
 | 6 | Incomplete work is disclosed | Part F lists the known limits: no failed-login limiting (OP-01.11), no way to fix a wrong same-day entry (SRS A-11), no Retire (Sprint 2), the timed clean-clone run, CI, Docker and GCP (Lab 5), and any test that failed or was skipped |
 | 7 | The AI use is declared | `docs/ai-use.md` is current and each PR says what the human checked or changed |
@@ -299,3 +299,4 @@ The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issu
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-08 | First draft (Issue #8) | pending |
+| 2026-11-08 | Review round 1 (PR #35): the contract index no longer has carriage returns in its titles, so it renders as nine rows of seven cells (checked in GitHub's rendered view); Product Definition of Done item 4 follows the five agreed build groups; TC-47 uses `document.documentElement.scrollWidth` and `window.innerWidth` | pending (partner re-check) |
