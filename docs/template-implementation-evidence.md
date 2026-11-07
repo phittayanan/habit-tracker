@@ -2,6 +2,8 @@
 
 Scope: F-03 and F-06 only. F-04 (the edit page, `PATCH /api/templates/:id`, and the in-use refusal) and the Sprint 2 retire refusal (TC-19) are not in this Issue. The Manager Edit control is visible because AC-03.6 requires it, and it does not start an edit flow. This records local checks. Teammate review and merge remain pending.
 
+Implementation review: [https://github.com/phittayanan/habit-tracker/pull/37](https://github.com/phittayanan/habit-tracker/pull/37), targeting `staging`, reviewer projectnewy.
+
 ## Test-first record
 
 - Red commit: `a19f025` (`test: specify template create and view before the routes exist`). The commit includes the additive `Template` migration because the new fixtures write template rows.
