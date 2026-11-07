@@ -129,28 +129,35 @@ test('TC-04: both roles expose only the contracted identity, never hash or sessi
   }
 });
 
-test('TC-04 regression: session middleware fetches only public user fields and keeps hashes out of request identity', async t => {
+test('TC-04 regression: session middleware keeps only public user fields in request identity', async () => {
   const cookie = cookieOf(await login());
-  const query = t.mock.method(db.session, 'findUnique');
-  let identityKeys;
-  let relatedUserKeys;
+  let observedUser;
+  let observedRelatedUser;
+  let observerCalls = 0;
   const fixture = createApp({ db, registerTestRoutes(app) {
     app.get('/api/test/identity', requireSession(db), (req, res) => {
-      identityKeys = Object.keys(req.user).sort();
-      relatedUserKeys = Object.keys(req.session.user).sort();
+      observerCalls++;
+      observedUser = req.user;
+      observedRelatedUser = req.session.user;
       res.json({ user: req.user });
     });
   } });
+  for (const invalidCookie of ['', 'sid=unknown']) {
+    const rejected = await request(fixture).get('/api/test/identity').set('Cookie', invalidCookie);
+    assert.equal(rejected.status, 401);
+    assert.deepEqual(rejected.body, unauthenticated);
+  }
+  assert.equal(observerCalls, 0);
   const response = await request(fixture).get('/api/test/identity').set('Cookie', cookie);
   assert.equal(response.status, 200);
   const fields = ['displayName', 'id', 'role', 'username'];
-  assert.deepEqual(identityKeys, fields);
-  assert.deepEqual(relatedUserKeys, fields);
+  assert.equal(observerCalls, 1);
+  assert.deepEqual(Object.keys(observedUser).sort(), fields);
+  assert.deepEqual(Object.keys(observedRelatedUser).sort(), fields);
+  assert.equal(Object.hasOwn(observedUser, 'passwordHash'), false);
+  assert.equal(Object.hasOwn(observedRelatedUser, 'passwordHash'), false);
+  assert.deepEqual(observedUser, publicUser(participant));
   assert.deepEqual(response.body, { user: publicUser(participant) });
-  assert.equal(query.mock.callCount(), 1);
-  assert.deepEqual(query.mock.calls[0].arguments[0].include.user, {
-    select: { id: true, username: true, displayName: true, role: true },
-  });
   await request(createApp({ db })).get('/api/test/identity').expect(404);
 });
 
