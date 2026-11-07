@@ -60,11 +60,11 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | NFR-02 | F-02 | API test per endpoint (role matrix, AC-02.2, AC-02.3) | TC-08, TC-66, TC-34 (goal and entry endpoints, AC-10.4) | 1 (rechecked later) |
 | NFR-03 | F-10 | API tests, two Participants and one Manager | TC-33, TC-34, TC-57 | 1 (rechecked in 2 and 3) |
 | NFR-04 | F-01 | API and unit tests: cookie flag, aged session, logged-out session (AC-01.1, AC-01.4, AC-01.7) | TC-06, TC-46, TC-03, TC-63 | 1 |
-| NFR-05 | Sprint 1 screens of F-01 (login), F-03, F-04, F-06 to F-09; later screens | Playwright at 375 px and 1280 px | TC-47 | 1; 2 and 3 for later screens |
-| NFR-06 | Same screens, including F-01 (login); F-12 markup | Playwright keyboard run; markup review | TC-48, TC-49 | 1; 2 and 3 for later screens |
-| NFR-07 | System: setup commands and docs | Timed clean-clone run | TC-50 | 1 documented; timed in Lab 5 |
-| NFR-08 | F-07, F-08, F-09 (rule code) | Coverage report | TC-51 | 1; 3 |
-| NFR-09 | System: CI | CI run on a PR | TC-52 | 1 locally; CI from Lab 5 |
+| NFR-05 | Sprint 1 screens of F-01 (login), F-03, F-04, F-06 to F-09; later screens | Playwright at 375 px and 1280 px (AC-SYS.1) | TC-47 | 1; 2 and 3 for later screens |
+| NFR-06 | Same screens, including F-01 (login); F-12 markup | Playwright keyboard run (AC-SYS.2); markup review | TC-48, TC-49 | 1; 2 and 3 for later screens |
+| NFR-07 | System: setup commands and docs | Timed clean-clone run (AC-SYS.3) | TC-50 | 1 documented; timed in Lab 5 |
+| NFR-08 | F-07, F-08, F-09 (rule code) | Coverage report (AC-SYS.4) | TC-51 | 1; 3 |
+| NFR-09 | System: CI | CI run on a PR (AC-SYS.5; run locally in Sprint 1) | TC-52 | 1 locally; CI from Lab 5 |
 
 ## Planned tests
 
@@ -149,7 +149,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 ## Coverage Gaps
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
-- AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). Sprint 2 and 3 rows have none by design.
+- AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). The five system checks for NFR-05 to NFR-09 (TC-47, TC-48, TC-50, TC-51, TC-52) have AC-SYS.1 to AC-SYS.5 in `docs/sprints/sprint-1/README.md` (Issue #8). Sprint 2 and 3 rows have none by design.
 - Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Other features' tests remain planned. TC-08 independently discovers Auth endpoints and test fixtures from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
