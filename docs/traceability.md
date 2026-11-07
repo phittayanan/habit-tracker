@@ -79,7 +79,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-05 | Protected path with no valid session returns 401 | API |
 | TC-06 | Session older than 8 hours returns 401 | API |
 | TC-07 | Menu items change with role; layout is the same | Browser |
-| TC-08 | Role matrix grows with each implemented endpoint: 401 without a session and 403 for the wrong role | API |
+| TC-08 | Independent Express route audit and role matrix grow with each implemented endpoint: exact public allowlist, missing registration detected, 401 without a session and 403 for the wrong role | API |
 | TC-09 | Manager creates a template | API |
 | TC-10 | Minimum not below maximum is rejected | Unit and API |
 | TC-11 | Manager table shows name, unit, range, state, with actions | Browser |

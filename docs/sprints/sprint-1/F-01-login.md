@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | none |
 | Needed by | every other feature (F-02 to F-10 read the session user) |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft, review round 1 applied |
+| Status | Merged contract; implementation review corrections specified |
 
 ## 2. Behaviour and workflow
 
@@ -128,7 +128,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | Test | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
 | TC-01 | AC-01.1 | API | Participant A exists; no session rows | `POST /api/auth/login` with A's username and password; then `GET /api/auth/me` with the returned cookie | 200 with A's user; one Session row for A with `expires_at` = `created_at` + 8 h; `me` gets 200 |
-| TC-02 | AC-01.2 | API | A exists; no user named `nobody` | Log in as `nobody` with any password; log in as A with a wrong password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; Session table still empty |
+| TC-02 | AC-01.2 | API | A exists; no user named `nobody` | Log in as `nobody` with any password; log in as A with a wrong password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; Session table still empty. A call-through spy verifies one real cost-10 bcrypt comparison per invalid attempt, including the unknown username |
 | TC-03 | AC-01.4 | API | A logged in; cookie saved | `POST /api/auth/logout`; replay the saved cookie on `GET /api/auth/me`; call logout again with no cookie | 204 and a clearing `Set-Cookie`; A's session row is gone; the replay gets `401 UNAUTHENTICATED`; the cookieless logout gets `401 UNAUTHENTICATED` |
 | TC-04 | AC-01.5 | API | Manager and A logged in | `GET /api/auth/me` as each | 200 with `displayName` and role `MANAGER`, then `PARTICIPANT`; no `password`, `passwordHash` or session ID in either body (also checked on the login body) |
 | TC-05 | AC-01.6 | API | A logged in, then A's session row deleted in the test database | `GET /api/auth/me` with no cookie, with `sid=abc`, and with A's deleted session ID | Each gets `401 UNAUTHENTICATED` |
@@ -165,7 +165,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | OP-01.9 | Message wording (SDS 4.2 leaves it to each contract) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): the texts in section 4 |
 | OP-01.10 | bcrypt cost factor | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): 10 |
 | OP-01.11 | Limiting repeated failed logins. No SRS line or ADR asks for it | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): not built in Sprint 1; listed here so the choice is visible |
-| OP-01.12 | Unknown username can return faster than a wrong password | Open (proposal from the corrected round-1 review): compare the supplied password against a precomputed dummy bcrypt hash with the same cost when the username is unknown, then return the same `401 INVALID_CREDENTIALS` body and no session. This adds comparable bcrypt work without promising identical response times; pending agreement |
+| OP-01.12 | Unknown username can return faster than a wrong password | Decided for this implementation round by [current teammate review](https://github.com/phittayanan/habit-tracker/pull/34#pullrequestreview-5810651960) and the owner-authorized 2026-11-07 review-fix brief: compare the supplied password against a precomputed dummy bcrypt hash at cost 10 when the username is unknown, then return the same `401 INVALID_CREDENTIALS` body and no session. TC-02 spies on the real bcrypt comparison for both invalid cases and verifies its cost. This adds comparable bcrypt work without promising identical response times. The earlier discussion on https://github.com/phittayanan/habit-tracker/pull/31 introduced the proposal; its empty approval did not explicitly name OP-01.12. See ADR 0051 |
 | OP-07.7 | Unknown body fields | Decided on PR #29 (Q3): stripped, the request is accepted. Applies to every Sprint 1 contract |
 | OP-07.9 | How tests fix "today" and the clock | Decided on PR #29 (Q2): unit tests pass the instant as an argument; tests through the server need no clock hook |
 
@@ -178,4 +178,12 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 
 ## 14. Implementation evidence
 
-Issue #32 implements this contract. [Local red/green evidence](../../auth-implementation-evidence.md) maps all AC and test IDs to actual results. The owner's package A UI answer is recorded in [ADR 0050](../../adr/0050-auth-layout.md). OP-01.12 remains open; failed-login limiting remains excluded by OP-01.11. Implementation review and merge remain pending.
+Issue #32 implements this contract. [Local red/green evidence](../../auth-implementation-evidence.md) maps all AC and test IDs to actual results. The owner's package A UI answer is recorded in [ADR 0050](../../adr/0050-auth-layout.md). OP-01.12 is authorized for implementation in the current review round (ADR 0051); failed-login limiting remains excluded by OP-01.11. Implementation review and merge remain pending.
+
+## 15. Current review regression requirements
+
+For TC-44/45, invoke the actual seed file with the current Node executable, independent of npm executable lookup and working directory. Prove this by running the seed against the disposable database with no npm on PATH and from another directory; keep the existing hash, idempotence and missing-variable checks.
+
+The shared session middleware selects only the public user fields (`id`, `username`, `displayName`, `role`); neither `req.user` nor the related session user carries `passwordHash` or `createdAt`. Verify the database selection with a call-through query spy and inspect the real middleware request downstream.
+
+Malformed or oversized JSON parsed under `/api` gets `400 VALIDATION_ERROR`; retain the exact login message. Outside login use the SDS generic validation message, “Please check your input.” The protected test-only Manager route exercises parser failures after Origin, session and role checks, without adding domain endpoints. This is shared error-handler evidence, not execution of future TC-53/56 domain tests.

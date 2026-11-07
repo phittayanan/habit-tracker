@@ -114,7 +114,7 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 ## 11. Definition of done
 
 - Every AC above has at least one test in section 10, written first and seen failing, then passing; the command, counts and tested commit are recorded.
-- The session and role checks are shared middleware; no route checks the role in its own code. TC-08 is table-driven from one list of endpoints, so an endpoint missing from the list or skipping the checks fails it (NFR-02).
+- The session and role checks are shared middleware; no route checks the role in its own code. TC-08 independently walks the actual Express route tree under `/api`, including mounted routers and each HTTP method. Only `POST /api/auth/login`, `GET /api/health` and `GET /api/ready` are public (implicit HEAD for GET follows Express). Every other route must be registered in the protected coverage table and must return 401 without a session; registered role restrictions also get 403 for the wrong role. A deliberately uncovered test-only route must fail the audit, including when both middleware and table entry are missing. Registering a route without protecting it must also fail (NFR-02).
 - Contract, `docs/traceability.md` rows (AC, Test ID, Issue and PR) and the README setup are current; open points are disclosed.
 - The PR is reviewed by the teammate with a specific check, and merged into `staging`.
 
@@ -139,3 +139,5 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 ## 14. Implementation evidence
 
 Issue #32 implements this contract's Auth build step. [Local red/green evidence](../../auth-implementation-evidence.md) records TC-07/08/66/67 and Auth TC-47/48 results. TC-08 currently covers Auth routes and the test-only Manager route; later feature Issues must extend the list. Auth-only destination headings contain no Template or Goal data. OP-10.1 remains open. Implementation review and merge remain pending.
+
+Current review clarification (2026-11-07): TC-08 route discovery is independent of `protectedRoutes`; regression fixtures cover nested router mounts, multiple methods, exact public paths and production test-route exclusion. OP-10.1 remains open. Source: https://github.com/phittayanan/habit-tracker/pull/34#pullrequestreview-5810651960.

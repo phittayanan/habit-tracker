@@ -1,6 +1,6 @@
 # 0050. Auth layout package A
 
-Status: accepted
+Status: owner approved; teammate agreement pending
 
 ## Decision
 
@@ -10,4 +10,4 @@ Use the proposed neutral system sans typography, 16px body, 24px heading, 8px sp
 
 ## Source
 
-Owner answer “A”, recorded in the 2026-11-07 firstmate implementation handoff and steering message 002. The reviewed wireframe comparison covered A, B (left aligned) and C (split heading/form). This records that answer; it adds no Template or Goal implementation. OP-01.12 and OP-10.1 stay open.
+Owner answer “A”, recorded in the 2026-11-07 firstmate implementation handoff and steering message 002. The reviewed wireframe comparison covered A, B (left aligned) and C (split heading/form). This records that answer; it adds no Template or Goal implementation. At that handoff OP-01.12 and OP-10.1 were open. OP-01.12 is separately authorized in ADR 0051; OP-10.1 remains open. No separate teammate layout comment was present on https://github.com/phittayanan/habit-tracker/pull/34 when checked on 2026-11-07; this records owner approval only.
