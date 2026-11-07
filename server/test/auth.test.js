@@ -1,6 +1,9 @@
 import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import bcrypt from 'bcryptjs';
 import express from 'express';
@@ -228,7 +231,14 @@ test('TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomical
   const participantPassword = randomBytes(24).toString('base64url');
   const env = { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL,
     SEED_MANAGER_PASSWORD: managerPassword, SEED_PARTICIPANT_PASSWORD: participantPassword };
-  for (let run = 0; run < 2; run++) execFileSync('npm', ['run', 'prisma:seed'], { env, stdio: 'pipe' });
+  // The seed must work without an npm launcher and outside the server cwd.
+  // This is also useful when npm is a Windows .cmd shim rather than an executable.
+  const seedCwd = mkdtempSync(join(tmpdir(), 'habit-seed-'));
+  try {
+    for (let run = 0; run < 2; run++) execFileSync('npm', ['run', 'prisma:seed'], {
+      env: { ...env, PATH: '' }, cwd: seedCwd, stdio: 'pipe',
+    });
+  } finally { rmSync(seedCwd, { recursive: true, force: true }); }
   assert.equal(await db.user.count(), 3);
   for (const user of await db.user.findMany()) {
     const plain = user.role === 'MANAGER' ? managerPassword : participantPassword;
