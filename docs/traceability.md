@@ -22,14 +22,16 @@
 
 ## FR -> Feature -> Acceptance Criteria -> Test
 
-Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No test code exists yet. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 build Issue; no PR exists yet. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 are new planned tests added by the first four contracts, and TC-62 to TC-73 by the other five.
+Auth implementation review: [https://github.com/phittayanan/habit-tracker/pull/34](https://github.com/phittayanan/habit-tracker/pull/34), for Issue #32 and parent #9.
+
+Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` and `client/test/` for implementation Issue #32; other feature tests remain planned. See [Auth implementation evidence](auth-implementation-evidence.md) for red/green commands, tested commits, AC results and limits. Auth API/unit checks pass 22/22 and Playwright checks pass 12/12 at 375px and 1280px on `31746a3` in the current review round; teammate re-review remains pending after changes requested. Initial-build counts remain in the evidence history. AC are set in each Sprint 1 feature contract (Part E); later-sprint rows need none now. Issue #9 is the Sprint 1 parent build Issue. The AC for F-07 to F-10 are written in `docs/sprints/sprint-1/` (contract Issue #28), and the AC for F-01 to F-04 and F-06 in the same folder (contract Issue #30). TC-53 to TC-61 were added by the first four contracts, and TC-62 to TC-73 by the other five.
 
 | BR | FR | Feature | AC | Test ID | Sprint | Issue / PR |
 |---|---|---|---|---|---|---|
-| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #9 |
-| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #9 |
-| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #9 |
-| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #9 |
+| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
+| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
+| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
+| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #9 |
 | BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #9 |
 | BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #9 |
@@ -47,7 +49,7 @@ Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No tes
 | none | FR-19 | F-15 | later | TC-40 | 2 | none yet |
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
-| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #9 |
+| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #9 |
 
 ## NFR -> Feature -> Verification -> Test
@@ -66,18 +68,18 @@ Test IDs (`TC-nn`) are provisional planned-test names; the list is below. No tes
 
 ## Planned tests
 
-Names only, from the "Tested by" and "Verification" columns of the SRS.
+Names from the "Tested by" and "Verification" columns of the SRS. Auth implementation and API/unit/browser results are linked above; other tests are still planned.
 
 | Test ID | Planned test | Level |
 |---|---|---|
 | TC-01 | Valid login creates a session row and an HTTP-only cookie | API |
-| TC-02 | Invalid login refused, no session | API |
+| TC-02 | Unknown username and wrong password: identical errors, real cost-10 bcrypt comparisons, no cookie or session | API |
 | TC-03 | Logout deletes the session; the cookie no longer gives access | API |
-| TC-04 | Current user returns name and role | API |
+| TC-04 | Current user returns public identity; real session middleware excludes hash and unrelated user fields | API |
 | TC-05 | Protected path with no valid session returns 401 | API |
 | TC-06 | Session older than 8 hours returns 401 | API |
 | TC-07 | Menu items change with role; layout is the same | Browser |
-| TC-08 | Role matrix grows with each implemented endpoint: 401 without a session and 403 for the wrong role | API |
+| TC-08 | Independent Express route audit and role matrix grow with each implemented endpoint: exact public allowlist, missing registration detected, 401 without a session and 403 for the wrong role | API |
 | TC-09 | Manager creates a template | API |
 | TC-10 | Minimum not below maximum is rejected | Unit and API |
 | TC-11 | Manager table shows name, unit, range, state, with actions | Browser |
@@ -131,7 +133,7 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 | TC-59 | Journey: a Manager creates a template through the UI; a Participant creates a goal, reads "0 of 1", records a value, reads "1 of 1", restarts, reads again; Manager and anonymous refused | Browser and API |
 | TC-60 | New goal form creates a goal and shows the API message for a rule failure | Browser |
 | TC-61 | Entry form shows the API message for a rejected value and keeps the typed value | Browser |
-| TC-62 | Login input validation: non-JSON body, missing, empty or non-string username or password; no cookie, no session | API |
+| TC-62 | Login input validation: non-JSON, missing, empty or non-string credentials; no cookie or session. Shared API malformed/oversized JSON returns 400 after auth checks | API |
 | TC-63 | Session expiry with the instant passed in: valid at login plus 7:59:59, expired at plus 8:00:00 | Unit |
 | TC-64 | Origin check: login and logout with a foreign `Origin` refused with 403 and change nothing; matching-host and no-Origin login accepted, including HTTP upstream with `X-Forwarded-Proto: https` | API |
 | TC-65 | Login screen: wrong password message, username kept; login opens the role's first page; logout shows the login screen | Browser |
@@ -148,7 +150,7 @@ Names only, from the "Tested by" and "Verification" columns of the SRS.
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
 - AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). Sprint 2 and 3 rows have none by design.
-- Test IDs are provisional and no test is written or run, so no result is shown. Nothing is marked done.
+- Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Other features' tests remain planned. TC-08 independently discovers Auth endpoints and test fixtures from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.
