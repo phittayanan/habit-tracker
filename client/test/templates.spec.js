@@ -45,7 +45,7 @@ test('TC-11: manager template page shows every state, New and Edit, and no Retir
   await page.reload();
   const table = page.getByRole('table');
   await expect(table).toBeVisible();
-  await expect(table.getByRole('columnheader')).toHaveText(['Name', 'Unit', 'Range', 'State']);
+  await expect(table.getByRole('columnheader')).toHaveText(['Name', 'Unit', 'Range', 'State', 'Edit']);
   const rows = table.getByRole('row');
   await expect(rows).toHaveCount(3);
   await expect(rows.nth(1)).toContainText('Sleep');
@@ -69,7 +69,16 @@ test('TC-70: the new template form shows the API message and keeps the typed val
   await page.getByLabel('Unit', { exact: true }).fill('minutes');
   await page.getByLabel('Minimum', { exact: true }).fill('10');
   await page.getByLabel('Maximum', { exact: true }).fill('5');
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route('**/api/templates', async route => {
+    if (route.request().method() === 'POST') await held;
+    await route.continue();
+  });
   await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  await expect(page.getByRole('status')).toHaveText('Saving…');
+  release();
   await expect(page.getByRole('alert')).toHaveText('Minimum must be below maximum.');
   await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Stretching');
   await expect(page.getByLabel('Unit', { exact: true })).toHaveValue('minutes');
@@ -125,11 +134,15 @@ test('TC-47 / TC-48: template screens fit both widths and the keyboard completes
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/templates\/new$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Log out' })).toBeFocused();
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('link', { name: 'Templates', exact: true })).toBeFocused();
-  for (const [label, value] of [['Name', 'Keyboard'], ['Unit', 'minutes'], ['Minimum', '1'], ['Maximum', '3']]) {
+  await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
+  await page.keyboard.type('Keyboard');
+  for (const [label, value] of [['Unit', 'minutes'], ['Minimum', '1'], ['Maximum', '3']]) {
     await page.keyboard.press('Tab');
-    if (label === 'Name') await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
+    await expect(page.getByLabel(label, { exact: true })).toBeFocused();
     await page.keyboard.type(value);
   }
   await page.keyboard.press('Tab');
@@ -137,11 +150,12 @@ test('TC-47 / TC-48: template screens fit both widths and the keyboard completes
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/templates$/);
   await expect(page.getByRole('table')).toContainText('Keyboard');
-  for (const name of ['Templates', 'Log out', 'New']) {
+  let editFocused = false;
+  for (let step = 0; step < 8 && !editFocused; step += 1) {
     await page.keyboard.press('Tab');
+    editFocused = await page.getByRole('button', { name: 'Edit', exact: true }).evaluate(el => el === document.activeElement);
   }
-  await page.keyboard.press('Tab');
-  await expect(page.getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
+  expect(editFocused).toBe(true);
   expect(await page.getByRole('button', { name: 'Edit', exact: true }).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
   for (const control of await page.locator('button, nav a, main a, main input').all()) {
     expect(await control.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);

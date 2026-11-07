@@ -8,7 +8,7 @@ Two students build this project with Claude Code. The team rules (Issues, branch
 
 ## Setup
 
-Auth F-01/F-02 is implemented for Issue #32 using React/Vite, Node.js, Express, Prisma and PostgreSQL 16. The approved package A provides login and the shared role bar. Templates and Goals are auth-only destination headings; domain features come in later Issues.
+Auth F-01/F-02 is implemented for Issue #32, and template create/view F-03/F-06 for Issue #36, using React/Vite, Node.js, Express, Prisma and PostgreSQL 16. The approved package A provides login and the shared role bar. A Manager's first page lists templates and can create one. A Participant can read active templates. Goals stay an auth-only destination heading; template edit, retire, and later domain features come in later Issues.
 
 Use Node.js 22.16+ (or a newer supported release) and npm. Local verification so far used Node.js 26.8.1, npm 11.19.0 and PostgreSQL 16.15. Use a local PostgreSQL 16 instance; the SDS specifies the starter kit's Compose service, whose Docker delivery belongs to Lab 5. An already running local PostgreSQL 16 also works for this backend verification.
 
@@ -39,7 +39,7 @@ npm run build
 npm start
 ```
 
-Open `http://localhost:3000/login` (or your configured `PORT`). The API serves the built client and supports direct visits to the contracted page addresses. `GET /api/health` checks the process; `GET /api/ready` checks PostgreSQL. The seed upserts `manager1`, `participant1`, `participant2`; it requires both seed-password variables, stores only bcrypt hashes, and updates hashes from the current environment on a second run. It creates no templates or other domain data.
+Open `http://localhost:3000/login` (or your configured `PORT`). The API serves the built client and supports direct visits to the contracted page addresses. `GET /api/health` checks the process; `GET /api/ready` checks PostgreSQL. The seed upserts `manager1`, `participant1`, `participant2`; it requires both seed-password variables, stores only bcrypt hashes, and updates hashes from the current environment on a second run. Set `SEED_DEMO_DATA=true` to also upsert three synthetic templates by name (`Reading`, `Walking`, and `Water`), owned by `manager1`. A second run updates those templates and does not add duplicates. Leave the variable unset to seed accounts only.
 
 For API/unit tests, use a **separate disposable database**: each API test deletes its User and Session rows and creates its own Manager and two Participants. Tests generate their passwords at runtime. Migrate that database before running tests (substitute its URL below):
 

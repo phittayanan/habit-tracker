@@ -55,6 +55,15 @@ const templateShape = (body, expected) => {
   assert.deepEqual(Object.keys(body).sort(), ['id', 'maxValue', 'minValue', 'name', 'state', 'unit']);
 };
 
+test('the template migration adds the range check and unique name without changing older tables', async () => {
+  const checks = await db.$queryRaw`SELECT conname::text AS name FROM pg_constraint WHERE conrelid = '"Template"'::regclass AND contype = 'c'`;
+  assert.deepEqual(checks.map(row => row.name), ['Template_min_below_max']);
+  const indexes = await db.$queryRaw`SELECT indexname::text AS name FROM pg_indexes WHERE tablename = 'Template' AND indexname = 'Template_name_key'`;
+  assert.deepEqual(indexes.map(row => row.name), ['Template_name_key']);
+  const userColumns = await db.$queryRaw`SELECT column_name::text AS name FROM information_schema.columns WHERE table_name = 'User' ORDER BY column_name`;
+  assert.deepEqual(userColumns.map(row => row.name), ['created_at', 'display_name', 'id', 'password_hash', 'role', 'username']);
+});
+
 test('TC-10: the range rule refuses an equal or higher minimum and accepts one just below', async () => {
   const { minimumBelowMaximum } = await import('../src/services/template.js');
   assert.equal(minimumBelowMaximum(5, 5), false);

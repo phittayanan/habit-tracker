@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from './api.js';
+import { TemplateForm, TemplateList } from './templates.jsx';
 
 const firstPage = user => user.role === 'MANAGER' ? '/templates' : '/goals';
 
@@ -85,8 +86,11 @@ export function App({ extraPage }) {
   const menu = user.role === 'MANAGER' ? ['Templates'] : ['Goals', 'Templates'];
   const wrongRole = (user.role === 'PARTICIPANT' && /^\/templates\/(new|[^/]+\/edit)\/?$/.test(path)) ||
     (user.role === 'MANAGER' && path === '/goals');
-  // No domain pages are implemented here. Only the approved destination headings ship.
-  const heading = path === '/templates' ? 'Templates' : path === '/goals' ? 'Goals' : null;
+  let page = extraPage?.(path);
+  if (wrongRole) page = <p>This page is not available for your role.</p>;
+  else if (path === '/templates') page = <TemplateList user={user} navigate={navigate} onUnauthenticated={unauthenticated} />;
+  else if (path === '/templates/new') page = <TemplateForm navigate={navigate} onUnauthenticated={unauthenticated} />;
+  else if (path === '/goals') page = <h1>Goals</h1>;
   return <>
     <header className="topbar">
       <div className="identity">{user.displayName}</div>
@@ -98,7 +102,7 @@ export function App({ extraPage }) {
     </header>
     <main className="shell">
       {message && <p role="alert" className="error">{message}</p>}
-      {wrongRole ? <p>This page is not available for your role.</p> : heading ? <h1>{heading}</h1> : extraPage?.(path)}
+      {page}
     </main>
   </>;
 }
