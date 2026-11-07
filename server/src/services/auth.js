@@ -2,12 +2,16 @@ import { randomBytes } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { SESSION_LENGTH_MS } from './session.js';
 
+// Precomputed cost-10 hash of discarded random data, never an account credential.
+const dummyPasswordHash = '$2b$10$0Sws8kjkBK5Qv3gczi7V9eke046vZR.oOXw2rVjfbQ3I4iSCEfe/e';
+
 export const publicUser = ({ id, username, displayName, role }) => ({ id, username, displayName, role });
 
 export async function authenticate(db, credentials, previousSessionId) {
   const user = await db.user.findUnique({ where: { username: credentials.username } });
-  // OP-01.12 is open: do not adopt the proposed dummy hash without agreement.
-  if (!user || !await bcrypt.compare(credentials.password, user.passwordHash)) return null;
+  // OP-01.12: perform comparable bcrypt work for unknown usernames too.
+  const matches = await bcrypt.compare(credentials.password, user ? user.passwordHash : dummyPasswordHash);
+  if (!user || !matches) return null;
   const createdAt = new Date();
   const id = randomBytes(32).toString('base64url');
   await db.$transaction(async tx => {

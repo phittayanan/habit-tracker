@@ -91,6 +91,16 @@ test('TC-02: unknown username and wrong password both perform cost-10 bcrypt wor
   assert.equal(compare.mock.calls[1].arguments[1], participant.passwordHash);
 });
 
+test('TC-02 regression: a successful dummy comparison still cannot authenticate an unknown username', async t => {
+  const compare = t.mock.method(bcrypt, 'compare', async () => true);
+  const response = await request(app).post('/api/auth/login').send({ username: 'nobody', password });
+  assert.equal(compare.mock.callCount(), 1);
+  assert.equal(response.status, 401);
+  assert.deepEqual(response.body, error('INVALID_CREDENTIALS', 'Username or password is incorrect.'));
+  assert.equal(response.headers['set-cookie'], undefined);
+  assert.equal(await db.session.count(), 0);
+});
+
 test('TC-03: logout deletes session and clears cookie; replay and anonymous logout fail', async () => {
   const cookie = cookieOf(await login());
   const response = await request(app).post('/api/auth/logout').set('Cookie', cookie);
