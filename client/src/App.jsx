@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { api } from './api.js';
 import { TemplateForm, TemplateList } from './templates.jsx';
 
+import { GoalForm, GoalList } from './goals.jsx';
+
 const firstPage = user => user.role === 'MANAGER' ? '/templates' : '/goals';
 
 export function App({ extraPage }) {
@@ -85,12 +87,13 @@ export function App({ extraPage }) {
 
   const menu = user.role === 'MANAGER' ? ['Templates'] : ['Goals', 'Templates'];
   const wrongRole = (user.role === 'PARTICIPANT' && /^\/templates\/(new|[^/]+\/edit)\/?$/.test(path)) ||
-    (user.role === 'MANAGER' && path === '/goals');
+    (user.role === 'MANAGER' && /^\/goals(?:\/|$)/.test(path));
   let page = extraPage?.(path);
   if (wrongRole) page = <p>This page is not available for your role.</p>;
   else if (path === '/templates') page = <TemplateList user={user} navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/templates/new') page = <TemplateForm navigate={navigate} onUnauthenticated={unauthenticated} />;
-  else if (path === '/goals') page = <h1>Goals</h1>;
+  else if (path === '/goals') page = <GoalList navigate={navigate} onUnauthenticated={unauthenticated} />;
+  else if (path === '/goals/new') page = <GoalForm navigate={navigate} onUnauthenticated={unauthenticated} />;
   return <>
     <header className="topbar">
       <div className="identity">{user.displayName}</div>

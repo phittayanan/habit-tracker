@@ -245,15 +245,24 @@ test('TC-64: Origin runs before body/session checks and compares host including 
   }
 });
 
+const wrongRoleCookies = participantCookie => {
+  let managerCookie;
+  return async allowedRole => {
+    if (allowedRole !== 'PARTICIPANT') return participantCookie;
+    managerCookie ??= cookieOf(await login('manager1'));
+    return managerCookie;
+  };
+};
+
 const coverageRoutes = () => [...protectedRoutes, {
   method: 'post', path: '/api/test/manager/:id', requestPath: '/api/test/manager/1', roles: ['MANAGER'],
 }];
 
 test('TC-08: independently audit every implemented API route, then exercise session and role checks', async () => {
   const cookie = cookieOf(await login());
-  await assertProtectedRouteCoverage(app, coverageRoutes(), cookie);
+  await assertProtectedRouteCoverage(app, coverageRoutes(), wrongRoleCookies(cookie));
   assert.deepEqual(calls, []);
-  assert.equal(await db.session.count(), 1);
+  assert.equal(await db.session.count(), 2);
 });
 
 test('TC-08 regression: an added nested route missing both middleware and registration fails coverage', async () => {
@@ -284,12 +293,12 @@ test('TC-08 regression: registration alone fails; protecting and registering nes
   const routes = [...protectedRoutes, ...['get', 'patch'].map(method => ({
     method, path: '/api/test/audit/nested/probe/:id', requestPath: '/api/test/audit/nested/probe/1',
   }))];
-  await assert.rejects(assertProtectedRouteCoverage(fixture(false), routes, cookie), /expected 401/);
+  await assert.rejects(assertProtectedRouteCoverage(fixture(false), routes, wrongRoleCookies(cookie)), /expected 401/);
   assert.equal(handlerCalls, 1);
   handlerCalls = 0;
   const secured = fixture(true);
   await assert.rejects(assertProtectedRouteCoverage(secured, routes.filter(route => route.method !== 'patch'), cookie), /Uncovered API route: patch/);
-  await assertProtectedRouteCoverage(secured, routes, cookie);
+  await assertProtectedRouteCoverage(secured, routes, wrongRoleCookies(cookie));
   assert.equal(handlerCalls, 0);
   await request(createApp({ db })).get('/api/test/audit/nested/probe/1').expect(404);
 });
@@ -311,7 +320,7 @@ test('TC-08 regression: public allowlist matches exact methods and paths, includ
   for (const mount of ['first', 'second']) for (const path of ['one', 'two']) {
     routes.push({ method: 'get', path: `/api/test/${mount}/${path}` });
   }
-  await assertProtectedRouteCoverage(mounted, routes, cookie);
+  await assertProtectedRouteCoverage(mounted, routes, wrongRoleCookies(cookie));
 });
 
 test('TC-66: session then role, before validation/existence; client roles cannot override', async () => {

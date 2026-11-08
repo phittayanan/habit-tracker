@@ -4,6 +4,7 @@ import bcrypt from '../../server/node_modules/bcryptjs/index.js';
 import { randomBytes } from 'node:crypto';
 if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.env.DATABASE_URL) throw new Error('Separate test database required.');
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
+test.use({ timezoneId: 'America/Los_Angeles' });
 const password = randomBytes(24).toString('base64url');
 let template;
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
@@ -40,7 +41,7 @@ test('TC-60: real goal creation, duplicate message and retained values, disabled
   await expect(page.getByText('hours', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page).toHaveURL(/\/goals$/);
-  await expect(page.getByRole('listitem')).toContainText(['Sleep', '20', 'hours', 'Active']);
+  for (const text of ['Sleep', '20', 'hours', 'Active']) await expect(page.getByRole('listitem')).toContainText(text);
   await newGoal(page).click(); await fill(page, '21');
   let release;
   const held = new Promise(resolve => { release = resolve; });
@@ -78,8 +79,14 @@ test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and can
   for (let i = 0; i < 6 && !reachedEnd; i++) { await page.keyboard.press('Tab'); reachedEnd = await page.getByLabel('End date', { exact: true }).evaluate(el => el === document.activeElement); }
   expect(reachedEnd).toBe(true);
   const [year, month, day] = today().split('-');
-  await page.keyboard.type(month); await page.keyboard.press('ArrowRight');
-  await page.keyboard.type(day); await page.keyboard.press('ArrowRight'); await page.keyboard.type(year);
+  // Reset to the first native segment before each part: Chrome may advance
+  // automatically after a two-digit month/day.
+  for (const [index, part] of [month, day, year].entries()) {
+    for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowLeft');
+    for (let i = 0; i < index; i++) await page.keyboard.press('ArrowRight');
+    await page.keyboard.type(part);
+  }
+  await expect(page.getByLabel('End date', { exact: true })).toHaveValue(today());
   for (let i = 0; i < 5; i++) { if (await page.getByRole('button', { name: 'Save', exact: true }).evaluate(el => el === document.activeElement)) break; await page.keyboard.press('Tab'); }
   await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
