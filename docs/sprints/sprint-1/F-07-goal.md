@@ -167,3 +167,11 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
 | 2026-11-08 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, OP-07.11 allows both serial orders | pending (partner review of the Issue #38 PR) |
+
+| 2026-11-08 | Issue #40 implementation evidence: owner-confirmed existing API behaviors, Goal tests-first history, local validation and remaining human review recorded in section 14; requirements unchanged | phittayanan (owner-only implementation authorization); teammate implementation review pending |
+
+## 14. Implementation evidence — Issue #40
+
+Implementation follows the merged contract and this session's owner-approved Issue #40. [Goal implementation evidence](../../goal-implementation-evidence.md) records the contract → failing tests → implementation history, AC/test mapping, exact commands/counts, tested revisions, concurrency proof, screenshot comparison and limitations. The owner confirmed the specified OP-07.3/4/6 behaviors for this implementation; teammate agreement remains unverified. This does not alter the earlier review history or resolve OP-07.11's future F-04 race test. Human implementation review and merge remain pending.
+
+Implementation PR: https://github.com/phittayanan/habit-tracker/pull/41. A substantive teammate review has been requested; approval and merge are pending.

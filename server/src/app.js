@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { requireOrigin, sendError } from './middleware/auth.js';
 import { registerAuth, invalidLogin, protectedRoutes as authRoutes } from './routes/auth.js';
 import { registerTemplates, templateRoutes } from './routes/templates.js';
-export const protectedRoutes = [...authRoutes, ...templateRoutes];
+import { registerGoals, goalRoutes } from './routes/goals.js';
+export const protectedRoutes = [...authRoutes, ...templateRoutes, ...goalRoutes];
 
 export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
   const app = express();
@@ -18,13 +19,14 @@ export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
   });
   registerAuth(app, db);
   registerTemplates(app, db);
+  registerGoals(app, db);
   // Explicit injection by test harness only. Runtime startup never supplies this callback.
   if (registerTestRoutes) registerTestRoutes(app);
   app.use('/api', (req, res) => sendError(res, 404, 'NOT_FOUND', 'Not found.'));
   const clientDir = fileURLToPath(new URL('../../client/dist/', import.meta.url));
   if (serveClient && existsSync(clientDir)) {
     app.use(express.static(clientDir));
-    app.get(['/login', '/', '/templates', '/templates/new', '/templates/:id/edit', '/goals'], (req, res) => {
+    app.get(['/login', '/', '/templates', '/templates/new', '/templates/:id/edit', '/goals', '/goals/new'], (req, res) => {
       res.set('Cache-Control', 'no-store').sendFile('index.html', { root: clientDir });
     });
   }

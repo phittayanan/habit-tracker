@@ -28,7 +28,7 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 | F-03 Template creation and Manager list | [`F-03-template-create.md`](F-03-template-create.md) | FR-05, FR-06; BR-03 (minimum below maximum) | AC-03.1 to AC-03.7 (7) | TC-09, TC-10, TC-68, TC-69, TC-11, TC-70 | #30 / PR #31 | #36 / PR #37 |
 | F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | not opened |
 | F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
-| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29 | not opened |
+| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29; #38 / PR #39 | [#40 implementation](https://github.com/phittayanan/habit-tracker/pull/41) (review pending) |
 | F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29 | not opened |
 | F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | not opened |
 | F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | not opened |
@@ -283,7 +283,7 @@ As of 2026-11-08. This table is a snapshot; the board and `docs/traceability.md`
 |---|---|---|---|
 | Auth | F-01, F-02 | #32 | Merged (PR #34). Evidence: `docs/auth-implementation-evidence.md` |
 | Template | F-03, F-04, F-06 | #36 (F-03, F-06); F-04 not opened | F-03 and F-06 merged (PR #37). Evidence: `docs/template-implementation-evidence.md`. F-04 not started (needs F-07) |
-| Goal | F-07 | not opened | Not started |
+| Goal | F-07 | #40 / [implementation](https://github.com/phittayanan/habit-tracker/pull/41) | Implemented; human review and merge pending. Evidence: `docs/goal-implementation-evidence.md`. Entries, progress and the F-04 edit/create race remain separate work |
 | Entry | F-08 | not opened | Not started |
 | Progress and privacy | F-09, F-10 | not opened | Not started |
 

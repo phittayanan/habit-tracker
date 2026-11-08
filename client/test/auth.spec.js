@@ -7,6 +7,7 @@ if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
 const password = randomBytes(24).toString('base64url');
 test.beforeEach(async () => {
+  await db.goal.deleteMany();
   await db.template.deleteMany();
   await db.session.deleteMany();
   await db.user.deleteMany();

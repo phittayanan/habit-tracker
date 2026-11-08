@@ -76,7 +76,8 @@ export async function assertProtectedRouteCoverage(app, routes, cookie) {
     assert.equal(anonymous.status, 401, `${route.method} ${path}: expected 401`);
     if (route.method !== 'head') assert.deepEqual(anonymous.body, { error: { code: 'UNAUTHENTICATED', message: 'Please log in.' } });
     if (coverage.roles?.length === 1) {
-      const forbiddenRequest = request(app)[route.method](path).set('Cookie', cookie);
+      const wrongRoleCookie = typeof cookie === 'function' ? await cookie(coverage.roles[0]) : cookie;
+      const forbiddenRequest = request(app)[route.method](path).set('Cookie', wrongRoleCookie);
       if (route.method !== 'head') forbiddenRequest.send({ name: 'valid' });
       const forbidden = await forbiddenRequest;
       assert.equal(forbidden.status, 403);
