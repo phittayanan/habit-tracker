@@ -4,7 +4,7 @@ import bcrypt from '../../server/node_modules/bcryptjs/index.js';
 import { randomBytes } from 'node:crypto';
 if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.env.DATABASE_URL) throw new Error('Separate test database required.');
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
-test.use({ timezoneId: 'America/Los_Angeles' });
+test.use({ locale: 'en-US', timezoneId: 'America/Los_Angeles' });
 const password = randomBytes(24).toString('base64url');
 let template;
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
@@ -57,16 +57,43 @@ test('TC-60: real goal creation, duplicate message and retained values, disabled
   expect(await db.goal.count()).toBe(1);
 });
 
-test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and cancels form', async ({ page }) => {
+// Native date segments follow the OS on some Chrome builds, even when the
+// browser locale is pinned. Observe a distinct date in a minimal page using keys.
+async function typeDateParts(page, parts) {
+  for (const [index, part] of parts.entries()) {
+    for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowLeft');
+    for (let i = 0; i < index; i++) await page.keyboard.press('ArrowRight');
+    await page.keyboard.type(part);
+  }
+}
+async function nativeDateOrder(context) {
+  const probe = await context.newPage();
+  try {
+    await probe.setContent('<label for="date">Date probe</label><input id="date" type="date">');
+    await probe.keyboard.press('Tab');
+    await expect(probe.getByLabel('Date probe')).toBeFocused();
+    await typeDateParts(probe, ['11', '08', '2026']);
+    const iso = await probe.getByLabel('Date probe').inputValue();
+    expect(['2026-11-08', '2026-08-11']).toContain(iso);
+    return iso === '2026-11-08' ? 'month-first' : 'day-first';
+  } finally { await probe.close(); }
+}
+
+test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and cancels form', async ({ page, context }) => {
+  const order = await nativeDateOrder(context);
   await login(page);
   await expect(newGoal(page)).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   // Start keyboard traversal from the document, independent of login focus restoration.
   await page.goto('/goals'); await expect(newGoal(page)).toBeVisible();
   for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
-  await expect(newGoal(page)).toBeFocused(); await page.keyboard.press('Enter');
+  await expect(newGoal(page)).toBeFocused();
+  expect(await newGoal(page).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
+  await page.keyboard.press('Enter');
   const select = page.getByLabel('Template', { exact: true });
+  await expect(select.getByRole('option', { name: 'Sleep', exact: true })).toHaveCount(1);
   await expect(select).toBeFocused();
+  expect(await select.evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
   await page.keyboard.press('ArrowDown'); await page.keyboard.press('s'); await page.keyboard.press('Enter');
   await expect(select).toHaveValue(String(template.id));
   await page.keyboard.press('Tab'); await expect(page.getByLabel('Daily target', { exact: true })).toBeFocused();
@@ -79,13 +106,7 @@ test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and can
   for (let i = 0; i < 6 && !reachedEnd; i++) { await page.keyboard.press('Tab'); reachedEnd = await page.getByLabel('End date', { exact: true }).evaluate(el => el === document.activeElement); }
   expect(reachedEnd).toBe(true);
   const [year, month, day] = today().split('-');
-  // Reset to the first native segment before each part: Chrome may advance
-  // automatically after a two-digit month/day.
-  for (const [index, part] of [month, day, year].entries()) {
-    for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowLeft');
-    for (let i = 0; i < index; i++) await page.keyboard.press('ArrowRight');
-    await page.keyboard.type(part);
-  }
+  await typeDateParts(page, order === 'month-first' ? [month, day, year] : [day, month, year]);
   await expect(page.getByLabel('End date', { exact: true })).toHaveValue(today());
   for (let i = 0; i < 5; i++) { if (await page.getByRole('button', { name: 'Save', exact: true }).evaluate(el => el === document.activeElement)) break; await page.keyboard.press('Tab'); }
   await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeFocused();
@@ -94,7 +115,12 @@ test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and can
   await page.keyboard.press('Enter'); await expect(page).toHaveURL(/\/goals$/);
   await expect(page.getByRole('listitem')).toContainText('Sleep');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await newGoal(page).focus(); await page.keyboard.press('Enter'); await expect(select).toBeFocused();
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press('Tab');
+    if (await newGoal(page).evaluate(el => el === document.activeElement)) break;
+  }
+  await expect(newGoal(page)).toBeFocused();
+  await page.keyboard.press('Enter'); await expect(select).toBeFocused();
   await page.keyboard.press('Shift+Tab'); await expect(page.getByRole('button', { name: 'Log out' })).toBeFocused();
   // Reach Cancel through the form's actual tab order.
   for (let i = 0; i < 15; i++) { await page.keyboard.press('Tab'); if (await page.getByRole('link', { name: 'Cancel' }).evaluate(el => el === document.activeElement)) break; }
