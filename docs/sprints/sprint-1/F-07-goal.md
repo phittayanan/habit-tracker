@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 | Depends on | F-03 (templates exist), F-06 (a Participant can see templates), F-01, F-02 (login and role checks) |
 | Needed by | F-08, F-09, F-10 |
 | Author / reviewer | projectnewy / phittayanan |
-| Status | Draft, review round 1 applied |
+| Status | Draft, review round 1 applied; revised for the template row lock and the decimal rules (Issue #38) |
 
 ## 2. Behaviour and workflow
 
@@ -28,9 +28,10 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 |---|---|---|
 | BR-05 | A Participant has at most one active goal per template. "Active" means not Ended, so a goal that starts in the future counts as active | SRS BR-05; ADR 0010; OP-07.5 |
 | BR-06 | A goal is Active until its end date passes, then Ended. The state is computed from dates | SRS BR-06; ADR 0012 |
-| Target | `daily_target` is above 0 and not above the template's `max_value` | SRS A-4 (decided on PR #23); SDS 3.2 |
+| Target | `daily_target` is above 0, has at most 2 decimal places, lies within `Decimal(10, 2)` (up to 99,999,999.99), and is not above the template's `max_value`. A number with more than 2 decimal places is refused, never rounded | SRS A-4 (decided on PR #23); SDS 3.2; F-03 OP-03.3, OP-03.4 |
 | Dates | `end_date` is on or after `start_date`. A day is a date in Asia/Bangkok | SDS 3.2; ADR 0006 |
 | Owner | The goal belongs to the session user. The owner is never read from the request | SDS 2.2, 3.3; GWS §5.2 |
+| Template lock | Goal creation locks the template row (`SELECT ... FOR UPDATE`) inside its transaction, before it reads the template's `max_value` and before the BR-05 check. So a template edit (F-04) and a new goal on that template cannot interleave: either the goal is saved and the edit is refused as in use, or the edit is saved first and the goal is checked against the edited range | F-04 OP-04.4 (decided on PR #31); SDS S-6 |
 
 State by date (today is the Asia/Bangkok date): Active when `today <= end_date` (this includes a goal that starts in the future and the end date itself); Ended when `today > end_date`.
 
@@ -43,11 +44,13 @@ Checks run in this order (SDS 2.2): session (401), role (403), validation (400),
 | No valid session | 401 | `UNAUTHENTICATED` |
 | Caller is a Manager | 403 | `FORBIDDEN` |
 | `templateId` missing, not an integer, or no such template | 400 | `VALIDATION_ERROR` (decided, OP-07.1) |
-| `dailyTarget` missing, not a number, 0 or negative | 400 | `VALIDATION_ERROR` |
+| `dailyTarget` missing, not a number, 0 or negative, with more than 2 decimal places, or above 99,999,999.99 (outside `Decimal(10, 2)`) | 400 | `VALIDATION_ERROR` (decided, F-03 OP-03.3 and OP-03.4) |
 | `dailyTarget` above the template's `max_value` | 400 | `TARGET_ABOVE_TEMPLATE_MAX` |
 | `startDate` or `endDate` missing or not `YYYY-MM-DD` | 400 | `VALIDATION_ERROR` |
 | `endDate` before `startDate` | 400 | `VALIDATION_ERROR` |
 | The caller already has a goal on this template that is not Ended | 409 | `ACTIVE_GOAL_EXISTS` |
+
+When a request breaks more than one row, the first one in this table is returned: validation errors come before rule errors. Example: a target of 30.555 for a template with maximum 24 gets `400 VALIDATION_ERROR` (more than 2 decimal places), not `TARGET_ABOVE_TEMPLATE_MAX`.
 
 Unknown body fields (for example `participantId` or `userId`) are stripped by the validation schema and do not cause an error (decided, OP-07.7).
 
@@ -97,8 +100,8 @@ Errors: 400, 401, 403, 409 as in section 4.
 |---|---|
 | Table `Goal` | `id` integer primary key; `participant_id` not null, reference to User; `template_id` not null, reference to Template; `daily_target` decimal not null; `start_date` date not null; `end_date` date not null; `created_at` timestamp not null (SDS 3.2) |
 | Constraints | check `daily_target > 0`; check `end_date >= start_date`. The rule "not above `max_value`" compares two tables, so the service enforces it |
-| BR-05 | The service checks and inserts inside one transaction (SDS S-6) |
-| Decimal scale | All four decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use 2 decimal places (decided, OP-07.8). Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
+| BR-05 and the template lock | The service locks the template row (`SELECT ... FOR UPDATE`), reads its `max_value`, checks BR-05 and inserts the goal inside one transaction (SDS S-6; F-04 OP-04.4) |
+| Decimal columns | All four decimal columns (`min_value`, `max_value`, `daily_target`, `value`) are `Decimal(10, 2)`: 2 decimal places, up to 99,999,999.99 (decided, OP-07.8; F-03 OP-03.4). A number with more than 2 decimal places, or outside that range, is refused with `400 VALIDATION_ERROR` and never rounded (F-03 OP-03.3). Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
 | Migration | One additive Prisma migration that creates `Goal`. It changes no existing table (the scale for the Template columns is part of F-03's migration) |
 | State | Not stored; computed from the dates |
 
@@ -111,10 +114,11 @@ Errors: 400, 401, 403, 409 as in section 4.
 | AC-07.3 | A second request for the same template while the first goal is not Ended gets 409 `ACTIVE_GOAL_EXISTS`, and no second row is stored |
 | AC-07.4 | A new goal is accepted when the earlier goal on the same template is Ended, when the template differs, and when another Participant has an active goal on the same template |
 | AC-07.5 | The state is `ACTIVE` on the start day, on the end day, and before the start day; it is `ENDED` the day after the end day |
-| AC-07.6 | A missing or invalid `templateId` (missing, not an integer, unknown), a missing or non-numeric `dailyTarget`, a target of 0 or less, a missing or badly formatted date, or `endDate` before `startDate` gets 400 `VALIDATION_ERROR` and nothing is stored |
+| AC-07.6 | A missing or invalid `templateId` (missing, not an integer, unknown), a missing or non-numeric `dailyTarget`, a target of 0 or less, a target with more than 2 decimal places or above 99,999,999.99, a missing or badly formatted date, or `endDate` before `startDate` gets 400 `VALIDATION_ERROR` and nothing is stored |
 | AC-07.7 | A target above the template's `max_value` gets 400 `TARGET_ABOVE_TEMPLATE_MAX`; a target equal to it is accepted |
 | AC-07.8 | A Manager gets 403 `FORBIDDEN` and an anonymous caller gets 401 `UNAUTHENTICATED`; nothing is stored |
 | AC-07.9 | The "+ New goal" form creates the goal through the API, shows the rejection message for a rule failure and keeps the typed values |
+| AC-07.10 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on that template, `POST /api/goals` waits and completes only after the lock is released, and then reads the template's values as they are at that moment |
 
 ## 10. Test specification
 
@@ -125,16 +129,18 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-20 | AC-07.1, AC-07.2 | API | Participant A logged in; template T (min 0, max 24); the body also carries `"participantId": 99` | `POST /api/goals` with valid data (start `D`, end `D+30`); restart the app; `GET /api/goals` | 201; goal returned with `state` ACTIVE; listed after the restart; stored owner is A, not 99 |
 | TC-21 | AC-07.3 | API | A has an active goal on T | `POST /api/goals` for T again | 409 `ACTIVE_GOAL_EXISTS`; A's goal count on T is still 1 |
 | TC-22 | AC-07.5 | Unit | `today` passed as an argument; goal start 2026-11-10, end 2026-11-12 | Compute the state for today = 11-09, 11-10, 11-12, 11-13 | ACTIVE, ACTIVE, ACTIVE, ENDED |
-| TC-53 | AC-07.6, AC-07.8 | API | A logged in; template T | Send each bad body: no `templateId`, `templateId` "abc", `templateId` 99999, no `dailyTarget`, `dailyTarget` "abc", `dailyTarget` 0, `dailyTarget` -1, bad date format, missing dates, end before start. Then send a valid body as Manager and with no session | Every bad body gets `400 VALIDATION_ERROR`; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED`; no row is stored in any case |
-| TC-54 | AC-07.7 | API and unit | Template max 24 | Send target 24, then 24.5 | 24 accepted (201); 24.5 gets `400 TARGET_ABOVE_TEMPLATE_MAX` |
+| TC-53 | AC-07.6, AC-07.8 | API | A logged in; template T | Send each bad body: no `templateId`, `templateId` "abc", `templateId` 99999, no `dailyTarget`, `dailyTarget` "abc", `dailyTarget` 0, `dailyTarget` -1, `dailyTarget` 10.555, `dailyTarget` 100000000, bad date format, missing dates, end before start. Then send a valid body as Manager and with no session | Every bad body gets `400 VALIDATION_ERROR`; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED`; no row is stored in any case |
+| TC-54 | AC-07.6, AC-07.7 | API and unit | Template max 24 | Send target 24, then 24.5, then 30.555 | 24 accepted (201); 24.5 gets `400 TARGET_ABOVE_TEMPLATE_MAX`; 30.555 gets `400 VALIDATION_ERROR` (more than 2 decimal places; validation wins over the rule); nothing is stored for the last two |
 | TC-55 | AC-07.2, AC-07.4 | API | A has an Ended goal G1 on T1 (end `D-1`); B has an **active** goal on T1 | A creates a goal on T1; A creates a goal on T2; the body of one request carries B's ID | Both of A's requests accepted (201); stored owner is A, never B |
 | TC-60 | AC-07.9 | Browser | A logged in; T exists | Open the form, submit a valid goal, then submit a second goal on T | The first goal appears; the second shows the API message and keeps the typed values |
+| TC-74 | AC-07.10 | API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
 
 ## 11. Definition of done
 
 - Every AC above has at least one test in section 10, written first and seen failing, then passing; the command, counts and tested commit are recorded.
 - The migration is additive and applies on a clean database; the seed still runs twice without error.
 - The rules (BR-05, BR-06, target and date checks) are unit tested; coverage of the rule code meets NFR-08.
+- The template lock is in the same transaction as the BR-05 check, and TC-74 proves that goal creation waits for a lock on the template row.
 - Contract, `docs/traceability.md` rows (AC, Test ID, Issue and PR) and the README setup are current; open points are disclosed.
 - The PR is reviewed by the teammate with a specific check, and merged into `staging`.
 
@@ -149,8 +155,10 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | OP-07.5 | Does a goal that starts in the future count as active for BR-05 | Decided on PR #29 (Q4): yes, not Ended counts as active |
 | OP-07.6 | Code for a target above the template maximum (A-4); SDS S-16 does not cover it | Open (proposal): 400 `TARGET_ABOVE_TEMPLATE_MAX` |
 | OP-07.7 | Unknown body fields (for example `participantId`): ignore or refuse. SDS 4.3 leaves it to the first contract | Decided on PR #29 (Q3): stripped, the request is accepted. Applies to every Sprint 1 contract |
-| OP-07.8 | Decimal scale for `min_value`, `max_value`, `daily_target` and `value` (SDS S-2) | Decided on PR #29 (Q8): 2 decimal places for all four; JSON numbers |
+| OP-07.8 | Decimal scale and precision for `min_value`, `max_value`, `daily_target` and `value` (SDS S-2); what happens to a number with more than 2 decimal places | Decided on PR #29 (Q8): 2 decimal places for all four; JSON numbers. Precision `Decimal(10, 2)` and the refusal of extra places with `400 VALIDATION_ERROR`, never rounding: decided in F-03 (OP-03.3, OP-03.4, PR #31 review) and applied here by Issue #38 |
 | OP-07.9 | How tests fix "today" | Decided on PR #29 (Q2): dates relative to the real Bangkok today for tests through the server; unit tests pass `today` as an argument |
+| OP-07.10 | Goal creation and a template edit racing on the same template (F-04 OP-04.4) | Decided in F-04 (PR #31 review) and applied here by Issue #38: goal creation locks the template row inside its transaction (AC-07.10, TC-74) |
+| OP-07.11 | The end-to-end race, a `PATCH /api/templates/:id` and a `POST /api/goals` at the same time, can only be run once F-04 exists, which is built after F-07 | Open (proposal): TC-74 proves the lock now; the F-04 contract gets the two-request test (one of `goal saved and edit refused as in use` or `edit saved and goal checked against the new range`, never both saved) when F-04 is built |
 
 ## 13. Revision history
 
@@ -158,3 +166,4 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
+| 2026-11-08 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` | pending (partner review of the Issue #38 PR) |
