@@ -165,7 +165,7 @@ Every test of the nine contracts in one table (handout D1 §3.5: "Map all Sprint
 | TC-21 | AC-07.3 | Second active goal on the same template rejected | API |
 | TC-22 | AC-07.5 | Goal state on start day, end day and the day after | Unit |
 | TC-53 | AC-07.6, AC-07.8 | Goal input validation: missing field, bad date, end before start, target 0 or negative, target with more than 2 decimal places or above 99,999,999.99, Manager and anonymous refused; nothing stored | API |
-| TC-54 | AC-07.6, AC-07.7 | Daily target equal to the template maximum accepted; above it rejected; a target above it with more than 2 decimal places gets `VALIDATION_ERROR` (validation wins) | API and unit |
+| TC-54 | AC-07.6, AC-07.7 | Daily target equal to the template maximum accepted; above it rejected; a target above it with more than 2 decimal places gets `VALIDATION_ERROR` (validation wins); a target above it with no `startDate` also gets `VALIDATION_ERROR` | API and unit |
 | TC-55 | AC-07.2, AC-07.4 | An ended goal does not block a new goal on the same template; another template or another Participant allowed; the owner is the session user | API |
 | TC-60 | AC-07.9 | New goal form creates a goal and shows the API message for a rule failure | Browser |
 | TC-74 | AC-07.10 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on the template, `POST /api/goals` waits, then reads the template as committed | API and database |
@@ -247,7 +247,7 @@ Collected from section 13 of each contract. The rule: a contract is changed by a
 | 2026-11-08 | F-06 | Issue #36 implementation evidence recorded in `docs/template-implementation-evidence.md`. No decided point was reopened. Edit refusal stays in F-04. | pending review |
 | 2026-11-07 | F-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
-| 2026-11-08 | F-07 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` | pending (partner review of the Issue #38 PR) |
+| 2026-11-08 | F-07 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, OP-07.11 allows both serial orders | pending (partner review of the Issue #38 PR) |
 | 2026-11-07 | F-08 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-08 | Review round 1 (PR #29): TC-28 gives each accepted value its own day; codes in TC-56; test dates relative to the Bangkok today; AC-08.5 and TC-27 reworded (TZ=UTC, goal period); AC-08.11 and AC-08.12 added; order of rule checks; date box named; decimal scale; decisions Q1, Q8, Q9 recorded | pending (partner re-check) |
 | 2026-11-07 | F-08 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |

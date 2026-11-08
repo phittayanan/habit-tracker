@@ -125,7 +125,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-51 | Rule code has at least 80% line coverage | CI report |
 | TC-52 | Tests run in CI on every PR against a real test database | CI |
 | TC-53 | Goal input validation: missing field, bad date, end before start, target 0 or negative, target with more than 2 decimal places or above 99,999,999.99, Manager and anonymous refused; nothing stored | API |
-| TC-54 | Daily target equal to the template maximum accepted; above it rejected; a target above it with more than 2 decimal places gets `VALIDATION_ERROR` (validation wins) | API and unit |
+| TC-54 | Daily target equal to the template maximum accepted; above it rejected; a target above it with more than 2 decimal places gets `VALIDATION_ERROR` (validation wins); a target above it with no `startDate` also gets `VALIDATION_ERROR` | API and unit |
 | TC-55 | An ended goal does not block a new goal on the same template; another template or another Participant allowed; the owner is the session user | API |
 | TC-56 | Entry input validation and access: missing or malformed date or value, value with more than 2 decimal places or outside `Decimal(10, 2)`; Manager, anonymous, another Participant's goal and unknown goal refused | API |
 | TC-57 | Another Participant's goal and an unknown goal id give the same 404 status and body | API |
