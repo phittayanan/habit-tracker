@@ -31,8 +31,8 @@ All submission deadlines are 23:59 on the given date (GWS §4). All due dates be
 | 12–25 Oct | Exam period | none | GWS §4 |
 | 26 Oct – 1 Nov | Midterm break, independent project work | none | GWS §4 |
 | 3, 5 Nov | Workshop: SRS, system SDS, Sprint 1 contract, tests, integration. Lab 5 sessions with the TA walkthrough in Lecture 11 | none | GWS §4; L5 cover table |
-| **8 Nov** | **Project Deliverable 1 due** (Sprint 1 released on `main`) | 80 project | GWS §4; D1 title |
 | 10, 12 Nov | Lab 6 sessions: cross-team UAT and defect management | none | GWS §4 |
+| **15 Nov** | **Project Deliverable 1 due**, 23:59 (Sprint 1 released on `main`). The handout said 8 Nov | 80 project | LEB2 Assessment Activity, checked 2026-11-09; GWS §4 and D1 title said 8 Nov |
 | **15 Nov** | **Lab 5 due**: deployed Sprint 1 and repeatable delivery | 100 lab | GWS §4; L5 cover table, §12 |
 | 17, 19 Nov | Lab 7 sessions: maintenance, metrics, release readiness | none | GWS §4 |
 | **22 Nov** | **Lab 6 due** | 100 lab | GWS §4, §10 |
@@ -46,7 +46,7 @@ Other dated checkpoints:
 
 | Date | Checkpoint | Source |
 |---|---|---|
-| 8 Nov | Sprint 1 working increment on `main`. Authentication, permissions and persistence | GWS §7; D1 §3.4 |
+| 15 Nov | Sprint 1 working increment on `main`. Authentication, permissions and persistence. The handout said 8 Nov | LEB2 Assessment Activity, checked 2026-11-09; GWS §7; D1 §3.4 |
 | 29 Nov | Sprint 2 complete. Sprint 3 contracts, working progress and a remaining-work list. Product "substantially complete" | GWS §4, §7; D1 §3.4; D2 §2 |
 | 13 Dec | Sprint 3 complete and released | GWS §7; D1 §3.4 |
 | 15 Dec | Example end date for the GCP budget alert ("or your Final Project deadline") | SG Ep. 1.5 |
@@ -108,7 +108,7 @@ Theme 8 as the handout words it (GWS §6.8):
 
 | Sprint | What the handout says | Due |
 |---|---|---|
-| 1 | Small working increment: authentication and authorization foundation plus an end-to-end domain slice. Show a normal workflow, a business-rule rejection, and access restrictions with tests. Runs locally with documented setup and is suitable for containerization | 8 Nov |
+| 1 | Small working increment: authentication and authorization foundation plus an end-to-end domain slice. Show a normal workflow, a business-rule rejection, and access restrictions with tests. Runs locally with documented setup and is suitable for containerization | 15 Nov (LEB2; the handout said 8 Nov) |
 | 2 | Major remaining workflows under feature contracts. Integrated, tested working increment | 29 Nov |
 | 3 | Remaining features, integration, failure handling, usability, authorization, regression tests, defect fixes. By 29 Nov: contracts, progress and a remaining-work list | 13 Dec |
 
@@ -151,7 +151,7 @@ No separate handout exists yet (see O-8).
 | Item | Value | Source |
 |---|---|---|
 | Title | Engineering baseline and working Sprint 1 | D1 title |
-| Due | 8 Nov 2026, 23:59 | D1 title, §4 |
+| Due | 15 Nov 2026, 23:59. The handout said 8 Nov | LEB2 Assessment Activity, checked 2026-11-09; D1 title, §4 said 8 Nov |
 | Points | 80 (8% of grade) | D1 title |
 | Submit | One self-contained PDF per team on LEB2 | D1 §4 |
 
@@ -618,7 +618,7 @@ These are questions only. This file gives no answers and no recommendations. The
 18. Which NFR matter, what is each measurable target, how is it verified, and in which sprint? (D1 §3.1)
 19. Which features cover each requirement, and which sprint builds and verifies each? Are there cross-cutting requirements? (D1 §3.2)
 20. What is the goal of each of the three sprints, which feature IDs go in each, and what depends on what? (D1 §3.4)
-21. Is the Sprint 1 scope small enough to finish by 8 Nov and large enough to match the theme's example? (D1 §3.4; GWS §6)
+21. Is the Sprint 1 scope small enough to finish by 15 Nov (LEB2; the handout said 8 Nov) and large enough to match the theme's example? (D1 §3.4; GWS §6)
 22. What does "done" mean for a feature and for the product (Product Definition of Done)? (D1 §3.5)
 
 ### 10.4 Architecture and data
@@ -672,7 +672,7 @@ Each point is a place where a handout is unclear, or two handouts disagree. Both
 | O-4 | Final video points and report parts. GWS §9 gives the video 8 points and a one-page release summary 2 points. FD gives the video 10 points and has no separate summary part | GWS §9; FD §1 |
 | O-5 | Final video content. GWS §9 lists live workflows, a rejected case, brief architecture, test and CI, and a traceability example, and later "one business rule, one failure or access case, one requirement-to-test chain". FD §3.5 lists major workflows, a business rule and a rejected or failure case, and does not list architecture, CI or traceability | GWS §9; FD §3.5 |
 | O-6 | Final PDF parts. GWS §9 lists the final report as an evidence index that includes the release summary. FD §4.1 asks for complete SRS, SDS and all contracts in appendices | GWS §9; FD §3.3, §4.1 |
-| O-7 | Lab 5 timing. GWS §4 lists "Lab 5: CI/CD, Docker, GCP deployment" next to the 3 and 5 Nov workshop, with no date of its own. L5 says its sessions are 3 and 5 Nov, which is before D1 is due on 8 Nov. L5 §1 starts from "your accepted Sprint 1 release", and SG Ep. 2 needs "the Sprint 1 app runs locally" | GWS §4; L5 cover table, §1; SG Ep. 2 |
+| O-7 | Lab 5 timing. GWS §4 lists "Lab 5: CI/CD, Docker, GCP deployment" next to the 3 and 5 Nov workshop, with no date of its own. L5 says its sessions are 3 and 5 Nov, which is before D1 is due on 15 Nov (LEB2, checked 2026-11-09; the handout said 8 Nov). L5 §1 starts from "your accepted Sprint 1 release", and SG Ep. 2 needs "the Sprint 1 app runs locally" | GWS §4; L5 cover table, §1; SG Ep. 2 |
 | O-8 | Lab 6 and Lab 7 have no handout yet. Only GWS §10 describes them | GWS §10, §12 |
 | O-9 | Whether the merge gate must cover staging. GWS §5.3 says a failed check must not enter the "normal release path". L5 §11 says CI runs on every PR into staging and `main` and "a failed required check blocks the merge". SG Ep. 6.5 sets the ruleset on `main` only | GWS §5.3; L5 §11; SG Ep. 6.5 |
 | O-10 | SG Ep. 6.5 step 5 offers "Include default branch" or a pattern `main`. ADR 0001 says `staging` is this repository's default branch | SG Ep. 6.5; ADR 0001 |
