@@ -7,7 +7,7 @@ import { createApp } from '../src/app.js';
 test('built client serves contracted page addresses from the isolated checkout, without test pages', async () => {
   assert.ok(existsSync(new URL('../../client/dist/index.html', import.meta.url)), 'Run the client build first.');
   const app = createApp({ db: {} });
-  for (const path of ['/login', '/templates', '/templates/new', '/templates/123/edit', '/goals']) {
+  for (const path of ['/login', '/templates', '/templates/new', '/templates/123/edit', '/goals', '/goals/new']) {
     const response = await request(app).get(path);
     assert.equal(response.status, 200, path);
     assert.match(response.headers['content-type'], /text\/html/);
