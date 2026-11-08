@@ -173,3 +173,5 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 ## 14. Implementation evidence — Issue #40
 
 Implementation follows the merged contract and this session's owner-approved Issue #40. [Goal implementation evidence](../../goal-implementation-evidence.md) records the contract → failing tests → implementation history, AC/test mapping, exact commands/counts, tested revisions, concurrency proof, screenshot comparison and limitations. The owner confirmed the specified OP-07.3/4/6 behaviors for this implementation; teammate agreement remains unverified. This does not alter the earlier review history or resolve OP-07.11's future F-04 race test. Human implementation review and merge remain pending.
+
+Implementation PR: https://github.com/phittayanan/habit-tracker/pull/41. A substantive teammate review has been requested; approval and merge are pending.

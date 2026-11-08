@@ -88,7 +88,7 @@ Commit `a2a7ce2` adds a keyboard-only probe in a minimal page, derives the obser
 
 ### Before/after comparison
 
-Local artifact: `/Users/phittayanan/dev/agentic-workflow/data/habit-goal-build/compare/index.html`. Eight pairs cover Goals empty/populated and form idle/rejected at 1280×900 and 375×900. `manifest.json` records both source revisions, filenames, dimensions and SHA-256 values. The PR URL is added to the index after publication.
+Local artifact: `/Users/phittayanan/dev/agentic-workflow/data/habit-goal-build/compare/index.html`. Eight pairs cover Goals empty/populated and form idle/rejected at 1280×900 and 375×900. `manifest.json` records both source revisions, filenames, dimensions and SHA-256 values. The comparison index links to https://github.com/phittayanan/habit-tracker/pull/41.
 
 Base `e16289c` has a Goals heading and no `/goals/new` route. Captions disclose that populated/form states do not exist on base; the actual heading/404 is shown. For exact base recapture, the three changed existing UI/route files were temporarily loaded from base, the base client was built, and all three head source files were restored byte-for-byte from task-owned backups and rebuilt. No alternate worktree was created. Head captures use the built app and synthetic task fixtures. Browser assertions check the Bangkok default, actual API save, duplicate message/retained target and no overflow.
 
@@ -97,3 +97,5 @@ The first screenshot pass used CLI resize, which Chrome clamped to 500px. Those 
 `bash .github/scripts/test-check-pr-issue-link.sh` also passed all existing metadata-check regression cases; `git diff --check` passed. Live staging remained `e16289c` and no other open PR was found when the busy schema, route index and package manifests were rechecked. Package manifests are unchanged.
 
 Human review/merge is pending. The implementation leaves F-04 template edit and its two-request race, entries, progress, calendar, broader F-10 work, release and assessment submission for their own tasks. The measured 100% applies to this Goal rule module, not all future BR-01 to BR-07 code or CI coverage.
+
+Implementation review: https://github.com/phittayanan/habit-tracker/pull/41, base `staging`, non-draft. A substantive review was requested from projectnewy under the explicit team-workflow submission authorization. Human review remains pending.
