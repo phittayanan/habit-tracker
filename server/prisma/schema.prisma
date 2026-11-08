@@ -61,5 +61,18 @@ model Goal {
   endDate       DateTime @map("end_date") @db.Date
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp(3)
 
+  entries       Entry[]
+
   @@index([participantId, templateId, endDate])
+}
+
+model Entry {
+  id        Int      @id @default(autoincrement())
+  goalId    Int      @map("goal_id")
+  goal      Goal     @relation(fields: [goalId], references: [id])
+  entryDate DateTime @map("entry_date") @db.Date
+  value     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  @@unique([goalId, entryDate])
 }

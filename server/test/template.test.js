@@ -20,7 +20,7 @@ let app;
 let manager;
 before(async () => { await db.$connect(); });
 beforeEach(async () => {
-  await db.goal.deleteMany();
+  await db.entry.deleteMany(); await db.goal.deleteMany();
   await db.template.deleteMany();
   await db.session.deleteMany();
   await db.user.deleteMany();

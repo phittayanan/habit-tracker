@@ -7,7 +7,7 @@ if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
 const password = randomBytes(24).toString('base64url');
 test.beforeEach(async () => {
-  await db.goal.deleteMany();
+  await db.entry.deleteMany(); await db.goal.deleteMany();
   await db.template.deleteMany();
   await db.session.deleteMany();
   await db.user.deleteMany();
@@ -114,7 +114,7 @@ test('TC-16: participant template page is read-only and hides an empty New butto
   await expect(page.getByRole('button', { name: 'New', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Edit', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Retire' })).toHaveCount(0);
-  await db.goal.deleteMany();
+  await db.entry.deleteMany(); await db.goal.deleteMany();
   await db.template.deleteMany();
   await page.reload();
   await expect(page.getByText('No templates yet')).toBeVisible();
