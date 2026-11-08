@@ -98,4 +98,8 @@ The first screenshot pass used CLI resize, which Chrome clamped to 500px. Those 
 
 Human review/merge is pending. The implementation leaves F-04 template edit and its two-request race, entries, progress, calendar, broader F-10 work, release and assessment submission for their own tasks. The measured 100% applies to this Goal rule module, not all future BR-01 to BR-07 code or CI coverage.
 
-Implementation review: https://github.com/phittayanan/habit-tracker/pull/41, base `staging`, non-draft. A substantive review was requested from projectnewy under the explicit team-workflow submission authorization. Human review remains pending.
+Implementation review: https://github.com/phittayanan/habit-tracker/pull/41, base `staging`, non-draft. A substantive review was requested from projectnewy under the explicit team-workflow submission authorization.
+
+### Review round 1
+
+projectnewy review 5818758376 asked TC-20 to spawn its child with `fileURLToPath`, because `new URL(...).pathname` is not a Windows filesystem path. `server/test/goal.test.js` now passes `fileURLToPath(new URL('./goal-process.js', import.meta.url))`. On macOS, `server/` `TEST_DATABASE_URL=<disposable-test-url> npm test` passed 41/41, including TC-20, after applying the three migrations to a new empty database. Windows and Git Bash were not run. The template-row lock question and OP-07.3/4/6 agreement were not changed.

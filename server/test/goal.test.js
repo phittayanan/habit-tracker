@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { fileURLToPath } from 'node:url';
 import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { createApp } from '../src/app.js';
@@ -46,7 +47,7 @@ test('TC-20: exact shape, stripped ownership, real process restart, own-only new
   const second = await post(body({ templateId: other.id, dailyTarget: 5 }));
   assert.equal(second.status, 201);
   const launch = async () => {
-    const child = spawn(process.execPath, [new URL('./goal-process.js', import.meta.url).pathname], {
+    const child = spawn(process.execPath, [fileURLToPath(new URL('./goal-process.js', import.meta.url))], {
       env: process.env, stdio: ['ignore', 'ignore', 'pipe', 'ipc'],
     });
     const [{ port }] = await Promise.race([once(child, 'message'), once(child, 'exit').then(() => { throw new Error('App exited before startup'); })]);
