@@ -28,8 +28,8 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 | F-03 Template creation and Manager list | [`F-03-template-create.md`](F-03-template-create.md) | FR-05, FR-06; BR-03 (minimum below maximum) | AC-03.1 to AC-03.7 (7) | TC-09, TC-10, TC-68, TC-69, TC-11, TC-70 | #30 / PR #31 | #36 / PR #37 |
 | F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | not opened |
 | F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
-| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29; #38 / PR #39 | [#40 implementation](https://github.com/phittayanan/habit-tracker/pull/41) (review pending) |
-| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29 | not opened |
+| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29 | #40 / PR #41 |
+| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29 | #42 |
 | F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | not opened |
 | F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | not opened |
 
@@ -248,10 +248,12 @@ Collected from section 13 of each contract. The rule: a contract is changed by a
 | 2026-11-07 | F-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
 | 2026-11-08 | F-07 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, OP-07.11 allows both serial orders | pending (partner review of the Issue #38 PR) |
+| 2026-11-08 | F-07 | Issue #40 implementation evidence: owner-confirmed existing API behaviors, Goal tests-first history, local validation and remaining human review recorded in section 14; requirements unchanged | phittayanan (owner-only implementation authorization); teammate implementation review pending |
 | 2026-11-07 | F-08 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-08 | Review round 1 (PR #29): TC-28 gives each accepted value its own day; codes in TC-56; test dates relative to the Bangkok today; AC-08.5 and TC-27 reworded (TZ=UTC, goal period); AC-08.11 and AC-08.12 added; order of rule checks; date box named; decimal scale; decisions Q1, Q8, Q9 recorded | pending (partner re-check) |
 | 2026-11-07 | F-08 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
 | 2026-11-08 | F-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |
+| 2026-11-09 | F-08 | Issue #42 implementation evidence recorded in section 14 and `docs/entry-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 | 2026-11-07 | F-09 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-09 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
 | 2026-11-07 | F-10 | First draft (Issue #28) | pending |
@@ -283,8 +285,8 @@ As of 2026-11-08. This table is a snapshot; the board and `docs/traceability.md`
 |---|---|---|---|
 | Auth | F-01, F-02 | #32 | Merged (PR #34). Evidence: `docs/auth-implementation-evidence.md` |
 | Template | F-03, F-04, F-06 | #36 (F-03, F-06); F-04 not opened | F-03 and F-06 merged (PR #37). Evidence: `docs/template-implementation-evidence.md`. F-04 not started (needs F-07) |
-| Goal | F-07 | #40 / [implementation](https://github.com/phittayanan/habit-tracker/pull/41) | Implemented; human review and merge pending. Evidence: `docs/goal-implementation-evidence.md`. Entries, progress and the F-04 edit/create race remain separate work |
-| Entry | F-08 | not opened | Not started |
+| Goal | F-07 | #40 | Merged (PR #41). Evidence: `docs/goal-implementation-evidence.md` |
+| Entry | F-08 | #42 | Implemented and tested, PR in review. Evidence: `docs/entry-implementation-evidence.md` |
 | Progress and privacy | F-09, F-10 | not opened | Not started |
 
 The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issue after this") are the follow-on step: the build Issues still marked "not opened" above are opened one by one, each after the contract it builds is in its final form.
