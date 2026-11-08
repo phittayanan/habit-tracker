@@ -37,8 +37,8 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #9 |
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.9 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60 | 1 | #28, #9 |
-| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.12 | TC-23 to TC-30, TC-56, TC-58, TC-61 | 1 | #28, #9 |
+| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.10 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | 1 | #28, #38, #9 |
+| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.12 | TC-23 to TC-30, TC-56, TC-58, TC-61 | 1 | #28, #38, #9 |
 | BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.8 | TC-31, TC-32, TC-59 | 1 | #28, #9 |
 | BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #9 |
 | BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #9 |
@@ -124,10 +124,10 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-50 | Clean clone builds, migrates, seeds and starts in 15 minutes or less | Manual, timed |
 | TC-51 | Rule code has at least 80% line coverage | CI report |
 | TC-52 | Tests run in CI on every PR against a real test database | CI |
-| TC-53 | Goal input validation: missing field, bad date, end before start, target 0 or negative, Manager and anonymous refused; nothing stored | API |
-| TC-54 | Daily target equal to the template maximum accepted; above it rejected | API and unit |
+| TC-53 | Goal input validation: missing field, bad date, end before start, target 0 or negative, target with more than 2 decimal places or above 99,999,999.99, Manager and anonymous refused; nothing stored | API |
+| TC-54 | Daily target equal to the template maximum accepted; above it rejected; a target above it with more than 2 decimal places gets `VALIDATION_ERROR` (validation wins); a target above it with no `startDate` also gets `VALIDATION_ERROR` | API and unit |
 | TC-55 | An ended goal does not block a new goal on the same template; another template or another Participant allowed; the owner is the session user | API |
-| TC-56 | Entry input validation and access: missing or malformed date or value; Manager, anonymous, another Participant's goal and unknown goal refused | API |
+| TC-56 | Entry input validation and access: missing or malformed date or value, value with more than 2 decimal places or outside `Decimal(10, 2)`; Manager, anonymous, another Participant's goal and unknown goal refused | API |
 | TC-57 | Another Participant's goal and an unknown goal id give the same 404 status and body | API |
 | TC-58 | A saved entry is returned after the app restarts | API and database |
 | TC-59 | Journey: a Manager creates a template through the UI; a Participant creates a goal, reads "0 of 1", records a value, reads "1 of 1", restarts, reads again; Manager and anonymous refused | Browser and API |
@@ -145,6 +145,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-71 | Template edit validation, unknown id 404 and anonymous 401; nothing changes | API |
 | TC-72 | Template edit: merged range below, duplicate name 409, own name accepted | Unit and API |
 | TC-73 | Template edit form: a valid change shows in the table; an edit of a used template shows the API message | Browser |
+| TC-74 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on the template, `POST /api/goals` waits, then reads the template as committed | API and database |
 
 ## Coverage Gaps
 

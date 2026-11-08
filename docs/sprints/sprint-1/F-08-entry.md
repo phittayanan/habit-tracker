@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 | Depends on | F-07 (a goal exists), F-01, F-02 |
 | Needed by | F-09, F-10 |
 | Author / reviewer | projectnewy / phittayanan |
-| Status | Draft, review round 1 applied |
+| Status | Draft, review round 1 applied; revised for the decimal rules (Issue #38) |
 
 ## 2. Behaviour and workflow
 
@@ -28,7 +28,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 |---|---|---|
 | BR-01 | The entry date is today or earlier, and inside the goal's start and end dates (both inclusive). Anything else is rejected | SRS BR-01; ADR 0005 |
 | BR-02 | A day is a date in Asia/Bangkok for every user. "Today" is computed on the server, and the UI's default date uses the same zone | SRS BR-02; ADR 0006; SDS 2.3 |
-| BR-03 | The value lies within the template's `min_value` and `max_value`, inclusive | SRS BR-03; ADR 0007 |
+| BR-03 | The value lies within the template's `min_value` and `max_value`, inclusive. The value has at most 2 decimal places and lies within `Decimal(10, 2)` (up to 99,999,999.99); a number with more places is refused, never rounded | SRS BR-03; ADR 0007; F-03 OP-03.3, OP-03.4 |
 | BR-04 | At most one entry per goal per day. A second entry for the same day is rejected | SRS BR-04; ADR 0008 |
 | BR-06 | An entry dated after an Ended goal's end date is rejected by BR-01. An entry dated inside the period of a goal that has already ended is still accepted, because BR-01 accepts it (decided, OP-08.6) | SRS BR-06; ADR 0012 |
 
@@ -41,13 +41,15 @@ Checks run in this order (SDS 2.2): session (401), role (403), ownership (404), 
 | 1 | No valid session | 401 | `UNAUTHENTICATED` |
 | 2 | Caller is a Manager | 403 | `FORBIDDEN` |
 | 3 | Goal does not exist, or belongs to another Participant | 404 | `GOAL_NOT_FOUND` (the same answer for both) |
-| 4 | `entryDate` missing or not `YYYY-MM-DD`; `value` missing or not a number | 400 | `VALIDATION_ERROR` |
+| 4 | `entryDate` missing or not `YYYY-MM-DD`; `value` missing or not a number, with more than 2 decimal places, or above 99,999,999.99 or below -99,999,999.99 (outside `Decimal(10, 2)`) | 400 | `VALIDATION_ERROR` (decided, F-03 OP-03.3 and OP-03.4) |
 | 5 | `entryDate` after today (Asia/Bangkok) | 400 | `ENTRY_DATE_IN_FUTURE` |
 | 6 | `entryDate` before the goal's start date or after its end date | 400 | `ENTRY_DATE_OUTSIDE_GOAL` |
 | 7 | `value` below `min_value` or above `max_value` | 400 | `VALUE_OUT_OF_RANGE` |
 | 8 | An entry already exists for this goal and day | 409 | `ENTRY_ALREADY_EXISTS` |
 
 When a request breaks more than one rule, the first one in this table is returned. Example: with today `D`, a goal ending `D+5` and an entry for `D+10`, the date is both in the future and outside the goal; the answer is `ENTRY_DATE_IN_FUTURE`.
+
+Because row 4 comes before row 7, a value with more than 2 decimal places gets `VALIDATION_ERROR` even when it is also out of range. Example: 24.555 for a template with maximum 24 gets `400 VALIDATION_ERROR`, not `VALUE_OUT_OF_RANGE`.
 
 Unknown body fields are stripped and do not cause an error (decided, OP-07.7).
 
@@ -93,7 +95,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 
 | Layer change | Detail |
 |---|---|
-| Table `Entry` | `id` integer primary key; `goal_id` not null, reference to Goal, on delete restrict; `entry_date` date not null; `value` decimal not null (2 decimal places, OP-07.8); `created_at` timestamp not null (SDS 3.2) |
+| Table `Entry` | `id` integer primary key; `goal_id` not null, reference to Goal, on delete restrict; `entry_date` date not null; `value` decimal not null (`Decimal(10, 2)`; OP-07.8, F-03 OP-03.4); `created_at` timestamp not null (SDS 3.2) |
 | Constraints | **unique (`goal_id`, `entry_date`)**, which enforces BR-04 even under two requests at once. The value range and the date rules compare other tables or "today", so the service enforces them |
 | Migration | One additive Prisma migration that creates `Entry`. It changes no existing table |
 | Ownership | An Entry belongs to a Participant through its Goal (`participant_id`) |
@@ -109,7 +111,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 | AC-08.5 | Today is the Asia/Bangkok date: at 23:59:59 Bangkok on 2026-11-10 an entry for 2026-11-11 gets 400 `ENTRY_DATE_IN_FUTURE`; at 00:00:00 on 2026-11-11 the same entry is accepted. This holds whatever time zone the server process uses |
 | AC-08.6 | A value below `min_value` or above `max_value` gets 400 `VALUE_OUT_OF_RANGE`; values equal to either limit are accepted |
 | AC-08.7 | A second entry for the same goal and day gets 409 `ENTRY_ALREADY_EXISTS`, and the stored entry is not changed |
-| AC-08.8 | A missing or malformed date or value gets 400 `VALIDATION_ERROR` and nothing is stored |
+| AC-08.8 | A missing or malformed date or value, a value with more than 2 decimal places, or a value outside `Decimal(10, 2)` gets 400 `VALIDATION_ERROR` (also when it is out of the template range as well) and nothing is stored |
 | AC-08.9 | An anonymous caller gets 401 `UNAUTHENTICATED`, a Manager 403 `FORBIDDEN`, and another Participant's or an unknown goal 404 `GOAL_NOT_FOUND`; nothing is stored |
 | AC-08.10 | The browser shows the API message for a rejected entry and keeps the typed value |
 | AC-08.11 | An entry dated inside the period of a goal that has already ended (and not in the future) is accepted |
@@ -129,7 +131,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-28 | AC-08.6 | Unit and API | Goal G6 (`D-15` to `D+5`) on template T (min 0, max 24) | `POST` -0.5 for `D-15` and 24.5 for `D-15` (both rejected); then 0 for `D-15` (accepted) and 24 for `D-14` (accepted) | -0.5 and 24.5 get `400 VALUE_OUT_OF_RANGE` with no row stored; 0 and 24 get 201 (each accepted value has its own day) |
 | TC-29 | AC-08.7 | API | An entry already exists for G on `D` | `POST` again for `D` (and two requests at once) | `409 ENTRY_ALREADY_EXISTS`; one row; the first value unchanged |
 | TC-30 | AC-08.3, AC-08.11 | Unit and API | Ended goal G4 (`D-15` to `D-5`) | `POST` for `D-4`; then `POST` for `D-10` | `D-4` gets `400 ENTRY_DATE_OUTSIDE_GOAL`; `D-10` (inside the period, in the past) gets 201 |
-| TC-56 | AC-08.8, AC-08.9 | API | A logged in; A's goal G | Send bodies with no date, bad date format, no value, value "abc" (all to G). Send a valid body as Manager and as anonymous. Send a valid body to B's goal and to goal id 99999 | Bad bodies get `400 VALIDATION_ERROR`; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`; B's goal and 99999 get `404 GOAL_NOT_FOUND`; no row stored |
+| TC-56 | AC-08.8, AC-08.9 | API | A logged in; A's goal G | Send bodies with no date, bad date format, no value, value "abc", value 7.555, value 24.555 (above the max of 24 and with 3 decimal places), value 100000000 (all to G). Send a valid body as Manager and as anonymous. Send a valid body to B's goal and to goal id 99999 | Bad bodies get `400 VALIDATION_ERROR`; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`; B's goal and 99999 get `404 GOAL_NOT_FOUND`; no row stored |
 | TC-58 | AC-08.1 | API and database | A's goal G; entry saved | Restart the app (new process and connection); `GET /api/goals/:id/entries` | The same entry is returned (data survives a restart) |
 | TC-61 | AC-08.10 | Browser | A logged in on the goals page | Type 30 (above max 24) and Save; then a valid value | The first shows the API message and keeps 30; the second saves |
 
@@ -149,7 +151,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | OP-08.2 | May `entryDate` be left out of the request (default today) | Open (proposal): required in the API; the UI fills in the date |
 | OP-08.3 | Order of `GET /api/goals/:id/entries` | Settled by ADR 0014 ("newest first"): newest date first |
 | OP-08.4 | A value above the daily target is allowed | Open (proposal): yes, only the template range limits the value (BR-03) |
-| OP-08.5 | Decimal scale of `value` | Decided on PR #29 (Q8): 2 decimal places for all four decimal columns; see OP-07.8 |
+| OP-08.5 | Decimal scale and precision of `value`; a value with more than 2 decimal places | Decided on PR #29 (Q8): 2 decimal places for all four decimal columns; see OP-07.8. Precision `Decimal(10, 2)` and the refusal of extra places with `400 VALIDATION_ERROR`, never rounding: decided in F-03 (OP-03.3, OP-03.4, PR #31 review) and applied here by Issue #38 |
 | OP-08.6 | An entry dated inside the period of a goal that has already ended | Decided on PR #29 (Q1): allowed (ADR 0012, BR-01); AC-08.11, TC-30 |
 | OP-08.7 | Which code when a request breaks several rules | Open (proposal from review point 10): `ENTRY_DATE_IN_FUTURE`, then `ENTRY_DATE_OUTSIDE_GOAL`, then `VALUE_OUT_OF_RANGE`, then `ENTRY_ALREADY_EXISTS` |
 | OP-08.8 | How the Sprint 1 goals page chooses the day | Decided on PR #29 (Q9): a date box next to the value box, defaulting to today in Asia/Bangkok |
@@ -161,3 +163,4 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): TC-28 gives each accepted value its own day; codes in TC-56; test dates relative to the Bangkok today; AC-08.5 and TC-27 reworded (TZ=UTC, goal period); AC-08.11 and AC-08.12 added; order of rule checks; date box named; decimal scale; decisions Q1, Q8, Q9 recorded | pending (partner re-check) |
 | 2026-11-07 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
+| 2026-11-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |

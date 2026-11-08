@@ -25,10 +25,10 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 |---|---|---|---|---|---|---|
 | F-01 Login, logout and session | [`F-01-login.md`](F-01-login.md) | FR-01, FR-02, FR-03, FR-04; NFR-01, NFR-04 | AC-01.1 to AC-01.10 (10) | TC-01, TC-02, TC-03, TC-04, TC-05, TC-06, TC-62, TC-63, TC-64, TC-44, TC-45, TC-46, TC-65 | #30 / PR #31 | #32 / PR #34 |
 | F-02 Role layout and endpoint protection | [`F-02-roles.md`](F-02-roles.md) | FR-22; NFR-02 | AC-02.1 to AC-02.5 (5) | TC-07, TC-08, TC-66, TC-67 | #30 / PR #31 | #32 / PR #34 |
-| F-03 Template creation and Manager list | [`F-03-template-create.md`](F-03-template-create.md) | FR-05, FR-06; BR-03 (minimum below maximum) | AC-03.1 to AC-03.7 (7) | TC-09, TC-10, TC-68, TC-69, TC-11, TC-70 | #30 / PR #31 | not opened |
+| F-03 Template creation and Manager list | [`F-03-template-create.md`](F-03-template-create.md) | FR-05, FR-06; BR-03 (minimum below maximum) | AC-03.1 to AC-03.7 (7) | TC-09, TC-10, TC-68, TC-69, TC-11, TC-70 | #30 / PR #31 | #36 / PR #37 |
 | F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | not opened |
-| F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | not opened |
-| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.9 (9) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60 | #28 / PR #29 | not opened |
+| F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
+| F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29 | not opened |
 | F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29 | not opened |
 | F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | not opened |
 | F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | not opened |
@@ -164,10 +164,11 @@ Every test of the nine contracts in one table (handout D1 §3.5: "Map all Sprint
 | TC-20 | AC-07.1, AC-07.2 | Participant creates a goal | API |
 | TC-21 | AC-07.3 | Second active goal on the same template rejected | API |
 | TC-22 | AC-07.5 | Goal state on start day, end day and the day after | Unit |
-| TC-53 | AC-07.6, AC-07.8 | Goal input validation: missing field, bad date, end before start, target 0 or negative, Manager and anonymous refused; nothing stored | API |
-| TC-54 | AC-07.7 | Daily target equal to the template maximum accepted; above it rejected | API and unit |
+| TC-53 | AC-07.6, AC-07.8 | Goal input validation: missing field, bad date, end before start, target 0 or negative, target with more than 2 decimal places or above 99,999,999.99, Manager and anonymous refused; nothing stored | API |
+| TC-54 | AC-07.6, AC-07.7 | Daily target equal to the template maximum accepted; above it rejected; a target above it with more than 2 decimal places gets `VALIDATION_ERROR` (validation wins); a target above it with no `startDate` also gets `VALIDATION_ERROR` | API and unit |
 | TC-55 | AC-07.2, AC-07.4 | An ended goal does not block a new goal on the same template; another template or another Participant allowed; the owner is the session user | API |
 | TC-60 | AC-07.9 | New goal form creates a goal and shows the API message for a rule failure | Browser |
+| TC-74 | AC-07.10 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on the template, `POST /api/goals` waits, then reads the template as committed | API and database |
 
 #### F-08 Daily entry recording
 
@@ -181,7 +182,7 @@ Every test of the nine contracts in one table (handout D1 §3.5: "Map all Sprint
 | TC-28 | AC-08.6 | Value below, at and above each limit | Unit and API |
 | TC-29 | AC-08.7 | Second entry for the same day returns 409 | API |
 | TC-30 | AC-08.3, AC-08.11 | Ended goal: an entry dated after its end is rejected; an entry dated inside its period is accepted | Unit and API |
-| TC-56 | AC-08.8, AC-08.9 | Entry input validation and access: missing or malformed date or value; Manager, anonymous, another Participant's goal and unknown goal refused | API |
+| TC-56 | AC-08.8, AC-08.9 | Entry input validation and access: missing or malformed date or value, value with more than 2 decimal places or outside `Decimal(10, 2)`; Manager, anonymous, another Participant's goal and unknown goal refused | API |
 | TC-58 | AC-08.1 | A saved entry is returned after the app restarts | API and database |
 | TC-61 | AC-08.10 | Entry form shows the API message for a rejected value and keeps the typed value | Browser |
 
@@ -238,15 +239,19 @@ Collected from section 13 of each contract. The rule: a contract is changed by a
 | 2026-11-07 | F-02 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): test-only protected route and page for TC-66/67; TC-08 grows with implemented endpoints; record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-07 | F-03 | First draft (Issue #30) | pending |
 | 2026-11-07 | F-03 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): record partner agreement on existing proposals | pending (partner re-check) |
+| 2026-11-08 | F-03 | Issue #36 implementation evidence recorded in `docs/template-implementation-evidence.md`. No decided point was reopened. | pending review |
 | 2026-11-07 | F-04 | First draft (Issue #30) | pending |
 | 2026-11-07 | F-04 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): own Participant edit refusal as AC-04.7 / TC-18; remove circular dependency; record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-07 | F-06 | First draft (Issue #30) | pending |
 | 2026-11-07 | F-06 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): move AC-06.4 / TC-18 to F-04 as AC-04.7 / TC-18; record partner agreement on existing proposals | pending (partner re-check) |
+| 2026-11-08 | F-06 | Issue #36 implementation evidence recorded in `docs/template-implementation-evidence.md`. No decided point was reopened. Edit refusal stays in F-04. | pending review |
 | 2026-11-07 | F-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
+| 2026-11-08 | F-07 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, OP-07.11 allows both serial orders | pending (partner review of the Issue #38 PR) |
 | 2026-11-07 | F-08 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-08 | Review round 1 (PR #29): TC-28 gives each accepted value its own day; codes in TC-56; test dates relative to the Bangkok today; AC-08.5 and TC-27 reworded (TZ=UTC, goal period); AC-08.11 and AC-08.12 added; order of rule checks; date box named; decimal scale; decisions Q1, Q8, Q9 recorded | pending (partner re-check) |
 | 2026-11-07 | F-08 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
+| 2026-11-08 | F-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |
 | 2026-11-07 | F-09 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-09 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
 | 2026-11-07 | F-10 | First draft (Issue #28) | pending |
@@ -277,12 +282,12 @@ As of 2026-11-08. This table is a snapshot; the board and `docs/traceability.md`
 | Group | Features | Build Issue | Status |
 |---|---|---|---|
 | Auth | F-01, F-02 | #32 | Merged (PR #34). Evidence: `docs/auth-implementation-evidence.md` |
-| Template | F-03, F-04, F-06 | not opened | Not started |
+| Template | F-03, F-04, F-06 | #36 (F-03, F-06); F-04 not opened | F-03 and F-06 merged (PR #37). Evidence: `docs/template-implementation-evidence.md`. F-04 not started (needs F-07) |
 | Goal | F-07 | not opened | Not started |
 | Entry | F-08 | not opened | Not started |
 | Progress and privacy | F-09, F-10 | not opened | Not started |
 
-The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issue after this") are the follow-on step: the four build Issues above are opened after this overview is merged.
+The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issue after this") are the follow-on step: the build Issues still marked "not opened" above are opened one by one, each after the contract it builds is in its final form.
 
 ## Open points
 
@@ -291,7 +296,7 @@ The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issu
 | OP-S.1 | The scheme for the system-check criteria, `AC-SYS.<n>`, and their wording (the requirement text is in the SRS, the Sprint 1 reading is new) | Open (proposal): as in the table above |
 | OP-S.2 | How NFR-07 is verified in Sprint 1. The traceability matrix says "documented; timed in Lab 5" | Open (proposal): the README is followed once on a clean clone and the steps and time are recorded; the 15-minute target binds in Lab 5 |
 | OP-S.3 | Which files count as "rule code" for NFR-08 and which tool measures coverage | Open (proposal): the service files that hold BR-01 to BR-07, measured with the Node test runner's coverage option |
-| OP-S.4 | The contracts F-07 and F-08 do not yet say three things that F-03 and F-04 decided: goal creation locks the template row (OP-04.4); a number with more than 2 decimal places is refused with `400 VALIDATION_ERROR` for `dailyTarget` and `value` (OP-03.3); precision `Decimal(10, 2)` (OP-03.4) | Open: a revision of F-07 and F-08 in its own Issue and PR, before those features are built |
+| OP-S.4 | The contracts F-07 and F-08 do not yet say three things that F-03 and F-04 decided: goal creation locks the template row (OP-04.4); a number with more than 2 decimal places is refused with `400 VALIDATION_ERROR` for `dailyTarget` and `value` (OP-03.3); precision `Decimal(10, 2)` (OP-03.4) | Resolved by Issue #38: F-07 (AC-07.10, TC-74, OP-07.10, OP-07.11) and F-08 (AC-08.8, OP-08.5) now say all three, before those features are built |
 | OP-S.5 | The Product Definition of Done above restates the handout. The thresholds (80% coverage, 15 minutes) come from the SRS | Open (proposal): confirm that both students accept this wording |
 
 ## Revision history of this overview
