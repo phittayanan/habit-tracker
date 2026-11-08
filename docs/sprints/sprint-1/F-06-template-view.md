@@ -119,3 +119,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): move AC-06.4 / TC-18 to F-04 as AC-04.7 / TC-18; record partner agreement on existing proposals | pending (partner re-check) |
+| 2026-11-08 | Issue #36 implementation evidence recorded in `docs/template-implementation-evidence.md`. No decided point was reopened. Edit refusal stays in F-04. | pending review |

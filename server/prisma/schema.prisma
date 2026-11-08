@@ -12,14 +12,20 @@ enum Role {
   MANAGER
 }
 
+enum TemplateState {
+  ACTIVE
+  RETIRED
+}
+
 model User {
-  id           Int       @id @default(autoincrement())
-  username     String    @unique
-  displayName  String    @map("display_name")
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  displayName  String     @map("display_name")
   role         Role
-  passwordHash String    @map("password_hash")
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  passwordHash String     @map("password_hash")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamp(3)
   sessions     Session[]
+  templates    Template[]
 }
 
 model Session {
@@ -28,4 +34,16 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @map("created_at") @db.Timestamp(3)
   expiresAt DateTime @map("expires_at") @db.Timestamp(3)
+}
+
+model Template {
+  id        Int           @id @default(autoincrement())
+  name      String        @unique
+  unit      String
+  minValue  Decimal       @map("min_value") @db.Decimal(10, 2)
+  maxValue  Decimal       @map("max_value") @db.Decimal(10, 2)
+  state     TemplateState @default(ACTIVE)
+  createdBy Int           @map("created_by")
+  creator   User          @relation(fields: [createdBy], references: [id])
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamp(3)
 }

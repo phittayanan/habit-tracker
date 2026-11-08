@@ -2,8 +2,9 @@ import express from 'express';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { requireOrigin, sendError } from './middleware/auth.js';
-import { registerAuth, invalidLogin } from './routes/auth.js';
-export { protectedRoutes } from './routes/auth.js';
+import { registerAuth, invalidLogin, protectedRoutes as authRoutes } from './routes/auth.js';
+import { registerTemplates, templateRoutes } from './routes/templates.js';
+export const protectedRoutes = [...authRoutes, ...templateRoutes];
 
 export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
   const app = express();
@@ -16,6 +17,7 @@ export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
     catch { sendError(res, 503, 'NOT_READY', 'Service is not ready.'); }
   });
   registerAuth(app, db);
+  registerTemplates(app, db);
   // Explicit injection by test harness only. Runtime startup never supplies this callback.
   if (registerTestRoutes) registerTestRoutes(app);
   app.use('/api', (req, res) => sendError(res, 404, 'NOT_FOUND', 'Not found.'));
