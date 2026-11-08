@@ -131,8 +131,9 @@ test('Goal screens: Bangkok default in a different browser zone, role restrictio
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await login(page); await page.goto('/goals/new');
   await expect(page.getByLabel('Start date', { exact: true })).toHaveValue(today());
+  await fill(page);
   await db.session.deleteMany();
-  await fill(page); await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await login(page, 'manager1'); await page.goto('/goals/new');
   await expect(page.getByText('This page is not available for your role.')).toBeVisible();
