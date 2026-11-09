@@ -60,7 +60,7 @@ test('TC-20: exact shape, stripped ownership, real process restart, own-only new
   try {
     const listed = await request(restarted.url).get('/api/goals').set('Cookie', cookies.a).expect(200);
     assert.deepEqual(listed.body.goals.map(g => g.id), [second.body.goal.id, goal.id]);
-    assert.deepEqual(listed.body.goals[1], goal);
+    assert.deepEqual(listed.body.goals[1], { ...goal, progress: { daysMet: 0, daysSoFar: 1 } }); // F-09 adds progress to the list
   } finally { restarted.child.kill('SIGTERM'); await once(restarted.child, 'exit'); }
 });
 
