@@ -1,6 +1,6 @@
 # Template edit implementation evidence (Issue #53)
 
-F-04 Template edit, built from the merged `docs/sprints/sprint-1/F-04-template-edit.md`. Written with Claude Code for phittayanan (implementation owner). The proposed reviewer is projectnewy. Teammate review and merge have not happened yet.
+F-04 Template edit, built from the merged `docs/sprints/sprint-1/F-04-template-edit.md`. Written with Claude Code for phittayanan (implementation owner). Implementation review: [https://github.com/phittayanan/habit-tracker/pull/54](https://github.com/phittayanan/habit-tracker/pull/54), targeting `staging`. The proposed reviewer is projectnewy. Teammate review and merge have not happened yet.
 
 ## History
 
