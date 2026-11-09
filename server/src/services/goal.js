@@ -1,3 +1,4 @@
+import { computeProgress } from './progress-rules.js';
 import { bangkokToday, goalState, targetWithinMaximum, hasActiveGoal } from './goal-rules.js';
 const dateText = value => value.toISOString().slice(0, 10);
 const dateValue = text => new Date(`${text}T00:00:00Z`);
@@ -9,10 +10,15 @@ export function toGoal(row, today) {
       minValue: Number(row.template.minValue), maxValue: Number(row.template.maxValue) },
   };
 }
-export async function listGoals(db, user) {
-  const today = bangkokToday();
+export async function listGoals(db, user, now = new Date()) {
+  const today = bangkokToday(now);
   const rows = await db.goal.findMany({ where: { participantId: user.id }, include: { template: true }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] });
-  return rows.map(row => toGoal(row, today));
+  const entries = rows.length ? await db.entry.findMany({ where: { goalId: { in: rows.map(row => row.id) } }, select: { goalId: true, entryDate: true, value: true } }) : [];
+  return rows.map(row => {
+    const goal = toGoal(row, today);
+    const own = entries.filter(entry => entry.goalId === row.id).map(entry => ({ entryDate: dateText(entry.entryDate), value: Number(entry.value) }));
+    return { ...goal, progress: computeProgress(goal, own, today) };
+  });
 }
 export async function createGoal(db, user, data) {
   return db.$transaction(async tx => {

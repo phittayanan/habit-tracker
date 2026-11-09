@@ -118,3 +118,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok, and t
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): error codes added to every expected result, "ignored" changed to "stripped" with OP-10.3, menu wording corrected | pending (partner re-check) |
+| 2026-11-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
+
+## 14. Implementation evidence — Issue #44
+
+Implemented from this contract. The failing-test commit `af813de` comes before the implementation commit `df8f61b`; commands, counts, AC mapping and limits are in [Progress and privacy implementation evidence](../../progress-privacy-implementation-evidence.md). No decided point was reopened.

@@ -7,7 +7,7 @@ function follow(event, navigate, path) {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault(); navigate(path);
 }
-function EntryPanel({ goal, onUnauthenticated }) {
+function EntryPanel({ goal, onUnauthenticated, onSaved }) {
   const [entries, setEntries] = useState(null);
   const [entryDate, setEntryDate] = useState(() => bangkokToday());
   const [value, setValue] = useState('');
@@ -27,6 +27,7 @@ function EntryPanel({ goal, onUnauthenticated }) {
       }) }, onUnauthenticated);
       setEntries(list => [body.entry, ...(list || [])].sort((x, y) => (x.entryDate < y.entryDate ? 1 : -1)));
       setValue('');
+      onSaved?.();
     } catch (error) { setMessage(error.message); }
     finally { setBusy(false); }
   }
@@ -43,11 +44,9 @@ function EntryPanel({ goal, onUnauthenticated }) {
 export function GoalList({ navigate, onUnauthenticated }) {
   const [goals, setGoals] = useState(null);
   const [message, setMessage] = useState('');
-  useEffect(() => {
-    let active = true;
-    api('/api/goals', {}, onUnauthenticated).then(body => { if (active) setGoals(body.goals); }).catch(error => { if (active) setMessage(error.message); });
-    return () => { active = false; };
-  }, []);
+  const active = useRef(true);
+  const load = () => api('/api/goals', {}, onUnauthenticated).then(body => { if (active.current) setGoals(body.goals); }).catch(error => { if (active.current) setMessage(error.message); });
+  useEffect(() => { active.current = true; load(); return () => { active.current = false; }; }, []);
   return <>
     <h1>Goals</h1>
     <p className="toolbar"><a className="button" href="/goals/new" onClick={event => follow(event, navigate, '/goals/new')}>+ New goal</a></p>
@@ -59,7 +58,8 @@ export function GoalList({ navigate, onUnauthenticated }) {
       <p>Daily target: {goal.dailyTarget} {goal.template.unit}</p>
       <p>{goal.startDate} – {goal.endDate}</p>
       <p>{goal.state === 'ACTIVE' ? 'Active' : 'Ended'}</p>
-      <EntryPanel goal={goal} onUnauthenticated={onUnauthenticated} />
+      <p>{goal.progress.daysMet} of {goal.progress.daysSoFar} days met</p>
+      <EntryPanel goal={goal} onUnauthenticated={onUnauthenticated} onSaved={load} />
     </li>)}</ul> : null}
   </>;
 }
