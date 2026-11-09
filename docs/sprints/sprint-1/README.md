@@ -30,8 +30,8 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 | F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
 | F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29, #38 / PR #39 | #40 / PR #41 |
 | F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29, #38 / PR #39 | #42 / PR #43 |
-| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | not opened |
-| F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | not opened |
+| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | #44 |
+| F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | #44 |
 
 Contract Issues and PRs: #30 and PR #31 for F-01 to F-06, #28 and PR #29 for F-07 to F-10. Build Issues follow the five groups in `docs/sprints/plan.md` ("Feasibility"): Auth, Template, Goal, Entry, and Progress with privacy.
 
@@ -256,8 +256,10 @@ Collected from section 13 of each contract. The rule: a contract is changed by a
 | 2026-11-09 | F-08 | Issue #42 implementation evidence recorded in section 14 and `docs/entry-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 | 2026-11-07 | F-09 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-09 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
+| 2026-11-10 | F-09 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 | 2026-11-07 | F-10 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-10 | Review round 1 (PR #29): error codes added to every expected result, "ignored" changed to "stripped" with OP-10.3, menu wording corrected | pending (partner re-check) |
+| 2026-11-10 | F-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 
 "Pending" in the last column is what the contract files say: they were not edited again after their PR was approved. The approval of each contract is the merged and approved PR: #31 for F-01 to F-06 and #29 for F-07 to F-10. The files get their approvers when the next revision touches them (OP-S.4).
 
@@ -286,8 +288,8 @@ As of 2026-11-08. This table is a snapshot; the board and `docs/traceability.md`
 | Auth | F-01, F-02 | #32 | Merged (PR #34). Evidence: `docs/auth-implementation-evidence.md` |
 | Template | F-03, F-04, F-06 | #36 (F-03, F-06); F-04 not opened | F-03 and F-06 merged (PR #37). Evidence: `docs/template-implementation-evidence.md`. F-04 not started (needs F-07) |
 | Goal | F-07 | #40 | Merged (PR #41). Evidence: `docs/goal-implementation-evidence.md` |
-| Entry | F-08 | #42 | Implemented and tested, PR in review. Evidence: `docs/entry-implementation-evidence.md` |
-| Progress and privacy | F-09, F-10 | not opened | Not started |
+| Entry | F-08 | #42 | Merged (PR #43). Evidence: `docs/entry-implementation-evidence.md` |
+| Progress and privacy | F-09, F-10 | #44 | Implemented and tested, PR in review. Evidence: `docs/progress-privacy-implementation-evidence.md` |
 
 The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issue after this") are the follow-on step: the build Issues still marked "not opened" above are opened one by one, each after the contract it builds is in its final form.
 

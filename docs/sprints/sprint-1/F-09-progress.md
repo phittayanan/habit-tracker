@@ -126,3 +126,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
+| 2026-11-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
+
+## 14. Implementation evidence — Issue #44
+
+Implemented from this contract. The failing-test commit `af813de` comes before the implementation commit `df8f61b`; commands, counts, AC mapping and limits are in [Progress and privacy implementation evidence](../../progress-privacy-implementation-evidence.md). No decided point was reopened.
