@@ -260,6 +260,9 @@ const coverageRoutes = () => [...protectedRoutes, {
 
 test('TC-08: independently audit every implemented API route, then exercise session and role checks', async () => {
   const cookie = cookieOf(await login());
+  // F-04 (Issue #53) adds the Manager-only template edit to the audited routes.
+  assert.deepEqual(protectedRoutes.find(route => route.method === 'patch' && route.path === '/api/templates/:id'),
+    { method: 'patch', path: '/api/templates/:id', requestPath: '/api/templates/1', roles: ['MANAGER'] });
   await assertProtectedRouteCoverage(app, coverageRoutes(), wrongRoleCookies(cookie));
   assert.deepEqual(calls, []);
   assert.equal(await db.session.count(), 2);
