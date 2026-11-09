@@ -28,6 +28,7 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
     event.preventDefault();
     navigate('/templates/new');
   }
+  const openEdit = template => navigate(`/templates/${template.id}/edit`);
 
   return <>
     <h1>Templates</h1>
@@ -47,7 +48,7 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
           <td>{rangeText(template.minValue, template.maxValue)}</td>
           {manager ? <>
             <td>{stateWord[template.state]}</td>
-            <td><button type="button">Edit</button></td>
+            <td><button type="button" onClick={() => openEdit(template)}>Edit</button></td>
           </> : null}
         </tr>)}
       </tbody>
@@ -55,15 +56,44 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
   </>;
 }
 
-export function TemplateForm({ navigate, onUnauthenticated }) {
+// F-04 sends only the fields that differ from the stored template.
+function changedFields(stored, typed) {
+  const changes = {};
+  if (typed.name !== stored.name) changes.name = typed.name;
+  if (typed.unit !== stored.unit) changes.unit = typed.unit;
+  const minValue = numberOrText(typed.minimum);
+  const maxValue = numberOrText(typed.maximum);
+  if (minValue !== stored.minValue) changes.minValue = minValue === undefined ? null : minValue;
+  if (maxValue !== stored.maxValue) changes.maxValue = maxValue === undefined ? null : maxValue;
+  return changes;
+}
+
+export function TemplateForm({ id, navigate, onUnauthenticated }) {
+  const editing = id !== undefined;
+  const [stored, setStored] = useState(null);
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('');
   const [minimum, setMinimum] = useState('');
   const [maximum, setMaximum] = useState('');
   const [message, setMessage] = useState('');
+  const [missing, setMissing] = useState(false);
   const [busy, setBusy] = useState(false);
   const nameRef = useRef(null);
-  useEffect(() => { nameRef.current?.focus(); }, []);
+  const ready = !editing || stored !== null;
+  useEffect(() => { if (ready) nameRef.current?.focus(); }, [ready]);
+  useEffect(() => {
+    if (!editing) return undefined;
+    let active = true;
+    api('/api/templates', {}, onUnauthenticated).then(body => {
+      if (!active) return;
+      const template = body.templates.find(row => String(row.id) === String(id));
+      if (!template) { setMissing(true); return; }
+      setStored(template);
+      setName(template.name); setUnit(template.unit);
+      setMinimum(String(template.minValue)); setMaximum(String(template.maxValue));
+    }).catch(error => { if (active) setMessage(error.message); });
+    return () => { active = false; };
+  }, [id]);
 
   async function save(event) {
     event.preventDefault();
@@ -71,9 +101,12 @@ export function TemplateForm({ navigate, onUnauthenticated }) {
     setBusy(true);
     setMessage('');
     try {
-      await api('/api/templates', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, unit, minValue: numberOrText(minimum), maxValue: numberOrText(maximum) }),
+      const body = editing
+        ? changedFields(stored, { name, unit, minimum, maximum })
+        : { name, unit, minValue: numberOrText(minimum), maxValue: numberOrText(maximum) };
+      await api(editing ? `/api/templates/${id}` : '/api/templates', {
+        method: editing ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       }, onUnauthenticated);
       navigate('/templates');
     } catch (error) { setMessage(error.message); }
@@ -85,8 +118,18 @@ export function TemplateForm({ navigate, onUnauthenticated }) {
     navigate('/templates');
   }
 
+  const heading = editing ? 'Edit template' : 'New template';
+  if (missing) return <>
+    <h1>{heading}</h1>
+    <p role="alert" className="error">Template not found.</p>
+    <div className="form-actions"><a className="button" href="/templates" onClick={cancel}>Cancel</a></div>
+  </>;
+  if (!ready) return <>
+    <h1>{heading}</h1>
+    {message ? <p role="alert" className="error">{message}</p> : <p role="status">Loading…</p>}
+  </>;
   return <>
-    <h1>New template</h1>
+    <h1>{heading}</h1>
     <form className="template-form" onSubmit={save} noValidate>
       {message && <p role="alert" className="error">{message}</p>}
       <label>Name<input ref={nameRef} name="name" value={name} onChange={event => setName(event.target.value)} /></label>

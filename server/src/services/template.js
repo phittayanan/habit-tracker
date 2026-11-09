@@ -40,6 +40,60 @@ export function parseTemplateCreate(body) {
   return { ok: true, data: parsed.data };
 }
 
+const editBody = z.object({
+  name: text(nameMessage, 100).optional(),
+  unit: text(unitMessage, 30).optional(),
+  minValue: decimal(minMessage).optional(),
+  maxValue: decimal(maxMessage).optional(),
+});
+const emptyEditMessage = 'Change at least one of name, unit, minimum or maximum.';
+const largestId = 2147483647;
+
+export function mergedRangeAllowed(stored, sent) {
+  return minimumBelowMaximum(sent.minValue ?? stored.minValue, sent.maxValue ?? stored.maxValue);
+}
+
+export function parseTemplateEdit(idText, body) {
+  const fail = message => ({ ok: false, status: 400, code: 'VALIDATION_ERROR', message });
+  if (!/^[1-9]\d*$/.test(idText)) return fail('Template id must be a positive whole number.');
+  const parsed = editBody.safeParse(body ?? {});
+  if (!parsed.success) {
+    const issue = [...parsed.error.issues].sort((left, right) => fieldOrder.indexOf(String(left.path[0])) - fieldOrder.indexOf(String(right.path[0])))[0];
+    return fail(issue.path.length ? issue.message : emptyEditMessage);
+  }
+  const data = Object.fromEntries(fieldOrder.filter(field => parsed.data[field] !== undefined).map(field => [field, parsed.data[field]]));
+  if (Object.keys(data).length === 0) return fail(emptyEditMessage);
+  return { ok: true, id: Number(idText), data };
+}
+
+const nameExists = { ok: false, status: 409, code: 'TEMPLATE_NAME_EXISTS', message: 'A template with this name already exists.' };
+const notFound = { ok: false, status: 404, code: 'TEMPLATE_NOT_FOUND', message: 'Template not found.' };
+
+// F-04 OP-04.4: lock the template row first, as goal creation (F-07) does, so a goal
+// cannot be created between the in-use check and the update.
+export async function editTemplate(db, id, data) {
+  if (id > largestId) return notFound;
+  try {
+    return await db.$transaction(async tx => {
+      const [row] = await tx.$queryRaw`SELECT id, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${id} FOR UPDATE`;
+      if (!row) return notFound;
+      if (await tx.goal.count({ where: { templateId: id } }) > 0) {
+        return { ok: false, status: 409, code: 'TEMPLATE_IN_USE', message: 'This template is used by a goal and cannot be edited.' };
+      }
+      if (!mergedRangeAllowed({ minValue: Number(row.minValue), maxValue: Number(row.maxValue) }, data)) {
+        return { ok: false, status: 400, code: 'MIN_NOT_BELOW_MAX', message: 'Minimum must be below maximum.' };
+      }
+      const changes = { ...data };
+      if (changes.minValue !== undefined) changes.minValue = changes.minValue.toFixed(2);
+      if (changes.maxValue !== undefined) changes.maxValue = changes.maxValue.toFixed(2);
+      return { ok: true, template: toTemplate(await tx.template.update({ where: { id }, data: changes })) };
+    });
+  } catch (error) {
+    if (error.code === 'P2002') return nameExists;
+    throw error;
+  }
+}
+
 export function toTemplate(row) {
   return {
     id: row.id,
@@ -67,9 +121,7 @@ export async function createTemplate(db, user, data) {
     } });
     return { ok: true, template: toTemplate(row) };
   } catch (error) {
-    if (error.code === 'P2002') {
-      return { ok: false, status: 409, code: 'TEMPLATE_NAME_EXISTS', message: 'A template with this name already exists.' };
-    }
+    if (error.code === 'P2002') return nameExists;
     throw error;
   }
 }
