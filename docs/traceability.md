@@ -34,7 +34,7 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
 | BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #9 |
+| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #53, #9 |
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
 | BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.10 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | 1 | #28, #38, #40, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
@@ -50,7 +50,7 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
 | none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
 
 Goal implementation evidence: [Issue #40](goal-implementation-evidence.md). AC-07.1/2 → TC-20; AC-07.3 → TC-21; AC-07.4 → TC-55; AC-07.5 → TC-22; AC-07.6/8 → TC-53; AC-07.7 → TC-54; AC-07.9 → TC-60; AC-07.10 → TC-74. `server/test/goal.test.js` covers the API/database cases; `server/test/goal-rules.test.js` adds rule units; `client/test/goals.spec.js` covers TC-60 and Goal TC-47/48 at both widths. TC-08's independent discovery now includes both `/api/goals` methods and their implicit HEAD protection. Goal rule coverage is local evidence for NFR-08; this is not a claim of CI coverage or completion of the later BR-01 to BR-07 rules.
 
@@ -86,7 +86,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-10 | Minimum not below maximum is rejected | Unit and API |
 | TC-11 | Manager table shows name, unit, range, state, with actions | Browser |
 | TC-12 | Edit of an unused template succeeds | API |
-| TC-13 | Edit of a used template refused | API |
+| TC-13 | Edit of a used template refused, also when the edit races a new goal on the same template (OP-04.4) | API and database |
 | TC-14 | Retired template leaves the new-goal list | API |
 | TC-15 | New goal on a retired template refused; existing goal still takes entries | API |
 | TC-16 | Participant sees active templates read-only | API and browser |
