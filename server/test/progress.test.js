@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { createApp } from '../src/app.js';
+import { listGoals } from '../src/services/goal.js';
 
 if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.env.DATABASE_URL) throw new Error('Separate disposable test database required.');
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
@@ -82,4 +83,34 @@ test('A Participant sees progress only for own goals', async () => {
   await entry(goalA, -2, 10); await entry(goalB, -1, 10); await entry(goalB, 0, 10);
   assert.deepEqual((await list(cookies.a).expect(200)).body.goals.map(g => [g.id, g.progress]), [[goalA.id, { daysMet: 1, daysSoFar: 3 }]]);
   assert.deepEqual((await list(cookies.b).expect(200)).body.goals.map(g => [g.id, g.progress]), [[goalB.id, { daysMet: 2, daysSoFar: 3 }]]);
+});
+
+test('AC-09.1 to AC-09.3: two active goals of one Participant keep separate progress, even with entries on the same day', async () => {
+  const walk = await db.template.create({ data: { name: 'Walk', unit: 'steps', minValue: 0, maxValue: 100000, createdBy: manager.id } });
+  const sleep = await goalFor(a, -3, 10, 8);
+  const steps = await db.goal.create({ data: { participantId: a.id, templateId: walk.id, dailyTarget: 5000, startDate: asDate(day(-3)), endDate: asDate(day(10)) } });
+  await entry(sleep, -1, 8); await entry(sleep, 0, 9);
+  await entry(steps, -1, 4000); await entry(steps, 0, 5000); await entry(steps, -2, 6000);
+  const byId = Object.fromEntries((await list().expect(200)).body.goals.map(g => [g.id, g.progress]));
+  assert.deepEqual(byId[sleep.id], { daysMet: 2, daysSoFar: 4 });
+  assert.deepEqual(byId[steps.id], { daysMet: 2, daysSoFar: 4 });
+  await entry(sleep, -2, 1);
+  const again = Object.fromEntries((await list().expect(200)).body.goals.map(g => [g.id, g.progress]));
+  assert.deepEqual(again[sleep.id], { daysMet: 2, daysSoFar: 4 });
+  const third = await db.template.create({ data: { name: 'Water', unit: 'ml', minValue: 0, maxValue: 10000, createdBy: manager.id } });
+  const water = await db.goal.create({ data: { participantId: a.id, templateId: third.id, dailyTarget: 1, startDate: asDate(day(-3)), endDate: asDate(day(10)) } });
+  await entry(water, -3, 5);
+  const last = Object.fromEntries((await list().expect(200)).body.goals.map(g => [g.id, g.progress]));
+  assert.deepEqual(last[water.id], { daysMet: 1, daysSoFar: 4 });
+  assert.deepEqual(last[sleep.id], { daysMet: 2, daysSoFar: 4 });
+  assert.deepEqual(last[steps.id], { daysMet: 2, daysSoFar: 4 });
+});
+
+test('The list takes "today" from the Asia/Bangkok date of the instant it is given', async () => {
+  const goal = await db.goal.create({ data: { participantId: a.id, templateId: template.id, dailyTarget: 30, startDate: asDate('2026-11-01'), endDate: asDate('2026-11-30') } });
+  await db.entry.create({ data: { goalId: goal.id, entryDate: asDate('2026-11-01'), value: 30 } });
+  const before = await listGoals(db, a, new Date('2026-11-10T16:59:59Z'));
+  assert.deepEqual(before[0].progress, { daysMet: 1, daysSoFar: 10 });
+  const after = await listGoals(db, a, new Date('2026-11-10T17:00:00Z'));
+  assert.deepEqual(after[0].progress, { daysMet: 1, daysSoFar: 11 });
 });

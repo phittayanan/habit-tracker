@@ -25,7 +25,7 @@ Environment: Windows 11, Node.js 24.14.0, PostgreSQL 16 in Docker (disposable te
 
 ```text
 server/: npm test
-68 tests; 68 passed; 0 failed; 0 skipped
+70 tests; 70 passed; 0 failed; 0 skipped
 server/: node --experimental-test-coverage --test test/progress-rules.test.js
 4 passed; progress-rules.js 100% lines, branches and functions
 server/: npm run build, client/: npm run build   exit 0
@@ -39,10 +39,10 @@ The 2 failures are the existing `goals.spec.js` TC-47 / TC-48 (Goal create form 
 
 | AC | Verified by |
 |---|---|
-| AC-09.1, AC-09.2, AC-09.3 | TC-31 (unit: met, missed, empty days, today counts) and the API test with 30 / 29.9 / 45 giving 2 of 10 |
+| AC-09.1, AC-09.2, AC-09.3 | TC-31 (unit: met, missed, empty days, today counts), the API test with 30 / 29.9 / 45 giving 2 of 10, and an API test with three active goals of one Participant that have entries on the same day, each with its own progress |
 | AC-09.4, AC-09.5 | TC-31 (unit: not started 0 of 0, Ended goal stops at its end date) and the same cases over the API |
-| AC-09.6 | API test: `daysMet` rises after a saved entry and is the same from a new app process |
-| AC-09.7 | TC-32 (browser: "2 of 10 days met"), and TC-59 shows "0 of 1", then "1 of 1" without a reload |
+| AC-09.6 | API test: `daysMet` rises after a saved entry and is the same from a new app process; TC-59 repeats it in the browser across a restart |
+| AC-09.7 | TC-32 (browser: "2 of 10 days met"), and TC-59 shows "0 of 1", then "1 of 1" without a reload, then "1 of 1" again after a real restart of the app |
 | AC-09.8 | Anonymous 401 and Manager 403 on `GET /api/goals` (TC-59, TC-34) |
 | AC-10.1, AC-10.2, AC-10.6 | TC-33 |
 | AC-10.3, AC-10.4 | TC-34 (every goal and entry endpoint, read and write; the stored rows are compared before and after) |
@@ -50,9 +50,19 @@ The 2 failures are the existing `goals.spec.js` TC-47 / TC-48 (Goal create form 
 | AC-10.7 | TC-35 (API and browser: each Participant sees only own goals, entries and progress) |
 | NFR-05/06 | TC-32 checks no horizontal overflow at both widths; the existing TC-47/48 cover the form |
 
+## Review round 1
+
+phittayanan (macOS: server 68/68, Playwright 38/38) checked TC-33, TC-34 and TC-57 by removing each access rule in turn and asked for three changes.
+
+1. Two goals were never tested together. An API test now gives one Participant three active goals with entries on the same day (met on one, not on another) and checks each goal's progress. With the per-goal filter in `listGoals` replaced by all the user's entries, that test fails (checked), and with the filter restored all 70 pass.
+2. TC-59 now restarts the app for real. `progress.spec.js` starts its own copy of the test server (`client/test/serve.js`, which takes the port from `TEST_SERVER_PORT`), records the entry, stops the process, starts a new one, waits until `/api/health` answers, reloads the page and expects "1 of 1 days met". This keeps the contract and traceability wording true.
+3. The README overview lists `#44 / PR #51` for F-09 and F-10, and the F-09 and F-10 traceability rows carry an implementation link.
+
+Optional points taken: `listGoals` accepts `now` (default: the current time), and a service test checks the Bangkok date at 16:59:59Z and 17:00:00Z (10 days, then 11 days so far). TC-35 in the browser now uses different counts for the two Participants ("1 of 2" and "2 of 2").
+
 ## Limits
 
-- TC-59 is the full journey in the browser, but the app restart in it is replaced by logging out and back in (a new session reads the saved result). The real restart (new process and connection) is in the server test for AC-09.6.
+- TC-59 restarts a second copy of the Vite-based test server started by the spec, not the built app served by `npm start`; the built app restart (new process and connection) is in the server test for AC-09.6.
 - Only the Windows run above. Nothing was run on macOS, Chrome stable or CI.
 - The progress rule is covered at 100%; coverage of the whole Sprint 1 rule code (AC-SYS.4) is not claimed.
 - Screenshots were not taken.

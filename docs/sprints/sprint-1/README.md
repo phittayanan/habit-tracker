@@ -30,8 +30,8 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 | F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
 | F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29, #38 / PR #39 | #40 / PR #41 |
 | F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29, #38 / PR #39 | #42 / PR #43 |
-| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | #44 |
-| F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | #44 |
+| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | #44 / PR #51 |
+| F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | #44 / PR #51 |
 
 Contract Issues and PRs: #30 and PR #31 for F-01 to F-06, #28 and PR #29 for F-07 to F-10. Build Issues follow the five groups in `docs/sprints/plan.md` ("Feasibility"): Auth, Template, Goal, Entry, and Progress with privacy.
 

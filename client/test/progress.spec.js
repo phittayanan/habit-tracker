@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 import { PrismaClient } from '../../server/node_modules/@prisma/client/default.js';
 import bcrypt from '../../server/node_modules/bcryptjs/index.js';
 import { randomBytes } from 'node:crypto';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+import { fileURLToPath } from 'node:url';
 if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.env.DATABASE_URL) throw new Error('Separate test database required.');
 const db = new PrismaClient({ datasources: { db: { url: process.env.TEST_DATABASE_URL } } });
 test.use({ locale: 'en-US', timezoneId: 'America/Los_Angeles' });
@@ -9,6 +12,20 @@ const password = randomBytes(24).toString('base64url');
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const day = n => new Date(Date.parse(`${today()}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 const asDate = text => new Date(`${text}T00:00:00Z`);
+const restartPort = 33140;
+const restartUrl = `http://127.0.0.1:${restartPort}`;
+const clientDir = fileURLToPath(new URL('..', import.meta.url));
+function startApp() {
+  return spawn(process.execPath, ['test/serve.js'], { cwd: clientDir, env: { ...process.env, TEST_SERVER_PORT: String(restartPort) }, stdio: 'ignore' });
+}
+async function waitUntilAnswering() {
+  for (let i = 0; i < 100; i++) {
+    try { if ((await fetch(`${restartUrl}/api/health`)).ok) return; } catch { /* not up yet */ }
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+  throw new Error('The restarted app did not answer.');
+}
+async function stopApp(child) { child.kill(); await once(child, 'exit'); }
 let manager, a, b;
 test.beforeEach(async () => {
   await db.entry.deleteMany(); await db.goal.deleteMany(); await db.template.deleteMany(); await db.session.deleteMany(); await db.user.deleteMany();
@@ -43,6 +60,7 @@ test('TC-35 (browser part): each Participant sees only own goals, entries and pr
   const gb = await db.goal.create({ data: { participantId: b.id, templateId: other.id, dailyTarget: 10, startDate: asDate(day(-1)), endDate: asDate(day(5)) } });
   await db.entry.create({ data: { goalId: ga.id, entryDate: asDate(day(-1)), value: 8 } });
   await db.entry.create({ data: { goalId: gb.id, entryDate: asDate(day(0)), value: 12.5 } });
+  await db.entry.create({ data: { goalId: gb.id, entryDate: asDate(day(-1)), value: 10 } });
   await login(page, 'participant1');
   await expect(page.getByRole('heading', { name: 'Sleep' })).toBeVisible();
   await expect(page.getByText('1 of 2 days met', { exact: true })).toBeVisible();
@@ -51,11 +69,16 @@ test('TC-35 (browser part): each Participant sees only own goals, entries and pr
   await logout(page);
   await login(page, 'participant2');
   await expect(page.getByRole('heading', { name: 'Reading' })).toBeVisible();
-  await expect(page.getByText('1 of 2 days met', { exact: true })).toBeVisible();
+  await expect(page.getByText('2 of 2 days met', { exact: true })).toBeVisible();
   await expect(page.getByText('Sleep')).toHaveCount(0);
 });
 
-test('TC-59: Manager creates a template, Participant sets a goal, records a day and reads progress', async ({ page, request }) => {
+test.describe('TC-59 with a real app restart', () => {
+  test.use({ baseURL: restartUrl });
+test('TC-59: Manager creates a template, Participant sets a goal, records a day and reads progress, after a restart', async ({ page, request }) => {
+  let app = startApp();
+  try {
+  await waitUntilAnswering();
   await login(page, 'manager1');
   await page.goto('/templates/new');
   await page.getByLabel('Name', { exact: true }).fill('Sleep');
@@ -79,10 +102,12 @@ test('TC-59: Manager creates a template, Participant sets a goal, records a day 
   await page.getByLabel('Value (hours)', { exact: true }).fill('8');
   await page.getByRole('button', { name: 'Save entry', exact: true }).click();
   await expect(page.getByText('1 of 1 days met', { exact: true })).toBeVisible();
+  // Restart the app: stop the process, start a new one, wait until it answers, then read the saved result.
+  await stopApp(app);
+  app = startApp();
+  await waitUntilAnswering();
   await page.reload();
   await expect(page.getByText('1 of 1 days met', { exact: true })).toBeVisible();
-
-  // A new session reads the saved result from the database (the app restart itself is covered by the server test AC-09.6).
   await logout(page);
   await login(page, 'participant1');
   await expect(page.getByText('1 of 1 days met', { exact: true })).toBeVisible();
@@ -95,4 +120,6 @@ test('TC-59: Manager creates a template, Participant sets a goal, records a day 
   await login(page, 'manager1');
   const asManager = await page.evaluate(async () => { const r = await fetch('/api/goals'); return [r.status, (await r.json()).error.code]; });
   expect(asManager).toEqual([403, 'FORBIDDEN']);
+  } finally { await stopApp(app); }
+});
 });

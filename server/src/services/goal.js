@@ -10,8 +10,8 @@ export function toGoal(row, today) {
       minValue: Number(row.template.minValue), maxValue: Number(row.template.maxValue) },
   };
 }
-export async function listGoals(db, user) {
-  const today = bangkokToday();
+export async function listGoals(db, user, now = new Date()) {
+  const today = bangkokToday(now);
   const rows = await db.goal.findMany({ where: { participantId: user.id }, include: { template: true }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] });
   const entries = rows.length ? await db.entry.findMany({ where: { goalId: { in: rows.map(row => row.id) } }, select: { goalId: true, entryDate: true, value: true } }) : [];
   return rows.map(row => {

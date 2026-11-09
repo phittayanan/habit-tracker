@@ -16,7 +16,7 @@ app.get('/test/protected', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 app.use(vite.middlewares);
-const server = app.listen(33132, '127.0.0.1');
+const server = app.listen(Number(process.env.TEST_SERVER_PORT || 33132), '127.0.0.1');
 async function stop() { server.close(); await vite.close(); await db.$disconnect(); process.exit(0); }
 process.on('SIGTERM', stop);
 process.on('SIGINT', stop);
