@@ -2,20 +2,22 @@
 process.env.TZ = 'UTC';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseEntryCreate, checkEntryRules, defaultEntryDate } from '../src/services/entry-rules.js';
+import { parseEntryCreate, checkEntryRules } from '../src/services/entry-rules.js';
+import { bangkokToday } from '../src/services/goal-rules.js';
 
 const goal = { startDate: '2026-11-01', endDate: '2026-11-30' };
 const template = { minValue: 0, maxValue: 24 };
 const at = iso => new Date(iso);
 const check = (entryDate, value, now) => checkEntryRules({ entryDate, value }, goal, template, now);
 
+// The browser default date is checked in client/test/entries.spec.js (TC-27 browser part) with a fixed clock.
 test('TC-27: today is the Asia/Bangkok date, whatever the process time zone', () => {
   assert.equal(new Date('2026-11-10T17:00:00Z').getHours(), 17, 'the process zone is UTC');
   const before = at('2026-11-10T16:59:59Z');
-  assert.equal(defaultEntryDate(before), '2026-11-10');
+  assert.equal(bangkokToday(before), '2026-11-10');
   assert.equal(check('2026-11-11', 5, before).code, 'ENTRY_DATE_IN_FUTURE');
   const after = at('2026-11-10T17:00:00Z');
-  assert.equal(defaultEntryDate(after), '2026-11-11');
+  assert.equal(bangkokToday(after), '2026-11-11');
   assert.equal(check('2026-11-11', 5, after), null);
 });
 

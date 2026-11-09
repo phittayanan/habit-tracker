@@ -113,6 +113,13 @@ test('TC-56 / TC-08: validation, roles, ownership and both endpoints', async () 
       assert.equal(r.status, 404); assert.equal(r.body.error.code, 'GOAL_NOT_FOUND');
     }
   }
+  // Ownership comes before validation: a bad body for another user's or an unknown goal is still 404.
+  for (const id of [bGoal.id, 99999]) {
+    for (const bad of [{}, { entryDate: 'nope', value: 'abc' }, { entryDate: day(0), value: 7.555 }]) {
+      const r = await request(app).post(`/api/goals/${id}/entries`).set('Cookie', cookies.a).send(bad);
+      assert.equal(r.status, 404, JSON.stringify(bad)); assert.equal(r.body.error.code, 'GOAL_NOT_FOUND');
+    }
+  }
   assert.equal((await request(app).get('/api/goals/abc/entries').set('Cookie', cookies.a)).status, 404);
   assert.equal(await db.entry.count(), 0);
 });

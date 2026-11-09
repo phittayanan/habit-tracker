@@ -55,13 +55,27 @@ test('TC-23 / TC-61: Bangkok default date, saved value with unit, API message an
   await expect(page.getByLabel('Value (hours)', { exact: true })).toHaveValue('6');
 });
 
+test('TC-27 / AC-08.12: the date box default follows the Asia/Bangkok date at 23:59:59 and 00:00:00, with the browser in Los Angeles', async ({ page }) => {
+  for (const [instant, expected] of [['2026-11-10T16:59:59Z', '2026-11-10'], ['2026-11-10T17:00:00Z', '2026-11-11']]) {
+    await page.clock.setFixedTime(instant);
+    await login(page);
+    await expect(page.getByLabel('Date', { exact: true })).toHaveValue(expected);
+    await page.getByRole('button', { name: 'Log out' }).click();
+    await expect(page).toHaveURL(/\/login$/);
+  }
+});
+
 test('TC-47 / TC-48: entry form fits the screen and works with the keyboard alone', async ({ page }) => {
   await login(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   for (const control of await page.locator('main .entry-form input, main .entry-form button').all()) {
     expect(await control.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   }
-  await page.getByLabel('Value (hours)', { exact: true }).focus();
+  // Tab into the date box, then through its native segments to the value box.
+  await page.getByLabel('Date', { exact: true }).focus();
+  const value = page.getByLabel('Value (hours)', { exact: true });
+  for (let i = 0; i < 6; i++) { if (await value.evaluate(el => el === document.activeElement)) break; await page.keyboard.press('Tab'); }
+  await expect(value).toBeFocused();
   await page.keyboard.type('5');
   await page.keyboard.press('Tab');
   await expect(save(page)).toBeFocused();

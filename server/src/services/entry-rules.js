@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { bangkokToday } from './goal-rules.js';
 
-// The date shown in the entry form and used as "today" by the rules: the Asia/Bangkok date (BR-02).
-export const defaultEntryDate = (instant = new Date()) => bangkokToday(instant);
-
 const LIMIT = 99999999.99;
 function validValue(value) {
   if (Math.abs(value) > LIMIT) return false;
