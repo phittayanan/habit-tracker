@@ -25,7 +25,7 @@ let calls;
 let participant;
 before(async () => { await db.$connect(); });
 beforeEach(async () => {
-  await db.goal.deleteMany();
+  await db.entry.deleteMany(); await db.goal.deleteMany();
   await db.template.deleteMany();
   await db.session.deleteMany();
   await db.user.deleteMany();
@@ -387,7 +387,7 @@ test('TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomical
     const scan = spawnSync('git', ['grep', '-l', '-F', '-e', plain, '--', '.'], { encoding: 'utf8' });
     assert.equal(scan.status, 1, 'Tracked files must not contain environment seed values');
   }
-  await db.goal.deleteMany();
+  await db.entry.deleteMany(); await db.goal.deleteMany();
   await db.template.deleteMany();
   await db.session.deleteMany();
   await db.user.deleteMany();

@@ -17,7 +17,7 @@ const body = (changes = {}) => ({ templateId: template.id, dailyTarget: 20, star
 const post = (data = body(), cookie = cookies.a) => request(app).post('/api/goals').set('Cookie', cookie).send(data);
 before(async () => db.$connect());
 beforeEach(async () => {
-  await db.goal.deleteMany(); await db.template.deleteMany(); await db.session.deleteMany(); await db.user.deleteMany();
+  await db.entry.deleteMany(); await db.goal.deleteMany(); await db.template.deleteMany(); await db.session.deleteMany(); await db.user.deleteMany();
   [a, b, manager] = await Promise.all(['PARTICIPANT', 'PARTICIPANT', 'MANAGER'].map((role, i) => db.user.create({ data: {
     username: `goal-user-${i}`, displayName: `Goal User ${i}`, role, passwordHash: 'unused-generated-session-fixture',
   } })));

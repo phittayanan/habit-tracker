@@ -7,6 +7,39 @@ function follow(event, navigate, path) {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault(); navigate(path);
 }
+function EntryPanel({ goal, onUnauthenticated }) {
+  const [entries, setEntries] = useState(null);
+  const [entryDate, setEntryDate] = useState(() => bangkokToday());
+  const [value, setValue] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let active = true;
+    api(`/api/goals/${goal.id}/entries`, {}, onUnauthenticated).then(body => { if (active) setEntries(body.entries); }).catch(error => { if (active) setMessage(error.message); });
+    return () => { active = false; };
+  }, [goal.id]);
+  async function save(event) {
+    event.preventDefault(); if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      const body = await api(`/api/goals/${goal.id}/entries`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        entryDate, value: value.trim() === '' ? undefined : Number(value),
+      }) }, onUnauthenticated);
+      setEntries(list => [body.entry, ...(list || [])].sort((x, y) => (x.entryDate < y.entryDate ? 1 : -1)));
+      setValue('');
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  return <form className="entry-form" onSubmit={save} noValidate aria-label={`Entries for ${goal.template.name}`}>
+    <label>Date<input name="entryDate" type="date" value={entryDate} onChange={event => setEntryDate(event.target.value)} /></label>
+    <label>Value ({goal.template.unit})<input name="value" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} /></label>
+    <button type="submit" disabled={busy}>Save entry</button>
+    {message && <p role="alert" className="error">{message}</p>}
+    {entries === null && !message ? <p role="status">Loading…</p> : null}
+    {entries?.length === 0 ? <p>No entries yet</p> : null}
+    {entries?.length > 0 ? <ul className="entry-list">{entries.map(entry => <li key={entry.id}>{entry.entryDate}: {entry.value} {goal.template.unit}</li>)}</ul> : null}
+  </form>;
+}
 export function GoalList({ navigate, onUnauthenticated }) {
   const [goals, setGoals] = useState(null);
   const [message, setMessage] = useState('');
@@ -26,6 +59,7 @@ export function GoalList({ navigate, onUnauthenticated }) {
       <p>Daily target: {goal.dailyTarget} {goal.template.unit}</p>
       <p>{goal.startDate} – {goal.endDate}</p>
       <p>{goal.state === 'ACTIVE' ? 'Active' : 'Ended'}</p>
+      <EntryPanel goal={goal} onUnauthenticated={onUnauthenticated} />
     </li>)}</ul> : null}
   </>;
 }

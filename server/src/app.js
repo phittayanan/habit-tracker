@@ -5,7 +5,8 @@ import { requireOrigin, sendError } from './middleware/auth.js';
 import { registerAuth, invalidLogin, protectedRoutes as authRoutes } from './routes/auth.js';
 import { registerTemplates, templateRoutes } from './routes/templates.js';
 import { registerGoals, goalRoutes } from './routes/goals.js';
-export const protectedRoutes = [...authRoutes, ...templateRoutes, ...goalRoutes];
+import { registerEntries, entryRoutes } from './routes/entries.js';
+export const protectedRoutes = [...authRoutes, ...templateRoutes, ...goalRoutes, ...entryRoutes];
 
 export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
   const app = express();
@@ -20,6 +21,7 @@ export function createApp({ db, registerTestRoutes, serveClient = true } = {}) {
   registerAuth(app, db);
   registerTemplates(app, db);
   registerGoals(app, db);
+  registerEntries(app, db);
   // Explicit injection by test harness only. Runtime startup never supplies this callback.
   if (registerTestRoutes) registerTestRoutes(app);
   app.use('/api', (req, res) => sendError(res, 404, 'NOT_FOUND', 'Not found.'));
