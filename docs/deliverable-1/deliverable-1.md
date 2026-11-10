@@ -3209,7 +3209,16 @@ The commits on the F-08 branch carry the git author name PhutWeb; the PR that ho
 
 ### Contribution table
 
-[Contribution table to be supplied by phittayanan and projectnewy: what each student did and any pair work.]
+By part, from the PR authors and reviewers recorded on GitHub (merged PRs into `staging` and the release PR into `main`).
+
+| Part | Phittayanan Tiencharoen (phittayanan) | Phuttipong Phankitnirundorn (projectnewy) | Together |
+|---|---|---|---|
+| A. SRS and product scope | Authored #20 (ADRs), #21 (SRS), #25 (SRS alignment) | Reviewed and merged #20, #21, #25 | Agreed the product design on Issue #3 (ADRs 0001-0051), which Parts A-E build on; each reviewed and merged the other's PRs |
+| B. Feature inventory and traceability | Authored #22 (features and traceability), #25 (features alignment) | Reviewed and merged #22, #25 | Agreed the product design on Issue #3 (ADRs 0001-0051), which Parts A-E build on; each reviewed and merged the other's PRs |
+| C. System-Level SDS | Reviewed and merged #23 | Authored #23 (SDS) | Agreed the product design on Issue #3 (ADRs 0001-0051), which Parts A-E build on; each reviewed and merged the other's PRs |
+| D. Three-sprint plan | Authored #26 (plan) | Reviewed and merged #26 | Agreed the product design on Issue #3 (ADRs 0001-0051), which Parts A-E build on; each reviewed and merged the other's PRs |
+| E. Sprint 1 engineering contracts | Authored #31 (F-01 to F-04, F-06); reviewed and merged #29, #35, #39 | Authored #29 (F-07 to F-10), #35 (overview), #39 (revision); reviewed and merged #31 | Agreed the product design on Issue #3 (ADRs 0001-0051), which Parts A-E build on; each reviewed and merged the other's PRs |
+| F. Working Sprint 1 and verification | Authored #34 (F-01, F-02), #37 (F-03, F-06), #41 (F-07), #54 (F-04), #61 (release); reviewed and merged #43, #51, #60 | Authored #43 (F-08), #51 (F-09, F-10), #60 (README setup); reviewed and merged #34, #37, #41, #54, #61 | Each reviewed and merged the other's PRs |
 
 For reference, what GitHub records for the 25 merged PRs (PR #1 to #61): phittayanan authored 18 and projectnewy 7; every PR was reviewed and merged by the other student.
 
