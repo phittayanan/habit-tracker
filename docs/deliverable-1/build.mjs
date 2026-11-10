@@ -51,11 +51,6 @@ marked.use({
 
 const css = `
 @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
-@page landscape { size: A4 landscape; }
-.landscape { page: landscape; }
-.landscape figure { margin-top: 0; }
-.landscape table.cap { width: 100%; table-layout: fixed; }
-.landscape table.cap th { width: 4.5em; }
 body { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.35; color: #111; }
 h1 { font-size: 20pt; margin: 0 0 10pt; }
 h2 { font-size: 16pt; margin: 14pt 0 8pt; }
@@ -162,7 +157,7 @@ async function render(pages, total, path) {
   await page.emulateMedia({ media: 'print' });
   const wide = await page.evaluate(() => [...document.querySelectorAll('table, pre, img')].filter(e => e.getBoundingClientRect().right > document.body.getBoundingClientRect().right + 1).map(e => e.textContent.slice(0, 60)));
   if (wide.length) throw new Error(`Wider than the page: ${wide.join(' | ')}`);
-  return page.pdf({ path, preferCSSPageSize: true, printBackground: true, displayHeaderFooter: true, headerTemplate: '<span></span>', footerTemplate: footer, margin: { top: '16mm', bottom: '18mm', left: '15mm', right: '15mm' } });
+  return page.pdf({ path, format: 'A4', printBackground: true, displayHeaderFooter: true, headerTemplate: '<span></span>', footerTemplate: footer, margin: { top: '16mm', bottom: '18mm', left: '15mm', right: '15mm' } });
 }
 
 try {
