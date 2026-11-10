@@ -30,7 +30,7 @@ Parts A–E are the documents at tag `v1.0` (commit `64831f7`). This PDF lists t
 | C. System-Level SDS | {{pages:part-c}} | Architecture, data model (User, Session, Template, Goal, Entry), UI and API conventions, role matrix, authentication, configuration, GCP plan | Access restrictions: Figures 6–9, page {{page:scenario-3}}; API refusals, page {{page:api-evidence}} |
 | D. Three-sprint plan | {{pages:part-d}} | Sprints 1 to 3, feature IDs per sprint, dependencies, cut line | Release: page {{page:f-1}}; Issue → PR chains and board: page {{page:chains}} |
 | E. Sprint 1 engineering contracts | {{pages:part-e}} | F-01, F-02, F-03, F-04, F-06, F-07, F-08, F-09, F-10; AC-01.1 to AC-10.7; AC-SYS.1 to AC-SYS.5; STS; Product Definition of Done | Journey (Figures 1–4): page {{page:scenario-1}}; rejection (Figure 5): page {{page:scenario-2}}; access (Figures 6–9): page {{page:scenario-3}}; AC → test: page {{page:ac-table}}; test excerpts: page {{page:f-4}} |
-| F. Working Sprint 1 and verification | {{pages:part-f}} | Demonstrations (Figures 1 to 9), build and test results, AC → test table, two test excerpts with red and green runs, Issue/PR chains #42 → #43 and #53 → #54, release PR #61, history, contributions, AI use, limitations | This part |
+| F. Working Sprint 1 and verification | {{pages:part-f}} | Demonstrations (Figures 1 to 10), build and test results, AC → test table, two test excerpts with red and green runs, Issue/PR chains #42 → #43 and #53 → #54, release PR #61, history, contributions, AI use, limitations | This part |
 
 ### Sources
 
@@ -2177,6 +2177,16 @@ In the same run, a value of 500 dated 2026-11-09 (before the goal starts) was re
 
 <div class="pair"><figure><img src="img/f11-after-logout-phone-marked.png"><figcaption>Figure 8. Logout ends the session<table class="cap"><tr><th>IDs</th><td>F-01, AC-01.4, AC-02.5</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>participant1 logged in on /goals</td></tr><tr><th>Steps</th><td>Log out, then open /goals again</td></tr><tr><th>Expected</th><td>the session row is deleted and the login screen is shown</td></tr><tr><th>Actual</th><td>the browser is sent to /login. Pass. The old cookie gets 401 (listing below)</td></tr></table></figcaption></figure><figure><img src="img/f12-participant2-own-only-phone-marked.png"><figcaption>Figure 9. A Participant sees only their own data<table class="cap"><tr><th>IDs</th><td>F-10, BR-10, AC-10.7</td></tr><tr><th>Role</th><td>Participant (participant2)</td></tr><tr><th>Start</th><td>participant1 owns the Meditation goal</td></tr><tr><th>Steps</th><td>log in as participant2</td></tr><tr><th>Expected</th><td>participant1's goal, entry and progress are not shown</td></tr><tr><th>Actual</th><td>"No goals yet". Pass</td></tr></table></figcaption></figure></div>
 
+<div class="keep">
+
+### Desktop width {#desktop}
+
+Figures 1 to 9 were taken in a 375 px wide window. This is the screen of Figure 3 in the same run at 1280 px.
+
+<figure style="width:100%"><img src="img/f07-entry-saved-desktop-marked.png"><figcaption>Figure 10. The goal page at desktop width<table class="cap"><tr><th>IDs</th><td>NFR-05, AC-SYS.1, ADR 0038</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>the entry of Figure 3 is saved; the same screen as Figure 3</td></tr><tr><th>Steps</th><td>resize the window from 375 px to 1280 px wide</td></tr><tr><th>Expected</th><td>no horizontal scroll and every control of the goal page shown at 1280 px, as at 375 px (AC-SYS.1 names both widths; ADR 0038: desktop designed first)</td></tr><tr><th>Actual</th><td>page width 1280 = window width 1280 (at 375 px: 375 = 375); the goal, its progress, the entry form and the entry list are shown. Pass</td></tr></table></figcaption></figure>
+
+</div>
+
 ### Backend evidence for the protected operations {#api-evidence}
 
 Same run, right after Figure 9. The requests used the real session cookies of the browser run (`participant2`, a new `manager1` login, and the two cookies that were logged out). Cookie values are not printed. Goal 1 is participant1's Meditation goal; template 4 is Meditation.
@@ -2407,17 +2417,17 @@ All six reached `main` through the release PR #61 (merge `64831f7`, tag `v1.0`).
 | Build branch | `feat/42-daily-entry` (from `staging`) | `feat/53-habit-template-edit` (from `staging`) |
 | Build PR | https://github.com/phittayanan/habit-tracker/pull/43 | https://github.com/phittayanan/habit-tracker/pull/54 |
 | Author → reviewer | projectnewy → phittayanan | phittayanan → projectnewy |
-| Review | Round 1 "changes requested" (2026-11-09 06:28 +07): ownership-before-validation not tested; TC-27 tested a helper the app never calls. Round 2 approved (2026-11-10 00:03 +07) after checking each fix by breaking the code (Figure 10) | Review comment (2026-11-10 12:06 +07): check order, row lock, stripped fields, Windows run 79/79 server, mutations that make TC-13 fail, decision on the edit-page wording; approval 12:07 +07 |
+| Review | Round 1 "changes requested" (2026-11-09 06:28 +07): ownership-before-validation not tested; TC-27 tested a helper the app never calls. Round 2 approved (2026-11-10 00:03 +07) after checking each fix by breaking the code (Figure 11) | Review comment (2026-11-10 12:06 +07): check order, row lock, stripped fields, Windows run 79/79 server, mutations that make TC-13 fail, decision on the edit-page wording; approval 12:07 +07 |
 | Into `staging` | merge commit `a5a9266`, 2026-11-10 00:08 +07, merged by phittayanan | merge commit `54ac16e`, 2026-11-10 12:07 +07, merged by projectnewy |
 | Into `main` | release PR #61, merge `64831f7`, tag `v1.0` | release PR #61, merge `64831f7`, tag `v1.0` |
 | Release review (PR #61) | projectnewy's PR comment before approving, 2026-11-10 13:30 +07: "The candidate `03e039e` is the current `origin/staging` (the merge of #60), so no commit was added after the test run." "Secrets: no `.env` file is tracked (only `server/.env.example` with placeholders) …" "Board: every Sprint 1 card is Done except #10." "No blocking findings." | same release review |
 | Board | Issue #42 Done | Issue #53 Done |
 
-<figure style="width:60%"><img src="img/f-pr43-review.png"><figcaption>Figure 10. PR #43 (F-08), phittayanan's approving re-review: each requested change was checked by moving the code back and watching the test fail. Public page, captured logged out on 2026-11-10.</figcaption></figure>
+<figure style="width:60%"><img src="img/f-pr43-review.png"><figcaption>Figure 11. PR #43 (F-08), phittayanan's approving re-review: each requested change was checked by moving the code back and watching the test fail. Public page, captured logged out on 2026-11-10.</figcaption></figure>
 
 
 
-<figure style="width:90%"><div class="imgs"><img src="img/f-board-backlog.png" style="width:48%;vertical-align:top"> <img src="img/f-board-done.png" style="width:48%;vertical-align:top"></div><figcaption>Figure 11. Project board "habit-tracker board", view "Deliverable 1" (filter milestone "Deliverable 1", 23 items), captured logged out on 2026-11-10 after the release and cropped to two columns: Backlog 1 (Issue #11, this PDF and its submission) and Done 22. The Done column continues below the part shown.</figcaption></figure>
+<figure style="width:90%"><div class="imgs"><img src="img/f-board-backlog.png" style="width:48%;vertical-align:top"> <img src="img/f-board-done.png" style="width:48%;vertical-align:top"></div><figcaption>Figure 12. Project board "habit-tracker board", view "Deliverable 1" (filter milestone "Deliverable 1", 23 items), captured logged out on 2026-11-10 after the release and cropped to two columns: Backlog 1 (Issue #11, this PDF and its submission) and Done 22. The Done column continues below the part shown.</figcaption></figure>
 
 <div class="keep">
 
