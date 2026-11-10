@@ -25,7 +25,7 @@ Parts A–E are the documents at tag `v1.0` (commit `64831f7`). This PDF lists t
 
 | Part | Pages | IDs covered | Execution evidence |
 |---|---|---|---|
-| A. SRS and product scope | {{pages:part-a}} | BR-01 to BR-15, FR-01 to FR-23, NFR-01 to NFR-09; assumptions A-1 to A-11; TA questions T-1 to T-10; ADR 0001 to ADR 0051 | NFR-01 to NFR-09 results: AC → test table, page {{page:ac-table}} |
+| A. SRS and product scope | {{pages:part-a}} | BR-01 to BR-15, FR-01 to FR-23, NFR-01 to NFR-09; assumptions A-1 to A-11; ADR 0001 to ADR 0051 | NFR-01 to NFR-09 results: AC → test table, page {{page:ac-table}} |
 | B. Feature inventory and traceability | {{pages:part-b}} | F-01 to F-17; BR → FR → feature → AC → test; test IDs TC-01 to TC-74; coverage gaps; approved changes | AC → test results: page {{page:ac-table}} |
 | C. System-Level SDS | {{pages:part-c}} | Architecture, data model (User, Session, Template, Goal, Entry), UI and API conventions, role matrix, authentication, configuration, GCP plan; open points S-1 to S-17 | Access restrictions: Figures 6–9, page {{page:scenario-3}}; API refusals, page {{page:api-evidence}} |
 | D. Three-sprint plan | {{pages:part-d}} | Sprints 1 to 3, feature IDs per sprint, dependencies, cut line | Release: page {{page:f-1}}; Issue → PR chains and board: page {{page:chains}} |
@@ -216,22 +216,6 @@ No ADR settles these. Each is left open and needs a decision before the requirem
 | A-9 | Seeded account names and the way their passwords are shared privately (not in the repository). | FR-01 |
 | A-10 | What a goal's detail page shows besides the best streak (ADR 0042 names the page, not its content). | FR-20 |
 | A-11 | Sprint 1 limit: a wrong same-day entry cannot be fixed until editing (FR-17) arrives in Sprint 2. Chosen over adding an edit to Sprint 1; the students may revisit. | BR-04, FR-11, FR-17 |
-
-#### 6.4 Questions for the TA (open)
-The team cannot settle these. They are open points in the handouts (`docs/design-questions.md`, "Ask the TA"). Record each reply here or in an ADR.
-
-| ID | Question for the TA | Status |
-|---|---|---|
-| T-1 | One `staging` branch for all sprints, or one per sprint? ADR 0001 proposes one. | Open |
-| T-2 | How long may the final demo video be: 4 minutes (FD Part E) or 10 minutes (FD §2, GWS §9)? | Open |
-| T-3 | Is the final video worth 8 points with a separate one-page release summary (GWS §9) or 10 points with no summary (FD)? | Open |
-| T-4 | What must the final video and the final PDF contain where GWS §9 and FD disagree? | Open |
-| T-5 | Must the merge gate cover PRs into `staging`, or only `main`? Does the ruleset include the default branch, which is `staging` here? How many approvals are required? | Open |
-| T-6 | Lab 5 sits in the 3 and 5 Nov workshop but needs an accepted Sprint 1 release due 8 Nov. What is the real order? | Open |
-| T-7 | Is there a Lab 6 and Lab 7 handout? When? | Open |
-| T-8 | How do we ask for agreement on an alternative Sprint 1 slice or a brief ambiguity, and how long does a reply take? | Open |
-| T-9 | May student IDs be left out of the PDF and given only on LEB2, given the repository is public? | Open |
-| T-10 | Which GCP access method applies: the instructor's announced method or a personal Gmail Free Trial? | Open |
 
 ## Design decisions by topic {#design-decisions}
 
@@ -769,10 +753,10 @@ Each row says where it comes from. ADRs 0030 to 0033 set the reference stack wit
 | Database | Cloud SQL for PostgreSQL 16, smallest tier `db-f1-micro`. Data lives here, so it survives a restart and a redeploy | ADR 0030; KIT; L5 R-04 |
 | Migrations | A separate job runs `prisma migrate deploy` before the service is updated; migrations are additive only | KIT; SG Ep. 0.4 |
 | Secrets | Secret Manager for `DATABASE_URL` and the seed passwords; GitHub signs in with Workload Identity Federation, not a key file | KIT; SG Ep. 0.4 |
-| CI | GitHub Actions, one job `test-and-docker`, the single required check. The kit runs it on PRs into `main` and SG Ep. 4.2 adds `staging`. Which branches the required check gates is open (T-5) | ADR 0033; KIT `ci-docker.yml`; SG Ep. 4.2 |
+| CI | GitHub Actions, one job `test-and-docker`, the single required check. The kit runs it on PRs into `main` and SG Ep. 4.2 adds `staging`. Which branches the required check gates is still a question for the TA | ADR 0033; KIT `ci-docker.yml`; SG Ep. 4.2 |
 | Release | Only `main` deploys. The reviewed release PR is the gate; there is no extra approval step. A smoke test runs after each deploy (read-only, no admin account) | ADR 0032; KIT; SG Ep. 7 |
 | Rollback | Redeploy an earlier image SHA; the database is not rolled back | KIT; SG Ep. 8 |
-| Ownership | phittayanan creates and owns the GCP project and adds projectnewy as Editor. ADR 0031 says to use the other way round (projectnewy owns it) if phittayanan's Gmail has already used the Free Trial. Which GCP access method applies is open (T-10) | ADR 0031; L5 §4.4 |
+| Ownership | phittayanan creates and owns the GCP project and adds projectnewy as Editor. ADR 0031 says to use the other way round (projectnewy owns it) if phittayanan's Gmail has already used the Free Trial. Which GCP access method applies is still a question for the TA | ADR 0031; L5 §4.4 |
 
 The kit's names (`toktickit`, `toktickit-migrate`, `toktickit-pg`, `toktickit-runner`, `toktickit-deployer`) are replaced everywhere by this project's names in Lab 5. The kit's smoke test calls `/api/categories`, which this app does not have. What it checks instead is open (S-17).
 
@@ -828,7 +812,7 @@ Part D of Deliverable 1 (Issue #7). The plan splits the product baseline across 
 | 2 | 29 Nov 2026 | An integrated, tested increment of the major remaining workflows. Sprint 3 contracts, working progress and a remaining-work list are also due this day. | GWS §7, D2 §2 |
 | 3 | 13 Dec 2026 | Remaining features, integration, failure handling, usability, authorization, regression tests and defect fixes. Released. | GWS §7 |
 
-The team keeps one `staging` for all sprints and asks the TA to confirm (SRS T-1; PR #26 review, O-5).
+The team keeps one `staging` for all sprints and asks the TA to confirm (PR #26 review, O-5).
 
 ### Scope per Sprint
 
@@ -2644,5 +2628,5 @@ No prompt transcripts are included. Automated results and AI statements do not c
 - Coverage (AC-SYS.4): the coverage above was measured over the whole server suite, not the unit tests alone. BR-04 (one entry per day) has no unit test; API and database tests check it (F.3).
 - Features not in Sprint 1: template retire F-05 (FR-08) and the retire refusal TC-19 are Sprint 2. Entry edit and delete (FR-17) are Sprint 2, so a wrong same-day entry cannot be fixed yet (SRS A-11). The calendar, colours, streaks and reminders are Sprints 2 and 3.
 - Security limits: no limit on failed logins (OP-01.11). An unknown username runs a cost-10 dummy bcrypt comparison (ADR 0051), but response times are not guaranteed to be identical.
-- Open points: the open points listed in Parts A to E (A-x, T-x, S-x, OP-x) stay open where marked; the open points O-x of the features list and the sprint plan are in `docs/features.md` and `docs/sprints/plan.md` in the repository. Several contract revision rows still say "pending" because the files were not edited after their PR was approved.
+- Open points: the open points listed in Parts A to E (A-x, S-x, OP-x) stay open where marked; the open points O-x of the features list and the sprint plan are in `docs/features.md` and `docs/sprints/plan.md` in the repository. Several contract revision rows still say "pending" because the files were not edited after their PR was approved.
 - Part F screenshots: taken on macOS with headless Chromium at 1100 × 700; the date box format follows the operating system.
