@@ -1,5 +1,5 @@
 // Builds dist/deliverable-1.pdf from deliverable-1.md.
-// Every level-1 and level-2 heading starts a new page. Each of those sections is
+// Every level-1 heading (Part) starts a new page; the font is Times New Roman, 12 pt or larger. Each Part is
 // rendered alone first to count its pages; the counts give the start page of every
 // section, which fills the table of contents and the {{pages:id}} / {{page:id}}
 // placeholders. The whole document is then rendered once with page numbers, and the
@@ -21,7 +21,7 @@ let current = { id: 'front', title: '', level: 0, lines: [], aliases: [] };
 let fence = false;
 for (const line of source.split('\n')) {
   if (/^```/.test(line)) fence = !fence;
-  const h = !fence && /^(#{1,2}) (.*?)(?: \{#([\w-]+)\})?$/.exec(line);
+  const h = !fence && /^(#{1}) (.*?)(?: \{#([\w-]+)\})?$/.exec(line);
   if (h) {
     const title = h[2].trim();
     const id = h[3] || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -57,30 +57,30 @@ marked.use({
 
 const css = `
 @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
-body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10pt; line-height: 1.4; color: #111; }
+body { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.35; color: #111; }
 h1 { font-size: 20pt; margin: 0 0 10pt; }
-h2 { font-size: 15pt; margin: 0 0 8pt; }
-h3 { font-size: 12.5pt; margin: 14pt 0 6pt; }
-h4, h5, h6 { font-size: 11pt; margin: 12pt 0 4pt; }
+h2 { font-size: 16pt; margin: 14pt 0 8pt; }
+h3 { font-size: 14pt; margin: 14pt 0 6pt; }
+h4, h5, h6 { font-size: 12pt; margin: 12pt 0 4pt; }
 h1, h2, h3, h4, h5, h6 { break-after: avoid; }
-table { border-collapse: collapse; width: 100%; margin: 6pt 0 10pt; font-size: 8.5pt; }
+table { border-collapse: collapse; width: 100%; margin: 6pt 0 10pt; font-size: 12pt; }
 th, td { border: 0.5pt solid #999; padding: 2.5pt 4pt; vertical-align: top; text-align: left; overflow-wrap: break-word; }
 th { background: #eee; }
 tr { break-inside: avoid; }
-code { font-family: Menlo, Consolas, monospace; font-size: 8.5pt; overflow-wrap: break-word; }
-pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt; }
-pre code { font-size: 8pt; }
+code { font-family: "Times New Roman", Times, serif; font-size: 12pt; overflow-wrap: break-word; }
+pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12pt; }
+pre code { font-family: "Courier New", Courier, monospace; font-size: 12pt; }
 td code, th code, td a, th a { overflow-wrap: anywhere; }
 img { max-width: 100%; box-sizing: border-box; border: 0.5pt solid #bbb; }
 figure { margin: 8pt 0 12pt; break-inside: avoid; }
-figcaption { font-size: 9pt; margin-top: 3pt; }
+figcaption { font-size: 12pt; margin-top: 3pt; }
 .section + .section { break-before: page; }
 .toc td:last-child, .toc th:last-child { text-align: right; width: 4em; }
 #navigation ~ table td:nth-child(2), #navigation ~ table th:nth-child(2) { white-space: nowrap; }
 .id { white-space: nowrap; }
 blockquote { margin: 6pt 0; padding-left: 8pt; border-left: 2pt solid #bbb; color: #333; }
 `;
-const footer = '<div style="width:100%;font-size:8pt;text-align:center;color:#555"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
+const footer = '<div style="width:100%;font-family:Times New Roman,serif;font-size:12pt;text-align:center;color:#555"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
 function html(bodies) {
   return `<!doctype html><html><head><meta charset="utf-8"><base href="${pathToFileURL(here + '/').href}"><style>${css}</style></head><body>${bodies.map(b => `<div class="section">${b}</div>`).join('\n')}</body></html>`;
