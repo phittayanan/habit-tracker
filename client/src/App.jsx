@@ -92,6 +92,7 @@ export function App({ extraPage }) {
   if (wrongRole) page = <p>This page is not available for your role.</p>;
   else if (path === '/templates') page = <TemplateList user={user} navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/templates/new') page = <TemplateForm navigate={navigate} onUnauthenticated={unauthenticated} />;
+  else if (/^\/templates\/\d+\/edit$/.test(path)) page = <TemplateForm key={path} id={path.split('/')[2]} navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/goals') page = <GoalList navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/goals/new') page = <GoalForm navigate={navigate} onUnauthenticated={unauthenticated} />;
   return <>

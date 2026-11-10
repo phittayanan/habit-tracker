@@ -174,3 +174,121 @@ test('TC-47 / TC-48: template screens fit both widths and the keyboard completes
   await expect(page.getByText('Active')).toHaveCount(0);
   await expect(page.getByRole('cell', { name: 'Active' })).toHaveCount(0);
 });
+
+const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+const addDays = n => new Date(Date.parse(`${today()}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+
+async function editRow(page, name) {
+  await page.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) }).getByRole('button', { name: 'Edit', exact: true }).click();
+}
+
+test('TC-73: Edit opens the filled form, a valid change shows in the table, a used template shows the API message', async ({ page, playwright }) => {
+  const manager = await db.user.findUniqueOrThrow({ where: { username: 'manager1' } });
+  const reading = await db.template.create({ data: { name: 'Reading', unit: 'pages', minValue: 0, maxValue: 500, createdBy: manager.id } });
+  const sleep = await db.template.create({ data: { name: 'Sleep', unit: 'hours', minValue: 0, maxValue: 24, createdBy: manager.id } });
+  const participant = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:33132' });
+  try {
+    expect((await participant.post('/api/auth/login', { data: { username: 'participant1', password } })).status()).toBe(200);
+    expect((await participant.post('/api/goals', { data: { templateId: sleep.id, dailyTarget: 8, startDate: today(), endDate: addDays(30) } })).status()).toBe(201);
+  } finally { await participant.dispose(); }
+  await logIn(page, 'manager1');
+  await editRow(page, 'Reading');
+  await expect(page).toHaveURL(new RegExp(`/templates/${reading.id}/edit$`));
+  await expect(page.getByRole('heading', { name: 'Edit template' })).toBeVisible();
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Reading');
+  await expect(page.getByLabel('Unit', { exact: true })).toHaveValue('pages');
+  await expect(page.getByLabel('Minimum', { exact: true })).toHaveValue('0');
+  await expect(page.getByLabel('Maximum', { exact: true })).toHaveValue('500');
+  await page.getByLabel('Maximum', { exact: true }).fill('300');
+  const sent = page.waitForRequest(req => req.method() === 'PATCH' && req.url().endsWith(`/api/templates/${reading.id}`));
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  expect((await sent).postDataJSON()).toEqual({ maxValue: 300 });
+  await expect(page).toHaveURL(/\/templates$/);
+  const readingRow = page.getByRole('row').filter({ has: page.getByRole('cell', { name: 'Reading', exact: true }) });
+  await expect(readingRow).toContainText(range(0, 300));
+  await editRow(page, 'Sleep');
+  await expect(page).toHaveURL(new RegExp(`/templates/${sleep.id}/edit$`));
+  await expect(page.getByLabel('Maximum', { exact: true })).toHaveValue('24');
+  await page.getByLabel('Maximum', { exact: true }).fill('12');
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route(`**/api/templates/${sleep.id}`, async route => { await held; await route.continue(); });
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  await expect(page.getByRole('status')).toHaveText('Saving…');
+  release();
+  await expect(page.getByRole('alert')).toHaveText('This template is used by a goal and cannot be edited.');
+  await expect(page.getByLabel('Maximum', { exact: true })).toHaveValue('12');
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Sleep');
+  await expect(page).toHaveURL(new RegExp(`/templates/${sleep.id}/edit$`));
+  expect(Number((await db.template.findUniqueOrThrow({ where: { id: sleep.id } })).maxValue)).toBe(24);
+  await page.getByRole('link', { name: 'Cancel', exact: true }).click();
+  await expect(page).toHaveURL(/\/templates$/);
+  await expect(page.getByRole('row').filter({ has: page.getByRole('cell', { name: 'Sleep', exact: true }) })).toContainText(range(0, 24));
+});
+
+test('edit page: a direct visit loads the stored values, an unknown id says so, and a participant cannot open it', async ({ page }) => {
+  const manager = await db.user.findUniqueOrThrow({ where: { username: 'manager1' } });
+  const walk = await db.template.create({ data: { name: 'Walk', unit: 'steps', minValue: 1.5, maxValue: 100, createdBy: manager.id } });
+  await logIn(page, 'manager1');
+  await page.goto(`/templates/${walk.id}/edit`);
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Walk');
+  await expect(page.getByLabel('Minimum', { exact: true })).toHaveValue('1.5');
+  await page.goto('/templates/99999/edit');
+  await expect(page.getByRole('alert')).toHaveText('Template not found.');
+  await expect(page.getByLabel('Name', { exact: true })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Cancel', exact: true }).click();
+  await expect(page).toHaveURL(/\/templates$/);
+  await page.getByRole('button', { name: 'Log out' }).click();
+  await logIn(page, 'participant1');
+  await page.goto(`/templates/${walk.id}/edit`);
+  await expect(page.getByText('This page is not available for your role.')).toBeVisible();
+  await expect(page.getByLabel('Name', { exact: true })).toHaveCount(0);
+});
+
+test('TC-47 / TC-48: the edit form fits both widths and the keyboard alone opens, saves and cancels it', async ({ page }) => {
+  const manager = await db.user.findUniqueOrThrow({ where: { username: 'manager1' } });
+  const reading = await db.template.create({ data: { name: 'Reading', unit: 'pages', minValue: 0, maxValue: 500, createdBy: manager.id } });
+  await logIn(page, 'manager1');
+  await expect(page.getByRole('table')).toContainText('Reading');
+  let editFocused = false;
+  for (let step = 0; step < 8 && !editFocused; step += 1) {
+    await page.keyboard.press('Tab');
+    editFocused = await page.getByRole('button', { name: 'Edit', exact: true }).evaluate(el => el === document.activeElement);
+  }
+  expect(editFocused).toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(new RegExp(`/templates/${reading.id}/edit$`));
+  await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Reading');
+  await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  for (const control of await page.locator('button, nav a, main a, main input').all()) {
+    expect(await control.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
+  }
+  for (const label of ['Unit', 'Minimum', 'Maximum']) {
+    await page.keyboard.press('Tab');
+    await expect(page.getByLabel(label, { exact: true })).toBeFocused();
+  }
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.type('400');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeFocused();
+  expect(await page.getByRole('button', { name: 'Save', exact: true }).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/templates$/);
+  await expect(page.getByRole('table')).toContainText(range(0, 400));
+  editFocused = false;
+  for (let step = 0; step < 8 && !editFocused; step += 1) {
+    await page.keyboard.press('Tab');
+    editFocused = await page.getByRole('button', { name: 'Edit', exact: true }).evaluate(el => el === document.activeElement);
+  }
+  expect(editFocused).toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
+  for (let i = 0; i < 5; i += 1) await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Cancel', exact: true })).toBeFocused();
+  expect(await page.getByRole('link', { name: 'Cancel', exact: true }).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/templates$/);
+  expect(Number((await db.template.findUniqueOrThrow({ where: { id: reading.id } })).maxValue)).toBe(400);
+});

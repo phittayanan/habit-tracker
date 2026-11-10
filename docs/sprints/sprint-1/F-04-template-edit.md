@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | F-03 (the template and its form), F-07 (a goal that uses the template) |
 | Needed by | no later Sprint 1 feature; owns the Participant edit refusal (TC-18), after F-07 exists |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft, review round 1 applied |
+| Status | Draft, review round 1 applied; implementation Issue #53 adds the two-request race to TC-13 and lists the edit-page details as OP-04.9 |
 
 ## 2. Behaviour and workflow
 
@@ -53,7 +53,7 @@ When a request breaks more than one rule, the first one in this table is returne
 
 Unknown body fields are stripped and do not cause an error (decided on PR #29, OP-07.7).
 
-Boundaries: sending the template's own current name is accepted (not a duplicate); a template whose only goal is Ended is still used. The check "no goal uses it" and the update run in one transaction; OP-04.4 records the remaining race with goal creation.
+Boundaries: sending the template's own current name is accepted (not a duplicate); a template whose only goal is Ended is still used. The check "no goal uses it" and the update run in one transaction that first locks the template row (`SELECT ... FOR UPDATE`); goal creation takes the same lock (F-07 AC-07.10), so the two cannot interleave (OP-04.4).
 
 ## 5. Permissions
 
@@ -92,7 +92,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4.
 | Layer change | Detail |
 |---|---|
 | Table and migration | none; uses `Template` from F-03 and `Goal` from F-07 |
-| In-use check | The service counts Goal rows with this `template_id` and updates the template inside one transaction |
+| In-use check | Inside one transaction the service locks the template row (`SELECT ... FOR UPDATE`), counts Goal rows with this `template_id`, checks the merged range and updates the template (OP-04.4) |
 | Constraints | The database check `min_value < max_value` and the unique `name` (F-03) are the last guard |
 
 ## 9. Acceptance criteria
@@ -114,7 +114,7 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | Test | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
 | TC-12 | AC-04.1 | API | Unused template "Reading" (pages, 0 to 500) | `PATCH` `{ "unit": "pages read", "maxValue": 300 }`; then `PATCH` `{ "name": "Reading time", "minValue": 1 }`; `GET /api/templates` | Both 200; the list shows "Reading time", "pages read", 1 to 300 |
-| TC-13 | AC-04.2, AC-04.5 | API | Template "Sleep" with A's Active goal (start `D`, end `D+30`); template "Steps" with A's Ended goal only (start `D-10`, end `D-1`) | `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH` "Sleep" `{ "minValue": 50 }` (also above the max); `PATCH` "Steps" `{ "unit": "km" }` | All three get `409 TEMPLATE_IN_USE`; both templates are unchanged |
+| TC-13 | AC-04.2, AC-04.5 | API and database | Template "Sleep" with A's Active goal (start `D`, end `D+30`); template "Steps" with A's Ended goal only (start `D-10`, end `D-1`). Race part (OP-04.4, F-07 OP-07.11): an unused template "Water" (0 to 24) | `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH` "Sleep" `{ "minValue": 50 }` (also above the max); `PATCH` "Steps" `{ "unit": "km" }`. Race: (a) in the test, open a transaction that locks "Water" (`FOR UPDATE`) and inserts A's goal; start `PATCH` "Water" `{ "maxValue": 10 }`; check it waits on the lock; commit. (b) Send `PATCH` "Water" `{ "maxValue": 10 }` and A's `POST /api/goals` (target 20) at the same time | All three get `409 TEMPLATE_IN_USE`; both templates are unchanged. (a) The edit waits, then gets `409 TEMPLATE_IN_USE`; "Water" keeps max 24. (b) Either order is valid: goal first, then the edit gets `409 TEMPLATE_IN_USE` and max stays 24; or edit first, then the goal gets `400 TARGET_ABOVE_TEMPLATE_MAX` and no goal is stored. Never both a stored goal and an edited range |
 | TC-71 | AC-04.4 | API | Unused template T; no template with id 99999 | `PATCH` T with `{}`; `{ "minValue": "abc" }`; `{ "maxValue": 10.555 }`; `PATCH /api/templates/abc` with a valid body; `PATCH /api/templates/99999` with a valid body; `PATCH` T with no session | `{}`, "abc", 10.555 and the id "abc" get `400 VALIDATION_ERROR`; 99999 gets `404 TEMPLATE_NOT_FOUND`; anonymous gets `401 UNAUTHENTICATED`; T is unchanged |
 | TC-72 | AC-04.3 | Unit and API | Unused templates "Walk" (0 to 100) and "Swim" (0 to 50) | Unit: the merged range for stored (0, 100) with sent `minValue` 100. API: `PATCH` "Walk" `{ "minValue": 100 }`; `PATCH` "Walk" `{ "name": "Swim" }`; `PATCH` "Walk" `{ "name": "Walk", "unit": "steps" }` | Unit: refused. API: `400 MIN_NOT_BELOW_MAX`; `409 TEMPLATE_NAME_EXISTS`; 200 with unit "steps". "Walk" keeps min 0 and max 100 after the first two |
 | TC-73 | AC-04.6 | Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
@@ -139,6 +139,7 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | OP-04.6 | Hide or disable Edit on a used template | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): keep it shown and let the API refuse; hiding it would need an "in use" field in `GET /api/templates` |
 | OP-04.7 | Code for an unknown template id | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1): `404 TEMPLATE_NOT_FOUND`. A template is not private (SDS 3.3), so 404 here reveals nothing |
 | OP-04.8 | Editing a Retired template that no goal uses | Not reachable in Sprint 1 (retire is Sprint 2); decided in the F-05 contract; scope confirmed in the [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) |
+| OP-04.9 | Edit-page details the contract does not name: the page heading, the message for a body with none of the four fields, and a direct visit to `/templates/:id/edit` for an id that does not exist | Open (proposal, Issue #53): heading "Edit template" (like F-03's "New template"); empty body message "Change at least one of name, unit, minimum or maximum."; an unknown id shows "Template not found." (the section 4 message) with Cancel back to the list. Reviewer to confirm or change |
 
 ## 13. Revision history
 
@@ -146,3 +147,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): own Participant edit refusal as AC-04.7 / TC-18; remove circular dependency; record partner agreement on existing proposals | pending (partner re-check) |
+| 2026-11-10 | Implementation Issue #53, before the code: the edit locks the template row (sections 4 and 8, as OP-04.4 decided); TC-13 adds the edit-versus-goal race that F-07 OP-07.11 deferred to F-04; OP-04.9 lists the edit-page details as a proposal | pending (partner review of the Issue #53 PR) |
