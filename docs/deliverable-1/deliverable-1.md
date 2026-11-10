@@ -21,13 +21,13 @@
 
 One row per part. Page numbers refer to this PDF.
 
-Parts A–E are the documents at tag `v1.0` (commit `64831f7`). This PDF lists the ADRs by topic and leaves out repeated or non-required sections, which stay in the repository. It also corrects, in the PDF only: the coverage-gap status (Part B) and the test-status sentence (Part D), the ADR range in SRS 6.2, the LEB2 due date notes, the link texts to the build PRs, one broken table line in F-07, and citations of the team's handout summary (`docs/assignment.md`), now given as handout tags.
+Parts A–E are the documents at tag `v1.0` (commit `64831f7`). This PDF lists the ADRs by topic and leaves out repeated or non-required sections (among them the TA questions and the open-point lists of the SDS and the contracts), which stay in the repository; sentences that cited a left-out open point by its number now state the decision instead. It also corrects, in the PDF only: the coverage-gap status (Part B) and the test-status sentence (Part D), the ADR range in SRS 6.2, the LEB2 due date notes, the link texts to the build PRs, one broken table line in F-07, and citations of the team's handout summary (`docs/assignment.md`), now given as handout tags.
 
 | Part | Pages | IDs covered | Execution evidence |
 |---|---|---|---|
 | A. SRS and product scope | {{pages:part-a}} | BR-01 to BR-15, FR-01 to FR-23, NFR-01 to NFR-09; assumptions A-1 to A-11; ADR 0001 to ADR 0051 | NFR-01 to NFR-09 results: AC → test table, page {{page:ac-table}} |
 | B. Feature inventory and traceability | {{pages:part-b}} | F-01 to F-17; BR → FR → feature → AC → test; test IDs TC-01 to TC-74; coverage gaps; approved changes | AC → test results: page {{page:ac-table}} |
-| C. System-Level SDS | {{pages:part-c}} | Architecture, data model (User, Session, Template, Goal, Entry), UI and API conventions, role matrix, authentication, configuration, GCP plan; open points S-1 to S-17 | Access restrictions: Figures 6–9, page {{page:scenario-3}}; API refusals, page {{page:api-evidence}} |
+| C. System-Level SDS | {{pages:part-c}} | Architecture, data model (User, Session, Template, Goal, Entry), UI and API conventions, role matrix, authentication, configuration, GCP plan | Access restrictions: Figures 6–9, page {{page:scenario-3}}; API refusals, page {{page:api-evidence}} |
 | D. Three-sprint plan | {{pages:part-d}} | Sprints 1 to 3, feature IDs per sprint, dependencies, cut line | Release: page {{page:f-1}}; Issue → PR chains and board: page {{page:chains}} |
 | E. Sprint 1 engineering contracts | {{pages:part-e}} | F-01, F-02, F-03, F-04, F-06, F-07, F-08, F-09, F-10; AC-01.1 to AC-10.7; AC-SYS.1 to AC-SYS.5; STS; Product Definition of Done | Journey (Figures 1–4): page {{page:scenario-1}}; rejection (Figure 5): page {{page:scenario-2}}; access (Figures 6–9): page {{page:scenario-3}}; AC → test: page {{page:ac-table}}; test excerpts: page {{page:f-4}} |
 | F. Working Sprint 1 and verification | {{pages:part-f}} | Demonstrations (Figures 1 to 9), build and test results, AC → test table, two test excerpts with red and green runs, Issue/PR chains #42 → #43 and #53 → #54, release PR #61, history, contributions, AI use, limitations | This part |
@@ -440,7 +440,7 @@ Auth implementation review: [https://github.com/phittayanan/habit-tracker/pull/3
 
 ## System Design Specification
 
-Part C of Deliverable 1 (Issue #6). The design is built from the ADRs (`docs/adr/`) and the requirements in `docs/srs.md`. Each section cites its source. Where no ADR or SRS line settles a point, the design gives a **proposal** and lists it in section 8.2. On PR #23 phittayanan answered the open points S-1 to S-14; those answers are recorded in 8.2 as decided, and S-15 to S-17 are new and still open. Nothing here changes a requirement or an ADR. Per-feature detail (exact request and response shapes, acceptance criteria) belongs to the Sprint 1 contracts (Part E).
+Part C of Deliverable 1 (Issue #6). The design is built from the ADRs (`docs/adr/`) and the requirements in `docs/srs.md`. Each section cites its source. Where no ADR or SRS line settles a point, the design gives a **proposal**; phittayanan answered most of them on PR #23, and the text below states each answer as decided. Three proposals were still open at the release (the test database reset, the status codes for rule rejections and the kit's smoke test). Nothing here changes a requirement or an ADR. Per-feature detail (exact request and response shapes, acceptance criteria) belongs to the Sprint 1 contracts (Part E).
 
 ### 1. Overview
 
@@ -472,7 +472,7 @@ How the Habit Tracker is built: the stack and components, the data model, the sc
 | Browser app (React, built with Vite) | Screens, form validation for fast feedback, calling the API. Holds no business rule that the server does not also enforce | API over HTTPS, same origin |
 | API (Express, Node.js) | Authentication, authorization, every business rule (BR-01 to BR-15), request validation, serving the built frontend files | Database through Prisma |
 | Database (PostgreSQL) | Durable storage, constraints (unique, foreign key, check), migrations | API only |
-| Test database | A separate PostgreSQL database for the tests. ADR 0035 says only "a real test database"; that the suite resets and seeds it before each run is a proposal (S-15) | API tests |
+| Test database | A separate PostgreSQL database for the tests. ADR 0035 says only "a real test database"; that the suite resets and seeds it before each run is a proposal | API tests |
 
 ![Diagram rendered from the Mermaid source in docs/system-sds.md](img/c-architecture.png)
 
@@ -494,7 +494,7 @@ The user ID for any action comes from the session, never from the request body o
 ### 3. Data Design
 
 #### 3.1 Entities
-Sprint 1 entities are User, Session, Template, Goal and Entry. Later sprints add to them (3.5). The key type and decimal precision are decided (S-2); the relationships and constraints come from the SRS and ADRs.
+Sprint 1 entities are User, Session, Template, Goal and Entry. Later sprints add to them (3.5). The key type and decimal precision are decided; the relationships and constraints come from the SRS and ADRs.
 
 ![Diagram rendered from the Mermaid source in docs/system-sds.md](img/c-entities.png)
 
@@ -502,7 +502,7 @@ Sprint 1 entities are User, Session, Template, Goal and Entry. Later sprints add
 **User** (seeded; no self-registration, ADR 0004)
 | Field | Type | Constraint | Note |
 |---|---|---|---|
-| id | integer | primary key | Integer IDs (S-2, decided) |
+| id | integer | primary key | Integer IDs |
 | username | text | unique, not null | Login name; seeded account names are open (SRS A-9) |
 | display_name | text | not null | Shown by "who am I" (FR-03) |
 | role | `PARTICIPANT` or `MANAGER` | not null | One role per account (GWS §5.2) |
@@ -521,7 +521,7 @@ Sprint 1 entities are User, Session, Template, Goal and Entry. Later sprints add
 | Field | Type | Constraint | Note |
 |---|---|---|---|
 | id | integer | primary key | |
-| name | text | not null, unique | A duplicate name is refused with 409 (S-4, decided) |
+| name | text | not null, unique | A duplicate name is refused with 409 |
 | unit | text | not null | Free text; spelling is not checked (ADR 0007) |
 | min_value | decimal | not null | Per entry |
 | max_value | decimal | not null, `min_value < max_value` | Database check (BR-03) |
@@ -552,11 +552,11 @@ The goal's state (Active or Ended) is not a column. It is computed from the date
 | created_at | timestamp | not null | |
 | | | **unique (goal_id, entry_date)** | One entry per goal per day (BR-04). The database enforces it even under two requests at once |
 
-Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed precision; the scale is set in the contracts (S-2, decided).
+Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed precision; the scale is set in the contracts.
 
 #### 3.3 Ownership links
 - A Goal belongs to one Participant (`participant_id`). An Entry belongs to that Participant through its Goal. This is what makes "a Participant sees only their own data" (BR-10) a single check.
-- A Template belongs to no Participant. Any Manager may see, edit or retire any template, including one another Manager made (S-5, decided). `created_by` records who made it but gives no extra right.
+- A Template belongs to no Participant. Any Manager may see, edit or retire any template, including one another Manager made. `created_by` records who made it but gives no extra right.
 - A Manager has no link to a Participant's Goal or Entry, so there is nothing for a Manager to be granted (ADR 0019, no sharing).
 
 #### 3.4 Where each rule lives
@@ -566,7 +566,7 @@ Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed 
 | BR-02 day is an Asia/Bangkok date | Service computes "today" | TC-27 |
 | BR-03 value inside the template range; min below max | Service for the entry range; database check for min below max | TC-10, TC-28 |
 | BR-04 one entry per goal per day | Database unique constraint, mapped to a 409 | TC-29 |
-| BR-05 one active goal per template per Participant | Service, inside a transaction (S-6, decided) | TC-21 |
+| BR-05 one active goal per template per Participant | Service, inside a transaction | TC-21 |
 | BR-06 goal state from dates | Computed; no stored state | TC-22, TC-30 |
 | BR-07 progress is days met | Computed from entries | TC-31 |
 | BR-08 edit a template only while no goal uses it | Service (checks for goals on the template) | TC-12, TC-13 |
@@ -592,7 +592,7 @@ Progress and streaks are computed from entries each time, so an edit needs no ex
 - **Setup:** PostgreSQL 16 (the kit's version). The connection comes only from `DATABASE_URL` (section 7).
 - **Migrations:** Prisma migrations, applied with `prisma migrate deploy`. They are additive only (add tables or columns), so an older image still works after a rollback (SG Ep. 0.4). Each migration is committed with the feature that needs it.
 - **Seed:** a script that is safe to run twice (the kit's `npm run prisma:seed`). It creates synthetic data only: one Manager, at least two Participants (the cross-account tests need two), and a few templates. Seeded passwords are read from environment variables, never written in code or the repository (SG Ep. 2.2). Account names are open (SRS A-9).
-- **Tests:** ADR 0035 says the tests run against a real test database. That the suite uses its own database and resets and seeds it before each run is a proposal (S-15).
+- **Tests:** ADR 0035 says the tests run against a real test database. That the suite uses its own database and resets and seeds it before each run is a proposal.
 
 ### 4. Interface Design
 
@@ -629,13 +629,13 @@ Exact wording of the messages is set in each feature contract.
 
 #### 4.3 API conventions (ADR 0025)
 - REST over JSON. Paths start with `/api`. Resource names are plural nouns.
-- **Status codes:** 200 and 201 for success; 204 for success with no body; **400** when the request itself is invalid, including a date or value that breaks BR-01 or BR-03 (proposal, S-16); 401 for no valid session; 403 for a valid session whose role may not do this; **404** when the record does not exist, and for another Participant's goal or entry, so its existence is not revealed (S-7, decided); **409** when the request conflicts with data already stored: a second entry on the same day (BR-04), a second active goal on a template (BR-05), an edit of a template that a goal uses (BR-08) or a duplicate template name (S-4); 500 for a server fault. A Manager's request for a Participant's data still gets 403, for the wrong role.
+- **Status codes:** 200 and 201 for success; 204 for success with no body; **400** when the request itself is invalid, including a date or value that breaks BR-01 or BR-03 (proposal); 401 for no valid session; 403 for a valid session whose role may not do this; **404** when the record does not exist, and for another Participant's goal or entry, so its existence is not revealed; **409** when the request conflicts with data already stored: a second entry on the same day (BR-04), a second active goal on a template (BR-05), an edit of a template that a goal uses (BR-08) or a duplicate template name; 500 for a server fault. A Manager's request for a Participant's data still gets 403, for the wrong role.
 - **Error body:** `{ "error": { "code": "ENTRY_ALREADY_EXISTS", "message": "..." } }`. `code` is a stable name tests can check; `message` is plain language for the user.
-- **Validation:** every request body, parameter and query is validated on the server before any rule runs. The validation library is zod (S-8, decided). Unknown fields are never stored; whether the schema ignores or refuses them is set in the first contract.
+- **Validation:** every request body, parameter and query is validated on the server before any rule runs. The validation library is zod. Unknown fields are never stored; whether the schema ignores or refuses them is set in the first contract.
 - **Safe errors:** responses never carry a stack trace, SQL, file path, secret or another user's data. The full detail goes to the server log only. Login failures give the same message for an unknown user and a wrong password.
 - **Dates and numbers:** dates are `YYYY-MM-DD` strings (Asia/Bangkok dates); values are numbers.
 
-#### 4.4 Endpoints (baseline, S-9)
+#### 4.4 Endpoints (baseline)
 Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature contracts; rows for Sprint 2 and 3 are outlines. Roles are in section 5.
 
 | Method and path | Purpose | Sprint | FR |
@@ -684,7 +684,7 @@ Two roles, one per account: Participant and Manager (GWS §5.2, GWS §6.8). A re
 | View a goal's detail and streak (Sprint 3) | 401 | own goals only | 403 | only goals owned by the session user |
 
 Rules behind the matrix:
-- **Ownership:** a Participant's goals and entries are private (BR-10, ADR 0019). A request for another Participant's goal or entry gets 404, so its existence is not revealed (S-7, decided). A Manager's request for them gets 403, for the wrong role. A Manager sees templates only.
+- **Ownership:** a Participant's goals and entries are private (BR-10, ADR 0019). A request for another Participant's goal or entry gets 404, so its existence is not revealed. A Manager's request for them gets 403, for the wrong role. A Manager sees templates only.
 - **No client-chosen identity:** the acting user is always the session user. A request field such as `participant_id` is ignored or refused (GWS §5.2).
 - **Test cover:** NFR-02 asks that every protected endpoint has a test for 401 and for the wrong role (TC-08); NFR-03 asks for cross-account tests with two Participants and a Manager (TC-33, TC-34).
 
@@ -699,10 +699,10 @@ Accounts are seeded; there is no self-registration or password recovery (ADR 000
 3. On success the API creates a Session row with a random ID and `expires_at` = now plus 8 hours (ADR 0028), and sets a cookie holding that ID.
 
 #### 6.3 Session cookie
-HTTP-only, so page scripts cannot read it (ADR 0027, NFR-04). Also: `Secure` in production and `SameSite=Lax` (S-10, decided), path `/`, and no `Max-Age` beyond the 8 hours. The cookie holds only the random session ID, never user data.
+HTTP-only, so page scripts cannot read it (ADR 0027, NFR-04). Also: `Secure` in production and `SameSite=Lax`, path `/`, and no `Max-Age` beyond the 8 hours. The cookie holds only the random session ID, never user data.
 
 #### 6.4 Every protected request
-The API reads the cookie, loads the Session row, and refuses with 401 if the row is missing or `expires_at` has passed. The 8 hours run from login and are not extended by activity (ADR 0028: "8 hours from login"; the 30-minute inactivity option was not chosen). Expired rows are removed when the API finds them (S-11, decided); there is no scheduled clean-up.
+The API reads the cookie, loads the Session row, and refuses with 401 if the row is missing or `expires_at` has passed. The 8 hours run from login and are not extended by activity (ADR 0028: "8 hours from login"; the 30-minute inactivity option was not chosen). Expired rows are removed when the API finds them; there is no scheduled clean-up.
 
 #### 6.5 Current user
 `GET /api/auth/me` returns the name and role of the session user, or 401 (FR-03).
@@ -713,12 +713,12 @@ The API reads the cookie, loads the Session row, and refuses with 401 if the row
 #### 6.7 Why a database session
 A redeploy or a new container does not log users out, and logout really ends the session (ADR 0027, SG Ep. 2.2). No session data lives in server memory.
 
-#### 6.8 Cross-site requests (S-12)
-A cookie session needs protection against cross-site requests. Decided on PR #23 (S-12): `SameSite=Lax`, JSON-only bodies, and a refusal of state-changing requests whose `Origin` is not the app's own origin. The exact check is written in the F-01 contract.
+#### 6.8 Cross-site requests
+A cookie session needs protection against cross-site requests. Decided on PR #23: `SameSite=Lax`, JSON-only bodies, and a refusal of state-changing requests whose `Origin` is not the app's own origin. The exact check is written in the F-01 contract.
 
 ### 7. Configuration and Deployment Plan
 
-#### 7.1 Environment variables (baseline, S-13 decided)
+#### 7.1 Environment variables (baseline)
 Every setting comes from the environment. `.env` is never committed; `.env.example` holds placeholders only (L5 R-02, R-12). Names follow the kit; the table is the design baseline and is finalised in `docs/labs/lab-05/deployment.md` (to be written in Lab 5).
 
 | Variable | Purpose | Secret | Local source | GCP source |
@@ -740,7 +740,7 @@ The container listens on `PORT` at `0.0.0.0`, keeps no data on its own disk and 
 - If a secret is ever pushed: change it at once, redeploy and tell a TA (L5 §4.3).
 
 #### 7.3 Database configuration
-Local: a PostgreSQL 16 instance reached through `DATABASE_URL`, started with the kit's Docker Compose file (S-14, decided). GCP: Cloud SQL for PostgreSQL 16 (KIT `deploy.sh`) on the `db-f1-micro` tier (ADR 0030), reached by Cloud Run through the connection name (KIT). The kit creates a 10 GB SSD. Turning storage auto-increase off is recommended, not required (L5 §5).
+Local: a PostgreSQL 16 instance reached through `DATABASE_URL`, started with the kit's Docker Compose file. GCP: Cloud SQL for PostgreSQL 16 (KIT `deploy.sh`) on the `db-f1-micro` tier (ADR 0030), reached by Cloud Run through the connection name (KIT). The kit creates a 10 GB SSD. Turning storage auto-increase off is recommended, not required (L5 §5).
 
 #### 7.4 Planned GCP deployment (Lab 5; ADR 0030 to ADR 0033, kit defaults)
 Each row says where it comes from. ADRs 0030 to 0033 set the reference stack with the kit defaults, the Cloud Run and Cloud SQL sizes, no approval step and the CI job name; the other facts come from the kit (KIT) and the GCP guide (SG).
@@ -758,33 +758,9 @@ Each row says where it comes from. ADRs 0030 to 0033 set the reference stack wit
 | Rollback | Redeploy an earlier image SHA; the database is not rolled back | KIT; SG Ep. 8 |
 | Ownership | phittayanan creates and owns the GCP project and adds projectnewy as Editor. ADR 0031 says to use the other way round (projectnewy owns it) if phittayanan's Gmail has already used the Free Trial. Which GCP access method applies is still a question for the TA | ADR 0031; L5 §4.4 |
 
-The kit's names (`toktickit`, `toktickit-migrate`, `toktickit-pg`, `toktickit-runner`, `toktickit-deployer`) are replaced everywhere by this project's names in Lab 5. The kit's smoke test calls `/api/categories`, which this app does not have. What it checks instead is open (S-17).
+The kit's names (`toktickit`, `toktickit-migrate`, `toktickit-pg`, `toktickit-runner`, `toktickit-deployer`) are replaced everywhere by this project's names in Lab 5. The kit's smoke test calls `/api/categories`, which this app does not have. What it checks instead was still open at the release.
 
 Sprint 1 itself needs only the local setup: install, migrate, seed, run and test, documented in the README. Docker and GCP are due in Lab 5.
-
-### 8. Key Design Decisions
-
-*8.1 (the decisions this design rests on) is not printed; the decisions are in Part A, page {{page:design-decisions}}.*
-
-#### 8.2 Open points and answers
-
-- S-1 Folder layout: Decided: the kit's layout (`client/`, `server/`)
-- S-2 Key type, names and decimal precision: Decided: integer IDs; decimals with a fixed precision (the scale is set in the contracts). Field and table names stay as in 3.2
-- S-3 Goal delete: Decided: no goal delete. The SRS has none, and goals end only by date (ADR 0012)
-- S-4 Unique template name: Decided: unique, and a duplicate returns 409
-- S-5 Manager rights on templates: Decided: any Manager may edit or retire any template, including one another Manager made
-- S-6 BR-05 under two requests at once: Decided: a check inside a transaction in the service
-- S-7 Another Participant's record: Decided: 404, so its existence is not revealed. A Manager's request still gets 403
-- S-8 Validation library: Decided: zod
-- S-9 Endpoint names and paths: Accepted as a baseline; exact paths are set in the contracts
-- S-10 Cookie flags: Decided: `Secure` in production, `SameSite=Lax`
-- S-11 Expired sessions: Decided: removed when found; no scheduled clean-up
-- S-12 Cross-site requests: Decided: an Origin check on state-changing requests, with `SameSite=Lax` and JSON-only bodies
-- S-13 Environment variables: Decided: the table in 7.1 is the baseline
-- S-14 Local PostgreSQL: Decided: the kit's Docker Compose file
-- S-15 Does the test suite use its own database and reset and seed it before each run: Open (proposal): yes. ADR 0035 says only "a real test database"
-- S-16 Codes for rule rejections: Open (proposal): 400 for BR-01 and BR-03 (the request's date or value is invalid); 409 for BR-04, BR-05 and BR-08 (it conflicts with stored data)
-- S-17 What the post-deploy smoke test checks for this app: Open (proposal): `/api/health`, `/api/ready`, `/`, and an optional login as a seeded Participant. Seeded account names are SRS A-9
 
 # Part D. Three-sprint plan {#part-d}
 
@@ -950,7 +926,7 @@ Test specification of the system checks:
 
 ### Contract Revision History
 
-Each contract's section 13 is its revision history.
+Each contract's section 11 is its revision history.
 
 ### Definition of Done {#product-dod}
 
@@ -963,14 +939,14 @@ The Product Definition of Done comes from handout D1 §3.5 and GWS §8.2. Each l
 | 3 | The tests are meaningful and pass | No required test is disabled or weakened to pass; failed and skipped tests are reported; the rule tests were seen failing before the code and passing after (red commit before the feature commit) |
 | 4 | Review and integration are complete | Each agreed build group (Auth, Template, Goal, Entry, and Progress with privacy) has its own Issue, branch and teammate-reviewed PR into `staging`; Auth is Issue #32 and PR #34. Every included feature and acceptance criterion is traceable to its tests and implementation. The release PR from `staging` into `main` is reviewed, `main` is tagged `v1.0`, and the board shows Done |
 | 5 | Setup and documents are current | README setup, `.env.example` (fake values only), the contracts, `docs/traceability.md` (AC, Test ID, Issue and PR) and this overview match the released code; seeded passwords are shared privately, never in Git |
-| 6 | Incomplete work is disclosed | Part F lists the known limits: no failed-login limiting (OP-01.11), no way to fix a wrong same-day entry (SRS A-11), no Retire (Sprint 2), the timed clean-clone run, CI, Docker and GCP (Lab 5), and any test that failed or was skipped |
+| 6 | Incomplete work is disclosed | Part F lists the known limits: no failed-login limiting, no way to fix a wrong same-day entry (SRS A-11), no Retire (Sprint 2), the timed clean-clone run, CI, Docker and GCP (Lab 5), and any test that failed or was skipped |
 | 7 | The AI use is declared | `docs/ai-use.md` is current and each PR says what the human checked or changed |
 
 This table applies to the whole Sprint 1 release.
 
 ## F-01 Login, logout and session
 
-Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -989,7 +965,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 1. Accounts are seeded; there is no self-registration and no password recovery (ADR 0004). The seed creates one Manager and at least two Participants (SDS 3.6).
 2. A user opens the login screen, types a username and a password and presses "Log in".
 3. The API compares the password with the stored bcrypt hash (ADR 0029). On success it stores a Session row with a random ID and `expires_at` = login time plus 8 hours (ADR 0027, ADR 0028), sets an HTTP-only cookie holding that ID, and returns the user. The browser then opens the role's first page (F-02).
-4. Every protected request reads the cookie and loads the Session row. A missing, unknown or expired session is refused with 401 (SDS 6.4). An expired row is deleted when the API finds it (SDS S-11).
+4. Every protected request reads the cookie and loads the Session row. A missing, unknown or expired session is refused with 401 (SDS 6.4). An expired row is deleted when the API finds it.
 5. "Log out" deletes the Session row and clears the cookie. The old cookie value no longer gives access, even if it is replayed (SDS 6.6).
 6. The 8 hours run from login and are not extended by activity (ADR 0028; SDS 3.2, 6.4).
 
@@ -1001,28 +977,28 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Same answer | An unknown username and a wrong password get the same status, code and message | SDS 4.3, 6.2 |
 | Logout | Logout deletes the Session row at once; the old cookie then gets 401 | SRS FR-02, NFR-04; ADR 0027 |
 | Who am I | A logged-in user can read their name and role | SRS FR-03; SDS 6.5 |
-| Expiry | A session is valid while the current instant is before `expires_at` (login plus 8 hours); from `expires_at` on it is refused with 401 (OP-01.6) | SRS FR-04, NFR-04; ADR 0028 |
-| Cookie | HTTP-only, `SameSite=Lax`, path `/`, `Secure` in production, and it holds only the session ID | SRS NFR-04; SDS 6.3, S-10 |
+| Expiry | A session is valid while the current instant is before `expires_at` (login plus 8 hours); from `expires_at` on it is refused with 401 | SRS FR-04, NFR-04; ADR 0028 |
+| Cookie | HTTP-only, `SameSite=Lax`, path `/`, `Secure` in production, and it holds only the session ID | SRS NFR-04; SDS 6.3 |
 | Session ID | Random, at least 128 bits, not guessable | SDS 3.2 |
 | Passwords | Stored only as bcrypt hashes (`bcryptjs`). No plaintext password in code, Git, logs, screens or any response | SRS NFR-01; ADR 0029; SDS 6.1 |
-| Cross-site | A state-changing request whose parsed `Origin` host differs from the `Host` header (OP-01.2) is refused (OP-01.2). Bodies are JSON only | SDS 6.8, S-12 |
+| Cross-site | A state-changing request whose parsed `Origin` host differs from the `Host` header is refused. Bodies are JSON only | SDS 6.8 |
 
 ### 4. Validation and failure cases
 
-Login is the only Sprint 1 endpoint that needs no session. On every state-changing request (`POST`, `PATCH`, `PUT`, `DELETE`), including login and logout, the Origin check runs first (OP-01.2). Then the steps of SDS 2.2 follow: session (401), role (403), validation (400). For login: Origin (403), validation (400), credentials (401).
+Login is the only Sprint 1 endpoint that needs no session. On every state-changing request (`POST`, `PATCH`, `PUT`, `DELETE`), including login and logout, the Origin check runs first. Then the steps of SDS 2.2 follow: session (401), role (403), validation (400). For login: Origin (403), validation (400), credentials (401).
 
-| Order | Case | Result | Error code | Message (OP-01.9) |
+| Order | Case | Result | Error code | Message |
 |---|---|---|---|---|
-| 1 | State-changing request with a malformed `Origin` or a parsed Origin host that differs from the `Host` header (OP-01.2) | 403 | `ORIGIN_NOT_ALLOWED` | "This request is not allowed from another site." |
+| 1 | State-changing request with a malformed `Origin` or a parsed Origin host that differs from the `Host` header | 403 | `ORIGIN_NOT_ALLOWED` | "This request is not allowed from another site." |
 | 2 | Protected request with no cookie, an unknown session ID, a deleted session, or a session at or past `expires_at` | 401 | `UNAUTHENTICATED` | "Please log in." |
 | 3 | Login body not JSON; `username` or `password` missing, not a string, or empty after trimming the username | 400 | `VALIDATION_ERROR` | "Enter your username and password." |
 | 4 | Login with an unknown username, or a known username and a wrong password | 401 | `INVALID_CREDENTIALS` | "Username or password is incorrect." (the same for both) |
 
 When a request breaks more than one row, the lowest order wins. Examples: a cross-site login with an empty body gets `403 ORIGIN_NOT_ALLOWED`; a login with no password and an unknown username gets `400 VALIDATION_ERROR`.
 
-Unknown body fields (for example `role`) are stripped and do not cause an error (decided on PR #29, OP-07.7).
+Unknown body fields (for example `role`) are stripped and do not cause an error (decided on PR #29).
 
-Boundaries: a session used at login plus 7:59:59 is accepted; at login plus 8:00:00 it is refused. A request with no `Origin` header is not refused by the Origin check (OP-01.2).
+Boundaries: a session used at login plus 7:59:59 is accepted; at login plus 8:00:00 it is refused. A request with no `Origin` header is not refused by the Origin check.
 
 ### 5. Permissions
 
@@ -1037,7 +1013,7 @@ The acting user always comes from the Session row named by the cookie, never fro
 ### 6. UI behaviour
 
 - **Login screen** (SDS 4.1): username box, password box (masked), "Log in" button. No sign-up and no "forgot password" link (ADR 0004).
-- On success the browser opens the role's first page (F-02, OP-02.1).
+- On success the browser opens the role's first page (F-02).
 - A rejected login shows the API `message` above the form, keeps the typed username and clears the password box. While the request runs the button is disabled (SDS 4.2).
 - **Log out** is in the top bar on every page (ADR 0026; F-02). After logout the browser shows the login screen.
 - Any API answer of 401 returns the user to the login screen (SDS 4.2; tested in F-02, TC-67).
@@ -1045,7 +1021,7 @@ The acting user always comes from the Session row named by the cookie, never fro
 
 ### 7. API
 
-Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API (OP-07.3). Bodies are JSON (`Content-Type: application/json`).
+Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API. Bodies are JSON (`Content-Type: application/json`).
 
 **`POST /api/auth/login`** (anyone)
 
@@ -1070,10 +1046,10 @@ No response carries `password`, `passwordHash` or the session ID in the body.
 | Layer change | Detail |
 |---|---|
 | Table `User` | `id` integer primary key; `username` text unique not null; `display_name` text not null; `role` enum `PARTICIPANT` or `MANAGER` not null; `password_hash` text not null; `created_at` timestamp not null (SDS 3.2) |
-| Table `Session` | `id` text primary key (random, at least 128 bits; OP-01.5); `user_id` not null, reference to User, on delete cascade; `created_at` timestamp not null; `expires_at` timestamp not null = `created_at` plus 8 hours (SDS 3.2) |
+| Table `Session` | `id` text primary key (random, at least 128 bits); `user_id` not null, reference to User, on delete cascade; `created_at` timestamp not null; `expires_at` timestamp not null = `created_at` plus 8 hours (SDS 3.2) |
 | Migration | One additive Prisma migration that creates `User` and `Session` (the first migration; no existing table changes) |
-| Seed | `npm run prisma:seed`, safe to run twice: upserts one Manager and two Participants by `username` (names: SRS A-9, OP-01.7). Passwords come from `SEED_MANAGER_PASSWORD` and `SEED_PARTICIPANT_PASSWORD` and are stored as bcrypt hashes (SDS 3.6, 7.1). If a variable is missing the seed stops with an error and creates no account (OP-01.8) |
-| Expired rows | Deleted when the API finds them on a request (SDS S-11); there is no scheduled clean-up |
+| Seed | `npm run prisma:seed`, safe to run twice: upserts one Manager and two Participants by `username` (names: SRS A-9). Passwords come from `SEED_MANAGER_PASSWORD` and `SEED_PARTICIPANT_PASSWORD` and are stored as bcrypt hashes (SDS 3.6, 7.1). If a variable is missing the seed stops with an error and creates no account |
+| Expired rows | Deleted when the API finds them on a request; there is no scheduled clean-up |
 
 ### 9. Acceptance criteria
 
@@ -1092,7 +1068,7 @@ No response carries `password`, `passwordHash` or the session ID in the body.
 
 ### 10. Test specification
 
-Fixtures: each test starts from its own data with one Manager and Participants A and B, created with test-only passwords from the test environment (never from the repository). Clock: unit tests of the session rule pass the current instant as an argument (decided on PR #29, OP-07.9); API tests age a session by moving its `created_at` and `expires_at` back in the test database, so the server needs no clock hook.
+Fixtures: each test starts from its own data with one Manager and Participants A and B, created with test-only passwords from the test environment (never from the repository). Clock: unit tests of the session rule pass the current instant as an argument (decided on PR #29); API tests age a session by moving its `created_at` and `expires_at` back in the test database, so the server needs no clock hook.
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
@@ -1110,37 +1086,17 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | TC-46<br>AC-01.1<br>API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
 | TC-65<br>AC-01.10<br>Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens. Log out: the login screen. Manager: the Manager's first page |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-01.1 | Code for a failed login. SDS 6.2 fixes 401 and one message for both cases, not the code | Decided (PR #31): `401 INVALID_CREDENTIALS`, kept apart from `UNAUTHENTICATED` so the UI can tell "wrong password" from "session ended" |
-| OP-01.2 | The exact Origin check (SDS 6.8 leaves it to this contract) | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1), host-only option: on `POST`, `PATCH`, `PUT` and `DELETE`, parse a present `Origin` as a URL and compare its host (including any port) against the `Host` header. A malformed or non-matching Origin gets `403 ORIGIN_NOT_ALLOWED`; no Origin passes. Runs before the session check. Compare hosts without the scheme because Cloud Run terminates HTTPS before Express, which may see HTTP; `X-Forwarded-Proto` does not change this comparison. No new environment variable |
-| OP-01.3 | A non-JSON body | Decided (PR #31): `400 VALIDATION_ERROR`, so every Sprint 1 error stays inside the SDS 4.3 status list (no 415) |
-| OP-01.4 | Logging in while already logged in | Decided (PR #31): a new session is created and the cookie replaced; the session named by an incoming cookie, if any, is deleted |
-| OP-01.5 | Session ID format and cookie name | Decided (PR #31): 32 random bytes from Node `crypto`, base64url; cookie name `sid`; `Max-Age=28800` (SDS 6.3 allows no more than 8 hours) |
-| OP-01.6 | Expiry boundary: is a session at exactly `expires_at` still valid | Decided (PR #31): no; valid only while now is before `expires_at` (TC-63) |
-| OP-01.7 | Seeded account names (SRS A-9) | Decided (PR #31): `manager1`, `participant1`, `participant2`, with display names "Manager One", "Participant One", "Participant Two". Passwords are shared privately (SDS 7.2) |
-| OP-01.8 | Seed when a password variable is missing; second seed run | Decided (PR #31): stop with an error and create nothing (no default password); a second run upserts by `username` and sets the hash from the current variable |
-| OP-01.9 | Message wording (SDS 4.2 leaves it to each contract) | Decided (PR #31): the texts in section 4 |
-| OP-01.10 | bcrypt cost factor | Decided (PR #31): 10 |
-| OP-01.11 | Limiting repeated failed logins. No SRS line or ADR asks for it | Decided (PR #31): not built in Sprint 1; listed here so the choice is visible |
-| OP-01.12 | Unknown username can return faster than a wrong password | Decided for this implementation round by [current teammate review](https://github.com/phittayanan/habit-tracker/pull/34#pullrequestreview-5810651960) and the owner-authorized 2026-11-07 review-fix brief: compare the supplied password against a precomputed dummy bcrypt hash at cost 10 when the username is unknown, then return the same `401 INVALID_CREDENTIALS` body and no session. TC-02 spies on the real bcrypt comparison for both invalid cases and verifies its cost. This adds comparable bcrypt work without promising identical response times. The earlier discussion on https://github.com/phittayanan/habit-tracker/pull/31 introduced the proposal; its empty approval did not explicitly name OP-01.12. See ADR 0051 |
-| OP-07.7 | Unknown body fields | Decided on PR #29 (Q3): stripped, the request is accepted. Applies to every Sprint 1 contract |
-| OP-07.9 | How tests fix "today" and the clock | Decided on PR #29 (Q2): unit tests pass the instant as an argument; tests through the server need no clock hook |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
-| 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): TC-05 uses auth only; host-only Origin check and forwarded HTTPS case in TC-64; login timing proposal OP-01.12; record partner agreement on existing proposals | pending (partner re-check) |
+| 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): TC-05 uses auth only; host-only Origin check and forwarded HTTPS case in TC-64; a login timing proposal; record partner agreement on existing proposals | pending (partner re-check) |
 
 ## F-02 Role layout and endpoint protection
 
-Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -1173,15 +1129,15 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 
 ### 4. Validation and failure cases
 
-| Order | Case | Result | Error code | Message (OP-02.4) |
+| Order | Case | Result | Error code | Message |
 |---|---|---|---|---|
-| 1 | State-changing request with a foreign `Origin` (F-01, OP-01.2) | 403 | `ORIGIN_NOT_ALLOWED` | as F-01 |
+| 1 | State-changing request with a foreign `Origin` (F-01) | 403 | `ORIGIN_NOT_ALLOWED` | as F-01 |
 | 2 | No valid session | 401 | `UNAUTHENTICATED` | "Please log in." |
 | 3 | Valid session, role not allowed on the route | 403 | `FORBIDDEN` | "You do not have permission to do this." |
 
 Later checks (ownership, validation, rules) never run for a request refused here. So an anonymous request to a Manager-only route gets 401, not 403; and a Participant's request to a Manager-only route gets 403 even when its body is invalid or its id does not exist (no 400 or 404).
 
-A `role` field in a body is stripped (OP-07.7), and a header such as `X-Role` is ignored; neither changes the role.
+A `role` field in a body is stripped, and a header such as `X-Role` is ignored; neither changes the role.
 
 ### 5. Permissions
 
@@ -1206,10 +1162,10 @@ A new protected endpoint is added to this table and to TC-08 in the PR that adds
 ### 6. UI behaviour
 
 - **Top bar** on every page after login: the display name from `GET /api/auth/me`, the role's menu items, and "Log out" (ADR 0026).
-- **Menu items** (OP-02.1): Manager: "Templates". Participant: "Goals", "Templates".
-- **First page after login** (OP-02.1): Manager: the template list (ADR 0043 "What the Program Manager sees first"). Participant: the goals page (in Sprint 1 the calendar does not exist yet; SRS A-3).
+- **Menu items**: Manager: "Templates". Participant: "Goals", "Templates".
+- **First page after login**: Manager: the template list (ADR 0043 "What the Program Manager sees first"). Participant: the goals page (in Sprint 1 the calendar does not exist yet; SRS A-3).
 - **No session**: opening any page other than the login screen shows the login screen. Any API answer of 401 returns the user to the login screen (SDS 4.2).
-- **Wrong-role page** (OP-02.2): a Participant who types a Manager-only page address (for example `/templates/new`) sees the plain sentence "This page is not available for your role." and the top bar; the API refuses any write anyway.
+- **Wrong-role page**: a Participant who types a Manager-only page address (for example `/templates/new`) sees the plain sentence "This page is not available for your role." and the top bar; the API refuses any write anyway.
 - The look is plain (ADR 0044). The top bar and menu work with the keyboard alone and fit 375 px and 1280 px (NFR-05, NFR-06; TC-47, TC-48 run on the Sprint 1 screens).
 
 ### 7. API
@@ -1241,7 +1197,7 @@ with status 403.
 
 ### 10. Test specification
 
-Fixtures: one Manager and Participants A and B created by each test with test-only passwords. At the F-02 build step, register `POST /api/test/manager/:id` only in the test app with the real session and Manager-role middleware, followed by a body validator, an existence check and a handler spy. Register a test-only page `/test/protected` using the real layout and API client; it calls `GET /api/auth/me`. Neither test route is shipped. Before feature pages exist, TC-07 checks the role layout mounted on this test page; it does not load template or goal data. Later TC-08 adds feature fixtures through their APIs as each route is built; goal dates are relative to the Bangkok today (PR #29, OP-07.9).
+Fixtures: one Manager and Participants A and B created by each test with test-only passwords. At the F-02 build step, register `POST /api/test/manager/:id` only in the test app with the real session and Manager-role middleware, followed by a body validator, an existence check and a handler spy. Register a test-only page `/test/protected` using the real layout and API client; it calls `GET /api/auth/me`. Neither test route is shipped. Before feature pages exist, TC-07 checks the role layout mounted on this test page; it does not load template or goal data. Later TC-08 adds feature fixtures through their APIs as each route is built; goal dates are relative to the Bangkok today (PR #29).
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
@@ -1250,20 +1206,8 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 | TC-66<br>AC-02.3, AC-02.4<br>API | Test-only Manager route registered as above; id 1 exists, 99999 does not; validator, existence check and handler are spies | Anonymous `POST /api/test/manager/1`; as A: POST id 1 with `{}`; POST id 99999; POST id 1 with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; validator, existence check and handler never run; no data changes |
 | TC-67<br>AC-02.5<br>Browser | App on the test database; A exists; test-only protected page registered as above | Open `/test/protected` with no session; log in as A and open that page; delete A's session row in the test database; reload the page | The first visit shows the login screen; after the reload `GET /api/auth/me` answers `401 UNAUTHENTICATED` and the login screen is shown |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-02.1 | Menu item names and each role's first page in Sprint 1. ADR 0043 sets the Manager's first screen (the template list); ADR 0037 puts the calendar first for a Participant, but the calendar is Sprint 2 (SRS A-3) | Decided (PR #31): Manager "Templates", first page the template list; Participant "Goals" and "Templates", first page the goals page until the calendar arrives |
-| OP-02.2 | What a Participant sees on a Manager-only page address | Decided (PR #31): the sentence "This page is not available for your role." with the top bar; no redirect |
-| OP-02.3 | Page addresses | Decided (PR #31): `/login`, `/templates`, `/templates/new`, `/templates/:id/edit`, `/goals` |
-| OP-02.4 | Message wording for 401 and 403 | Decided (PR #31): the texts in section 4 |
-| OP-02.5 | An unknown `/api` path | Decided (PR #31): `404 NOT_FOUND` with the standard error body, with or without a session |
-| OP-10.1 | F-10 repeats the 401 and 403 checks for goal and entry endpoints in TC-34 | Open on PR #29 (proposal there: yes). TC-08 here covers every endpoint either way |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
@@ -1272,7 +1216,7 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 
 ## F-03 Template creation and Manager list
 
-Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -1291,7 +1235,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 1. A logged-in Manager opens "Templates" and sees the template table (ADR 0043; SRS FR-06).
 2. "New" opens the template form: name, unit (free text), minimum and maximum per entry (ADR 0007; SRS FR-05).
 3. On Save the API checks the request (section 4). If it passes, one Template row is stored with state `ACTIVE`, and the table shows it.
-4. Any Manager sees and may edit every template, including one another Manager made (SDS S-5). `created_by` records who made it and gives no extra right.
+4. Any Manager sees and may edit every template, including one another Manager made. `created_by` records who made it and gives no extra right.
 5. The table shows New and, per row, Edit (F-04). There is no Retire control in Sprint 1 (features O-4; SRS FR-06).
 
 ### 3. Business rules
@@ -1300,28 +1244,28 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 |---|---|---|
 | BR-03 (template part) | A template's minimum is below its maximum. Equal is refused | SRS BR-03; ADR 0007 ("the minimum must be below the maximum") |
 | Unit | Free text; spelling is not checked | ADR 0007; SRS 1.3 |
-| Unique name | Two templates cannot have the same name; a duplicate is refused with 409 | SDS 3.2, S-4 |
-| Decimal scale | `min_value` and `max_value` have 2 decimal places, sent as JSON numbers | Decided on PR #29 (OP-07.8) |
+| Unique name | Two templates cannot have the same name; a duplicate is refused with 409 | SDS 3.2 |
+| Decimal scale | `min_value` and `max_value` have 2 decimal places, sent as JSON numbers | Decided on PR #29 |
 | New state | A new template is `ACTIVE`; the state column exists from the start, retire comes in Sprint 2 | SDS 3.2 |
 | Creator | `created_by` is the session user, never read from the request | SDS 2.2, 3.2 |
 
 ### 4. Validation and failure cases
 
-Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403), validation (400), then the rules in this order. The status codes for rule rejections follow the SDS proposal S-16, which is still open: 400 for BR-03, 409 for a duplicate name (S-4, decided).
+Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403), validation (400), then the rules in this order. The status codes for rule rejections follow an SDS proposal that was still open at the release: 400 for BR-03, 409 for a duplicate name (decided).
 
-| Order | Case | Result | Error code | Message (OP-03.6) |
+| Order | Case | Result | Error code | Message |
 |---|---|---|---|---|
 | 1 | No valid session | 401 | `UNAUTHENTICATED` | F-01 |
 | 2 | Caller is a Participant | 403 | `FORBIDDEN` | F-02 (tested in F-06) |
-| 3 | `name` or `unit` missing, not a string, empty after trimming, or longer than the limit (OP-03.2); `minValue` or `maxValue` missing, not a number, more than 2 decimal places, or outside the column range (OP-03.3, OP-03.4) | 400 | `VALIDATION_ERROR` | names the field, for example "Maximum must be a number with at most 2 decimal places." |
+| 3 | `name` or `unit` missing, not a string, empty after trimming, or longer than the limit; `minValue` or `maxValue` missing, not a number, more than 2 decimal places, or outside the column range | 400 | `VALIDATION_ERROR` | names the field, for example "Maximum must be a number with at most 2 decimal places." |
 | 4 | `minValue` equal to or above `maxValue` | 400 | `MIN_NOT_BELOW_MAX` | "Minimum must be below maximum." |
-| 5 | A template with the same name already exists (OP-03.1) | 409 | `TEMPLATE_NAME_EXISTS` | "A template with this name already exists." |
+| 5 | A template with the same name already exists | 409 | `TEMPLATE_NAME_EXISTS` | "A template with this name already exists." |
 
 When a request breaks more than one rule, the first one in this table is returned. Example: a new template named like an existing one with minimum 5 and maximum 5 gets `400 MIN_NOT_BELOW_MAX`.
 
-Unknown body fields (for example `state`, `createdBy` or `id`) are stripped and do not cause an error (decided on PR #29, OP-07.7). Names and units are stored trimmed.
+Unknown body fields (for example `state`, `createdBy` or `id`) are stripped and do not cause an error (decided on PR #29). Names and units are stored trimmed.
 
-Boundaries: a minimum just below the maximum (0 and 0.01) is accepted; negative numbers are accepted (OP-03.5). Two requests with the same new name at the same time give one stored template and one `409 TEMPLATE_NAME_EXISTS` (the database unique constraint decides).
+Boundaries: a minimum just below the maximum (0 and 0.01) is accepted; negative numbers are accepted. Two requests with the same new name at the same time give one stored template and one `409 TEMPLATE_NAME_EXISTS` (the database unique constraint decides).
 
 ### 5. Permissions
 
@@ -1333,15 +1277,15 @@ Boundaries: a minimum just below the maximum (0 and 0.01) is accepted; negative 
 
 ### 6. UI behaviour
 
-- **Template list** (Manager's first page; ADR 0043, OP-02.1): a table with the columns Name, Unit, Range (`min–max`), State (`Active` or `Retired`), a "New" button above it, and an "Edit" button on each row. No Retire button in Sprint 1 (features O-4). The state is shown as a word, not by colour (NFR-06).
+- **Template list** (Manager's first page; ADR 0043): a table with the columns Name, Unit, Range (`min–max`), State (`Active` or `Retired`), a "New" button above it, and an "Edit" button on each row. No Retire button in Sprint 1 (features O-4). The state is shown as a word, not by colour (NFR-06).
 - **Empty state**: "No templates yet", with "New" visible (SDS 4.2).
-- **Template form** (`/templates/new`, OP-02.3): Name, Unit, Minimum, Maximum (number boxes), Save, Cancel. The form may check "minimum below maximum" first for a faster message; the API decides.
+- **Template form** (`/templates/new`): Name, Unit, Minimum, Maximum (number boxes), Save, Cancel. The form may check "minimum below maximum" first for a faster message; the API decides.
 - A rejected request shows the API `message` next to the form and keeps the typed values. While the request runs Save is disabled. On 201 the table is shown with the new row.
 - The table and the form fit 375 px and 1280 px wide with no horizontal scroll, and work with the keyboard alone (NFR-05, NFR-06; TC-47, TC-48 run on these screens).
 
 ### 7. API
 
-Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API (OP-07.3). Decimal values travel as JSON numbers (OP-07.8).
+Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API. Decimal values travel as JSON numbers.
 
 **`POST /api/templates`** (Manager)
 
@@ -1355,15 +1299,15 @@ Response 201:
 ```
 Errors: 400, 401, 403, 409 as in section 4.
 
-**`GET /api/templates`** (Manager or Participant): returns `{ "templates": [ ... ] }` in the shape above, ordered by name A to Z (OP-03.7). A Manager gets every template; a Participant gets active templates only (F-06). Errors: 401.
+**`GET /api/templates`** (Manager or Participant): returns `{ "templates": [ ... ] }` in the shape above, ordered by name A to Z. A Manager gets every template; a Participant gets active templates only (F-06). Errors: 401.
 
 ### 8. Data
 
 | Layer change | Detail |
 |---|---|
 | Table `Template` | `id` integer primary key; `name` text not null unique; `unit` text not null; `min_value` decimal not null; `max_value` decimal not null; `state` enum `ACTIVE` or `RETIRED` not null default `ACTIVE`; `created_by` not null, reference to User; `created_at` timestamp not null (SDS 3.2) |
-| Constraints | check `min_value < max_value` (BR-03, SDS 3.4); unique `name` (S-4) |
-| Decimal scale | `min_value` and `max_value` use 2 decimal places (OP-07.8), precision 10 (OP-03.4). Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
+| Constraints | check `min_value < max_value` (BR-03, SDS 3.4); unique `name` |
+| Decimal scale | `min_value` and `max_value` use 2 decimal places, precision 10. Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
 | Migration | One additive Prisma migration that creates `Template` and its enum. It changes no existing table. F-07's migration relies on this one for the template scale (F-07 section 8) |
 | Seed | When `SEED_DEMO_DATA` is true, the seed also upserts a few synthetic templates by name, safe to run twice (SDS 3.6, 7.1) |
 
@@ -1392,25 +1336,8 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-11<br>AC-03.6<br>Browser | Manager; no templates at first. Then templates "Sleep" (active) and "Steps" (set to `RETIRED` directly in the test database, since retire is Sprint 2) | Open the template page before and after the templates exist | Before: "No templates yet" and "New". After: two rows with name, unit, range and the words "Active" and "Retired"; "New" above, "Edit" on each row; no "Retire" anywhere |
 | TC-70<br>AC-03.7<br>Browser | Manager logged in; no templates | Open "New"; enter "Stretching", "minutes", 10, 5 and Save; change the minimum to 0 and Save | First Save: the message "Minimum must be below maximum." and the typed values stay. Second: the table shows "Stretching" |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-03.1 | Is the unique name compared with or without case ("Sleep" and "sleep") | Decided (PR #31): exact match after trimming, as the database unique constraint compares; case-insensitive would need a functional index |
-| OP-03.2 | Length limits for `name` and `unit` | Decided (PR #31): name 1 to 100 characters, unit 1 to 30, after trimming |
-| OP-03.3 | A number with more than 2 decimal places: refuse or round. The scale was decided on PR #29 (OP-07.8); the handling of extra places was not, and F-07 and F-08 do not say it either | Decided (PR #31): refuse with `400 VALIDATION_ERROR`, never round silently. The same answer should apply to `dailyTarget` and `value` (note for F-07 and F-08 on this PR) |
-| OP-03.4 | Precision of the four decimal columns (SDS S-2 sets "a fixed precision") | Decided (PR #31): `Decimal(10, 2)`, so values up to 99,999,999.99; a value outside it gets `400 VALIDATION_ERROR` |
-| OP-03.5 | May a minimum be negative | Decided (PR #31): yes; ADR 0007 sets no lower bound and units are free text |
-| OP-03.6 | Message wording | Decided (PR #31): the texts in section 4 |
-| OP-03.7 | Order of `GET /api/templates` | Decided (PR #31): name A to Z (no ADR sets it) |
-| OP-03.8 | Code for a minimum not below the maximum (BR-03). SDS S-16 proposes 400 for BR-03 but no code name | Decided (PR #31): `400 MIN_NOT_BELOW_MAX` |
-| OP-03.9 | Code for a duplicate name (SDS S-4 fixes 409, not the code) | Decided (PR #31): `409 TEMPLATE_NAME_EXISTS` |
-| OP-07.7 | Unknown body fields | Decided on PR #29 (Q3): stripped, the request is accepted |
-| OP-07.8 | Decimal scale | Decided on PR #29 (Q8): 2 decimal places for all four decimal columns; JSON numbers |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
@@ -1422,7 +1349,7 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 
 ## F-04 Template edit
 
-Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -1434,37 +1361,37 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Depends on | F-03 (the template and its form), F-07 (a goal that uses the template) |
 | Needed by | no later Sprint 1 feature; owns the Participant edit refusal (TC-18), after F-07 exists |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft, review round 1 applied; implementation Issue #53 adds the two-request race to TC-13 and lists the edit-page details as OP-04.9 |
+| Status | Draft, review round 1 applied; implementation Issue #53 adds the two-request race to TC-13 and proposes the edit-page details |
 
 ### 2. Behaviour and workflow
 
 1. On the template list a Manager presses "Edit" on a row. The template form opens filled with the current name, unit, minimum and maximum.
 2. On Save the API checks the request (section 4). If no goal uses the template and the new values pass, the template is changed and the table shows the new values.
 3. Once any goal uses the template, the edit is refused and nothing changes. Such a template can only be retired, which comes in Sprint 2 (ADR 0017; SRS BR-08, FR-08).
-4. Any Manager may edit any template, including one another Manager made (SDS S-5).
+4. Any Manager may edit any template, including one another Manager made.
 
 ### 3. Business rules
 
 | Rule | Statement | Source |
 |---|---|---|
 | BR-08 (edit part) | A Manager may edit a template only while no goal uses it | SRS BR-08, FR-07; ADR 0017 |
-| "Uses" | A template is used when at least one Goal row refers to it, whoever owns the goal and whether it is Active or Ended (OP-04.1). ADR 0017 gives the reason: "Saved entries never fall outside a changed range" | ADR 0017; OP-04.1 |
+| "Uses" | A template is used when at least one Goal row refers to it, whoever owns the goal and whether it is Active or Ended. ADR 0017 gives the reason: "Saved entries never fall outside a changed range" | ADR 0017 |
 | BR-03 | After the edit the minimum is still below the maximum | SRS BR-03; ADR 0007 |
-| Unique name | The new name must not belong to another template | SDS 3.2, S-4 |
-| Decimal scale | 2 decimal places, JSON numbers | Decided on PR #29 (OP-07.8) |
-| Not editable | `state`, `createdBy` and `id` cannot be changed by an edit (stripped, OP-07.7). Retire is Sprint 2 | SDS 3.2; features O-4 |
+| Unique name | The new name must not belong to another template | SDS 3.2 |
+| Decimal scale | 2 decimal places, JSON numbers | Decided on PR #29 |
+| Not editable | `state`, `createdBy` and `id` cannot be changed by an edit (stripped). Retire is Sprint 2 | SDS 3.2; features O-4 |
 
 Because a used template cannot be edited, an edit can never put a goal's daily target above a new maximum (SRS A-4) or an entry outside a new range.
 
 ### 4. Validation and failure cases
 
-Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403), validation (400), existence (404), then the rules in this order (OP-04.3). The status codes for rule rejections follow the SDS proposal S-16, which is still open: 409 for BR-08 and a duplicate name, 400 for BR-03.
+Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403), validation (400), existence (404), then the rules in this order. The status codes for rule rejections follow an SDS proposal that was still open at the release: 409 for BR-08 and a duplicate name, 400 for BR-03.
 
-| Order | Case | Result | Error code | Message (OP-04.5) |
+| Order | Case | Result | Error code | Message |
 |---|---|---|---|---|
 | 1 | No valid session | 401 | `UNAUTHENTICATED` | F-01 |
 | 2 | Caller is a Participant | 403 | `FORBIDDEN` | F-02 (tested here in TC-18) |
-| 3 | `:id` not a positive integer; body has none of `name`, `unit`, `minValue`, `maxValue` (OP-04.2); a field present with a wrong type, empty, too long or with more than 2 decimal places (as F-03 section 4) | 400 | `VALIDATION_ERROR` | names the field |
+| 3 | `:id` not a positive integer; body has none of `name`, `unit`, `minValue`, `maxValue`; a field present with a wrong type, empty, too long or with more than 2 decimal places (as F-03 section 4) | 400 | `VALIDATION_ERROR` | names the field |
 | 4 | No template with this id | 404 | `TEMPLATE_NOT_FOUND` | "Template not found." |
 | 5 | A goal uses the template | 409 | `TEMPLATE_IN_USE` | "This template is used by a goal and cannot be edited." |
 | 6 | After merging the sent fields with the stored ones, the minimum is not below the maximum | 400 | `MIN_NOT_BELOW_MAX` | "Minimum must be below maximum." |
@@ -1472,9 +1399,9 @@ Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403
 
 When a request breaks more than one rule, the first one in this table is returned. Example: an edit of a used template that also sets the minimum above the maximum gets `409 TEMPLATE_IN_USE`.
 
-Unknown body fields are stripped and do not cause an error (decided on PR #29, OP-07.7).
+Unknown body fields are stripped and do not cause an error (decided on PR #29).
 
-Boundaries: sending the template's own current name is accepted (not a duplicate); a template whose only goal is Ended is still used. The check "no goal uses it" and the update run in one transaction that first locks the template row (`SELECT ... FOR UPDATE`); goal creation takes the same lock (F-07 AC-07.10), so the two cannot interleave (OP-04.4).
+Boundaries: sending the template's own current name is accepted (not a duplicate); a template whose only goal is Ended is still used. The check "no goal uses it" and the update run in one transaction that first locks the template row (`SELECT ... FOR UPDATE`); goal creation takes the same lock (F-07 AC-07.10), so the two cannot interleave.
 
 ### 5. Permissions
 
@@ -1486,15 +1413,15 @@ Boundaries: sending the template's own current name is accepted (not a duplicate
 
 ### 6. UI behaviour
 
-- "Edit" on a template row opens `/templates/:id/edit` (OP-02.3): the F-03 form, filled with the stored values, with Save and Cancel.
+- "Edit" on a template row opens `/templates/:id/edit`: the F-03 form, filled with the stored values, with Save and Cancel.
 - Save sends the changed fields. On 200 the table shows the new values.
 - A rejected request shows the API `message` next to the form and keeps the typed values. While it runs Save is disabled.
-- The Edit button is shown on every row, used or not; the API answer explains a refusal (OP-04.6).
+- The Edit button is shown on every row, used or not; the API answer explains a refusal.
 - The form fits 375 px and 1280 px wide and works with the keyboard alone (NFR-05, NFR-06; TC-47, TC-48 run on this screen).
 
 ### 7. API
 
-Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase (OP-07.3). Decimal values travel as JSON numbers (OP-07.8).
+Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase. Decimal values travel as JSON numbers.
 
 **`PATCH /api/templates/:id`** (Manager)
 
@@ -1513,7 +1440,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4.
 | Layer change | Detail |
 |---|---|
 | Table and migration | none; uses `Template` from F-03 and `Goal` from F-07 |
-| In-use check | Inside one transaction the service locks the template row (`SELECT ... FOR UPDATE`), counts Goal rows with this `template_id`, checks the merged range and updates the template (OP-04.4) |
+| In-use check | Inside one transaction the service locks the template row (`SELECT ... FOR UPDATE`), counts Goal rows with this `template_id`, checks the merged range and updates the template |
 | Constraints | The database check `min_value < max_value` and the unique `name` (F-03) are the last guard |
 
 ### 9. Acceptance criteria
@@ -1530,46 +1457,31 @@ Errors: 400, 401, 403, 404, 409 as in section 4.
 
 ### 10. Test specification
 
-Fixtures: each test starts from its own data with one Manager and Participant A (test-only passwords). Goals are created through `POST /api/goals` as A (F-07), with dates relative to `D`, today in Asia/Bangkok (decided on PR #29, OP-07.9). A goal with an end date in the past is allowed and is Ended at once (OP-07.2).
+Fixtures: each test starts from its own data with one Manager and Participant A (test-only passwords). Goals are created through `POST /api/goals` as A (F-07), with dates relative to `D`, today in Asia/Bangkok (decided on PR #29). A goal with an end date in the past is allowed and is Ended at once.
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
 | TC-12<br>AC-04.1<br>API | Unused template "Reading" (pages, 0 to 500) | `PATCH` `{ "unit": "pages read", "maxValue": 300 }`; then `PATCH` `{ "name": "Reading time", "minValue": 1 }`; `GET /api/templates` | Both 200; the list shows "Reading time", "pages read", 1 to 300 |
-| TC-13<br>AC-04.2, AC-04.5<br>API and database | Template "Sleep" with A's Active goal (start `D`, end `D+30`); template "Steps" with A's Ended goal only (start `D-10`, end `D-1`). Race part (OP-04.4, F-07 OP-07.11): an unused template "Water" (0 to 24) | `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH` "Sleep" `{ "minValue": 50 }` (also above the max); `PATCH` "Steps" `{ "unit": "km" }`. Race: (a) in the test, open a transaction that locks "Water" (`FOR UPDATE`) and inserts A's goal; start `PATCH` "Water" `{ "maxValue": 10 }`; check it waits on the lock; commit. (b) Send `PATCH` "Water" `{ "maxValue": 10 }` and A's `POST /api/goals` (target 20) at the same time | All three get `409 TEMPLATE_IN_USE`; both templates are unchanged. (a) The edit waits, then gets `409 TEMPLATE_IN_USE`; "Water" keeps max 24. (b) Either order is valid: goal first, then the edit gets `409 TEMPLATE_IN_USE` and max stays 24; or edit first, then the goal gets `400 TARGET_ABOVE_TEMPLATE_MAX` and no goal is stored. Never both a stored goal and an edited range |
+| TC-13<br>AC-04.2, AC-04.5<br>API and database | Template "Sleep" with A's Active goal (start `D`, end `D+30`); template "Steps" with A's Ended goal only (start `D-10`, end `D-1`). Race part: an unused template "Water" (0 to 24) | `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH` "Sleep" `{ "minValue": 50 }` (also above the max); `PATCH` "Steps" `{ "unit": "km" }`. Race: (a) in the test, open a transaction that locks "Water" (`FOR UPDATE`) and inserts A's goal; start `PATCH` "Water" `{ "maxValue": 10 }`; check it waits on the lock; commit. (b) Send `PATCH` "Water" `{ "maxValue": 10 }` and A's `POST /api/goals` (target 20) at the same time | All three get `409 TEMPLATE_IN_USE`; both templates are unchanged. (a) The edit waits, then gets `409 TEMPLATE_IN_USE`; "Water" keeps max 24. (b) Either order is valid: goal first, then the edit gets `409 TEMPLATE_IN_USE` and max stays 24; or edit first, then the goal gets `400 TARGET_ABOVE_TEMPLATE_MAX` and no goal is stored. Never both a stored goal and an edited range |
 | TC-71<br>AC-04.4<br>API | Unused template T; no template with id 99999 | `PATCH` T with `{}`; `{ "minValue": "abc" }`; `{ "maxValue": 10.555 }`; `PATCH /api/templates/abc` with a valid body; `PATCH /api/templates/99999` with a valid body; `PATCH` T with no session | `{}`, "abc", 10.555 and the id "abc" get `400 VALIDATION_ERROR`; 99999 gets `404 TEMPLATE_NOT_FOUND`; anonymous gets `401 UNAUTHENTICATED`; T is unchanged |
 | TC-72<br>AC-04.3<br>Unit and API | Unused templates "Walk" (0 to 100) and "Swim" (0 to 50) | Unit: the merged range for stored (0, 100) with sent `minValue` 100. API: `PATCH` "Walk" `{ "minValue": 100 }`; `PATCH` "Walk" `{ "name": "Swim" }`; `PATCH` "Walk" `{ "name": "Walk", "unit": "steps" }` | Unit: refused. API: `400 MIN_NOT_BELOW_MAX`; `409 TEMPLATE_NAME_EXISTS`; 200 with unit "steps". "Walk" keeps min 0 and max 100 after the first two |
 | TC-73<br>AC-04.6<br>Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
 | TC-18<br>AC-04.7<br>API | A logged in; template "Sleep" (hours, 0 to 24); no template with id 99999 | As A: `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH /api/templates/99999` `{ "unit": "x" }` | Both get `403 FORBIDDEN`; "Sleep" still has max 24 |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-04.1 | Does an Ended goal still "use" a template (ADR 0017, BR-08 say "while no goal uses it") | Decided (PR #31): yes, any goal row counts, so saved entries never fall outside a changed range (the reason in ADR 0017) |
-| OP-04.2 | Partial edit or full replace; an empty body | Decided (PR #31): `PATCH` with any non-empty subset of the four fields; `{}` gets `400 VALIDATION_ERROR` |
-| OP-04.3 | Which code wins when an edit breaks several rules | Decided (PR #31): the order in section 4: `TEMPLATE_NOT_FOUND`, then `TEMPLATE_IN_USE`, then `MIN_NOT_BELOW_MAX`, then `TEMPLATE_NAME_EXISTS`. A used template is refused first because no edit of it can succeed |
-| OP-04.4 | Race between an edit and a new goal on the same template (SDS S-6 puts BR-05 in a transaction but says nothing about this pair) | Decided (PR #31): both the edit (here) and goal creation (F-07) lock the template row (`SELECT ... FOR UPDATE`) inside their transactions, so a goal cannot be created between the in-use check and the update. F-07 does not say this yet; note on this PR for F-07's author |
-| OP-04.5 | Message wording | Decided (PR #31): the texts in section 4 |
-| OP-04.6 | Hide or disable Edit on a used template | Decided (PR #31): keep it shown and let the API refuse; hiding it would need an "in use" field in `GET /api/templates` |
-| OP-04.7 | Code for an unknown template id | Decided (PR #31): `404 TEMPLATE_NOT_FOUND`. A template is not private (SDS 3.3), so 404 here reveals nothing |
-| OP-04.8 | Editing a Retired template that no goal uses | Not reachable in Sprint 1 (retire is Sprint 2); decided in the F-05 contract; scope confirmed in the [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) |
-| OP-04.9 | Edit-page details the contract does not name: the page heading, the message for a body with none of the four fields, and a direct visit to `/templates/:id/edit` for an id that does not exist | Open (proposal, Issue #53): heading "Edit template" (like F-03's "New template"); empty body message "Change at least one of name, unit, minimum or maximum."; an unknown id shows "Template not found." (the section 4 message) with Cancel back to the list. Reviewer to confirm or change |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): own Participant edit refusal as AC-04.7 / TC-18; remove circular dependency; record partner agreement on existing proposals | pending (partner re-check) |
-| 2026-11-10 | Implementation Issue #53, before the code: the edit locks the template row (sections 4 and 8, as OP-04.4 decided); TC-13 adds the edit-versus-goal race that F-07 OP-07.11 deferred to F-04; OP-04.9 lists the edit-page details as a proposal | pending (partner review of the Issue #53 PR) |
+| 2026-11-10 | Implementation Issue #53, before the code: the edit locks the template row (sections 4 and 8, as decided on PR #31); TC-13 adds the edit-versus-goal race that F-07 deferred to F-04; the edit-page details are given as a proposal | pending (partner review of the Issue #53 PR) |
 
 <!-- source: docs/sprints/sprint-1/F-06-template-view.md at v1.0 (64831f7) -->
 
 ## F-06 Participant template view and write refusal
 
-Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -1623,7 +1535,7 @@ The 403 body is the one in F-02 section 7. A refused request stores and changes 
 
 ### 6. UI behaviour
 
-- **Templates page for a Participant** (`/templates`, OP-02.3): a read-only list with Name, Unit and Range (`min–max`) for each active template, ordered as `GET /api/templates` returns them (OP-03.7). No New, Edit or Retire button, and no state column (every row is active).
+- **Templates page for a Participant** (`/templates`): a read-only list with Name, Unit and Range (`min–max`) for each active template, ordered as `GET /api/templates` returns them. No New, Edit or Retire button, and no state column (every row is active).
 - **Empty state**: "No templates yet". No New button, because a Participant cannot create (SDS 4.2: "the New button stays visible for the role that can create").
 - The list fits 375 px and 1280 px wide and works with the keyboard alone (NFR-05, NFR-06; TC-47, TC-48 run on this screen).
 
@@ -1631,7 +1543,7 @@ The 403 body is the one in F-02 section 7. A refused request stores and changes 
 
 Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025).
 
-**`GET /api/templates`** as a Participant: response 200, active templates only, in the F-03 shape (OP-06.1):
+**`GET /api/templates`** as a Participant: response 200, active templates only, in the F-03 shape:
 ```json
 { "templates": [ { "id": 3, "name": "Sleep", "unit": "hours", "minValue": 0, "maxValue": 24, "state": "ACTIVE" } ] }
 ```
@@ -1665,18 +1577,8 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-16<br>AC-06.1, AC-06.2<br>API and browser | Active templates "Sleep" (hours, 0 to 24) and "Reading" (pages, 0 to 500); template "Steps" set to `RETIRED` | As A: `GET /api/templates`; open the templates page. Then, with no templates at all, open the page again | The API returns "Reading" and "Sleep" with their units and ranges, and not "Steps". The page shows the same two rows and no New, Edit or Retire control. With no templates: "No templates yet" and no New button |
 | TC-17<br>AC-06.3<br>API | A logged in; template count known | As A: `POST /api/templates` with a valid body (`"Yoga"`, minutes, 0 to 120); with `{ "name": "" }`; with `{}` | Each gets `403 FORBIDDEN`; the template count is unchanged; no "Yoga" row |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-06.1 | Does the Participant's list carry `state` | Decided (PR #31): yes, the same shape as the Manager's (always `ACTIVE`), so one response type serves both |
-| OP-06.2 | Does a Participant see a retired template's name on their existing goals (SRS A-5) | Not reachable in Sprint 1 (retire is Sprint 2); decided in the F-05 contract. F-07's goal response embeds the template, so it is not affected by this list; scope confirmed in the [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) |
-| OP-06.3 | FR-23's retire refusal cannot be tested before retire exists (features O-5) | Settled: TC-19 runs in Sprint 2; scope confirmed in the [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) |
-| OP-03.7 | Order of the list | Decided on [PR #31 review](https://github.com/phittayanan/habit-tracker/pull/31#pullrequestreview) (projectnewy, corrected round 1) (in F-03): name A to Z |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
@@ -1688,7 +1590,7 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 
 ## F-07 Goal creation
 
-Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -1713,25 +1615,25 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 
 | Rule | Statement | Source |
 |---|---|---|
-| BR-05 | A Participant has at most one active goal per template. "Active" means not Ended, so a goal that starts in the future counts as active | SRS BR-05; ADR 0010; OP-07.5 |
+| BR-05 | A Participant has at most one active goal per template. "Active" means not Ended, so a goal that starts in the future counts as active | SRS BR-05; ADR 0010 |
 | BR-06 | A goal is Active until its end date passes, then Ended. The state is computed from dates | SRS BR-06; ADR 0012 |
-| Target | `daily_target` is above 0, has at most 2 decimal places, lies within `Decimal(10, 2)` (up to 99,999,999.99), and is not above the template's `max_value`. A number with more than 2 decimal places is refused, never rounded | SRS A-4 (decided on PR #23); SDS 3.2; F-03 OP-03.3, OP-03.4 |
+| Target | `daily_target` is above 0, has at most 2 decimal places, lies within `Decimal(10, 2)` (up to 99,999,999.99), and is not above the template's `max_value`. A number with more than 2 decimal places is refused, never rounded | SRS A-4 (decided on PR #23); SDS 3.2 |
 | Dates | `end_date` is on or after `start_date`. A day is a date in Asia/Bangkok | SDS 3.2; ADR 0006 |
 | Owner | The goal belongs to the session user. The owner is never read from the request | SDS 2.2, 3.3; GWS §5.2 |
-| Template lock | Goal creation locks the template row (`SELECT ... FOR UPDATE`) inside its transaction, before it reads the template's `max_value` and before the BR-05 check. So a template edit (F-04) and a new goal on that template cannot interleave: either the goal is saved and the edit is refused as in use, or the edit is saved first and the goal is checked against the edited range | F-04 OP-04.4 (decided on PR #31); SDS S-6 |
+| Template lock | Goal creation locks the template row (`SELECT ... FOR UPDATE`) inside its transaction, before it reads the template's `max_value` and before the BR-05 check. So a template edit (F-04) and a new goal on that template cannot interleave: either the goal is saved and the edit is refused as in use, or the edit is saved first and the goal is checked against the edited range | F-04 (decided on PR #31); SDS 3.4 |
 
 State by date (today is the Asia/Bangkok date): Active when `today <= end_date` (this includes a goal that starts in the future and the end date itself); Ended when `today > end_date`.
 
 ### 4. Validation and failure cases
 
-Checks run in this order (SDS 2.2): session (401), role (403), validation (400), rules (409). The status codes for rule rejections follow the SDS proposal S-16, which is still open: `409 ACTIVE_GOAL_EXISTS` follows that proposal, and `400 TARGET_ABOVE_TEMPLATE_MAX` is the code for the decided A-4 rule, which S-16 does not cover (OP-07.6).
+Checks run in this order (SDS 2.2): session (401), role (403), validation (400), rules (409). The status codes for rule rejections follow an SDS proposal that was still open at the release: `409 ACTIVE_GOAL_EXISTS` follows that proposal, and `400 TARGET_ABOVE_TEMPLATE_MAX` is the code for the decided A-4 rule, which that proposal does not cover.
 
 | Case | Result | Error code |
 |---|---|---|
 | No valid session | 401 | `UNAUTHENTICATED` |
 | Caller is a Manager | 403 | `FORBIDDEN` |
-| `templateId` missing, not an integer, or no such template | 400 | `VALIDATION_ERROR` (decided, OP-07.1) |
-| `dailyTarget` missing, not a number, 0 or negative, with more than 2 decimal places, or above 99,999,999.99 (outside `Decimal(10, 2)`) | 400 | `VALIDATION_ERROR` (decided, F-03 OP-03.3 and OP-03.4) |
+| `templateId` missing, not an integer, or no such template | 400 | `VALIDATION_ERROR` (decided) |
+| `dailyTarget` missing, not a number, 0 or negative, with more than 2 decimal places, or above 99,999,999.99 (outside `Decimal(10, 2)`) | 400 | `VALIDATION_ERROR` (decided) |
 | `startDate` or `endDate` missing or not `YYYY-MM-DD` | 400 | `VALIDATION_ERROR` |
 | `endDate` before `startDate` | 400 | `VALIDATION_ERROR` |
 | `dailyTarget` above the template's `max_value` | 400 | `TARGET_ABOVE_TEMPLATE_MAX` |
@@ -1739,9 +1641,9 @@ Checks run in this order (SDS 2.2): session (401), role (403), validation (400),
 
 When a request breaks more than one row, the first one in this table is returned: all validation rows (schema, dates) come before the rule rows (`TARGET_ABOVE_TEMPLATE_MAX`, `ACTIVE_GOAL_EXISTS`), whatever their order of listing in the request. Example: a target of 30.555 for a template with maximum 24 gets `400 VALIDATION_ERROR` (more than 2 decimal places), not `TARGET_ABOVE_TEMPLATE_MAX`. Example: target 25 for a template with maximum 24 and a missing `startDate` gets `400 VALIDATION_ERROR`, not `TARGET_ABOVE_TEMPLATE_MAX`.
 
-Unknown body fields (for example `participantId` or `userId`) are stripped by the validation schema and do not cause an error (decided, OP-07.7).
+Unknown body fields (for example `participantId` or `userId`) are stripped by the validation schema and do not cause an error (decided).
 
-Boundaries: a target equal to `max_value` is accepted; `startDate` equal to `endDate` is accepted (a one-day goal); an end date in the past is accepted (the goal is Ended at once; decided, OP-07.2).
+Boundaries: a target equal to `max_value` is accepted; `startDate` equal to `endDate` is accepted (a one-day goal); an end date in the past is accepted (the goal is Ended at once; decided).
 
 ### 5. Permissions
 
@@ -1763,7 +1665,7 @@ The request carries no owner. A user or participant ID in the body is stripped, 
 
 ### 7. API
 
-Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API (OP-07.3). Decimal values travel as JSON numbers (OP-07.8).
+Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API. Decimal values travel as JSON numbers.
 
 **`POST /api/goals`** (Participant)
 
@@ -1779,7 +1681,7 @@ Response 201:
 ```
 Errors: 400, 401, 403, 409 as in section 4.
 
-**`GET /api/goals`** (Participant): returns `{ "goals": [ ... ] }`, the caller's own goals in the shape above, newest `created_at` first (OP-07.4). F-09 adds a `progress` object to each goal.
+**`GET /api/goals`** (Participant): returns `{ "goals": [ ... ] }`, the caller's own goals in the shape above, newest `created_at` first. F-09 adds a `progress` object to each goal.
 
 ### 8. Data
 
@@ -1787,8 +1689,8 @@ Errors: 400, 401, 403, 409 as in section 4.
 |---|---|
 | Table `Goal` | `id` integer primary key; `participant_id` not null, reference to User; `template_id` not null, reference to Template; `daily_target` decimal not null; `start_date` date not null; `end_date` date not null; `created_at` timestamp not null (SDS 3.2) |
 | Constraints | check `daily_target > 0`; check `end_date >= start_date`. The rule "not above `max_value`" compares two tables, so the service enforces it |
-| BR-05 and the template lock | The service locks the template row (`SELECT ... FOR UPDATE`), reads its `max_value`, checks BR-05 and inserts the goal inside one transaction (SDS S-6; F-04 OP-04.4) |
-| Decimal columns | All four decimal columns (`min_value`, `max_value`, `daily_target`, `value`) are `Decimal(10, 2)`: 2 decimal places, up to 99,999,999.99 (decided, OP-07.8; F-03 OP-03.4). A number with more than 2 decimal places, or outside that range, is refused with `400 VALIDATION_ERROR` and never rounded (F-03 OP-03.3). Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
+| BR-05 and the template lock | The service locks the template row (`SELECT ... FOR UPDATE`), reads its `max_value`, checks BR-05 and inserts the goal inside one transaction |
+| Decimal columns | All four decimal columns (`min_value`, `max_value`, `daily_target`, `value`) are `Decimal(10, 2)`: 2 decimal places, up to 99,999,999.99 (decided). A number with more than 2 decimal places, or outside that range, is refused with `400 VALIDATION_ERROR` and never rounded. Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
 | Migration | One additive Prisma migration that creates `Goal`. It changes no existing table (the scale for the Template columns is part of F-03's migration) |
 | State | Not stored; computed from the dates |
 
@@ -1809,7 +1711,7 @@ Errors: 400, 401, 403, 409 as in section 4.
 
 ### 10. Test specification
 
-Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests that go through the running server use dates relative to `D` (for example `D+1`), so the server needs no clock hook. Unit tests of the rule code pass `today` as an argument.
+Dates in tests (decided on PR #29): `D` is today in Asia/Bangkok. Tests that go through the running server use dates relative to `D` (for example `D+1`), so the server needs no clock hook. Unit tests of the rule code pass `today` as an argument.
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
@@ -1822,37 +1724,20 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-60<br>AC-07.9<br>Browser | A logged in; T exists | Open the form, submit a valid goal, then submit a second goal on T | The first goal appears; the second shows the API message and keeps the typed values |
 | TC-74<br>AC-07.10<br>API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-07.1 | Code for an unknown `templateId` | Decided on PR #29 (review question Q7): 400 `VALIDATION_ERROR` |
-| OP-07.2 | A goal with an end date already in the past | Decided on PR #29 (Q6): allowed; the goal is Ended at once |
-| OP-07.3 | API field names in camelCase against the snake_case columns | Decided: camelCase in JSON, mapped by Prisma. Accepted by projectnewy on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
-| OP-07.4 | Order of `GET /api/goals` | Decided: newest `created_at` first (ADR 0014 covers the entry list, not this list). Accepted by projectnewy on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
-| OP-07.5 | Does a goal that starts in the future count as active for BR-05 | Decided on PR #29 (Q4): yes, not Ended counts as active |
-| OP-07.6 | Code for a target above the template maximum (A-4); SDS S-16 does not cover it | Decided: 400 `TARGET_ABOVE_TEMPLATE_MAX`. Accepted by projectnewy on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
-| OP-07.7 | Unknown body fields (for example `participantId`): ignore or refuse. SDS 4.3 leaves it to the first contract | Decided on PR #29 (Q3): stripped, the request is accepted. Applies to every Sprint 1 contract |
-| OP-07.8 | Decimal scale and precision for `min_value`, `max_value`, `daily_target` and `value` (SDS S-2); what happens to a number with more than 2 decimal places | Decided on PR #29 (Q8): 2 decimal places for all four; JSON numbers. Precision `Decimal(10, 2)` and the refusal of extra places with `400 VALIDATION_ERROR`, never rounding: decided in F-03 (OP-03.3, OP-03.4, PR #31 review) and applied here by Issue #38 |
-| OP-07.9 | How tests fix "today" | Decided on PR #29 (Q2): dates relative to the real Bangkok today for tests through the server; unit tests pass `today` as an argument |
-| OP-07.10 | Goal creation and a template edit racing on the same template (F-04 OP-04.4) | Decided in F-04 (PR #31 review) and applied here by Issue #38: goal creation locks the template row inside its transaction (AC-07.10, TC-74) |
-| OP-07.11 | The end-to-end race, a `PATCH /api/templates/:id` and a `POST /api/goals` at the same time, can only be run once F-04 exists, which is built after F-07 | Open (proposal): TC-74 proves the lock now. The F-04 contract gets the two-request test when F-04 is built, with either order valid: goal first, then the edit is refused as in use; edit first, then the goal is validated against the edited range and saved or refused (`TARGET_ABOVE_TEMPLATE_MAX`) according to that range. What the lock rules out is validating against a stale range |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
-| 2026-11-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
-| 2026-11-08 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, OP-07.11 allows both serial orders | pending (partner review of the Issue #38 PR) |
+| 2026-11-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, a note on the status codes for rule rejections, unknown fields stripped, decimal scale, order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
+| 2026-11-08 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, the race test allows both serial orders | pending (partner review of the Issue #38 PR) |
 | 2026-11-08 | Issue #40 implementation evidence: owner-confirmed existing API behaviors, Goal tests-first history, local validation and remaining human review recorded in section 14 of the contract file in the repository; requirements unchanged | phittayanan (owner-only implementation authorization); teammate implementation review pending |
-| 2026-11-10 | Issue #56: recorded projectnewy's acceptance of OP-07.3, OP-07.4, OP-07.6 and the ownership change (section 12, and section 14 of the contract file in the repository); behaviour and requirements unchanged | projectnewy accepted on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
+| 2026-11-10 | Issue #56: recorded projectnewy's acceptance of the camelCase field names, the newest-first goal list, the target-above-maximum code and the ownership change (in the contract file in the repository); behaviour and requirements unchanged | projectnewy accepted on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
 
 ## F-08 Daily entry recording
 
-Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -1879,20 +1764,20 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 |---|---|---|
 | BR-01 | The entry date is today or earlier, and inside the goal's start and end dates (both inclusive). Anything else is rejected | SRS BR-01; ADR 0005 |
 | BR-02 | A day is a date in Asia/Bangkok for every user. "Today" is computed on the server, and the UI's default date uses the same zone | SRS BR-02; ADR 0006; SDS 2.3 |
-| BR-03 | The value lies within the template's `min_value` and `max_value`, inclusive. The value has at most 2 decimal places and lies within `Decimal(10, 2)` (up to 99,999,999.99); a number with more places is refused, never rounded | SRS BR-03; ADR 0007; F-03 OP-03.3, OP-03.4 |
+| BR-03 | The value lies within the template's `min_value` and `max_value`, inclusive. The value has at most 2 decimal places and lies within `Decimal(10, 2)` (up to 99,999,999.99); a number with more places is refused, never rounded | SRS BR-03; ADR 0007 |
 | BR-04 | At most one entry per goal per day. A second entry for the same day is rejected | SRS BR-04; ADR 0008 |
-| BR-06 | An entry dated after an Ended goal's end date is rejected by BR-01. An entry dated inside the period of a goal that has already ended is still accepted, because BR-01 accepts it (decided, OP-08.6) | SRS BR-06; ADR 0012 |
+| BR-06 | An entry dated after an Ended goal's end date is rejected by BR-01. An entry dated inside the period of a goal that has already ended is still accepted, because BR-01 accepts it (decided) | SRS BR-06; ADR 0012 |
 
 ### 4. Validation and failure cases
 
-Checks run in this order (SDS 2.2): session (401), role (403), ownership (404), validation (400), then the rules below in this order (OP-08.7). The status codes for rule rejections follow the SDS proposal S-16, which is still open (OP-08.1).
+Checks run in this order (SDS 2.2): session (401), role (403), ownership (404), validation (400), then the rules below in this order. The status codes for rule rejections follow an SDS proposal that was still open at the release.
 
 | Order | Case | Result | Error code |
 |---|---|---|---|
 | 1 | No valid session | 401 | `UNAUTHENTICATED` |
 | 2 | Caller is a Manager | 403 | `FORBIDDEN` |
 | 3 | Goal does not exist, or belongs to another Participant | 404 | `GOAL_NOT_FOUND` (the same answer for both) |
-| 4 | `entryDate` missing or not `YYYY-MM-DD`; `value` missing or not a number, with more than 2 decimal places, or above 99,999,999.99 or below -99,999,999.99 (outside `Decimal(10, 2)`) | 400 | `VALIDATION_ERROR` (decided, F-03 OP-03.3 and OP-03.4) |
+| 4 | `entryDate` missing or not `YYYY-MM-DD`; `value` missing or not a number, with more than 2 decimal places, or above 99,999,999.99 or below -99,999,999.99 (outside `Decimal(10, 2)`) | 400 | `VALIDATION_ERROR` (decided) |
 | 5 | `entryDate` after today (Asia/Bangkok) | 400 | `ENTRY_DATE_IN_FUTURE` |
 | 6 | `entryDate` before the goal's start date or after its end date | 400 | `ENTRY_DATE_OUTSIDE_GOAL` |
 | 7 | `value` below `min_value` or above `max_value` | 400 | `VALUE_OUT_OF_RANGE` |
@@ -1902,7 +1787,7 @@ When a request breaks more than one rule, the first one in this table is returne
 
 Because row 4 comes before row 7, a value with more than 2 decimal places gets `VALIDATION_ERROR` even when it is also out of range. Example: 24.555 for a template with maximum 24 gets `400 VALIDATION_ERROR`, not `VALUE_OUT_OF_RANGE`.
 
-Unknown body fields are stripped and do not cause an error (decided, OP-07.7).
+Unknown body fields are stripped and do not cause an error (decided).
 
 Boundaries: a value equal to `min_value` or `max_value` is accepted; `entryDate` equal to today, to the start date or to the end date is accepted; an entry dated after the end date is rejected. Two requests for the same day at the same time give one stored entry and one 409 (the database unique constraint decides).
 
@@ -1914,11 +1799,11 @@ Boundaries: a value equal to `min_value` or `max_value` is accepted; `entryDate`
 | Participant | on own goal only | own goal only |
 | Manager | 403 | 403 |
 
-Another Participant's goal gives 404 (SDS S-7). The acting user is always the session user.
+Another Participant's goal gives 404. The acting user is always the session user.
 
 ### 6. UI behaviour
 
-- On the plain goals page (Sprint 1 has no calendar; SRS A-3) each goal row has a **date box** next to a **number box** that shows the template's unit, and a Save control. The date box defaults to today in Asia/Bangkok, not the browser's local date (BR-02); the Participant can pick another day (decided, OP-08.8).
+- On the plain goals page (Sprint 1 has no calendar; SRS A-3) each goal row has a **date box** next to a **number box** that shows the template's unit, and a Save control. The date box defaults to today in Asia/Bangkok, not the browser's local date (BR-02); the Participant can pick another day (decided).
 - The browser may check the date and the range first for a faster message; the API still decides.
 - A rejected request shows the API `message` next to the box and keeps the typed value. While it runs, Save is disabled. Nothing is shown as saved until the API answers 201.
 - Empty state for a goal with no entries: "No entries yet".
@@ -1926,7 +1811,7 @@ Another Participant's goal gives 404 (SDS S-7). The acting user is always the se
 
 ### 7. API
 
-Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Decimal values travel as JSON numbers (OP-07.8).
+Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Decimal values travel as JSON numbers.
 
 **`POST /api/goals/:id/entries`** (Participant, own goal)
 
@@ -1938,15 +1823,15 @@ Response 201:
 ```json
 { "entry": { "id": 41, "goalId": 12, "entryDate": "2026-11-10", "value": 7.5 } }
 ```
-Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API; the UI fills in today (OP-08.2).
+Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API; the UI fills in today.
 
-**`GET /api/goals/:id/entries`** (Participant, own goal): returns `{ "entries": [ ... ] }` in the shape above, newest date first (ADR 0014; OP-08.3). Errors: 401, 403, 404.
+**`GET /api/goals/:id/entries`** (Participant, own goal): returns `{ "entries": [ ... ] }` in the shape above, newest date first (ADR 0014). Errors: 401, 403, 404.
 
 ### 8. Data
 
 | Layer change | Detail |
 |---|---|
-| Table `Entry` | `id` integer primary key; `goal_id` not null, reference to Goal, on delete restrict; `entry_date` date not null; `value` decimal not null (`Decimal(10, 2)`; OP-07.8, F-03 OP-03.4); `created_at` timestamp not null (SDS 3.2) |
+| Table `Entry` | `id` integer primary key; `goal_id` not null, reference to Goal, on delete restrict; `entry_date` date not null; `value` decimal not null (`Decimal(10, 2)`); `created_at` timestamp not null (SDS 3.2) |
 | Constraints | **unique (`goal_id`, `entry_date`)**, which enforces BR-04 even under two requests at once. The value range and the date rules compare other tables or "today", so the service enforces them |
 | Migration | One additive Prisma migration that creates `Entry`. It changes no existing table |
 | Ownership | An Entry belongs to a Participant through its Goal (`participant_id`) |
@@ -1970,7 +1855,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 
 ### 10. Test specification
 
-Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests that go through the running server use dates relative to `D`, so the server needs no clock hook. Unit tests of the rule code pass the current instant as an argument. Each test starts with its own fixtures, so the goals named G to G6 are separate per test and BR-05 (one active goal per template) does not interfere between them.
+Dates in tests (decided on PR #29): `D` is today in Asia/Bangkok. Tests that go through the running server use dates relative to `D`, so the server needs no clock hook. Unit tests of the rule code pass the current instant as an argument. Each test starts with its own fixtures, so the goals named G to G6 are separate per test and BR-05 (one active goal per template) does not interfere between them.
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
@@ -1986,34 +1871,20 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-58<br>AC-08.1<br>API and database | A's goal G; entry saved | Restart the app (new process and connection); `GET /api/goals/:id/entries` | The same entry is returned (data survives a restart) |
 | TC-61<br>AC-08.10<br>Browser | A logged in on the goals page | Type 30 (above max 24) and Save; then a valid value | The first shows the API message and keeps 30; the second saves |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-08.1 | Codes for rule rejections (SDS S-16 is open) | Open (proposal): 400 for BR-01 and BR-03, 409 for BR-04, as in the SDS proposal |
-| OP-08.2 | May `entryDate` be left out of the request (default today) | Open (proposal): required in the API; the UI fills in the date |
-| OP-08.3 | Order of `GET /api/goals/:id/entries` | Settled by ADR 0014 ("newest first"): newest date first |
-| OP-08.4 | A value above the daily target is allowed | Open (proposal): yes, only the template range limits the value (BR-03) |
-| OP-08.5 | Decimal scale and precision of `value`; a value with more than 2 decimal places | Decided on PR #29 (Q8): 2 decimal places for all four decimal columns; see OP-07.8. Precision `Decimal(10, 2)` and the refusal of extra places with `400 VALIDATION_ERROR`, never rounding: decided in F-03 (OP-03.3, OP-03.4, PR #31 review) and applied here by Issue #38 |
-| OP-08.6 | An entry dated inside the period of a goal that has already ended | Decided on PR #29 (Q1): allowed (ADR 0012, BR-01); AC-08.11, TC-30 |
-| OP-08.7 | Which code when a request breaks several rules | Open (proposal from review point 10): `ENTRY_DATE_IN_FUTURE`, then `ENTRY_DATE_OUTSIDE_GOAL`, then `VALUE_OUT_OF_RANGE`, then `ENTRY_ALREADY_EXISTS` |
-| OP-08.8 | How the Sprint 1 goals page chooses the day | Decided on PR #29 (Q9): a date box next to the value box, defaulting to today in Asia/Bangkok |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): TC-28 gives each accepted value its own day; codes in TC-56; test dates relative to the Bangkok today; AC-08.5 and TC-27 reworded (TZ=UTC, goal period); AC-08.11 and AC-08.12 added; order of rule checks; date box named; decimal scale; decisions Q1, Q8, Q9 recorded | pending (partner re-check) |
 | 2026-11-07 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
-| 2026-11-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |
+| 2026-11-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56) | pending (partner review of the Issue #38 PR) |
 | 2026-11-09 | Issue #42 implementation evidence recorded in section 14 of the contract file in the repository and `docs/entry-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 
 ## F-09 Progress (days met)
 
-Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -2039,7 +1910,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 |---|---|---|
 | BR-07 | Progress is days met: the count of days whose value reached the daily target, out of the days so far | SRS BR-07; ADR 0013 |
 | Day met | A day is met when its entry's `value` is greater than or equal to the goal's `daily_target`. There is at most one entry per day (BR-04), so the day's value is that entry's value | ADR 0013; SRS BR-04 |
-| Days so far | The number of days from the goal's start date up to today, or up to the end date if the goal has ended. Both ends are included, so today counts even before today has an entry. Before the start date it is 0 | SRS A-1; decided on PR #29 (Q5), OP-09.1 |
+| Days so far | The number of days from the goal's start date up to today, or up to the end date if the goal has ended. Both ends are included, so today counts even before today has an entry. Before the start date it is 0 | SRS A-1; decided on PR #29 (Q5) |
 | Day | A day is an Asia/Bangkok date | ADR 0006 |
 
 Missed day: a day so far whose entry is below the target. Empty day: a day so far with no entry. Both count in `daysSoFar` and not in `daysMet`.
@@ -2108,7 +1979,7 @@ No new table and no migration. Progress is computed from `Goal` and `Entry` (F-0
 
 ### 10. Test specification
 
-Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Browser and API tests use dates relative to `D` (seeded or created by the test), so the server needs no clock hook. The unit test of the calculation passes `today` as an argument.
+Dates in tests (decided on PR #29): `D` is today in Asia/Bangkok. Browser and API tests use dates relative to `D` (seeded or created by the test), so the server needs no clock hook. The unit test of the calculation passes `today` as an argument.
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
@@ -2116,27 +1987,18 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | TC-32<br>AC-09.7<br>Browser | A logged in; goal from `D-9` to `D+20`, target 30, with entries `D-9` value 30, `D-8` value 29.9, `D-6` value 45 (seeded relative to `D`) | Open the goals page | The page shows "2 of 10 days met" for that goal |
 | TC-59<br>AC-09.6, AC-09.7, AC-09.8<br>Browser and API | Seeded Manager, Participants A and B; no template named "Sleep"; A has no goal | Journey: the Manager logs in and creates the template "Sleep" through the UI; A logs in and creates a goal starting `D` on it; A reads the goals page ("0 of 1 days met"); A records a value that meets the target for `D`; A reads the page again ("1 of 1 days met"); restart the app; read again. Also call `GET /api/goals` as Manager and with no session | The page shows "0 of 1", then "1 of 1", and "1 of 1" after the restart; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED` |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-09.1 | SRS A-1: does "days so far" include today while today has no entry yet | Decided on PR #29 (Q5): include today, as A-1 assumes. The streak rule in ADR 0015 is a different matter (Sprint 3) |
-| OP-09.2 | Shape of the percentage: the SRS and ADR 0013 give counts only | Open (proposal): counts only ("N of M days met"), no percentage |
-| OP-09.3 | `daysSoFar` for a goal whose start date is in the future | Open (proposal): 0, shown as "0 of 0 days met" |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
-| 2026-11-07 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
+| 2026-11-07 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; the days-so-far rule decided (Q5) | pending (partner re-check) |
 | 2026-11-10 | Issue #44 implementation evidence recorded in section 14 of the contract file in the repository and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 
 ## F-10 Participant data privacy
 
-Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Where those documents do not settle a point it is listed in section 12; each open point has a proposal and each decided point says where it was decided.
+Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from the merged `docs/srs.md`, `docs/system-sds.md`, `docs/features.md`, `docs/traceability.md` and the ADRs. Points those documents did not settle were decided in review; the open-point list of each contract is in its file in the repository.
 
 ### 1. Identity
 
@@ -2155,9 +2017,9 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 F-10 adds no screen and no endpoint. It is the rule, built into the Sprint 1 goal and entry endpoints (F-07, F-08, F-09), that a Participant's goals, entries and progress are private:
 
 1. A Participant sees and changes only records whose `participant_id` is their own (BR-10).
-2. Another Participant gets 404, so the record's existence is not revealed (SDS S-7).
+2. Another Participant gets 404, so the record's existence is not revealed.
 3. A Manager gets 403 on every goal and entry endpoint, because the role may not use them. A Manager sees templates only (ADR 0019).
-4. The acting user always comes from the session, never from the request (GWS §5.2). Unknown body fields, such as a participant ID, are stripped (OP-07.7).
+4. The acting user always comes from the session, never from the request (GWS §5.2). Unknown body fields, such as a participant ID, are stripped.
 
 ### 3. Business rules
 
@@ -2222,7 +2084,7 @@ No new path. The behaviour in section 4 applies to the existing endpoints. Error
 
 ### 10. Test specification
 
-Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok, and tests use dates relative to `D`. Fixtures: Participants A and B and one Manager, each with a goal or entry where needed (the names of seeded accounts are SRS A-9; tests use fixtures).
+Dates in tests (decided on PR #29): `D` is today in Asia/Bangkok, and tests use dates relative to `D`. Fixtures: Participants A and B and one Manager, each with a goal or entry where needed (the names of seeded accounts are SRS A-9; tests use fixtures).
 
 | Test / AC / Level | Precondition / input | Action | Expected result |
 |---|---|---|---|
@@ -2231,22 +2093,13 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok, and t
 | TC-35<br>AC-10.7<br>API and browser | A and B each with a goal and entries | Open the goals page as A, then as B | Each page lists only that Participant's goals, entries and progress |
 | TC-57<br>AC-10.5<br>API | A's goal GA; no goal with id 99999 | As B: `GET /api/goals/GA/entries` and `GET /api/goals/99999/entries` | Both give `404 GOAL_NOT_FOUND` with identical status and body |
 
-*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
-### 12. Open points and decisions
-
-| ID | Point | Status and answer |
-|---|---|---|
-| OP-10.1 | NFR-02 (401 and 403 on every protected endpoint) is owned by F-02 and TC-08. Does F-10 repeat it for goal and entry endpoints | Open (proposal): yes, TC-34 repeats it for these endpoints, so a gap shows in this feature too |
-| OP-10.2 | Template endpoints and the Manager's access to `GET /api/templates` are not part of F-10 | Open (proposal): covered by F-03 and F-06 (BR-09, FR-23) |
-| OP-10.3 | Unknown body fields: ignore or refuse | Decided on PR #29 (Q3): stripped, the request is accepted; recorded once in F-07 as OP-07.7 |
-
-### 13. Revision history
+### 11. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-07 | First draft (Issue #28) | pending |
-| 2026-11-07 | Review round 1 (PR #29): error codes added to every expected result, "ignored" changed to "stripped" with OP-10.3, menu wording corrected | pending (partner re-check) |
+| 2026-11-07 | Review round 1 (PR #29): error codes added to every expected result, "ignored" changed to "stripped", menu wording corrected | pending (partner re-check) |
 | 2026-11-10 | Issue #44 implementation evidence recorded in section 14 of the contract file in the repository and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 
 # Part F. Working Sprint 1 and verification {#part-f}
@@ -2564,7 +2417,7 @@ All six reached `main` through the release PR #61 (merge `64831f7`, tag `v1.0`).
 | Build branch | `feat/42-daily-entry` (from `staging`) | `feat/53-habit-template-edit` (from `staging`) |
 | Build PR | https://github.com/phittayanan/habit-tracker/pull/43 | https://github.com/phittayanan/habit-tracker/pull/54 |
 | Author → reviewer | projectnewy → phittayanan | phittayanan → projectnewy |
-| Review | Round 1 "changes requested" (2026-11-09 06:28 +07): ownership-before-validation not tested; TC-27 tested a helper the app never calls. Round 2 approved (2026-11-10 00:03 +07) after checking each fix by breaking the code (Figure 10) | Review comment (2026-11-10 12:06 +07): check order, row lock, stripped fields, Windows run 79/79 server, mutations that make TC-13 fail, OP-04.9 decision; approval 12:07 +07 |
+| Review | Round 1 "changes requested" (2026-11-09 06:28 +07): ownership-before-validation not tested; TC-27 tested a helper the app never calls. Round 2 approved (2026-11-10 00:03 +07) after checking each fix by breaking the code (Figure 10) | Review comment (2026-11-10 12:06 +07): check order, row lock, stripped fields, Windows run 79/79 server, mutations that make TC-13 fail, decision on the edit-page wording; approval 12:07 +07 |
 | Into `staging` | merge commit `a5a9266`, 2026-11-10 00:08 +07, merged by phittayanan | merge commit `54ac16e`, 2026-11-10 12:07 +07, merged by projectnewy |
 | Into `main` | release PR #61, merge `64831f7`, tag `v1.0` | release PR #61, merge `64831f7`, tag `v1.0` |
 | Release review (PR #61) | projectnewy's PR comment before approving, 2026-11-10 13:30 +07: "The candidate `03e039e` is the current `origin/staging` (the merge of #60), so no commit was added after the test run." "Secrets: no `.env` file is tracked (only `server/.env.example` with placeholders) …" "Board: every Sprint 1 card is Done except #10." "No blocking findings." | same release review |
@@ -2627,6 +2480,6 @@ No prompt transcripts are included. Automated results and AI statements do not c
 - Not run in Sprint 1: the timed clean-clone setup TC-50 (AC-SYS.3) is planned for Lab 5. CI on every PR (AC-SYS.5) starts in Lab 5; the suites were run locally. Docker and GCP deployment are Lab 5.
 - Coverage (AC-SYS.4): the coverage above was measured over the whole server suite, not the unit tests alone. BR-04 (one entry per day) has no unit test; API and database tests check it (F.3).
 - Features not in Sprint 1: template retire F-05 (FR-08) and the retire refusal TC-19 are Sprint 2. Entry edit and delete (FR-17) are Sprint 2, so a wrong same-day entry cannot be fixed yet (SRS A-11). The calendar, colours, streaks and reminders are Sprints 2 and 3.
-- Security limits: no limit on failed logins (OP-01.11). An unknown username runs a cost-10 dummy bcrypt comparison (ADR 0051), but response times are not guaranteed to be identical.
-- Open points: the open points listed in Parts A to E (A-x, S-x, OP-x) stay open where marked; the open points O-x of the features list and the sprint plan are in `docs/features.md` and `docs/sprints/plan.md` in the repository. Several contract revision rows still say "pending" because the files were not edited after their PR was approved.
+- Security limits: no limit on failed logins. An unknown username runs a cost-10 dummy bcrypt comparison (ADR 0051), but response times are not guaranteed to be identical.
+- Open points: the assumptions A-1 to A-11 (Part A) stay open where marked. The open-point lists of the features list, the sprint plan, the SDS and the contracts are in their files in the repository. Several contract revision rows still say "pending" because the files were not edited after their PR was approved.
 - Part F screenshots: taken on macOS with headless Chromium at 1100 × 700; the date box format follows the operating system.
