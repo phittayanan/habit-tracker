@@ -2423,11 +2423,11 @@ All six reached `main` through the release PR #61 (merge `64831f7`, tag `v1.0`).
 | Release review (PR #61) | projectnewy's PR comment before approving, 2026-11-10 13:30 +07: "The candidate `03e039e` is the current `origin/staging` (the merge of #60), so no commit was added after the test run." "Secrets: no `.env` file is tracked (only `server/.env.example` with placeholders) …" "Board: every Sprint 1 card is Done except #10." "No blocking findings." | same release review |
 | Board | Issue #42 Done | Issue #53 Done |
 
-<figure style="width:60%"><img src="img/f-pr43-review.png"><figcaption>Figure 11. PR #43 (F-08), phittayanan's approving re-review: each requested change was checked by moving the code back and watching the test fail. Public page, captured logged out on 2026-11-10.</figcaption></figure>
+<figure style="width:63%"><img src="img/f-pr43-review.png"><figcaption>Figure 11. PR #43 (F-08), phittayanan's approving re-review: each requested change was checked by moving the code back and watching the test fail. Public page, captured logged out on 2026-11-10.</figcaption></figure>
 
 
 
-<figure style="width:90%"><div class="imgs"><img src="img/f-board-backlog.png" style="width:48%;vertical-align:top"> <img src="img/f-board-done.png" style="width:48%;vertical-align:top"></div><figcaption>Figure 12. Project board "habit-tracker board", view "Deliverable 1" (filter milestone "Deliverable 1", 23 items), captured logged out on 2026-11-10 after the release and cropped to two columns: Backlog 1 (Issue #11, this PDF and its submission) and Done 22. The Done column continues below the part shown.</figcaption></figure>
+<figure style="width:100%"><div class="imgs"><img src="img/f-board-backlog.png" style="width:49.5%;vertical-align:top"> <img src="img/f-board-done.png" style="width:49.5%;vertical-align:top"></div><figcaption>Figure 12. Project board "habit-tracker board", view "Deliverable 1" (filter milestone "Deliverable 1", 23 items), captured logged out on 2026-11-10 after the release and cropped to two columns: Backlog 1 (Issue #11, this PDF and its submission) and Done 22. The Done column continues below the part shown.</figcaption></figure>
 
 <div class="keep">
 
