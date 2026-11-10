@@ -1110,21 +1110,21 @@ No response carries `password`, `passwordHash` or the session ID in the body.
 
 Fixtures: each test starts from its own data with one Manager and Participants A and B, created with test-only passwords from the test environment (never from the repository). Clock: unit tests of the session rule pass the current instant as an argument (decided on PR #29, OP-07.9); API tests age a session by moving its `created_at` and `expires_at` back in the test database, so the server needs no clock hook.
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-01 | AC-01.1 | API | Participant A exists; no session rows | `POST /api/auth/login` with A's username and password; then `GET /api/auth/me` with the returned cookie | 200 with A's user; one Session row for A with `expires_at` = `created_at` + 8 h; `me` gets 200 |
-| TC-02 | AC-01.2 | API | A exists; no user named `nobody` | Log in as `nobody` with any password; log in as A with a wrong password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; Session table still empty. A call-through spy verifies one real cost-10 bcrypt comparison per invalid attempt, including the unknown username |
-| TC-03 | AC-01.4 | API | A logged in; cookie saved | `POST /api/auth/logout`; replay the saved cookie on `GET /api/auth/me`; call logout again with no cookie | 204 and a clearing `Set-Cookie`; A's session row is gone; the replay gets `401 UNAUTHENTICATED`; the cookieless logout gets `401 UNAUTHENTICATED` |
-| TC-04 | AC-01.5 | API | Manager and A logged in | `GET /api/auth/me` as each | 200 with `displayName` and role `MANAGER`, then `PARTICIPANT`; no `password`, `passwordHash` or session ID in either body (also checked on the login body) |
-| TC-05 | AC-01.6 | API | A logged in, then A's session row deleted in the test database | `GET /api/auth/me` with no cookie, with `sid=abc`, and with A's deleted session ID | Each gets `401 UNAUTHENTICATED` |
-| TC-06 | AC-01.7 | API | A logged in; A makes one request and the test reads `expires_at` | Move A's session `created_at` and `expires_at` back by 8 hours in the test database; `GET /api/auth/me` | `expires_at` did not change after the first request; the aged session gets `401 UNAUTHENTICATED`; the row is deleted |
-| TC-62 | AC-01.3 | API | A exists | Log in with: a form-encoded body; `{}`; no `password`; `"password": 123`; `"password": ""`; `"username": "   "` | Each gets `400 VALIDATION_ERROR`; no `Set-Cookie`; no Session row |
-| TC-63 | AC-01.7 | Unit | Session created at 2026-11-10T01:00:00Z; the instant is passed as an argument | Check the session at 08:59:59Z and at 09:00:00Z | Valid at 08:59:59Z; expired at 09:00:00Z |
-| TC-64 | AC-01.9 | API | A exists; A logged in on a second client; request `Host: app.example` | Log in as A with `Origin: https://evil.example`; log out the second client with the same Origin; log in with `Origin: https://app.example`; log in with no Origin. On an HTTP connection to Express repeat the matching-host login with `Origin: https://app.example` and `X-Forwarded-Proto: https`, then repeat with the foreign Origin and that forwarded header | Foreign requests get `403 ORIGIN_NOT_ALLOWED`; they add no session and the second client still gets 200 on `me`. Matching-host and no-Origin logins get 200, including the HTTP upstream / HTTPS forwarded case; the forwarded header does not allow the foreign Origin |
-| TC-44 | AC-01.8 | API | Seed run with test passwords | Read every `password_hash` in the user table | Each matches the bcrypt format and verifies with `bcryptjs` against its test password; none equals the plaintext |
-| TC-45 | AC-01.8 | Script | Seed password values from the environment | Search the Git-tracked files for each value | No match |
-| TC-46 | AC-01.1 | API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
-| TC-65 | AC-01.10 | Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens. Log out: the login screen. Manager: the Manager's first page |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-01<br>AC-01.1<br>API | Participant A exists; no session rows | `POST /api/auth/login` with A's username and password; then `GET /api/auth/me` with the returned cookie | 200 with A's user; one Session row for A with `expires_at` = `created_at` + 8 h; `me` gets 200 |
+| TC-02<br>AC-01.2<br>API | A exists; no user named `nobody` | Log in as `nobody` with any password; log in as A with a wrong password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; Session table still empty. A call-through spy verifies one real cost-10 bcrypt comparison per invalid attempt, including the unknown username |
+| TC-03<br>AC-01.4<br>API | A logged in; cookie saved | `POST /api/auth/logout`; replay the saved cookie on `GET /api/auth/me`; call logout again with no cookie | 204 and a clearing `Set-Cookie`; A's session row is gone; the replay gets `401 UNAUTHENTICATED`; the cookieless logout gets `401 UNAUTHENTICATED` |
+| TC-04<br>AC-01.5<br>API | Manager and A logged in | `GET /api/auth/me` as each | 200 with `displayName` and role `MANAGER`, then `PARTICIPANT`; no `password`, `passwordHash` or session ID in either body (also checked on the login body) |
+| TC-05<br>AC-01.6<br>API | A logged in, then A's session row deleted in the test database | `GET /api/auth/me` with no cookie, with `sid=abc`, and with A's deleted session ID | Each gets `401 UNAUTHENTICATED` |
+| TC-06<br>AC-01.7<br>API | A logged in; A makes one request and the test reads `expires_at` | Move A's session `created_at` and `expires_at` back by 8 hours in the test database; `GET /api/auth/me` | `expires_at` did not change after the first request; the aged session gets `401 UNAUTHENTICATED`; the row is deleted |
+| TC-62<br>AC-01.3<br>API | A exists | Log in with: a form-encoded body; `{}`; no `password`; `"password": 123`; `"password": ""`; `"username": "   "` | Each gets `400 VALIDATION_ERROR`; no `Set-Cookie`; no Session row |
+| TC-63<br>AC-01.7<br>Unit | Session created at 2026-11-10T01:00:00Z; the instant is passed as an argument | Check the session at 08:59:59Z and at 09:00:00Z | Valid at 08:59:59Z; expired at 09:00:00Z |
+| TC-64<br>AC-01.9<br>API | A exists; A logged in on a second client; request `Host: app.example` | Log in as A with `Origin: https://evil.example`; log out the second client with the same Origin; log in with `Origin: https://app.example`; log in with no Origin. On an HTTP connection to Express repeat the matching-host login with `Origin: https://app.example` and `X-Forwarded-Proto: https`, then repeat with the foreign Origin and that forwarded header | Foreign requests get `403 ORIGIN_NOT_ALLOWED`; they add no session and the second client still gets 200 on `me`. Matching-host and no-Origin logins get 200, including the HTTP upstream / HTTPS forwarded case; the forwarded header does not allow the foreign Origin |
+| TC-44<br>AC-01.8<br>API | Seed run with test passwords | Read every `password_hash` in the user table | Each matches the bcrypt format and verifies with `bcryptjs` against its test password; none equals the plaintext |
+| TC-45<br>AC-01.8<br>Script | Seed password values from the environment | Search the Git-tracked files for each value | No match |
+| TC-46<br>AC-01.1<br>API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
+| TC-65<br>AC-01.10<br>Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens. Log out: the login screen. Manager: the Manager's first page |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -1259,12 +1259,12 @@ with status 403.
 
 Fixtures: one Manager and Participants A and B created by each test with test-only passwords. At the F-02 build step, register `POST /api/test/manager/:id` only in the test app with the real session and Manager-role middleware, followed by a body validator, an existence check and a handler spy. Register a test-only page `/test/protected` using the real layout and API client; it calls `GET /api/auth/me`. Neither test route is shipped. Before feature pages exist, TC-07 checks the role layout mounted on this test page; it does not load template or goal data. Later TC-08 adds feature fixtures through their APIs as each route is built; goal dates are relative to the Bangkok today (PR #29, OP-07.9).
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-07 | AC-02.1 | Browser | App on the test database; Manager and A exist | Log in as the Manager and read the top bar; log out; log in as A and read it | Both bars show the display name and "Log out"; the Manager's menu is exactly "Templates", A's is exactly "Goals", "Templates" |
-| TC-08 | AC-02.2 | API | F-02: auth routes and the test-only Manager route; later: fixtures required by each implemented feature route | Table-driven over the implemented protected routes in section 5 plus the test-only route: call each with no cookie, then as the wrong role where restricted, with a valid body | Every no-session call gets `401 UNAUTHENTICATED`; every wrong-role call gets `403 FORBIDDEN`; no protected handler runs and no data changes. Start with F-01 routes and the test-only route; each feature PR adds its routes until every protected row in section 5 is covered |
-| TC-66 | AC-02.3, AC-02.4 | API | Test-only Manager route registered as above; id 1 exists, 99999 does not; validator, existence check and handler are spies | Anonymous `POST /api/test/manager/1`; as A: POST id 1 with `{}`; POST id 99999; POST id 1 with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; validator, existence check and handler never run; no data changes |
-| TC-67 | AC-02.5 | Browser | App on the test database; A exists; test-only protected page registered as above | Open `/test/protected` with no session; log in as A and open that page; delete A's session row in the test database; reload the page | The first visit shows the login screen; after the reload `GET /api/auth/me` answers `401 UNAUTHENTICATED` and the login screen is shown |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-07<br>AC-02.1<br>Browser | App on the test database; Manager and A exist | Log in as the Manager and read the top bar; log out; log in as A and read it | Both bars show the display name and "Log out"; the Manager's menu is exactly "Templates", A's is exactly "Goals", "Templates" |
+| TC-08<br>AC-02.2<br>API | F-02: auth routes and the test-only Manager route; later: fixtures required by each implemented feature route | Table-driven over the implemented protected routes in section 5 plus the test-only route: call each with no cookie, then as the wrong role where restricted, with a valid body | Every no-session call gets `401 UNAUTHENTICATED`; every wrong-role call gets `403 FORBIDDEN`; no protected handler runs and no data changes. Start with F-01 routes and the test-only route; each feature PR adds its routes until every protected row in section 5 is covered |
+| TC-66<br>AC-02.3, AC-02.4<br>API | Test-only Manager route registered as above; id 1 exists, 99999 does not; validator, existence check and handler are spies | Anonymous `POST /api/test/manager/1`; as A: POST id 1 with `{}`; POST id 99999; POST id 1 with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; validator, existence check and handler never run; no data changes |
+| TC-67<br>AC-02.5<br>Browser | App on the test database; A exists; test-only protected page registered as above | Open `/test/protected` with no session; log in as A and open that page; delete A's session row in the test database; reload the page | The first visit shows the login screen; after the reload `GET /api/auth/me` answers `401 UNAUTHENTICATED` and the login screen is shown |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -1399,14 +1399,14 @@ Errors: 400, 401, 403, 409 as in section 4.
 
 Fixtures: each test starts from its own data with one Manager and Participant A (test-only passwords). No two accepted requests in one test use the same template name.
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-09 | AC-03.1 | API | Manager logged in; no templates | `POST /api/templates` with `{ "name": "Reading", "unit": "pages", "minValue": 0, "maxValue": 500, "state": "RETIRED" }`; restart the app; `GET /api/templates` as the Manager | 201; the template has `state` `ACTIVE` and `minValue` 0, `maxValue` 500 as numbers; it is listed after the restart; `created_by` is the Manager |
-| TC-10 | AC-03.2 | Unit and API | Manager logged in; no templates | Unit: the range rule for (5, 5), (6, 5), (0, 0.01). API: `POST` "Water" with min 5 max 5, then min 6 max 5, then min 0 max 0.01 | Unit: refused, refused, accepted. API: the first two get `400 MIN_NOT_BELOW_MAX` with no row stored; the third gets 201 |
-| TC-68 | AC-03.3, AC-03.5 | API | Manager logged in | Send each bad body: no `name`; `name` "   "; `name` 7; a 101-character name; no `unit`; `minValue` "abc"; no `maxValue`; `maxValue` 10.555. Then send a valid body and `GET /api/templates` with no session | Every bad body gets `400 VALIDATION_ERROR`; both anonymous calls get `401 UNAUTHENTICATED`; the template count stays 0 |
-| TC-69 | AC-03.4 | API | Template "Walk" (min 0, max 100) exists | `POST` "Walk" with min 0 max 50; `POST` "Walk" with min 5 max 5; two `POST` "Swim" at the same time | First: `409 TEMPLATE_NAME_EXISTS`. Second: `400 MIN_NOT_BELOW_MAX`. "Swim": one 201 and one `409 TEMPLATE_NAME_EXISTS`. One "Walk" and one "Swim" row |
-| TC-11 | AC-03.6 | Browser | Manager; no templates at first. Then templates "Sleep" (active) and "Steps" (set to `RETIRED` directly in the test database, since retire is Sprint 2) | Open the template page before and after the templates exist | Before: "No templates yet" and "New". After: two rows with name, unit, range and the words "Active" and "Retired"; "New" above, "Edit" on each row; no "Retire" anywhere |
-| TC-70 | AC-03.7 | Browser | Manager logged in; no templates | Open "New"; enter "Stretching", "minutes", 10, 5 and Save; change the minimum to 0 and Save | First Save: the message "Minimum must be below maximum." and the typed values stay. Second: the table shows "Stretching" |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-09<br>AC-03.1<br>API | Manager logged in; no templates | `POST /api/templates` with `{ "name": "Reading", "unit": "pages", "minValue": 0, "maxValue": 500, "state": "RETIRED" }`; restart the app; `GET /api/templates` as the Manager | 201; the template has `state` `ACTIVE` and `minValue` 0, `maxValue` 500 as numbers; it is listed after the restart; `created_by` is the Manager |
+| TC-10<br>AC-03.2<br>Unit and API | Manager logged in; no templates | Unit: the range rule for (5, 5), (6, 5), (0, 0.01). API: `POST` "Water" with min 5 max 5, then min 6 max 5, then min 0 max 0.01 | Unit: refused, refused, accepted. API: the first two get `400 MIN_NOT_BELOW_MAX` with no row stored; the third gets 201 |
+| TC-68<br>AC-03.3, AC-03.5<br>API | Manager logged in | Send each bad body: no `name`; `name` "   "; `name` 7; a 101-character name; no `unit`; `minValue` "abc"; no `maxValue`; `maxValue` 10.555. Then send a valid body and `GET /api/templates` with no session | Every bad body gets `400 VALIDATION_ERROR`; both anonymous calls get `401 UNAUTHENTICATED`; the template count stays 0 |
+| TC-69<br>AC-03.4<br>API | Template "Walk" (min 0, max 100) exists | `POST` "Walk" with min 0 max 50; `POST` "Walk" with min 5 max 5; two `POST` "Swim" at the same time | First: `409 TEMPLATE_NAME_EXISTS`. Second: `400 MIN_NOT_BELOW_MAX`. "Swim": one 201 and one `409 TEMPLATE_NAME_EXISTS`. One "Walk" and one "Swim" row |
+| TC-11<br>AC-03.6<br>Browser | Manager; no templates at first. Then templates "Sleep" (active) and "Steps" (set to `RETIRED` directly in the test database, since retire is Sprint 2) | Open the template page before and after the templates exist | Before: "No templates yet" and "New". After: two rows with name, unit, range and the words "Active" and "Retired"; "New" above, "Edit" on each row; no "Retire" anywhere |
+| TC-70<br>AC-03.7<br>Browser | Manager logged in; no templates | Open "New"; enter "Stretching", "minutes", 10, 5 and Save; change the minimum to 0 and Save | First Save: the message "Minimum must be below maximum." and the typed values stay. Second: the table shows "Stretching" |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -1548,14 +1548,14 @@ Errors: 400, 401, 403, 404, 409 as in section 4.
 
 Fixtures: each test starts from its own data with one Manager and Participant A (test-only passwords). Goals are created through `POST /api/goals` as A (F-07), with dates relative to `D`, today in Asia/Bangkok (decided on PR #29, OP-07.9). A goal with an end date in the past is allowed and is Ended at once (OP-07.2).
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-12 | AC-04.1 | API | Unused template "Reading" (pages, 0 to 500) | `PATCH` `{ "unit": "pages read", "maxValue": 300 }`; then `PATCH` `{ "name": "Reading time", "minValue": 1 }`; `GET /api/templates` | Both 200; the list shows "Reading time", "pages read", 1 to 300 |
-| TC-13 | AC-04.2, AC-04.5 | API and database | Template "Sleep" with A's Active goal (start `D`, end `D+30`); template "Steps" with A's Ended goal only (start `D-10`, end `D-1`). Race part (OP-04.4, F-07 OP-07.11): an unused template "Water" (0 to 24) | `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH` "Sleep" `{ "minValue": 50 }` (also above the max); `PATCH` "Steps" `{ "unit": "km" }`. Race: (a) in the test, open a transaction that locks "Water" (`FOR UPDATE`) and inserts A's goal; start `PATCH` "Water" `{ "maxValue": 10 }`; check it waits on the lock; commit. (b) Send `PATCH` "Water" `{ "maxValue": 10 }` and A's `POST /api/goals` (target 20) at the same time | All three get `409 TEMPLATE_IN_USE`; both templates are unchanged. (a) The edit waits, then gets `409 TEMPLATE_IN_USE`; "Water" keeps max 24. (b) Either order is valid: goal first, then the edit gets `409 TEMPLATE_IN_USE` and max stays 24; or edit first, then the goal gets `400 TARGET_ABOVE_TEMPLATE_MAX` and no goal is stored. Never both a stored goal and an edited range |
-| TC-71 | AC-04.4 | API | Unused template T; no template with id 99999 | `PATCH` T with `{}`; `{ "minValue": "abc" }`; `{ "maxValue": 10.555 }`; `PATCH /api/templates/abc` with a valid body; `PATCH /api/templates/99999` with a valid body; `PATCH` T with no session | `{}`, "abc", 10.555 and the id "abc" get `400 VALIDATION_ERROR`; 99999 gets `404 TEMPLATE_NOT_FOUND`; anonymous gets `401 UNAUTHENTICATED`; T is unchanged |
-| TC-72 | AC-04.3 | Unit and API | Unused templates "Walk" (0 to 100) and "Swim" (0 to 50) | Unit: the merged range for stored (0, 100) with sent `minValue` 100. API: `PATCH` "Walk" `{ "minValue": 100 }`; `PATCH` "Walk" `{ "name": "Swim" }`; `PATCH` "Walk" `{ "name": "Walk", "unit": "steps" }` | Unit: refused. API: `400 MIN_NOT_BELOW_MAX`; `409 TEMPLATE_NAME_EXISTS`; 200 with unit "steps". "Walk" keeps min 0 and max 100 after the first two |
-| TC-73 | AC-04.6 | Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
-| TC-18 | AC-04.7 | API | A logged in; template "Sleep" (hours, 0 to 24); no template with id 99999 | As A: `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH /api/templates/99999` `{ "unit": "x" }` | Both get `403 FORBIDDEN`; "Sleep" still has max 24 |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-12<br>AC-04.1<br>API | Unused template "Reading" (pages, 0 to 500) | `PATCH` `{ "unit": "pages read", "maxValue": 300 }`; then `PATCH` `{ "name": "Reading time", "minValue": 1 }`; `GET /api/templates` | Both 200; the list shows "Reading time", "pages read", 1 to 300 |
+| TC-13<br>AC-04.2, AC-04.5<br>API and database | Template "Sleep" with A's Active goal (start `D`, end `D+30`); template "Steps" with A's Ended goal only (start `D-10`, end `D-1`). Race part (OP-04.4, F-07 OP-07.11): an unused template "Water" (0 to 24) | `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH` "Sleep" `{ "minValue": 50 }` (also above the max); `PATCH` "Steps" `{ "unit": "km" }`. Race: (a) in the test, open a transaction that locks "Water" (`FOR UPDATE`) and inserts A's goal; start `PATCH` "Water" `{ "maxValue": 10 }`; check it waits on the lock; commit. (b) Send `PATCH` "Water" `{ "maxValue": 10 }` and A's `POST /api/goals` (target 20) at the same time | All three get `409 TEMPLATE_IN_USE`; both templates are unchanged. (a) The edit waits, then gets `409 TEMPLATE_IN_USE`; "Water" keeps max 24. (b) Either order is valid: goal first, then the edit gets `409 TEMPLATE_IN_USE` and max stays 24; or edit first, then the goal gets `400 TARGET_ABOVE_TEMPLATE_MAX` and no goal is stored. Never both a stored goal and an edited range |
+| TC-71<br>AC-04.4<br>API | Unused template T; no template with id 99999 | `PATCH` T with `{}`; `{ "minValue": "abc" }`; `{ "maxValue": 10.555 }`; `PATCH /api/templates/abc` with a valid body; `PATCH /api/templates/99999` with a valid body; `PATCH` T with no session | `{}`, "abc", 10.555 and the id "abc" get `400 VALIDATION_ERROR`; 99999 gets `404 TEMPLATE_NOT_FOUND`; anonymous gets `401 UNAUTHENTICATED`; T is unchanged |
+| TC-72<br>AC-04.3<br>Unit and API | Unused templates "Walk" (0 to 100) and "Swim" (0 to 50) | Unit: the merged range for stored (0, 100) with sent `minValue` 100. API: `PATCH` "Walk" `{ "minValue": 100 }`; `PATCH` "Walk" `{ "name": "Swim" }`; `PATCH` "Walk" `{ "name": "Walk", "unit": "steps" }` | Unit: refused. API: `400 MIN_NOT_BELOW_MAX`; `409 TEMPLATE_NAME_EXISTS`; 200 with unit "steps". "Walk" keeps min 0 and max 100 after the first two |
+| TC-73<br>AC-04.6<br>Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
+| TC-18<br>AC-04.7<br>API | A logged in; template "Sleep" (hours, 0 to 24); no template with id 99999 | As A: `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH /api/templates/99999` `{ "unit": "x" }` | Both get `403 FORBIDDEN`; "Sleep" still has max 24 |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -1676,10 +1676,10 @@ Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025
 
 Fixtures: each test starts from its own data with one Manager and Participant A (test-only passwords). A retired template is set up by writing `state = RETIRED` directly in the test database, because retire is built in Sprint 2.
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-16 | AC-06.1, AC-06.2 | API and browser | Active templates "Sleep" (hours, 0 to 24) and "Reading" (pages, 0 to 500); template "Steps" set to `RETIRED` | As A: `GET /api/templates`; open the templates page. Then, with no templates at all, open the page again | The API returns "Reading" and "Sleep" with their units and ranges, and not "Steps". The page shows the same two rows and no New, Edit or Retire control. With no templates: "No templates yet" and no New button |
-| TC-17 | AC-06.3 | API | A logged in; template count known | As A: `POST /api/templates` with a valid body (`"Yoga"`, minutes, 0 to 120); with `{ "name": "" }`; with `{}` | Each gets `403 FORBIDDEN`; the template count is unchanged; no "Yoga" row |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-16<br>AC-06.1, AC-06.2<br>API and browser | Active templates "Sleep" (hours, 0 to 24) and "Reading" (pages, 0 to 500); template "Steps" set to `RETIRED` | As A: `GET /api/templates`; open the templates page. Then, with no templates at all, open the page again | The API returns "Reading" and "Sleep" with their units and ranges, and not "Steps". The page shows the same two rows and no New, Edit or Retire control. With no templates: "No templates yet" and no New button |
+| TC-17<br>AC-06.3<br>API | A logged in; template count known | As A: `POST /api/templates` with a valid body (`"Yoga"`, minutes, 0 to 120); with `{ "name": "" }`; with `{}` | Each gets `403 FORBIDDEN`; the template count is unchanged; no "Yoga" row |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -1827,16 +1827,16 @@ Errors: 400, 401, 403, 409 as in section 4.
 
 Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests that go through the running server use dates relative to `D` (for example `D+1`), so the server needs no clock hook. Unit tests of the rule code pass `today` as an argument.
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-20 | AC-07.1, AC-07.2 | API | Participant A logged in; template T (min 0, max 24); the body also carries `"participantId": 99` | `POST /api/goals` with valid data (start `D`, end `D+30`); restart the app; `GET /api/goals` | 201; goal returned with `state` ACTIVE; listed after the restart; stored owner is A, not 99 |
-| TC-21 | AC-07.3 | API | A has an active goal on T | `POST /api/goals` for T again | 409 `ACTIVE_GOAL_EXISTS`; A's goal count on T is still 1 |
-| TC-22 | AC-07.5 | Unit | `today` passed as an argument; goal start 2026-11-10, end 2026-11-12 | Compute the state for today = 11-09, 11-10, 11-12, 11-13 | ACTIVE, ACTIVE, ACTIVE, ENDED |
-| TC-53 | AC-07.6, AC-07.8 | API | A logged in; template T | Send each bad body: no `templateId`, `templateId` "abc", `templateId` 99999, no `dailyTarget`, `dailyTarget` "abc", `dailyTarget` 0, `dailyTarget` -1, `dailyTarget` 10.555, `dailyTarget` 100000000, bad date format, missing dates, end before start. Then send a valid body as Manager and with no session | Every bad body gets `400 VALIDATION_ERROR`; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED`; no row is stored in any case |
-| TC-54 | AC-07.6, AC-07.7 | API and unit | Template max 24 | Send target 24, then 24.5, then 30.555, then target 25 with no `startDate` | 24 accepted (201); 24.5 gets `400 TARGET_ABOVE_TEMPLATE_MAX`; 30.555 gets `400 VALIDATION_ERROR` (more than 2 decimal places; validation wins over the rule); the combined case (25, no `startDate`) gets `400 VALIDATION_ERROR`; nothing is stored for the last three |
-| TC-55 | AC-07.2, AC-07.4 | API | A has an Ended goal G1 on T1 (end `D-1`); B has an **active** goal on T1 | A creates a goal on T1; A creates a goal on T2; the body of one request carries B's ID | Both of A's requests accepted (201); stored owner is A, never B |
-| TC-60 | AC-07.9 | Browser | A logged in; T exists | Open the form, submit a valid goal, then submit a second goal on T | The first goal appears; the second shows the API message and keeps the typed values |
-| TC-74 | AC-07.10 | API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-20<br>AC-07.1, AC-07.2<br>API | Participant A logged in; template T (min 0, max 24); the body also carries `"participantId": 99` | `POST /api/goals` with valid data (start `D`, end `D+30`); restart the app; `GET /api/goals` | 201; goal returned with `state` ACTIVE; listed after the restart; stored owner is A, not 99 |
+| TC-21<br>AC-07.3<br>API | A has an active goal on T | `POST /api/goals` for T again | 409 `ACTIVE_GOAL_EXISTS`; A's goal count on T is still 1 |
+| TC-22<br>AC-07.5<br>Unit | `today` passed as an argument; goal start 2026-11-10, end 2026-11-12 | Compute the state for today = 11-09, 11-10, 11-12, 11-13 | ACTIVE, ACTIVE, ACTIVE, ENDED |
+| TC-53<br>AC-07.6, AC-07.8<br>API | A logged in; template T | Send each bad body: no `templateId`, `templateId` "abc", `templateId` 99999, no `dailyTarget`, `dailyTarget` "abc", `dailyTarget` 0, `dailyTarget` -1, `dailyTarget` 10.555, `dailyTarget` 100000000, bad date format, missing dates, end before start. Then send a valid body as Manager and with no session | Every bad body gets `400 VALIDATION_ERROR`; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED`; no row is stored in any case |
+| TC-54<br>AC-07.6, AC-07.7<br>API and unit | Template max 24 | Send target 24, then 24.5, then 30.555, then target 25 with no `startDate` | 24 accepted (201); 24.5 gets `400 TARGET_ABOVE_TEMPLATE_MAX`; 30.555 gets `400 VALIDATION_ERROR` (more than 2 decimal places; validation wins over the rule); the combined case (25, no `startDate`) gets `400 VALIDATION_ERROR`; nothing is stored for the last three |
+| TC-55<br>AC-07.2, AC-07.4<br>API | A has an Ended goal G1 on T1 (end `D-1`); B has an **active** goal on T1 | A creates a goal on T1; A creates a goal on T2; the body of one request carries B's ID | Both of A's requests accepted (201); stored owner is A, never B |
+| TC-60<br>AC-07.9<br>Browser | A logged in; T exists | Open the form, submit a valid goal, then submit a second goal on T | The first goal appears; the second shows the API message and keeps the typed values |
+| TC-74<br>AC-07.10<br>API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -1988,19 +1988,19 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 
 Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests that go through the running server use dates relative to `D`, so the server needs no clock hook. Unit tests of the rule code pass the current instant as an argument. Each test starts with its own fixtures, so the goals named G to G6 are separate per test and BR-05 (one active goal per template) does not interfere between them.
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-23 | AC-08.1 | API and browser | A's goal G (start `D-9`, end `D+20`) on template T (min 0, max 24, unit hours) | `POST` value 7.5 for `D`; then read the goals page | 201; the entry is listed; the page shows "7.5 hours" |
-| TC-24 | AC-08.2 | Unit and API | G as above; a second goal G2 ending `D+5` on another template | `POST` for `D+1` on G; `POST` for `D+10` on G2 | Both get `400 ENTRY_DATE_IN_FUTURE` (the second is also outside G2, and the future rule comes first); no row stored |
-| TC-25 | AC-08.3 | Unit and API | Goal G3 (`D-15` to `D+5`); Ended goal G4 (`D-15` to `D-5`) on another template | `POST` for `D-16` on G3; `POST` for `D-4` on G4 | Each gets `400 ENTRY_DATE_OUTSIDE_GOAL`; no row stored |
-| TC-26 | AC-08.4 | Unit and API | Goal G5 (`D-15` to `D`) | `POST` for `D-15` (the start) and for `D` (today, which is the end date) | Both 201 |
-| TC-27 | AC-08.5, AC-08.12 | Unit | Process time zone set to `TZ=UTC`; a goal whose period is 2026-11-01 to 2026-11-30; the instant is passed as an argument | At 2026-11-10T16:59:59Z (23:59:59 Bangkok) check an entry for 2026-11-11 and the UI's default-date helper; at 2026-11-10T17:00:00Z (00:00:00 on 11-11 Bangkok) check them again | First instant: today is 2026-11-10, the entry gets `ENTRY_DATE_IN_FUTURE`, the helper returns 2026-11-10. Second instant: today is 2026-11-11, the entry is accepted, the helper returns 2026-11-11. An implementation that uses the machine's local zone fails the second check (with `TZ=UTC`, 17:00:00Z is still 11-10 locally) |
-| TC-28 | AC-08.6 | Unit and API | Goal G6 (`D-15` to `D+5`) on template T (min 0, max 24) | `POST` -0.5 for `D-15` and 24.5 for `D-15` (both rejected); then 0 for `D-15` (accepted) and 24 for `D-14` (accepted) | -0.5 and 24.5 get `400 VALUE_OUT_OF_RANGE` with no row stored; 0 and 24 get 201 (each accepted value has its own day) |
-| TC-29 | AC-08.7 | API | An entry already exists for G on `D` | `POST` again for `D` (and two requests at once) | `409 ENTRY_ALREADY_EXISTS`; one row; the first value unchanged |
-| TC-30 | AC-08.3, AC-08.11 | Unit and API | Ended goal G4 (`D-15` to `D-5`) | `POST` for `D-4`; then `POST` for `D-10` | `D-4` gets `400 ENTRY_DATE_OUTSIDE_GOAL`; `D-10` (inside the period, in the past) gets 201 |
-| TC-56 | AC-08.8, AC-08.9 | API | A logged in; A's goal G | Send bodies with no date, bad date format, no value, value "abc", value 7.555, value 24.555 (above the max of 24 and with 3 decimal places), value 100000000 (all to G). Send a valid body as Manager and as anonymous. Send a valid body to B's goal and to goal id 99999 | Bad bodies get `400 VALIDATION_ERROR`; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`; B's goal and 99999 get `404 GOAL_NOT_FOUND`; no row stored |
-| TC-58 | AC-08.1 | API and database | A's goal G; entry saved | Restart the app (new process and connection); `GET /api/goals/:id/entries` | The same entry is returned (data survives a restart) |
-| TC-61 | AC-08.10 | Browser | A logged in on the goals page | Type 30 (above max 24) and Save; then a valid value | The first shows the API message and keeps 30; the second saves |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-23<br>AC-08.1<br>API and browser | A's goal G (start `D-9`, end `D+20`) on template T (min 0, max 24, unit hours) | `POST` value 7.5 for `D`; then read the goals page | 201; the entry is listed; the page shows "7.5 hours" |
+| TC-24<br>AC-08.2<br>Unit and API | G as above; a second goal G2 ending `D+5` on another template | `POST` for `D+1` on G; `POST` for `D+10` on G2 | Both get `400 ENTRY_DATE_IN_FUTURE` (the second is also outside G2, and the future rule comes first); no row stored |
+| TC-25<br>AC-08.3<br>Unit and API | Goal G3 (`D-15` to `D+5`); Ended goal G4 (`D-15` to `D-5`) on another template | `POST` for `D-16` on G3; `POST` for `D-4` on G4 | Each gets `400 ENTRY_DATE_OUTSIDE_GOAL`; no row stored |
+| TC-26<br>AC-08.4<br>Unit and API | Goal G5 (`D-15` to `D`) | `POST` for `D-15` (the start) and for `D` (today, which is the end date) | Both 201 |
+| TC-27<br>AC-08.5, AC-08.12<br>Unit | Process time zone set to `TZ=UTC`; a goal whose period is 2026-11-01 to 2026-11-30; the instant is passed as an argument | At 2026-11-10T16:59:59Z (23:59:59 Bangkok) check an entry for 2026-11-11 and the UI's default-date helper; at 2026-11-10T17:00:00Z (00:00:00 on 11-11 Bangkok) check them again | First instant: today is 2026-11-10, the entry gets `ENTRY_DATE_IN_FUTURE`, the helper returns 2026-11-10. Second instant: today is 2026-11-11, the entry is accepted, the helper returns 2026-11-11. An implementation that uses the machine's local zone fails the second check (with `TZ=UTC`, 17:00:00Z is still 11-10 locally) |
+| TC-28<br>AC-08.6<br>Unit and API | Goal G6 (`D-15` to `D+5`) on template T (min 0, max 24) | `POST` -0.5 for `D-15` and 24.5 for `D-15` (both rejected); then 0 for `D-15` (accepted) and 24 for `D-14` (accepted) | -0.5 and 24.5 get `400 VALUE_OUT_OF_RANGE` with no row stored; 0 and 24 get 201 (each accepted value has its own day) |
+| TC-29<br>AC-08.7<br>API | An entry already exists for G on `D` | `POST` again for `D` (and two requests at once) | `409 ENTRY_ALREADY_EXISTS`; one row; the first value unchanged |
+| TC-30<br>AC-08.3, AC-08.11<br>Unit and API | Ended goal G4 (`D-15` to `D-5`) | `POST` for `D-4`; then `POST` for `D-10` | `D-4` gets `400 ENTRY_DATE_OUTSIDE_GOAL`; `D-10` (inside the period, in the past) gets 201 |
+| TC-56<br>AC-08.8, AC-08.9<br>API | A logged in; A's goal G | Send bodies with no date, bad date format, no value, value "abc", value 7.555, value 24.555 (above the max of 24 and with 3 decimal places), value 100000000 (all to G). Send a valid body as Manager and as anonymous. Send a valid body to B's goal and to goal id 99999 | Bad bodies get `400 VALIDATION_ERROR`; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`; B's goal and 99999 get `404 GOAL_NOT_FOUND`; no row stored |
+| TC-58<br>AC-08.1<br>API and database | A's goal G; entry saved | Restart the app (new process and connection); `GET /api/goals/:id/entries` | The same entry is returned (data survives a restart) |
+| TC-61<br>AC-08.10<br>Browser | A logged in on the goals page | Type 30 (above max 24) and Save; then a valid value | The first shows the API message and keeps 30; the second saves |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -2126,11 +2126,11 @@ No new table and no migration. Progress is computed from `Goal` and `Entry` (F-0
 
 Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Browser and API tests use dates relative to `D` (seeded or created by the test), so the server needs no clock hook. The unit test of the calculation passes `today` as an argument.
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-31 | AC-09.1, AC-09.2, AC-09.3, AC-09.4, AC-09.5 | Unit | `today` = 2026-11-10 passed as an argument; template unit minutes, min 0, max 120; target 30; goal 2026-11-01 to 2026-11-30 with entries 11-01 value 30 (met), 11-02 value 29.9 (missed), 11-03 none (empty), 11-04 value 45 (met) | Compute progress; then for a goal starting 2026-11-20; then for goal 2026-11-01 to 2026-11-05 | `daysMet` 2 of `daysSoFar` 10; then 0 of 0; then `daysSoFar` 5 and not 10 |
-| TC-32 | AC-09.7 | Browser | A logged in; goal from `D-9` to `D+20`, target 30, with entries `D-9` value 30, `D-8` value 29.9, `D-6` value 45 (seeded relative to `D`) | Open the goals page | The page shows "2 of 10 days met" for that goal |
-| TC-59 | AC-09.6, AC-09.7, AC-09.8 | Browser and API | Seeded Manager, Participants A and B; no template named "Sleep"; A has no goal | Journey: the Manager logs in and creates the template "Sleep" through the UI; A logs in and creates a goal starting `D` on it; A reads the goals page ("0 of 1 days met"); A records a value that meets the target for `D`; A reads the page again ("1 of 1 days met"); restart the app; read again. Also call `GET /api/goals` as Manager and with no session | The page shows "0 of 1", then "1 of 1", and "1 of 1" after the restart; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED` |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-31<br>AC-09.1, AC-09.2, AC-09.3, AC-09.4, AC-09.5<br>Unit | `today` = 2026-11-10 passed as an argument; template unit minutes, min 0, max 120; target 30; goal 2026-11-01 to 2026-11-30 with entries 11-01 value 30 (met), 11-02 value 29.9 (missed), 11-03 none (empty), 11-04 value 45 (met) | Compute progress; then for a goal starting 2026-11-20; then for goal 2026-11-01 to 2026-11-05 | `daysMet` 2 of `daysSoFar` 10; then 0 of 0; then `daysSoFar` 5 and not 10 |
+| TC-32<br>AC-09.7<br>Browser | A logged in; goal from `D-9` to `D+20`, target 30, with entries `D-9` value 30, `D-8` value 29.9, `D-6` value 45 (seeded relative to `D`) | Open the goals page | The page shows "2 of 10 days met" for that goal |
+| TC-59<br>AC-09.6, AC-09.7, AC-09.8<br>Browser and API | Seeded Manager, Participants A and B; no template named "Sleep"; A has no goal | Journey: the Manager logs in and creates the template "Sleep" through the UI; A logs in and creates a goal starting `D` on it; A reads the goals page ("0 of 1 days met"); A records a value that meets the target for `D`; A reads the page again ("1 of 1 days met"); restart the app; read again. Also call `GET /api/goals` as Manager and with no session | The page shows "0 of 1", then "1 of 1", and "1 of 1" after the restart; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED` |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -2240,12 +2240,12 @@ No new path. The behaviour in section 4 applies to the existing endpoints. Error
 
 Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok, and tests use dates relative to `D`. Fixtures: Participants A and B and one Manager, each with a goal or entry where needed (the names of seeded accounts are SRS A-9; tests use fixtures).
 
-| Test | AC | Level | Precondition / input | Action | Expected result |
-|---|---|---|---|---|---|
-| TC-33 | AC-10.1, AC-10.2, AC-10.6 | API | A has goal GA with an entry; B has goal GB | As B: `GET /api/goals`; `GET` and `POST` `/api/goals/GA/entries`; `POST /api/goals` with A's id in the body | B's list holds only GB; both entries calls get `404 GOAL_NOT_FOUND` with nothing stored or returned; the new goal is accepted (201) and belongs to B; A's data unchanged |
-| TC-34 | AC-10.3, AC-10.4 | API | Same data | As Manager and as anonymous: each goal and entry endpoint (read and write) | Manager gets `403 FORBIDDEN` and anonymous `401 UNAUTHENTICATED` on every call; nothing stored or returned |
-| TC-35 | AC-10.7 | API and browser | A and B each with a goal and entries | Open the goals page as A, then as B | Each page lists only that Participant's goals, entries and progress |
-| TC-57 | AC-10.5 | API | A's goal GA; no goal with id 99999 | As B: `GET /api/goals/GA/entries` and `GET /api/goals/99999/entries` | Both give `404 GOAL_NOT_FOUND` with identical status and body |
+| Test / AC / Level | Precondition / input | Action | Expected result |
+|---|---|---|---|
+| TC-33<br>AC-10.1, AC-10.2, AC-10.6<br>API | A has goal GA with an entry; B has goal GB | As B: `GET /api/goals`; `GET` and `POST` `/api/goals/GA/entries`; `POST /api/goals` with A's id in the body | B's list holds only GB; both entries calls get `404 GOAL_NOT_FOUND` with nothing stored or returned; the new goal is accepted (201) and belongs to B; A's data unchanged |
+| TC-34<br>AC-10.3, AC-10.4<br>API | Same data | As Manager and as anonymous: each goal and entry endpoint (read and write) | Manager gets `403 FORBIDDEN` and anonymous `401 UNAUTHENTICATED` on every call; nothing stored or returned |
+| TC-35<br>AC-10.7<br>API and browser | A and B each with a goal and entries | Open the goals page as A, then as B | Each page lists only that Participant's goals, entries and progress |
+| TC-57<br>AC-10.5<br>API | A's goal GA; no goal with id 99999 | As B: `GET /api/goals/GA/entries` and `GET /api/goals/99999/entries` | Both give `404 GOAL_NOT_FOUND` with identical status and body |
 
 *Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
@@ -2324,31 +2324,31 @@ All figures in this section come from one run of the release build: `v1.0` (`648
 ### Scenario 1: normal journey and retrieval of the saved result {#scenario-1}
 
 
-<figure><img src="img/f04-template-created.png" style="width:50%"><figcaption>Figure 1. F-03 (AC-03.1, FR-05): Manager; steps: New, name Meditation, unit minutes, minimum 0, maximum 120, Save; expected: 201 and the new template is listed as Active; actual: Meditation 0 to 120 minutes is listed.</figcaption></figure>
+<figure><img src="img/f04-template-created.png" style="width:50%"><figcaption>Figure 1. A Manager creates a template<table class="cap"><tr><th>IDs</th><td>F-03, FR-05, AC-03.1</td></tr><tr><th>Role</th><td>Manager (manager1)</td></tr><tr><th>Start</th><td>manager1 logged in; templates Reading, Walking and Water from the seed</td></tr><tr><th>Steps</th><td>New, name Meditation, unit minutes, minimum 0, maximum 120, Save</td></tr><tr><th>Expected</th><td>201; the new template is listed as Active</td></tr><tr><th>Actual</th><td>Meditation 0 to 120 minutes is listed. Pass</td></tr></table></figcaption></figure>
 
 
-<figure><img src="img/f06-goal-created.png" style="width:50%"><figcaption>Figure 2. F-07, F-09 (AC-07.1, AC-09.7): Participant; goal just saved, no entry yet; expected: the goal is listed with its target, dates, state Active and "0 of 1 days met" (today counts as a day so far); actual: as expected, "No entries yet".</figcaption></figure>
+<figure><img src="img/f06-goal-created.png" style="width:50%"><figcaption>Figure 2. A Participant creates a goal<table class="cap"><tr><th>IDs</th><td>F-07, F-09, AC-07.1, AC-09.7</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>participant1 logged in; no goals</td></tr><tr><th>Steps</th><td>+ New goal, template Meditation, daily target 15, start 2026-11-10, end 2026-11-16, Save</td></tr><tr><th>Expected</th><td>the goal is listed with its target, dates, state Active and "0 of 1 days met" (today counts as a day so far)</td></tr><tr><th>Actual</th><td>as expected; "No entries yet". Pass</td></tr></table></figcaption></figure>
 
-<figure><img src="img/f07-entry-saved.png" style="width:50%"><figcaption>Figure 3. F-08, F-09 (AC-08.1, AC-09.1, AC-09.6): Participant; goal of Figure 2; steps: value 20 for today (2026-11-10), Save entry; expected: 201, entry listed with its unit, progress rises to "1 of 1 days met" because 20 ≥ 15; actual: as expected.</figcaption></figure>
+<figure><img src="img/f07-entry-saved.png" style="width:50%"><figcaption>Figure 3. A day is recorded and progress rises<table class="cap"><tr><th>IDs</th><td>F-08, F-09, AC-08.1, AC-09.1, AC-09.6</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>the goal of Figure 2</td></tr><tr><th>Steps</th><td>value 20 for today (2026-11-10), Save entry</td></tr><tr><th>Expected</th><td>201; the entry is listed with its unit; progress "1 of 1 days met" because 20 ≥ 15</td></tr><tr><th>Actual</th><td>as expected. Pass</td></tr></table></figcaption></figure>
 
-<figure><img src="img/f09-after-restart.png" style="width:50%"><figcaption>Figure 4. F-08, F-09 (AC-08.1, AC-09.6): Participant; the app process was stopped and started again (new process, new database connection), then the page reloaded; expected: goal, entry and progress are read back from PostgreSQL; actual: "1 of 1 days met" and "2026-11-10: 20 minutes" are shown.</figcaption></figure>
+<figure><img src="img/f09-after-restart.png" style="width:50%"><figcaption>Figure 4. The saved result is read back after a restart<table class="cap"><tr><th>IDs</th><td>F-08, F-09, AC-08.1, AC-09.6</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>the entry of Figure 3 is saved</td></tr><tr><th>Steps</th><td>stop the app process, start it again (new process, new database connection), reload the page</td></tr><tr><th>Expected</th><td>goal, entry and progress are read back from PostgreSQL</td></tr><tr><th>Actual</th><td>"1 of 1 days met" and "2026-11-10: 20 minutes" are shown. Pass</td></tr></table></figcaption></figure>
 
 ### Scenario 2: business-rule rejections {#scenario-2}
 
 
-<figure><img src="img/f08-entry-duplicate-rejected.png" style="width:50%"><figcaption>Figure 5. F-08, BR-04 (AC-08.7, AC-08.10): Participant; an entry for 2026-11-10 already exists (Figure 3); steps: value 25 for the same day, Save entry; expected: 409 ENTRY_ALREADY_EXISTS, the stored entry stays 20; actual: "An entry already exists for this day.", the list still shows 20 minutes, the typed 25 is kept.</figcaption></figure>
+<figure><img src="img/f08-entry-duplicate-rejected.png" style="width:50%"><figcaption>Figure 5. A second entry for the same day is refused<table class="cap"><tr><th>IDs</th><td>F-08, BR-04, AC-08.7, AC-08.10</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>an entry for 2026-11-10 already exists (Figure 3)</td></tr><tr><th>Steps</th><td>value 25 for the same day, Save entry</td></tr><tr><th>Expected</th><td>409 ENTRY_ALREADY_EXISTS; the stored entry stays 20</td></tr><tr><th>Actual</th><td>"An entry already exists for this day."; the list still shows 20 minutes; the typed 25 is kept. Pass</td></tr></table></figcaption></figure>
 
 In the same run, a value of 500 dated 2026-11-09 (before the goal starts) was refused with "The date must be inside the goal start and end dates." (BR-01, AC-08.3); the date check runs before the value range check, as the F-08 contract orders them.
 
 ### Scenario 3: login, logout and forbidden operations {#scenario-3}
 
-<figure><img src="img/f01-login-rejected.png" style="width:45%"><figcaption>Figure 6. F-01 (AC-01.2, AC-01.10): anonymous; steps: username manager1 with a wrong password, Log in; expected: one generic error, username kept, password cleared, no session; actual: "Username or password is incorrect.", username kept, password empty.</figcaption></figure>
+<figure><img src="img/f01-login-rejected.png" style="width:45%"><figcaption>Figure 6. A wrong password is refused<table class="cap"><tr><th>IDs</th><td>F-01, AC-01.2, AC-01.10</td></tr><tr><th>Role</th><td>anonymous</td></tr><tr><th>Start</th><td>no session; the login page</td></tr><tr><th>Steps</th><td>username manager1 with a wrong password, Log in</td></tr><tr><th>Expected</th><td>one generic error; username kept; password cleared; no session</td></tr><tr><th>Actual</th><td>"Username or password is incorrect."; username kept; password empty. Pass</td></tr></table></figcaption></figure>
 
-<figure><img src="img/f10-participant-forbidden-page.png" style="width:50%"><figcaption>Figure 7. F-02, BR-09: Participant participant1; logged in; steps: open the Manager-only address /templates/new; expected: the page is not offered to the role; actual: "This page is not available for your role." The screen alone proves nothing about the backend; the API refusals are in the listing below and in the TC-18 excerpt in F.4.</figcaption></figure>
+<figure><img src="img/f10-participant-forbidden-page.png" style="width:50%"><figcaption>Figure 7. A Manager-only page is not offered to a Participant<table class="cap"><tr><th>IDs</th><td>F-02, BR-09</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>participant1 logged in</td></tr><tr><th>Steps</th><td>open the Manager-only address /templates/new</td></tr><tr><th>Expected</th><td>the page is not offered to the role</td></tr><tr><th>Actual</th><td>"This page is not available for your role." Pass. The screen alone proves nothing about the backend; the API refusals are in the listing below and in the TC-18 excerpt in F.4</td></tr></table></figcaption></figure>
 
-<figure><img src="img/f11-after-logout.png" style="width:45%"><figcaption>Figure 8. F-01 (AC-01.4, AC-02.5): Participant participant1; logged in on /goals; steps: Log out, then open /goals again; expected: the session row is deleted and the login screen is shown; actual: the browser is sent to /login. The old cookie gets 401 (listing below).</figcaption></figure>
+<figure><img src="img/f11-after-logout.png" style="width:45%"><figcaption>Figure 8. Logout ends the session<table class="cap"><tr><th>IDs</th><td>F-01, AC-01.4, AC-02.5</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>participant1 logged in on /goals</td></tr><tr><th>Steps</th><td>Log out, then open /goals again</td></tr><tr><th>Expected</th><td>the session row is deleted and the login screen is shown</td></tr><tr><th>Actual</th><td>the browser is sent to /login. Pass. The old cookie gets 401 (listing below)</td></tr></table></figcaption></figure>
 
-<figure><img src="img/f12-participant2-own-only.png" style="width:50%"><figcaption>Figure 9. F-10 (AC-10.7, BR-10): Participant participant2; participant1 owns the Meditation goal; steps: log in as participant2; expected: participant1's goal, entry and progress are not shown; actual: "No goals yet".</figcaption></figure>
+<figure><img src="img/f12-participant2-own-only.png" style="width:50%"><figcaption>Figure 9. A Participant sees only their own data<table class="cap"><tr><th>IDs</th><td>F-10, BR-10, AC-10.7</td></tr><tr><th>Role</th><td>Participant (participant2)</td></tr><tr><th>Start</th><td>participant1 owns the Meditation goal</td></tr><tr><th>Steps</th><td>log in as participant2</td></tr><tr><th>Expected</th><td>participant1's goal, entry and progress are not shown</td></tr><tr><th>Actual</th><td>"No goals yet". Pass</td></tr></table></figcaption></figure>
 
 ### Backend evidence for the protected operations {#api-evidence}
 
@@ -2396,7 +2396,7 @@ The one failure in run 1 was `goals.spec.js` "TC-47 / TC-48: goals screens fit a
   43 passed (1.3m)
 ```
 
-It passed in all 8 later runs of that test (6 in the rerun, 2 in run 2). The same test fails on Windows at both widths, which is a known limitation recorded before the release (README; PR #43). The macOS failure is intermittent; its cause was not investigated for this report.
+It passed in all 8 later runs of that test (6 in the rerun, 2 in run 2). The same test fails on Windows at both widths, which is a known limitation recorded before the release (README; PR #43) and now tracked as Issue #62. The macOS failure is intermittent; its cause was not investigated for this report.
 
 End of the server run and of browser run 2:
 
@@ -2594,27 +2594,18 @@ All six reached `main` through the release PR #61 (merge `64831f7`, tag `v1.0`).
 
 ### History sequence: contract and tests before implementation {#history}
 
-Commit dates are author dates (+07). "Merged" is when the PR reached `staging`.
+All dates are 2026, +07; commit dates are author dates and PR dates are merge times. Each row reads left to right in time order.
 
-| When | Commit or PR | Step | F-08 | F-04 |
-|---|---|---|---|---|
-| 2026-11-07 04:00 | `db9efae` | Contract written | F-08 contract (with F-07, F-09, F-10) | |
-| 2026-11-07 04:14 | `b5304f0` | Contract review fixes (PR #29) | F-08 | |
-| 2026-11-07 04:17 | PR #29 merged (`9d5e3cc`) | Contract approved | F-08 | |
-| 2026-11-07 04:32 | `06e536b` | Contract written | | F-04 contract (with F-03, F-06) |
-| 2026-11-07 05:02 | `5e5c174` | Contract review fixes (PR #31) | | F-04 |
-| 2026-11-07 05:04 | PR #31 merged (`1c72dbf`) | Contract approved | | F-04 |
-| 2026-11-08 17:54 | `f2114c4` | Contract revision before build (decimals, template lock) | F-08 | |
-| 2026-11-08 23:02 | PR #39 merged (`e16289c`) | Revision approved | F-08 | |
-| 2026-11-09 01:01 | `d43f160` | Failing tests (red) | F-08 | |
-| 2026-11-09 01:04 | `7d2979b` | Implementation (green) | F-08 | |
-| 2026-11-09 22:59 | `a10bd75` | Review fixes (tests) | F-08 | |
-| 2026-11-10 00:08 | PR #43 merged (`a5a9266`) | Into `staging` | F-08 | |
-| 2026-11-10 02:00 | `14475ba` | Contract update for the build (row lock, race test) | | F-04 |
-| 2026-11-10 02:03 | `e4fe33d` | Failing tests (red) | | F-04 |
-| 2026-11-10 02:04 | `3d1ccbb` | Implementation (green) | | F-04 |
-| 2026-11-10 12:07 | PR #54 merged (`54ac16e`) | Into `staging` | | F-04 |
-| 2026-11-10 13:31 | PR #61 merged (`64831f7`) | Release into `main`; tag `v1.0` at 13:35 | F-08 | F-04 |
+<div class="keep">
+
+| Chain | Contract approved | Tests fail (red) | Code passes (green) | Into `staging` | Into `main` (`v1.0`) |
+|---|---|---|---|---|---|
+| F-08 daily entry | PR #29 `9d5e3cc`, <span class="id">11-07 04:17</span>; revision PR #39 `e16289c`, <span class="id">11-08 23:02</span> | `d43f160`, <span class="id">11-09 01:01</span> | `7d2979b`, <span class="id">11-09 01:04</span> | PR #43 `a5a9266`, <span class="id">11-10 00:08</span> | PR #61 `64831f7`, <span class="id">11-10 13:31</span> |
+| F-04 template edit | PR #31 `1c72dbf`, <span class="id">11-07 05:04</span>; build update `14475ba`, <span class="id">11-10 02:00</span> | `e4fe33d`, <span class="id">11-10 02:03</span> | `3d1ccbb`, <span class="id">11-10 02:04</span> | PR #54 `54ac16e`, <span class="id">11-10 12:07</span> | PR #61 `64831f7`, <span class="id">11-10 13:31</span> |
+
+</div>
+
+Other commits in the two chains: contract written `db9efae` (<span class="id">11-07 04:00</span>) and `06e536b` (<span class="id">11-07 04:32</span>); contract review fixes `b5304f0` (<span class="id">11-07 04:14</span>) and `5e5c174` (<span class="id">11-07 05:02</span>); contract revision `f2114c4` (<span class="id">11-08 17:54</span>); test review fixes `a10bd75` (<span class="id">11-09 22:59</span>). The tag `v1.0` was made at <span class="id">11-10 13:35</span>.
 
 The commits on the F-08 branch carry the git author name PhutWeb; the PR that holds them, #43, is projectnewy's.
 
@@ -2648,7 +2639,7 @@ No prompt transcripts are included. Automated results and AI statements do not c
 
 ### Known limitations, failed and skipped tests
 
-- Failed and skipped tests: no skipped test. One browser failure in run 1 (Goal TC-47/48 at 1280 px, F.3), passing in all 8 later runs. On Windows the Goal TC-47/48 keyboard test fails at both widths (README, PR #43); no Issue was opened.
+- Failed and skipped tests: no skipped test. One browser failure in run 1 (Goal TC-47/48 at 1280 px, F.3), passing in all 8 later runs. On Windows the Goal TC-47/48 keyboard test fails at both widths (README, PR #43); it is recorded as Issue #62 and is not fixed in Sprint 1.
 - Not run in Sprint 1: the timed clean-clone setup TC-50 (AC-SYS.3) is planned for Lab 5. CI on every PR (AC-SYS.5) starts in Lab 5; the suites were run locally. Docker and GCP deployment are Lab 5.
 - Coverage (AC-SYS.4): the coverage above was measured over the whole server suite, not the unit tests alone. BR-04 (one entry per day) has no unit test; API and database tests check it (F.3).
 - Features not in Sprint 1: template retire F-05 (FR-08) and the retire refusal TC-19 are Sprint 2. Entry edit and delete (FR-17) are Sprint 2, so a wrong same-day entry cannot be fixed yet (SRS A-11). The calendar, colours, streaks and reminders are Sprints 2 and 3.

@@ -70,11 +70,15 @@ a.page { color: inherit; text-decoration: none; }
 img { max-width: 100%; box-sizing: border-box; border: 0.5pt solid #bbb; }
 figure { margin: 8pt 0 12pt; break-inside: avoid; }
 figcaption { font-size: 12pt; margin-top: 3pt; }
+table.cap { width: auto; margin: 3pt 0 0; }
+table.cap th, table.cap td { border: none; background: none; padding: 1pt 8pt 1pt 0; font-weight: normal; }
+table.cap th { font-weight: bold; white-space: nowrap; }
 .part + .part { break-before: page; }
 .toc a { color: inherit; text-decoration: none; }
 .toc td:last-child, .toc th:last-child { text-align: right; width: 4em; }
 #navigation ~ table td:nth-child(2), #navigation ~ table th:nth-child(2) { white-space: nowrap; }
 .id { white-space: nowrap; }
+.keep { break-inside: avoid; }
 .note { border: 1pt solid #888; padding: 6pt 8pt; margin: 0 0 12pt; }
 blockquote { margin: 6pt 0; padding-left: 8pt; border-left: 2pt solid #bbb; color: #333; }
 `;
