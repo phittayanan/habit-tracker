@@ -13,8 +13,8 @@
 
 | Student | Student ID | GitHub |
 |---|---|---|
-| [name: to be supplied by the team] | [student ID — fill privately] | phittayanan |
-| [name: to be supplied by the team] | [student ID — fill privately] | projectnewy |
+| Phittayanan Tiencharoen | [student ID — fill privately] | phittayanan |
+| Phuttipong Phankitnirundorn | [student ID — fill privately] | projectnewy |
 
 ## Navigation {#navigation}
 
