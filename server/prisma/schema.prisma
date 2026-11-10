@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PARTICIPANT
+  MANAGER
+}
+
+enum TemplateState {
+  ACTIVE
+  RETIRED
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  displayName  String     @map("display_name")
+  role         Role
+  passwordHash String     @map("password_hash")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamp(3)
+  sessions     Session[]
+  templates    Template[]
+  goals        Goal[]
+}
+
+model Session {
+  id        String   @id
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @map("created_at") @db.Timestamp(3)
+  expiresAt DateTime @map("expires_at") @db.Timestamp(3)
+}
+
+model Template {
+  id        Int           @id @default(autoincrement())
+  name      String        @unique
+  unit      String
+  minValue  Decimal       @map("min_value") @db.Decimal(10, 2)
+  maxValue  Decimal       @map("max_value") @db.Decimal(10, 2)
+  state     TemplateState @default(ACTIVE)
+  createdBy Int           @map("created_by")
+  goals     Goal[]
+  creator   User          @relation(fields: [createdBy], references: [id])
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamp(3)
+}
+
+model Goal {
+  id            Int      @id @default(autoincrement())
+  participantId Int      @map("participant_id")
+  participant   User     @relation(fields: [participantId], references: [id])
+  templateId    Int      @map("template_id")
+  template      Template @relation(fields: [templateId], references: [id])
+  dailyTarget   Decimal  @map("daily_target") @db.Decimal(10, 2)
+  startDate     DateTime @map("start_date") @db.Date
+  endDate       DateTime @map("end_date") @db.Date
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  entries       Entry[]
+
+  @@index([participantId, templateId, endDate])
+}
+
+model Entry {
+  id        Int      @id @default(autoincrement())
+  goalId    Int      @map("goal_id")
+  goal      Goal     @relation(fields: [goalId], references: [id])
+  entryDate DateTime @map("entry_date") @db.Date
+  value     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  @@unique([goalId, entryDate])
+}
