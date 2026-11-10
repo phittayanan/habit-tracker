@@ -1,0 +1,12 @@
+{
+  "name": "habit-tracker-deliverable-1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "marked": "18.1.2",
+    "playwright": "1.65.0"
+  }
+}
