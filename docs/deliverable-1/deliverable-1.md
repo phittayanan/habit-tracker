@@ -9,6 +9,7 @@
 | Team (LEB2 group) | Nine's AI |
 | Theme and context | Theme 8, Habit and Activity Tracking System (GWS §6.8). Context: a general habit programme with no named organisation (ADR 0003). |
 | Repository | https://github.com/phittayanan/habit-tracker |
+| Submission deadline | 15 Nov 2026 23:59 (LEB2, read 2026-11-10). The handout said 8 Nov; the documents below keep the handout's date |
 | Submitted release | Tag `v1.0` (annotated, 2026-11-10 13:35 +07) on commit `64831f7`, the merge of the release PR #61 from `staging` into `main` |
 
 | Student | Student ID | GitHub |
@@ -20,14 +21,35 @@
 
 One row per part. Page numbers refer to this PDF.
 
+Parts A–E are the documents at tag `v1.0` (commit `64831f7`). This PDF lists the ADRs by topic and leaves out repeated or non-required sections, which stay in the repository. It also corrects, in the PDF only: the coverage-gap status (Part B) and the test-status sentence (Part D), the ADR range in SRS 6.2, the LEB2 due date notes, the link texts to the build PRs, one broken table line in F-07, and citations of the team's handout summary (`docs/assignment.md`), now given as handout tags.
+
 | Part | Pages | IDs covered | Execution evidence |
 |---|---|---|---|
-| A. SRS and product scope | {{pages:part-a}} | BR-01 to BR-15, FR-01 to FR-23, NFR-01 to NFR-09; assumptions A-1 to A-11; TA questions T-1 to T-10; ADR 0001 to ADR 0051 | NFR-01 to NFR-09 results: Part F, page {{page:part-f}} |
-| B. Feature inventory and traceability | {{pages:part-b}} | F-01 to F-17; BR → FR → feature → AC → test; test IDs TC-01 to TC-74; coverage gaps; approved changes | AC → test results: Part F, page {{page:part-f}} |
-| C. System-Level SDS | {{pages:part-c}} | Architecture, data model (User, Session, Template, Goal, Entry), UI and API conventions, role matrix, authentication, configuration, GCP plan; open points S-1 to S-17 | Access restrictions: Part F, page {{page:part-f}} |
-| D. Three-sprint plan | {{pages:part-d}} | Sprints 1 to 3, feature IDs per sprint, dependencies, cut line | Sprint 1 release and board: Part F, page {{page:part-f}} |
-| E. Sprint 1 engineering contracts | {{pages:part-e}} | F-01, F-02, F-03, F-04, F-06, F-07, F-08, F-09, F-10; AC-01.1 to AC-10.7; AC-SYS.1 to AC-SYS.5; STS; Product Definition of Done | Part F, page {{page:part-f}} |
+| A. SRS and product scope | {{pages:part-a}} | BR-01 to BR-15, FR-01 to FR-23, NFR-01 to NFR-09; assumptions A-1 to A-11; TA questions T-1 to T-10; ADR 0001 to ADR 0051 | NFR-01 to NFR-09 results: AC → test table, page {{page:ac-table}} |
+| B. Feature inventory and traceability | {{pages:part-b}} | F-01 to F-17; BR → FR → feature → AC → test; test IDs TC-01 to TC-74; coverage gaps; approved changes | AC → test results: page {{page:ac-table}} |
+| C. System-Level SDS | {{pages:part-c}} | Architecture, data model (User, Session, Template, Goal, Entry), UI and API conventions, role matrix, authentication, configuration, GCP plan; open points S-1 to S-17 | Access restrictions: Figures 6–9, page {{page:scenario-3}}; API refusals, page {{page:api-evidence}} |
+| D. Three-sprint plan | {{pages:part-d}} | Sprints 1 to 3, feature IDs per sprint, dependencies, cut line | Release: page {{page:f-1}}; Issue → PR chains and board: page {{page:chains}} |
+| E. Sprint 1 engineering contracts | {{pages:part-e}} | F-01, F-02, F-03, F-04, F-06, F-07, F-08, F-09, F-10; AC-01.1 to AC-10.7; AC-SYS.1 to AC-SYS.5; STS; Product Definition of Done | Journey (Figures 1–4): page {{page:scenario-1}}; rejection (Figure 5): page {{page:scenario-2}}; access (Figures 6–9): page {{page:scenario-3}}; AC → test: page {{page:ac-table}}; test excerpts: page {{page:f-4}} |
 | F. Working Sprint 1 and verification | {{pages:part-f}} | Demonstrations (Figures 1 to 9), build and test results, AC → test table, two test excerpts with red and green runs, Issue/PR chains #42 → #43 and #53 → #54, release PR #61, history, contributions, AI use, limitations | This part |
+
+### Sources
+
+Short tags used inside the documents, with section numbers (for example GWS §5.2, SG Ep. 2.2, L5 R-02).
+
+| Tag | Document | What it is | Where it comes from |
+|---|---|---|---|
+| D1 | CPE 334 Project Deliverable 1 | This assignment's handout | Course file `project_deliverable_1_v1.pdf` |
+| D2 | CPE 334 Project Deliverable 2 | The next deliverable's handout | Course file `project_deliverable_2_v1.pdf` |
+| FD | CPE 334 Final Project Delivery | The final delivery handout | Course file `project_final_delivery_v1.pdf` |
+| GWS | CPE 334 Group Work Specification | The master specification for the group project (themes, sprints, workflow) | Course file `group_work_specs_v1.pdf` |
+| L5 | Lab 5: Cloud Deployment and CI/CD Pipeline on GCP | The Lab 5 handout; R-nn are its numbered requirements | Course file `01_SE_Lab_5_updated.pdf` |
+| KIT | Lab 5 starter kit | The course's starter project (Dockerfile, CI workflow, deploy script) | Course file `02_lab5-starter-kit.zip` |
+| SG | Student Guide: GCP Deployment and CI/CD, V1.1 | Step-by-step GCP guide; "Ep. n" is its Episode n | Course file `03_Student-Guide-GCP-Deployment-and+CI+CD-V1_1.pdf` |
+| LEB2 | LEB2 course page | The course site with the due dates and the submission box | LEB2, Deliverable 1 activity (login required) |
+| SRS | Software Requirements Specification | Part A of this PDF | `docs/srs.md` in the repository |
+| SDS | System Design Specification | Part C of this PDF | `docs/system-sds.md` in the repository |
+| ADR | Architecture decision record | One design decision; listed by topic in Part A | `docs/adr/` in the repository |
+| #n, PR #n | GitHub Issue or pull request number n | Work item or code review | https://github.com/phittayanan/habit-tracker/issues/n (or /pull/n) |
 
 ### Contents
 
@@ -58,7 +80,7 @@ In scope for the product (all three sprints):
 - A browser UI built around one month calendar (ADR 0037 to ADR 0049).
 - Private participant data (ADR 0019).
 
-Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026) is the handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Sprint 2 (due 29 Nov): goal changes and history. Sprint 3 (due 13 Dec): streaks, reminders, summaries and hardening.
+Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026; LEB2: 15 Nov 2026) is the handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Sprint 2 (due 29 Nov): goal changes and history. Sprint 3 (due 13 Dec): streaks, reminders, summaries and hardening.
 
 #### 1.3 Scope Exclusions
 - Medical diagnosis and treatment advice (course brief, GWS §6.8).
@@ -176,7 +198,7 @@ Areas are security and privacy, usability and accessibility, and maintainability
 - One `staging` branch for all sprints (ADR 0001).
 
 #### 6.2 Decisions recorded
-All design decisions are in `docs/adr/` (ADR 0002 to 0049), agreed by both students. The requirements above cite them by number.
+All design decisions are in `docs/adr/` (ADR 0001 to 0051), agreed by both students. The requirements above cite them by number.
 
 #### 6.3 Assumptions and open points for the students
 No ADR settles these. Each is left open and needs a decision before the requirement is final.
@@ -286,6 +308,8 @@ Each line is one decision record: number, the question, then the answer chosen. 
 
 # Part B. Feature inventory and traceability {#part-b}
 
+<div class="note">Status words in this part (draft, pending, open, planned, not built yet) show the state on the day each document was written, before the Sprint 1 build. The released state is in Part F: release, page {{page:f-1}}; test results, page {{page:f-3}}; reviews, merges and history, page {{page:f-5}}.</div>
+
 <!-- source: docs/features.md at v1.0 (64831f7) -->
 
 ## Features
@@ -368,20 +392,20 @@ Auth implementation review: [https://github.com/phittayanan/habit-tracker/pull/3
 
 | BR | FR | Feature | AC | Test ID | Sprint | Issue / PR |
 |---|---|---|---|---|---|---|
-| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/54) |
+| none | FR-01 | F-01 | AC-01.1 to AC-01.3, AC-01.9, AC-01.10 | TC-01, TC-02, TC-46, TC-62, TC-64, TC-65 | 1 | #30, #32, #9, [build PR #34](https://github.com/phittayanan/habit-tracker/pull/34) |
+| none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9, [build PR #34](https://github.com/phittayanan/habit-tracker/pull/34) |
+| none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9, [build PR #34](https://github.com/phittayanan/habit-tracker/pull/34) |
+| none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [build PR #34](https://github.com/phittayanan/habit-tracker/pull/34) |
+| BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #36, #9, [build PR #37](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #36, #9, [build PR #37](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #53, #9, [build PR #54](https://github.com/phittayanan/habit-tracker/pull/54) |
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
-| BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.10 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | 1 | #28, #38, #40, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
-| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.12 | TC-23 to TC-30, TC-56, TC-58, TC-61 | 1 | #28, #38, #42, #9 |
-| BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.8 | TC-31, TC-32, TC-59 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
-| BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
-| BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
+| BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [build PR #37](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.10 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | 1 | #28, #38, #40, #9, [build PR #41](https://github.com/phittayanan/habit-tracker/pull/41) |
+| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.12 | TC-23 to TC-30, TC-56, TC-58, TC-61 | 1 | #28, #38, #42, #9, [build PR #43](https://github.com/phittayanan/habit-tracker/pull/43) |
+| BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.8 | TC-31, TC-32, TC-59 | 1 | #28, #44, #9, [build PR #51](https://github.com/phittayanan/habit-tracker/pull/51) |
+| BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [build PR #51](https://github.com/phittayanan/habit-tracker/pull/51) |
+| BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [build PR #51](https://github.com/phittayanan/habit-tracker/pull/51) |
 | none | FR-15 | F-11 | later | TC-36 | 2 | none yet |
 | BR-15 | FR-16 | F-12 | later | TC-37 | 2 | none yet |
 | BR-11 | FR-17 | F-13 | later | TC-38 | 2 | none yet |
@@ -389,8 +413,8 @@ Auth implementation review: [https://github.com/phittayanan/habit-tracker/pull/3
 | none | FR-19 | F-15 | later | TC-40 | 2 | none yet |
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
-| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
+| none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [build PR #34](https://github.com/phittayanan/habit-tracker/pull/34) |
+| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #53, #9, [build PR #37](https://github.com/phittayanan/habit-tracker/pull/37) |
 
 
 ### NFR -> Feature -> Verification -> Test
@@ -411,7 +435,7 @@ Auth implementation review: [https://github.com/phittayanan/habit-tracker/pull/3
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
 - AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). The five system checks for NFR-05 to NFR-09 (TC-47, TC-48, TC-50, TC-51, TC-52) have AC-SYS.1 to AC-SYS.5 in `docs/sprints/sprint-1/README.md` (Issue #8). Sprint 2 and 3 rows have none by design.
-- Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Template create and view checks have passed for Issue #36 on `5435e89`, including TC-47/48 on the template list and new form at 375px and 1280px. F-04 tests (TC-12, TC-13 with the edit-versus-goal race, TC-18, TC-71, TC-72, TC-73, and TC-47/48 on the edit form) pass locally for Issue #53 on `3d1ccbb`, and TC-08 now audits `PATCH /api/templates/:id`; teammate review is pending. The Sprint 2 retire refusal (TC-19) remains planned. TC-08 independently discovers implemented API routes from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Issue #36 adds `GET /api/templates` and `POST /api/templates` to that coverage. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
+- All Sprint 1 tests are built and pass on the release `v1.0` (Part F, page {{page:f-3}}); every build PR was reviewed and merged (Part F, page {{page:f-5}}). The Sprint 2 retire refusal (TC-19) remains planned.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.
@@ -756,6 +780,8 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 
 ### 8. Key Design Decisions
 
+*8.1 (the decisions this design rests on) is not printed; the decisions are in Part A, page {{page:design-decisions}}.*
+
 #### 8.2 Open points and answers
 
 - S-1 Folder layout: Decided: the kit's layout (`client/`, `server/`)
@@ -778,11 +804,13 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 
 # Part D. Three-sprint plan {#part-d}
 
+<div class="note">Status words in this part (draft, pending, open, planned, not built yet) show the state on the day each document was written, before the Sprint 1 build. The released state is in Part F: release, page {{page:f-1}}; test results, page {{page:f-3}}; reviews, merges and history, page {{page:f-5}}.</div>
+
 <!-- source: docs/sprints/plan.md at v1.0 (64831f7) -->
 
 ## Sprint Plan
 
-Part D of Deliverable 1 (Issue #7). The plan splits the product baseline across the three course sprints. It is built from merged documents only: the sprint column of `docs/features.md`, the FR sprints and A-3 in `docs/srs.md`, the planned tests in `docs/traceability.md`, `docs/system-sds.md` and the ADRs. It adds no feature, requirement or scope. The handout asks for each sprint's goal, feature IDs, dependencies and completion outcome, covering the whole baseline between them (`docs/assignment.md` 4.3, Part D), and for the scope of Sprint 1 (rubric, 4.1). Who does which Issue is not set here (ADR 0036 gives each Issue one assignee). Points the documents do not settle are in "Open points"; the answers from review round 1 are in "Decisions from review round 1".
+Part D of Deliverable 1 (Issue #7). The plan splits the product baseline across the three course sprints. It is built from merged documents only: the sprint column of `docs/features.md`, the FR sprints and A-3 in `docs/srs.md`, the planned tests in `docs/traceability.md`, `docs/system-sds.md` and the ADRs. It adds no feature, requirement or scope. The handout asks for each sprint's goal, feature IDs, dependencies and completion outcome, covering the whole baseline between them (D1 §3, Part D), and for the scope of Sprint 1 (rubric, 4.1). Who does which Issue is not set here (ADR 0036 gives each Issue one assignee). Points the documents do not settle are in "Open points"; the answers from review round 1 are in "Decisions from review round 1".
 
 ### Goals
 
@@ -790,23 +818,23 @@ Part D of Deliverable 1 (Issue #7). The plan splits the product baseline across 
 |---|---|---|
 | 1 | The handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Login, logout, two roles and backend permissions come with it. | ADR 0020; SRS 1.2 |
 | 2 | Goal changes and history: template retire, the month calendar with its side panel and colours, entry edit and delete, goal change, and the Calendar and List switch. | ADR 0021; SRS A-3 |
-| 3 | Streaks and the stored reminder. Hardening, regression tests and defect fixes round it off. | ADR 0021; GWS §7 (`docs/assignment.md` 3.4) |
+| 3 | Streaks and the stored reminder. Hardening, regression tests and defect fixes round it off. | ADR 0021; GWS §7 |
 
 ### Sprint Schedule
 
 | Sprint | Due | What the handout says is due | Source |
 |---|---|---|---|
-| 1 | 8 Nov 2026 | A small working increment on `main`: authentication, permissions and persistence, with a normal workflow, a business-rule rejection and access restrictions, all with tests. It runs locally from documented setup. | `docs/assignment.md` 3.4, 4.2 |
-| 2 | 29 Nov 2026 | An integrated, tested increment of the major remaining workflows. Sprint 3 contracts, working progress and a remaining-work list are also due this day. | `docs/assignment.md` 3.4, 5.2 |
-| 3 | 13 Dec 2026 | Remaining features, integration, failure handling, usability, authorization, regression tests and defect fixes. Released. | `docs/assignment.md` 3.4 |
+| 1 | 8 Nov 2026 (LEB2: 15 Nov 2026) | A small working increment on `main`: authentication, permissions and persistence, with a normal workflow, a business-rule rejection and access restrictions, all with tests. It runs locally from documented setup. | GWS §7, D1 §2 |
+| 2 | 29 Nov 2026 | An integrated, tested increment of the major remaining workflows. Sprint 3 contracts, working progress and a remaining-work list are also due this day. | GWS §7, D2 §2 |
+| 3 | 13 Dec 2026 | Remaining features, integration, failure handling, usability, authorization, regression tests and defect fixes. Released. | GWS §7 |
 
 The team keeps one `staging` for all sprints and asks the TA to confirm (SRS T-1; PR #26 review, O-5).
 
 ### Scope per Sprint
 
-Feature IDs and FR/BR/NFR links come from `docs/features.md`. Test IDs (`TC-nn`) come from `docs/traceability.md`; they are provisional names and no test is written or run yet.
+Feature IDs and FR/BR/NFR links come from `docs/features.md`. Test IDs (`TC-nn`) come from `docs/traceability.md`; they were provisional names when this plan was written; the Sprint 1 tests now exist and their results are in Part F, page {{page:f-3}}.
 
-#### Sprint 1 (due 8 Nov 2026)
+#### Sprint 1 (due 8 Nov 2026; LEB2: 15 Nov 2026)
 
 **Goal.** See Goals above.
 
@@ -826,12 +854,12 @@ The rows run in build order, taken from the Depends-on column. F-04 follows F-07
 
 **Sprint 1 scope.**
 - In: the nine features above, plus NFR-05 to NFR-09 as they apply to the Sprint 1 screens and the local setup (features, cross-cutting table). Sprint 1 has a plain goals page and no calendar (SRS A-3, SDS 4.1).
-- Out of Sprint 1: the Retire control and FR-08 (features O-4, decided by the owner on 2026-11-07), entry edit and delete (FR-17), so a wrong same-day entry cannot be fixed yet (SRS A-11), Docker, CI and GCP (Lab 5, not D1; `docs/assignment.md` 4.2).
+- Out of Sprint 1: the Retire control and FR-08 (features O-4, decided by the owner on 2026-11-07), entry edit and delete (FR-17), so a wrong same-day entry cannot be fixed yet (SRS A-11), Docker, CI and GCP (Lab 5, not D1; D1 §2).
 - Out of the project: the exclusions in SRS 1.3 and ADR 0004.
 
 **Tests planned.** TC-01 to TC-13, TC-16 to TC-18, TC-20 to TC-35, TC-44 to TC-48, TC-50 to TC-52, TC-53 to TC-61, TC-62 to TC-73 and TC-74 (NFR-07 documented, NFR-09 run locally; TC-53 to TC-61 were added by the F-07 to F-10 contracts, Issue #28, TC-62 to TC-73 by the F-01 to F-04 and F-06 contracts, Issue #30, and TC-74 by the F-07 revision, Issue #38). TC-08 grows with each implemented protected endpoint; TC-18 belongs to F-04 after F-07, rather than F-06, so the build order has no edit/goal dependency cycle. The negative and boundary cases include TC-02, TC-05, TC-06, TC-10, TC-13, TC-17, TC-18, TC-21, TC-24 to TC-30, TC-33 and TC-34. AC are written in each feature's contract (Part E, `docs/sprints/sprint-1/`), and the AC column of the traceability matrix lists them.
 
-**Completion outcome.** The increment the handout requires is on `main` with documented local setup (`docs/assignment.md` 4.2):
+**Completion outcome.** The increment the handout requires is on `main` with documented local setup (D1 §2):
 - a full journey through the UI, the API and the database: a Manager creates a template, a Participant sets a goal, records an entry and reads the saved progress;
 - login, logout and current-user identity for the two roles;
 - a business-rule rejection (for example a future-dated entry or a second entry for a day) and a forbidden operation (a Participant creating a template, or one Participant reading another's goals), both refused by the backend;
@@ -867,9 +895,9 @@ All dependencies are Sprint 1 features or earlier Sprint 2 features, so Sprint 2
 
 **Data change.** Goal versions: each change of the daily target becomes a new row with an effective-from date, and the Sprint 1 `daily_target` column moves to the version rows (SDS 3.5, ADR 0011).
 
-**Tests planned.** TC-14, TC-15, TC-19 (F-05), TC-36 (F-11), TC-37 (F-12), TC-38 (F-13), TC-39 (F-14), TC-40 (F-15), TC-49 (non-colour signal on the calendar). NFR-05 and NFR-06 are checked on the new screens, and NFR-02 and NFR-03 are rechecked on each new endpoint (SRS 5.1). Feature contracts with AC and test IDs are written before each feature is built (`docs/assignment.md` 3.5).
+**Tests planned.** TC-14, TC-15, TC-19 (F-05), TC-36 (F-11), TC-37 (F-12), TC-38 (F-13), TC-39 (F-14), TC-40 (F-15), TC-49 (non-colour signal on the calendar). NFR-05 and NFR-06 are checked on the new screens, and NFR-02 and NFR-03 are rechecked on each new endpoint (SRS 5.1). Feature contracts with AC and test IDs are written before each feature is built (GWS §8).
 
-**Completion outcome.** All six Sprint 2 features are implemented, reviewed, integrated and verified against their contracts, with Sprint 1 behavior, login, backend permissions and record ownership still working (`docs/assignment.md` 5.2). The Participant's first screen is the month calendar. The Sprint 2 release is on `main`. By the same date the Sprint 3 contracts, working progress on at least one Sprint 3 workflow or rule, and a remaining-work list are due (`docs/assignment.md` 5.2).
+**Completion outcome.** All six Sprint 2 features are implemented, reviewed, integrated and verified against their contracts, with Sprint 1 behavior, login, backend permissions and record ownership still working (D2 §2). The Participant's first screen is the month calendar. The Sprint 2 release is on `main`. By the same date the Sprint 3 contracts, working progress on at least one Sprint 3 workflow or rule, and a remaining-work list are due (D2 §2).
 
 #### Sprint 3 (due 13 Dec 2026)
 
@@ -882,11 +910,11 @@ All dependencies are Sprint 1 features or earlier Sprint 2 features, so Sprint 2
 
 F-16 needs F-13 (Sprint 2) because a streak is computed from entries after any edit or delete. F-17 depends only on F-07 and could start earlier. ADR 0021 names it as the small item done before 29 Nov.
 
-**Also in Sprint 3.** NFR-08 hardening (SRS 5.1), the NFR rechecks in SRS 5.1, and the handout's remaining Sprint 3 work: integration, failure handling, usability, authorization, regression tests and defect fixes (`docs/assignment.md` 3.4). None of these has a feature ID; they stay a note, with a tracking Issue in Sprint 3 (O-2 below).
+**Also in Sprint 3.** NFR-08 hardening (SRS 5.1), the NFR rechecks in SRS 5.1, and the handout's remaining Sprint 3 work: integration, failure handling, usability, authorization, regression tests and defect fixes (GWS §7). None of these has a feature ID; they stay a note, with a tracking Issue in Sprint 3 (O-2 below).
 
 **Tests planned.** TC-41, TC-42 (F-16), TC-43 (F-17).
 
-**Completion outcome.** Both features are implemented and verified against their contracts, all baseline features of the three sprints are complete, and the final release is on `main` (`docs/assignment.md` 3.4, 6.2).
+**Completion outcome.** Both features are implemented and verified against their contracts, all baseline features of the three sprints are complete, and the final release is on `main` (GWS §7, FD §2).
 
 #### Coverage check
 
@@ -901,6 +929,8 @@ That is 17 features and FR-01 to FR-23, each in one sprint, matching the sprint 
 The plan's risks, the decisions from its review round 1 and its open points O-1 to O-6 are in `docs/sprints/plan.md` in the repository.
 
 # Part E. Sprint 1 engineering contracts {#part-e}
+
+<div class="note">Status words in this part (draft, pending, open, planned, not built yet) show the state on the day each document was written, before the Sprint 1 build. The released state is in Part F: release, page {{page:f-1}}; test results, page {{page:f-3}}; reviews, merges and history, page {{page:f-5}}.</div>
 
 <!-- source: docs/sprints/sprint-1/README.md at v1.0 (64831f7) -->
 
@@ -938,7 +968,7 @@ Test specification of the system checks:
 
 Each contract's section 13 is its revision history.
 
-### Definition of Done
+### Definition of Done {#product-dod}
 
 The Product Definition of Done comes from handout D1 §3.5 and GWS §8.2. Each line says what shows it is true. Completion is shown by evidence from commands that were run, not by a statement of an AI agent.
 
@@ -1096,6 +1126,8 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | TC-46 | AC-01.1 | API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
 | TC-65 | AC-01.10 | Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens. Log out: the login screen. Manager: the Manager's first page |
 
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
+
 ### 12. Open points and decisions
 
 | ID | Point | Status and answer |
@@ -1233,6 +1265,8 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 | TC-08 | AC-02.2 | API | F-02: auth routes and the test-only Manager route; later: fixtures required by each implemented feature route | Table-driven over the implemented protected routes in section 5 plus the test-only route: call each with no cookie, then as the wrong role where restricted, with a valid body | Every no-session call gets `401 UNAUTHENTICATED`; every wrong-role call gets `403 FORBIDDEN`; no protected handler runs and no data changes. Start with F-01 routes and the test-only route; each feature PR adds its routes until every protected row in section 5 is covered |
 | TC-66 | AC-02.3, AC-02.4 | API | Test-only Manager route registered as above; id 1 exists, 99999 does not; validator, existence check and handler are spies | Anonymous `POST /api/test/manager/1`; as A: POST id 1 with `{}`; POST id 99999; POST id 1 with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; validator, existence check and handler never run; no data changes |
 | TC-67 | AC-02.5 | Browser | App on the test database; A exists; test-only protected page registered as above | Open `/test/protected` with no session; log in as A and open that page; delete A's session row in the test database; reload the page | The first visit shows the login screen; after the reload `GET /api/auth/me` answers `401 UNAUTHENTICATED` and the login screen is shown |
+
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
 ### 12. Open points and decisions
 
@@ -1373,6 +1407,8 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-69 | AC-03.4 | API | Template "Walk" (min 0, max 100) exists | `POST` "Walk" with min 0 max 50; `POST` "Walk" with min 5 max 5; two `POST` "Swim" at the same time | First: `409 TEMPLATE_NAME_EXISTS`. Second: `400 MIN_NOT_BELOW_MAX`. "Swim": one 201 and one `409 TEMPLATE_NAME_EXISTS`. One "Walk" and one "Swim" row |
 | TC-11 | AC-03.6 | Browser | Manager; no templates at first. Then templates "Sleep" (active) and "Steps" (set to `RETIRED` directly in the test database, since retire is Sprint 2) | Open the template page before and after the templates exist | Before: "No templates yet" and "New". After: two rows with name, unit, range and the words "Active" and "Retired"; "New" above, "Edit" on each row; no "Retire" anywhere |
 | TC-70 | AC-03.7 | Browser | Manager logged in; no templates | Open "New"; enter "Stretching", "minutes", 10, 5 and Save; change the minimum to 0 and Save | First Save: the message "Minimum must be below maximum." and the typed values stay. Second: the table shows "Stretching" |
+
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
 ### 12. Open points and decisions
 
@@ -1521,6 +1557,8 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-73 | AC-04.6 | Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
 | TC-18 | AC-04.7 | API | A logged in; template "Sleep" (hours, 0 to 24); no template with id 99999 | As A: `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH /api/templates/99999` `{ "unit": "x" }` | Both get `403 FORBIDDEN`; "Sleep" still has max 24 |
 
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
+
 ### 12. Open points and decisions
 
 | ID | Point | Status and answer |
@@ -1642,6 +1680,8 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 |---|---|---|---|---|---|
 | TC-16 | AC-06.1, AC-06.2 | API and browser | Active templates "Sleep" (hours, 0 to 24) and "Reading" (pages, 0 to 500); template "Steps" set to `RETIRED` | As A: `GET /api/templates`; open the templates page. Then, with no templates at all, open the page again | The API returns "Reading" and "Sleep" with their units and ranges, and not "Steps". The page shows the same two rows and no New, Edit or Retire control. With no templates: "No templates yet" and no New button |
 | TC-17 | AC-06.3 | API | A logged in; template count known | As A: `POST /api/templates` with a valid body (`"Yoga"`, minutes, 0 to 120); with `{ "name": "" }`; with `{}` | Each gets `403 FORBIDDEN`; the template count is unchanged; no "Yoga" row |
+
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
 
 ### 12. Open points and decisions
 
@@ -1798,6 +1838,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-60 | AC-07.9 | Browser | A logged in; T exists | Open the form, submit a valid goal, then submit a second goal on T | The first goal appears; the second shows the API message and keeps the typed values |
 | TC-74 | AC-07.10 | API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
 
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
+
 ### 12. Open points and decisions
 
 | ID | Point | Status and answer |
@@ -1821,7 +1863,6 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): codes in TC-53, active B goal in TC-55, test dates relative to the Bangkok today, S-16 note and OP-07.6, unknown fields stripped (OP-07.7), decimal scale (OP-07.8), order of the goals list, decisions Q4, Q6, Q7 recorded | pending (partner re-check) |
 | 2026-11-08 | Revision for Issue #38 (before the code is built): template row lock in goal creation (AC-07.10, TC-74, OP-07.10, OP-07.11); `dailyTarget` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR` (sections 3, 4, 8, AC-07.6, TC-53, TC-54, OP-07.8); validation wins over `TARGET_ABOVE_TEMPLATE_MAX` ; review round 1: validation rows before rule rows with a combined case in TC-54, OP-07.11 allows both serial orders | pending (partner review of the Issue #38 PR) |
-
 | 2026-11-08 | Issue #40 implementation evidence: owner-confirmed existing API behaviors, Goal tests-first history, local validation and remaining human review recorded in section 14 of the contract file in the repository; requirements unchanged | phittayanan (owner-only implementation authorization); teammate implementation review pending |
 | 2026-11-10 | Issue #56: recorded projectnewy's acceptance of OP-07.3, OP-07.4, OP-07.6 and the ownership change (section 12, and section 14 of the contract file in the repository); behaviour and requirements unchanged | projectnewy accepted on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
 
@@ -1961,6 +2002,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-58 | AC-08.1 | API and database | A's goal G; entry saved | Restart the app (new process and connection); `GET /api/goals/:id/entries` | The same entry is returned (data survives a restart) |
 | TC-61 | AC-08.10 | Browser | A logged in on the goals page | Type 30 (above max 24) and Save; then a valid value | The first shows the API message and keeps 30; the second saves |
 
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
+
 ### 12. Open points and decisions
 
 | ID | Point | Status and answer |
@@ -2089,6 +2132,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | TC-32 | AC-09.7 | Browser | A logged in; goal from `D-9` to `D+20`, target 30, with entries `D-9` value 30, `D-8` value 29.9, `D-6` value 45 (seeded relative to `D`) | Open the goals page | The page shows "2 of 10 days met" for that goal |
 | TC-59 | AC-09.6, AC-09.7, AC-09.8 | Browser and API | Seeded Manager, Participants A and B; no template named "Sleep"; A has no goal | Journey: the Manager logs in and creates the template "Sleep" through the UI; A logs in and creates a goal starting `D` on it; A reads the goals page ("0 of 1 days met"); A records a value that meets the target for `D`; A reads the page again ("1 of 1 days met"); restart the app; read again. Also call `GET /api/goals` as Manager and with no session | The page shows "0 of 1", then "1 of 1", and "1 of 1" after the restart; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED` |
 
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
+
 ### 12. Open points and decisions
 
 | ID | Point | Status and answer |
@@ -2202,6 +2247,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok, and t
 | TC-35 | AC-10.7 | API and browser | A and B each with a goal and entries | Open the goals page as A, then as B | Each page lists only that Participant's goals, entries and progress |
 | TC-57 | AC-10.5 | API | A's goal GA; no goal with id 99999 | As B: `GET /api/goals/GA/entries` and `GET /api/goals/99999/entries` | Both give `404 GOAL_NOT_FOUND` with identical status and body |
 
+*Section 11 (the feature's Definition of Done) is not printed; the Product Definition of Done applies, page {{page:product-dod}}.*
+
 ### 12. Open points and decisions
 
 | ID | Point | Status and answer |
@@ -2230,7 +2277,7 @@ This part holds the execution evidence for the Sprint 1 release `v1.0` (commit `
 |---|---|
 | Release tag | `v1.0`, annotated, "v1.0: Sprint 1 release", 2026-11-10 13:35 +07 |
 | Release commit | `64831f7`, merge of PR #61 (`staging` → `main`), merged by projectnewy on 2026-11-10 13:31 +07 |
-| Release PR | https://github.com/phittayanan/habit-tracker/pull/61, author phittayanan, approved by projectnewy (review text in F.5) |
+| Release PR | https://github.com/phittayanan/habit-tracker/pull/61, author phittayanan, approved by projectnewy. The approval itself has no text; projectnewy's review of the release is a PR comment, quoted in F.5 |
 | Sprint integration branch | `staging` (one branch for all sprints, ADR 0001) |
 | Later commits | Work after the release goes to `staging` only; `main` and the tag `v1.0` stay on `64831f7` |
 
@@ -2274,7 +2321,7 @@ The data is synthetic. The seed creates `manager1` (Manager), `participant1` and
 
 All figures in this section come from one run of the release build: `v1.0` (`64831f7`) built with `npm run build`, started with `node dist/index.js` on a fresh PostgreSQL database that was migrated and seeded with `SEED_DEMO_DATA=true`. A headless Playwright Chromium script drove the screens on 2026-11-10 and saved each screenshot. There is no exception to the release commit. The date box shows the date in the machine's day/month/year format; the stored value is the ISO date shown in the entry list.
 
-### Scenario 1: normal journey and retrieval of the saved result
+### Scenario 1: normal journey and retrieval of the saved result {#scenario-1}
 
 
 <figure><img src="img/f04-template-created.png" style="width:50%"><figcaption>Figure 1. F-03 (AC-03.1, FR-05): Manager; steps: New, name Meditation, unit minutes, minimum 0, maximum 120, Save; expected: 201 and the new template is listed as Active; actual: Meditation 0 to 120 minutes is listed.</figcaption></figure>
@@ -2286,14 +2333,14 @@ All figures in this section come from one run of the release build: `v1.0` (`648
 
 <figure><img src="img/f09-after-restart.png" style="width:50%"><figcaption>Figure 4. F-08, F-09 (AC-08.1, AC-09.6): Participant; the app process was stopped and started again (new process, new database connection), then the page reloaded; expected: goal, entry and progress are read back from PostgreSQL; actual: "1 of 1 days met" and "2026-11-10: 20 minutes" are shown.</figcaption></figure>
 
-### Scenario 2: business-rule rejections
+### Scenario 2: business-rule rejections {#scenario-2}
 
 
 <figure><img src="img/f08-entry-duplicate-rejected.png" style="width:50%"><figcaption>Figure 5. F-08, BR-04 (AC-08.7, AC-08.10): Participant; an entry for 2026-11-10 already exists (Figure 3); steps: value 25 for the same day, Save entry; expected: 409 ENTRY_ALREADY_EXISTS, the stored entry stays 20; actual: "An entry already exists for this day.", the list still shows 20 minutes, the typed 25 is kept.</figcaption></figure>
 
 In the same run, a value of 500 dated 2026-11-09 (before the goal starts) was refused with "The date must be inside the goal start and end dates." (BR-01, AC-08.3); the date check runs before the value range check, as the F-08 contract orders them.
 
-### Scenario 3: login, logout and forbidden operations
+### Scenario 3: login, logout and forbidden operations {#scenario-3}
 
 <figure><img src="img/f01-login-rejected.png" style="width:45%"><figcaption>Figure 6. F-01 (AC-01.2, AC-01.10): anonymous; steps: username manager1 with a wrong password, Log in; expected: one generic error, username kept, password cleared, no session; actual: "Username or password is incorrect.", username kept, password empty.</figcaption></figure>
 
@@ -2303,7 +2350,7 @@ In the same run, a value of 500 dated 2026-11-09 (before the goal starts) was re
 
 <figure><img src="img/f12-participant2-own-only.png" style="width:50%"><figcaption>Figure 9. F-10 (AC-10.7, BR-10): Participant participant2; participant1 owns the Meditation goal; steps: log in as participant2; expected: participant1's goal, entry and progress are not shown; actual: "No goals yet".</figcaption></figure>
 
-### Backend evidence for the protected operations
+### Backend evidence for the protected operations {#api-evidence}
 
 Same run, right after Figure 9. The requests used the real session cookies of the browser run (`participant2`, a new `manager1` login, and the two cookies that were logged out). Cookie values are not printed. Goal 1 is participant1's Meditation goal; template 4 is Meditation.
 
@@ -2367,7 +2414,21 @@ End of the server run and of browser run 2:
   44 passed (1.5m)
 ```
 
-### Acceptance criteria to test results
+### Business rules and their unit tests
+
+From the test files at `v1.0`; all passed in the server run above.
+
+| BR | Rule | Unit test (file: test) | Note |
+|---|---|---|---|
+| BR-01 | Entry date today or earlier, inside the goal | `entry-rules.test.js`: TC-24 / TC-25 / TC-26 | |
+| BR-02 | A day is a date in Asia/Bangkok | `entry-rules.test.js`: TC-27 | |
+| BR-03 | Value inside the template range; minimum below maximum | `entry-rules.test.js`: TC-28; `template.test.js`: TC-10 (the range rule) | |
+| BR-04 | One entry per goal per day | none | Checked by the API test TC-29 and the database unique-constraint test in `entry.test.js` |
+| BR-05 | One active goal per template | `goal-rules.test.js`: Goal unit BR-05/BR-06 and target maximum | |
+| BR-06 | Goal state from dates | `goal-rules.test.js`: Goal unit BR-05/BR-06; `goal.test.js`: TC-22 | |
+| BR-07 | Progress is days met | `progress-rules.test.js`: four TC-31 tests | |
+
+### Acceptance criteria to test results {#ac-table}
 
 Every Sprint 1 AC from Part E with its planned test (STS), the actual test files and test labels, and the result in the runs above. "Automated" tests ran in the suites above. AC-SYS.3 is a manual check and was not run. AC-SYS.4 and AC-SYS.5 are command checks. A count such as "pass (6/6)" is the number of actual tests listed in that row.
 
@@ -2439,7 +2500,7 @@ Every Sprint 1 AC from Part E with its planned test (STS), the actual test files
 | AC-SYS.1 | TC-47 | `auth.spec.js` TC-47 / TC-48; `entries.spec.js` TC-47 / TC-48; `goals.spec.js` TC-47 / TC-48; `templates.spec.js` TC-47 / TC-48 | automated browser | pass (5/5); goals TC-47/48 failed once at 1280 px in run 1 |
 | AC-SYS.2 | TC-48 | `auth.spec.js` TC-47 / TC-48; `entries.spec.js` TC-47 / TC-48; `goals.spec.js` TC-47 / TC-48; `templates.spec.js` TC-47 / TC-48 | automated browser | pass (5/5); goals TC-47/48 failed once at 1280 px in run 1 |
 | AC-SYS.3 | TC-50 | manual, timed clean clone | manual | Not run in Sprint 1 (timed run is in Lab 5). The README commands were followed on an existing clone for this report (Part F, setup). |
-| AC-SYS.4 | TC-51 | coverage report | command | Measured: `node --experimental-test-coverage` over the whole server suite: entry-rules.js, goal-rules.js and progress-rules.js 100% lines; template.js 96.85% lines. A unit-only run and a per-BR check were not made. |
+| AC-SYS.4 | TC-51 | coverage report | command | Measured: `node --experimental-test-coverage` over the whole server suite: entry-rules.js, goal-rules.js and progress-rules.js 100% lines; template.js 96.85% lines. A unit-only coverage run was not made; BR-04 has no unit test (list above). |
 | AC-SYS.5 | TC-52 | local run (CI from Lab 5) | command | Server suite exit 0 (79/79). Client suite run 1: 43 passed, 1 failed; run 2: 44 passed, exit 0. |
 
 ## F.4 Test excerpts and red/green history {#f-4}
@@ -2496,7 +2557,20 @@ test('TC-18: a participant edit is forbidden for an existing and an unknown id, 
 
 ## F.5 Engineering workflow and history {#f-5}
 
-### Two Issue → PR chains
+### Build Issues, branches and PRs
+
+| Build Issue | Features | Contract PR | Branch (from `staging`) | Build PR | Author → reviewer | Merged into `staging` |
+|---|---|---|---|---|---|---|
+| #32 | F-01, F-02 | #31 | `feat/32-habit-auth-build` | #34 | phittayanan → projectnewy | `6721633` |
+| #36 | F-03, F-06 | #31 | `feat/36-habit-template-build` | #37 | phittayanan → projectnewy | `5a70424` |
+| #40 | F-07 | #29, #39 | `feat/40-habit-goal-build` | #41 | phittayanan → projectnewy | `f06b491` |
+| #42 | F-08 | #29, #39 | `feat/42-daily-entry` | #43 | projectnewy → phittayanan | `a5a9266` |
+| #44 | F-09, F-10 | #29 | `feat/44-progress-privacy` | #51 | projectnewy → phittayanan | `c0b5c69` |
+| #53 | F-04 | #31 | `feat/53-habit-template-edit` | #54 | phittayanan → projectnewy | `54ac16e` |
+
+All six reached `main` through the release PR #61 (merge `64831f7`, tag `v1.0`).
+
+### Two Issue → PR chains {#chains}
 
 | | Chain 1: daily entry | Chain 2: template edit |
 |---|---|---|
@@ -2509,15 +2583,16 @@ test('TC-18: a participant edit is forbidden for an existing and an unknown id, 
 | Review | Round 1 "changes requested" (2026-11-09 06:28 +07): ownership-before-validation not tested; TC-27 tested a helper the app never calls. Round 2 approved (2026-11-10 00:03 +07) after checking each fix by breaking the code (Figure 10) | Review comment (2026-11-10 12:06 +07): check order, row lock, stripped fields, Windows run 79/79 server, mutations that make TC-13 fail, OP-04.9 decision; approval 12:07 +07 |
 | Into `staging` | merge commit `a5a9266`, 2026-11-10 00:08 +07, merged by phittayanan | merge commit `54ac16e`, 2026-11-10 12:07 +07, merged by projectnewy |
 | Into `main` | release PR #61, merge `64831f7`, tag `v1.0` | release PR #61, merge `64831f7`, tag `v1.0` |
+| Release review (PR #61) | projectnewy's PR comment before approving, 2026-11-10 13:30 +07: "The candidate `03e039e` is the current `origin/staging` (the merge of #60), so no commit was added after the test run." "Secrets: no `.env` file is tracked (only `server/.env.example` with placeholders) …" "Board: every Sprint 1 card is Done except #10." "No blocking findings." | same release review |
 | Board | Issue #42 Done | Issue #53 Done |
 
 <figure><img src="img/f-pr43-review.png" style="width:60%"><figcaption>Figure 10. PR #43 (F-08), phittayanan's approving re-review: each requested change was checked by moving the code back and watching the test fail. Public page, captured logged out on 2026-11-10.</figcaption></figure>
 
 
 
-<figure><img src="img/f-board-deliverable1.png"><figcaption>Figure 11. Project board "habit-tracker board", view "Deliverable 1" (filter milestone "Deliverable 1", 23 items), captured logged out on 2026-11-10 after the release: Done 22, Backlog 1 (Issue #11, this PDF and its submission). The Done column continues below the visible part.</figcaption></figure>
+<figure><img src="img/f-board-backlog.png" style="width:44%;vertical-align:top"> <img src="img/f-board-done.png" style="width:44%;vertical-align:top"><figcaption>Figure 11. Project board "habit-tracker board", view "Deliverable 1" (filter milestone "Deliverable 1", 23 items), captured logged out on 2026-11-10 after the release and cropped to two columns: Backlog 1 (Issue #11, this PDF and its submission) and Done 22. The Done column continues below the part shown.</figcaption></figure>
 
-### History sequence: contract and tests before implementation
+### History sequence: contract and tests before implementation {#history}
 
 Commit dates are author dates (+07). "Merged" is when the PR reached `staging`.
 
@@ -2567,7 +2642,7 @@ Short form of `docs/ai-use.md` at `v1.0`; that file has one line per Issue.
 | Claude Code (Claude Sonnet 5.5) | Drafted `docs/assignment.md`, the design questions, the ADRs from the students' answers, the SRS, features, traceability, SDS, sprint plan, the nine contracts and the Part E overview; implemented F-08 (Issue #42), F-09 and F-10 tests (Issue #44) and F-04 (Issue #53) tests-first; README updates. Open points were listed for the students, not decided by the AI | Design decisions are the students' answers on Issue #3, recorded as ADRs; points the documents did not settle were left as open points. Each PR was reviewed by the other student before merge (F.5); in PRs #43, #51 and #54 the reviewer broke the code to see the tests fail. For several documentation Issues the human-check line in `docs/ai-use.md` still says pending |
 | Codex (gpt-6.1-sol) | Implemented Auth F-01/F-02 (Issue #32) and Goal F-07 (Issue #40) tests-first | projectnewy reviewed PR #34 and PR #41 and requested fixes; phittayanan, the owner of both Issues, approved the behaviour and the UI package |
 | Cursor (Grok 4.7) | Implemented template create and view F-03/F-06 (Issue #36) tests-first | projectnewy reviewed PR #37 (read the code; did not run the suites) |
-| Claude Code (this PDF, Issue #11) | Assembled this PDF from the released documents, ran the build and tests, took the screenshots with a headless browser and wrote Part F | [human check of this PDF, to be recorded by the team before submission] |
+| Claude Code (this PDF, Issue #11) | Assembled this PDF from the released documents, ran the build and tests, took the screenshots with a headless browser and wrote Part F | DRAFT for phittayanan to confirm or change after reading the PDF: "phittayanan chose the outline, the cuts and the type of this PDF, read it on [date] and checked [which Parts and items]." Not yet confirmed |
 
 No prompt transcripts are included. Automated results and AI statements do not count as review; the reviews are the PR texts shown in F.5.
 
@@ -2575,7 +2650,7 @@ No prompt transcripts are included. Automated results and AI statements do not c
 
 - Failed and skipped tests: no skipped test. One browser failure in run 1 (Goal TC-47/48 at 1280 px, F.3), passing in all 8 later runs. On Windows the Goal TC-47/48 keyboard test fails at both widths (README, PR #43); no Issue was opened.
 - Not run in Sprint 1: the timed clean-clone setup TC-50 (AC-SYS.3) is planned for Lab 5. CI on every PR (AC-SYS.5) starts in Lab 5; the suites were run locally. Docker and GCP deployment are Lab 5.
-- Coverage (AC-SYS.4): the coverage above was measured over the whole server suite, not the unit tests alone, and no separate check per BR-01 to BR-07 was made.
+- Coverage (AC-SYS.4): the coverage above was measured over the whole server suite, not the unit tests alone. BR-04 (one entry per day) has no unit test; API and database tests check it (F.3).
 - Features not in Sprint 1: template retire F-05 (FR-08) and the retire refusal TC-19 are Sprint 2. Entry edit and delete (FR-17) are Sprint 2, so a wrong same-day entry cannot be fixed yet (SRS A-11). The calendar, colours, streaks and reminders are Sprints 2 and 3.
 - Security limits: no limit on failed logins (OP-01.11). An unknown username runs a cost-10 dummy bcrypt comparison (ADR 0051), but response times are not guaranteed to be identical.
 - Open points: the open points listed in Parts A to E (A-x, T-x, S-x, OP-x) stay open where marked; the open points O-x of the features list and the sprint plan are in `docs/features.md` and `docs/sprints/plan.md` in the repository. Several contract revision rows still say "pending" because the files were not edited after their PR was approved.

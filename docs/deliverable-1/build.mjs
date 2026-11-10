@@ -1,9 +1,10 @@
 // Builds dist/deliverable-1.pdf from deliverable-1.md.
-// Every level-1 heading (Part) starts a new page; the font is Times New Roman, 12 pt or larger. Each Part is
-// rendered alone first to count its pages; the counts give the start page of every
-// section, which fills the table of contents and the {{pages:id}} / {{page:id}}
-// placeholders. The whole document is then rendered once with page numbers, and the
-// build fails if its page count differs from the sum of the section counts.
+// Each Part (level-1 heading) starts a new page; the font is Times New Roman, 12 pt or larger.
+// Page numbers: the contents lists every level-1 and level-2 heading as a link, and every
+// {{page:id}} / {{pages:id}} placeholder becomes a link to that heading. Chromium writes each
+// link target into the PDF as a named destination with its page, so the build renders the PDF,
+// reads the page of every target, fills the numbers and renders again until the numbers no
+// longer change. It fails if a referenced heading has no page or the numbers do not settle.
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -14,35 +15,28 @@ import { chromium } from 'playwright';
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, 'deliverable-1.md'), 'utf8').replace(/\r\n/g, '\n');
 const out = join(here, 'dist');
+const slug = t => t.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-// Split into sections at level-1 and level-2 headings outside code fences.
-const sections = [];
-let current = { id: 'front', title: '', level: 0, lines: [], aliases: [] };
+// Split into Parts at level-1 headings outside code fences; give every level-1 and level-2 heading an id.
+const parts = [];
+const headings = [];
+const ids = new Set();
+let current = { id: 'front', lines: [] };
 let fence = false;
 for (const line of source.split('\n')) {
   if (/^```/.test(line)) fence = !fence;
-  const h = !fence && /^(#{1}) (.*?)(?: \{#([\w-]+)\})?$/.exec(line);
-  if (h) {
-    const title = h[2].trim();
-    const id = h[3] || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const heading = `${h[1]} ${title} {#${id}}`;
-    // A level-2 heading right after its part heading stays on the part's first page.
-    const empty = current.level === 1 && current.lines.slice(1).every(l => !l.trim() || /^<!--.*-->$/.test(l.trim()));
-    if (h[1].length === 2 && empty) {
-      current.lines.push(heading);
-      current.aliases.push({ id, title, level: 2 });
-    } else {
-      sections.push(current);
-      current = { id, title, level: h[1].length, lines: [heading], aliases: [] };
-    }
-  } else current.lines.push(line);
+  const h = !fence && /^(#{1,6}) (.*?)(?: \{#([\w-]+)\})?$/.exec(line);
+  if (!h || (h[1].length > 2 && !h[3])) { current.lines.push(line); continue; }
+  const title = h[2].trim();
+  const id = h[3] || slug(title);
+  if (ids.has(id)) throw new Error(`Duplicate heading id: ${id}`);
+  ids.add(id);
+  const heading = `${h[1]} ${title} {#${id}}`;
+  if (h[1].length <= 2) headings.push({ id, title, level: h[1].length });
+  if (h[1].length === 1) { parts.push(current); current = { id, lines: [heading] }; }
+  else current.lines.push(heading);
 }
-sections.push(current);
-const ids = new Set();
-for (const s of sections) for (const x of [s, ...(s.aliases || [])]) {
-  if (ids.has(x.id)) throw new Error(`Duplicate section id: ${x.id}`);
-  ids.add(x.id);
-}
+parts.push(current);
 
 const marked = new Marked({ gfm: true });
 marked.use({
@@ -67,59 +61,86 @@ table { border-collapse: collapse; width: 100%; margin: 6pt 0 10pt; font-size: 1
 th, td { border: 0.5pt solid #999; padding: 2.5pt 4pt; vertical-align: top; text-align: left; overflow-wrap: break-word; }
 th { background: #eee; }
 tr { break-inside: avoid; }
-code { font-family: "Times New Roman", Times, serif; font-size: 12pt; overflow-wrap: break-word; }
+code { font-family: "Times New Roman", Times, serif; font-size: 12pt; }
+td code, th code { overflow-wrap: normal; }
 pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12pt; }
 pre code { font-family: "Courier New", Courier, monospace; font-size: 12pt; }
-td code, th code, td a, th a { overflow-wrap: anywhere; }
+td a, th a { overflow-wrap: anywhere; }
+a.page { color: inherit; text-decoration: none; }
 img { max-width: 100%; box-sizing: border-box; border: 0.5pt solid #bbb; }
 figure { margin: 8pt 0 12pt; break-inside: avoid; }
 figcaption { font-size: 12pt; margin-top: 3pt; }
-.section + .section { break-before: page; }
+.part + .part { break-before: page; }
+.toc a { color: inherit; text-decoration: none; }
 .toc td:last-child, .toc th:last-child { text-align: right; width: 4em; }
 #navigation ~ table td:nth-child(2), #navigation ~ table th:nth-child(2) { white-space: nowrap; }
 .id { white-space: nowrap; }
+.note { border: 1pt solid #888; padding: 6pt 8pt; margin: 0 0 12pt; }
 blockquote { margin: 6pt 0; padding-left: 8pt; border-left: 2pt solid #bbb; color: #333; }
 `;
 const footer = '<div style="width:100%;font-family:Times New Roman,serif;font-size:12pt;text-align:center;color:#555"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
-function html(bodies) {
-  return `<!doctype html><html><head><meta charset="utf-8"><base href="${pathToFileURL(here + '/').href}"><style>${css}</style></head><body>${bodies.map(b => `<div class="section">${b}</div>`).join('\n')}</body></html>`;
-}
-
-function fill(text, pages, width) {
-  const pad = n => String(n).padStart(width, ' ');
-  return text
-    .replace(/\{\{page:([\w-]+)\}\}/g, (_, id) => pages ? String(pages.get(id).start) : pad(0))
-    .replace(/\{\{pages:([\w-]+)\}\}/g, (_, id) => {
-      if (!pages) return `${pad(0)}–${pad(0)}`;
-      const p = pages.get(id);
-      return p.start === p.end ? String(p.start) : `${p.start}–${p.end}`;
-    });
+function partRange(id, pages, total) {
+  const starts = headings.filter(h => h.level === 1).map(h => h.id);
+  const i = starts.indexOf(id);
+  const start = pages.get(id);
+  const end = i + 1 < starts.length ? pages.get(starts[i + 1]) - 1 : total;
+  return start === end ? String(start) : `${start}–${end}`;
 }
 
 function toc(pages) {
-  const rows = sections.flatMap(s => [s, ...s.aliases.map(a => ({ ...a, page: s.id }))]).filter(s => s.level > 0).map(s => {
-    const n = pages ? String(pages.get(s.page || s.id).start) : '000';
-    return `| ${s.level === 2 ? '&emsp;' : ''}${s.level === 1 ? `**${s.title}**` : s.title} | ${n} |`;
+  const rows = headings.map(h => {
+    const n = pages ? pages.get(h.id) : '000';
+    const label = h.level === 1 ? `**${h.title}**` : `&emsp;${h.title}`;
+    return `| [${label}](#${h.id}) | [${n}](#${h.id}) |`;
   });
   return `<div class="toc">\n\n| Section | Page |\n|---|---|\n${rows.join('\n')}\n\n</div>`;
 }
 
-function sectionHtml(s, pages) {
-  const md = fill(s.lines.join('\n'), pages, 3).replace('<!-- toc -->', () => toc(pages));
-  // Keep IDs such as AC-01.1 or TC-47 on one line.
-  return marked.parse(md).replace(/>([^<]+)</g, (_, text) => '>' + text.replace(/\b((?:AC|TC|FR|BR|NFR|OP|ADR|F|S|A|T|O)-[A-Z0-9]+(?:\.[0-9]+)*)/g, '<span class="id">$1</span>') + '<');
+function partHtml(part, pages, total) {
+  const md = part.lines.join('\n')
+    .replace('<!-- toc -->', () => toc(pages))
+    .replace(/\{\{page:([\w-]+)\}\}/g, (_, id) => `<a class="page" href="#${id}">${pages ? pages.get(id) : '000'}</a>`)
+    .replace(/\{\{pages:([\w-]+)\}\}/g, (_, id) => `<a class="page" href="#${id}">${pages ? partRange(id, pages, total) : '000–000'}</a>`);
+  return marked.parse(md)
+    // Keep IDs such as AC-01.1 or TC-47 on one line.
+    .replace(/>([^<]+)</g, (_, text) => '>' + text.replace(/\b((?:AC|TC|FR|BR|NFR|OP|ADR|F|S|A|T|O)-[A-Z0-9]+(?:\.[0-9]+)*)/g, '<span class="id">$1</span>') + '<')
+    // Let long codes and paths in code spans break only after "_" or "/".
+    .replace(/<code>([^<]*)<\/code>/g, (_, c) => `<code>${c.replace(/([_/])/g, '$1<wbr>')}</code>`);
 }
 
-const pageCount = pdf => (pdf.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) || []).length;
+// Page of every named destination, from the PDF bytes Chromium writes.
+function destinationPages(pdf) {
+  const s = pdf.toString('latin1');
+  const obj = n => {
+    const m = new RegExp(`(?:^|\\s)${n} 0 obj\\s*([\\s\\S]*?)endobj`).exec(s);
+    if (!m) throw new Error(`PDF object ${n} not found`);
+    return m[1];
+  };
+  const order = [];
+  const walk = n => {
+    const d = obj(n);
+    if (/\/Type\s*\/Pages\b/.test(d)) for (const k of /\/Kids\s*\[([^\]]*)\]/.exec(d)[1].matchAll(/(\d+) 0 R/g)) walk(k[1]);
+    else order.push(n);
+  };
+  const root = /\/Root (\d+) 0 R/.exec(s)[1];
+  walk(/\/Pages (\d+) 0 R/.exec(obj(root))[1]);
+  const pages = new Map();
+  const dests = /\/Dests (\d+) 0 R/.exec(s);
+  if (dests) for (const m of obj(dests[1]).matchAll(/\/([\w#-]+)\s*\[(\d+) 0 R/g)) {
+    pages.set(m[1].replace(/#([0-9a-fA-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16))), order.indexOf(m[2]) + 1);
+  }
+  return { pages, total: order.length };
+}
 
 mkdirSync(out, { recursive: true });
 const work = mkdtempSync(join(tmpdir(), 'd1-build-'));
 const browser = await chromium.launch();
 const page = await browser.newPage();
-async function render(bodies, path) {
+async function render(pages, total, path) {
   const file = join(work, 'page.html');
-  writeFileSync(file, html(bodies));
+  const body = parts.map(p => `<div class="part">${partHtml(p, pages, total)}</div>`).join('\n');
+  writeFileSync(file, `<!doctype html><html><head><meta charset="utf-8"><base href="${pathToFileURL(here + '/').href}"><style>${css}</style></head><body>${body}</body></html>`);
   await page.goto(pathToFileURL(file).href, { waitUntil: 'load' });
   await page.evaluate(() => Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; }))));
   const broken = await page.evaluate(() => [...document.images].filter(i => !i.naturalWidth).map(i => i.getAttribute('src')));
@@ -131,31 +152,21 @@ async function render(bodies, path) {
 }
 
 try {
-  // Pass 1: page count of each section, with placeholder numbers of the final width.
-  const counts = [];
-  for (const s of sections) counts.push(pageCount(await render([sectionHtml(s, null)])));
-  const starts = new Map();
-  let next = 1;
-  sections.forEach((s, i) => {
-    for (const x of [s, ...s.aliases]) starts.set(x.id, { start: next, end: next + counts[i] - 1 });
-    next += counts[i];
-  });
-  // A level-1 section's range runs to the end of its last level-2 section.
-  sections.forEach((s, i) => {
-    if (s.level !== 1) return;
-    let j = i + 1;
-    while (j < sections.length && sections[j].level === 2) j++;
-    starts.get(s.id).end = starts.get(sections[j - 1].id).end;
-  });
-  const expected = next - 1;
-  // Pass 2: the whole document with real numbers.
   const pdfPath = join(out, 'deliverable-1.pdf');
-  const total = pageCount(await render(sections.map(s => sectionHtml(s, starts)), pdfPath));
-  if (total !== expected) throw new Error(`Page count ${total} differs from the section sum ${expected}; page references would be wrong.`);
-  const front = counts[0];
-  if (pageCount(await render([sectionHtml(sections[0], starts)])) !== front) throw new Error('Front matter changed length after filling page numbers.');
+  const referenced = new Set([...headings.map(h => h.id), ...[...source.matchAll(/\{\{pages?:([\w-]+)\}\}/g)].map(m => m[1])]);
+  let pages = null;
+  let total = 0;
+  for (let round = 1; ; round++) {
+    const found = destinationPages(await render(pages, total, pdfPath));
+    const missing = [...referenced].filter(id => !found.pages.has(id));
+    if (missing.length) throw new Error(`No page found for: ${missing.join(', ')}`);
+    const same = pages && found.total === total && [...referenced].every(id => found.pages.get(id) === pages.get(id));
+    pages = found.pages; total = found.total;
+    if (same) break;
+    if (round === 5) throw new Error('Page numbers did not settle after 5 renders.');
+  }
   console.log(`${pdfPath}: ${total} pages`);
-  for (const s of sections.filter(s => s.level === 1)) console.log(`  ${s.title}: pages ${starts.get(s.id).start}–${starts.get(s.id).end}`);
+  for (const h of headings.filter(h => h.level === 1)) console.log(`  ${h.title}: pages ${partRange(h.id, pages, total)}`);
 } finally {
   await browser.close();
   rmSync(work, { recursive: true, force: true });
