@@ -67,8 +67,13 @@ pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: 
 pre code { font-family: "Courier New", Courier, monospace; font-size: 12pt; }
 td a, th a { overflow-wrap: anywhere; }
 a.page { color: inherit; text-decoration: none; }
-img { max-width: 100%; box-sizing: border-box; border: 0.5pt solid #bbb; }
-figure { margin: 8pt 0 12pt; break-inside: avoid; }
+img { max-width: 100%; box-sizing: border-box; border: 1px solid #999; }
+figure { margin: 8pt auto 12pt; break-inside: avoid; text-align: left; }
+figure > img { display: block; width: 100%; }
+figure .imgs { text-align: center; }
+p > img:only-child { display: block; margin: 0 auto; }
+.pair { display: flex; justify-content: center; align-items: flex-start; gap: 3%; break-inside: avoid; margin: 8pt 0 12pt; }
+.pair figure { width: 48%; margin: 0; }
 figcaption { font-size: 12pt; margin-top: 3pt; }
 table.cap { width: auto; margin: 3pt 0 0; }
 table.cap th, table.cap td { border: none; background: none; padding: 1pt 8pt 1pt 0; font-weight: normal; }
