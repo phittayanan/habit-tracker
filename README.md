@@ -12,7 +12,7 @@ Auth F-01/F-02 is implemented for Issue #32, and template create/view F-03/F-06 
 
 Use Node.js 22.16+ (or a newer supported release) and npm. Local verification so far used Node.js 26.8.1, npm 11.19.0 and PostgreSQL 16.15. Use a local PostgreSQL 16 instance; the SDS specifies the starter kit's Compose service, whose Docker delivery belongs to Lab 5. An already running local PostgreSQL 16 also works for this backend verification.
 
-The shell examples use POSIX syntax. On Windows, use Git Bash for `cp` and the inline environment assignments shown below; install Windows Node.js/npm and PostgreSQL and put their tools on PATH. Native PowerShell requires its own environment-variable syntax. For browser artifacts on Windows, set `PLAYWRIGHT_OUTPUT_DIR` to a writable absolute path such as `C:/Temp/habit-auth-playwright` instead of relying on `/tmp`. The seed tests use the current Node executable and an absolute seed-file path, avoiding an npm `.cmd` subprocess. Local checks ran on macOS 27.2; Windows and Git Bash execution have **not** been verified.
+The shell examples use POSIX syntax. On Windows, use Git Bash for `cp` and the inline environment assignments shown below; install Windows Node.js/npm and PostgreSQL and put their tools on PATH. Native PowerShell requires its own environment-variable syntax. For browser artifacts on Windows, set `PLAYWRIGHT_OUTPUT_DIR` to a writable absolute path such as `C:/Temp/habit-auth-playwright` instead of relying on `/tmp`. The seed tests use the current Node executable and an absolute seed-file path, avoiding an npm `.cmd` subprocess. Checks ran on macOS 27.2 (phittayanan) and on Windows 11 with Git Bash, Node.js 24.14.0 and PostgreSQL 16 in Docker (projectnewy). On Windows the Goal keyboard test TC-47 / TC-48 in `client/test/goals.spec.js` fails at the template select step, at both widths, on `staging` too; it passes on macOS. It is a known limitation and no Issue was opened for it (see PR #43).
 
 First, from `client/`:
 
@@ -34,14 +34,13 @@ Edit `.env`: set `DATABASE_URL` and `TEST_DATABASE_URL` with an explicit Postgre
 npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:seed
-npm run prisma:seed
 npm run build
 npm start
 ```
 
 Open `http://localhost:3000/login` (or your configured `PORT`). The API serves the built client and supports direct visits to the contracted page addresses. `GET /api/health` checks the process; `GET /api/ready` checks PostgreSQL. The seed upserts `manager1`, `participant1`, `participant2`; it requires both seed-password variables, stores only bcrypt hashes, and updates hashes from the current environment on a second run. Set `SEED_DEMO_DATA=true` to also upsert three synthetic templates by name (`Reading`, `Walking`, and `Water`), owned by `manager1`. A second run updates those templates and does not add duplicates. Leave the variable unset to seed accounts only.
 
-For API/unit tests, use a **separate disposable database**: API fixtures reset Goal, Template, Session and User rows and create the accounts needed by each case. Tests generate their passwords at runtime. Migrate that database before running tests (substitute its URL below):
+For API/unit tests, use a **separate disposable database**: API fixtures reset Entry, Goal, Template, Session and User rows and create the accounts needed by each case. Tests generate their passwords at runtime. Migrate that database before running tests (substitute its URL below):
 
 ```sh
 DATABASE_URL='postgresql://YOUR_LOCAL_ROLE@localhost:5432/habit_tracker_test' npm run prisma:migrate
@@ -61,4 +60,4 @@ The tests use Playwright's downloaded Chromium by default; set `PLAYWRIGHT_CHANN
 
 For development, keep `npm run dev` in `server/` on port 3000 and run `npm run dev` in `client/`; Vite proxies `/api` to that backend. Production uses the built client served by Express, without Vite.
 
-Open limitations: failed-login limiting is excluded from Sprint 1 (OP-01.11); OP-01.12 now performs a cost-10 dummy bcrypt comparison for an unknown username, with the same invalid-credentials response and no session (ADR 0051); comparable bcrypt work does not guarantee identical response times; OP-10.1 belongs to later privacy testing. Issue #36 does not build template edit, `PATCH`, the in-use refusal, or retire. The Manager Edit control is only a visible button. Docker, CI and GCP verification are deferred to Lab 5. Goal tests pin `en-US` and use a keyboard-only probe for native date segment order, which can follow the OS despite the browser locale. They retain a non-Bangkok browser timezone and assert the entered ISO date. See [Goal implementation evidence](docs/goal-implementation-evidence.md), [Auth implementation evidence](docs/auth-implementation-evidence.md) and [Template implementation evidence](docs/template-implementation-evidence.md) for actual checks and their limits.
+Open limitations: failed-login limiting is excluded from Sprint 1 (OP-01.11); OP-01.12 now performs a cost-10 dummy bcrypt comparison for an unknown username, with the same invalid-credentials response and no session (ADR 0051); comparable bcrypt work does not guarantee identical response times. Template edit (F-04) is built; retire (F-05) is a Sprint 2 feature and the Manager has no Retire control yet. A wrong same-day entry cannot be fixed in Sprint 1 (entry edit and delete are Sprint 2). Docker, CI and GCP verification are deferred to Lab 5. Goal tests pin `en-US` and use a keyboard-only probe for native date segment order, which can follow the OS despite the browser locale. They retain a non-Bangkok browser timezone and assert the entered ISO date. See [Goal implementation evidence](docs/goal-implementation-evidence.md), [Auth implementation evidence](docs/auth-implementation-evidence.md), [Template implementation evidence](docs/template-implementation-evidence.md), [Template edit implementation evidence](docs/template-edit-implementation-evidence.md), [Entry implementation evidence](docs/entry-implementation-evidence.md) and [Progress and privacy implementation evidence](docs/progress-privacy-implementation-evidence.md) for actual checks and their limits.
