@@ -2181,11 +2181,11 @@ In the same run, a value of 500 dated 2026-11-09 (before the goal starts) was re
 
 ### Desktop width {#desktop}
 
-Figures 1 to 9 were taken in a 375 px wide window. This is the screen of Figure 3 in the same run at 1280 px.
-
-<figure style="width:100%"><img src="img/f07-entry-saved-desktop-marked.png"><figcaption>Figure 10. The goal page at desktop width<table class="cap"><tr><th>IDs</th><td>NFR-05, AC-SYS.1, ADR 0038</td></tr><tr><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>the entry of Figure 3 is saved; the same screen as Figure 3</td></tr><tr><th>Steps</th><td>resize the window from 375 px to 1280 px wide</td></tr><tr><th>Expected</th><td>no horizontal scroll and every control of the goal page shown at 1280 px, as at 375 px (AC-SYS.1 names both widths; ADR 0038: desktop designed first)</td></tr><tr><th>Actual</th><td>page width 1280 = window width 1280 (at 375 px: 375 = 375); the goal, its progress, the entry form and the entry list are shown. Pass</td></tr></table></figcaption></figure>
+Figures 1 to 9 were taken in a 375 px wide window. Figure 10, on the next page, is the screen of Figure 3 in the same run at 1280 px. It is printed across a landscape page so that its text stays readable.
 
 </div>
+
+<div class="landscape"><figure style="width:100%"><img src="img/f07-entry-saved-desktop-marked.png"><figcaption>Figure 10. The goal page at desktop width<table class="cap"><tr><th>IDs</th><td>NFR-05, AC-SYS.1, ADR 0038</td><th>Role</th><td>Participant (participant1)</td></tr><tr><th>Start</th><td>the entry of Figure 3 is saved; the same screen as Figure 3</td><th>Steps</th><td>resize the window from 375 px to 1280 px wide</td></tr><tr><th>Expected</th><td>no horizontal scroll and every control of the goal page shown at 1280 px, as at 375 px (AC-SYS.1 names both widths; ADR 0038: desktop designed first)</td><th>Actual</th><td>page width 1280 = window width 1280 (at 375 px: 375 = 375); the goal, its progress, the entry form and the entry list are shown. Pass</td></tr></table></figcaption></figure></div>
 
 ### Backend evidence for the protected operations {#api-evidence}
 
