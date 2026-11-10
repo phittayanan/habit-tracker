@@ -72,6 +72,13 @@ figure { margin: 8pt auto 12pt; break-inside: avoid; text-align: left; }
 figure > img { display: block; width: 100%; }
 figure .imgs { text-align: center; }
 p > img:only-child { display: block; margin: 0 auto; }
+.board { margin: 8pt 0 14pt; }
+.board .desk, .board .mob { break-inside: avoid; }
+.board .mob { display: flex; gap: 4mm; align-items: flex-start; margin-top: 6pt; }
+.board .mob img, .board .desk img { display: block; width: 100%; }
+.board .desk img { width: auto; }
+.board .caption { flex: 1; }
+.board p.sub { margin: 0 0 2pt; font-style: italic; }
 .pair { display: flex; justify-content: center; align-items: flex-start; gap: 3%; break-inside: avoid; margin: 8pt 0 12pt; }
 .pair figure { width: 48%; margin: 0; }
 figcaption { font-size: 12pt; margin-top: 3pt; }
