@@ -139,3 +139,21 @@ Run from the repository root. Docker must be running and ports 3000 and 5173 fre
 | Stop (data kept) | `docker compose down` |
 | Stop and delete the data | `docker compose down -v` |
 | Root image only | `docker build .` |
+
+### 7.4 Checks run in step 3 (Issue #49)
+
+Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chrome 157. Passwords were generated fake values and are not in any output.
+
+| Check | Result | Commit |
+|---|---|---|
+| Kit files as copied | `docker compose build server` failed: `"/tsconfig.json": not found` | `28d53f2` |
+| Sign-in through `:5173` with the kit's `Host $host` | 403 `ORIGIN_NOT_ALLOWED`; through `:3000` 200 | `822cada` |
+| Same with `Host $http_host` | 200, cookie `HttpOnly; Secure; SameSite=Lax` | `60c62e1` |
+| `docker compose up --build -d` from an empty volume | `db`, `server`, `client` up; `migrate` `Exited (0)`; `curl --fail` on `/api/health` and `/api/ready` answer | `cfac799` |
+| `Secure` cookie on `http://localhost:5173` in the browser | Stored and sent back (`GET /api/goals` 200 after sign-in) | `cfac799` |
+| A missing seed password | `migrate` prints "Both SEED_MANAGER_PASSWORD and SEED_PARTICIPANT_PASSWORD are required." and exits 1 | `cfac799` |
+| Persistence (R-04, local only; C-05 on GCP is separate) | A goal created as `participant1` is listed again after `docker compose down`, `docker compose up -d` and a new sign-in | `cfac799` |
+| Root image | `docker build .` succeeds; it runs as `node`, serves `/`, `/login`, `/api/health` and `/api/ready` from `/app/client/dist` and `/app/server/dist` | `cfac799` |
+| C-03 / TC-50: fresh clone | Empty folder, `git clone`, branch checked out, `server/.env` from `server/.env.example` with only its values filled (fake), `docker compose build --no-cache --pull`, `docker compose up -d`: all services up, `migrate` `Exited (0)`, both endpoints answer, `manager1` and `participant1` sign in. **27 seconds** from clone to sign-in (target 15 minutes, NFR-07). The base images were already on the machine, so their first download is not counted | `ad3300a` |
+
+Not run here: Windows (the reviewer's check), CI, any registry or GCP step.
