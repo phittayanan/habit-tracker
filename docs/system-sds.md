@@ -305,7 +305,7 @@ Every setting comes from the environment. `.env` is never committed; `.env.examp
 |---|---|---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string | yes | `server/.env` | Secret Manager |
 | `PORT` | Port the server listens on (3000) | no | `server/.env` | Cloud Run sets it |
-| `NODE_ENV` | `development`, `test` or `production` | no | npm scripts | Cloud Run setting |
+| `NODE_ENV` | `production` makes the session cookie `Secure`; any other value does not | no | not set by any npm script; `server/.env` only to try the production cookie | Cloud Run setting `production` |
 | `SEED_MANAGER_PASSWORD` | Password for the seeded Manager | yes | `server/.env` | Secret Manager |
 | `SEED_PARTICIPANT_PASSWORD` | Password for the seeded Participants | yes | `server/.env` | Secret Manager |
 | `SEED_DEMO_DATA` | Whether the seed also loads demo templates | no | `server/.env` | Cloud Run setting |
