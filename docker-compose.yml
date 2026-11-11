@@ -1,18 +1,25 @@
+# Habit Tracker - local stack (Lab 5 step 3, Issue #49). Local only: the cloud
+# gets its values from Secret Manager in step 5.
+# Before the first run: copy server/.env.example to server/.env and fill in the
+# two SEED_* passwords with your own values (server/.env is not committed).
+# The POSTGRES_* fallbacks below are for a throwaway database on your own
+# computer only.
 services:
   db:
     image: postgres:16-alpine
-    container_name: toktickit-db
+    container_name: habit-tracker-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-toktickit}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-toktickit}
-      POSTGRES_DB: ${POSTGRES_DB:-toktickit}
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-habit_tracker}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-habit_tracker_local}
+      POSTGRES_DB: ${POSTGRES_DB:-habit_tracker}
+    # No host port: only the other containers reach the database. This also
+    # avoids a clash with a PostgreSQL already running on the host's 5432.
+    # Use `docker compose exec db psql -U habit_tracker` to look inside.
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-toktickit} -d ${POSTGRES_DB:-toktickit}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-habit_tracker} -d ${POSTGRES_DB:-habit_tracker}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -21,24 +28,28 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: toktickit-migrate
+    container_name: habit-tracker-migrate
     restart: "no"
     depends_on:
       db:
         condition: service_healthy
+    # SEED_MANAGER_PASSWORD, SEED_PARTICIPANT_PASSWORD and SEED_DEMO_DATA come
+    # from server/.env; no password value is written in this file. If either
+    # password is missing the seed stops with an error and the server does not
+    # start. The values below override server/.env's local DATABASE_URL and
+    # NODE_ENV.
+    env_file:
+      - ./server/.env
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-toktickit}:${POSTGRES_PASSWORD:-toktickit}@db:5432/${POSTGRES_DB:-toktickit}?schema=public
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-AdminInitial123!}
-      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-DemoInitial123!}
-      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-habit_tracker}:${POSTGRES_PASSWORD:-habit_tracker_local}@db:5432/${POSTGRES_DB:-habit_tracker}?schema=public
     command: ["sh", "-c", "npx prisma migrate deploy && npm run prisma:seed"]
 
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: toktickit-server
+    container_name: habit-tracker-server
     restart: unless-stopped
     depends_on:
       db:
@@ -49,7 +60,7 @@ services:
       NODE_ENV: production
       TZ: Asia/Bangkok
       PORT: 3000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-toktickit}:${POSTGRES_PASSWORD:-toktickit}@db:5432/${POSTGRES_DB:-toktickit}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-habit_tracker}:${POSTGRES_PASSWORD:-habit_tracker_local}@db:5432/${POSTGRES_DB:-habit_tracker}?schema=public
     ports:
       - "3000:3000"
 
@@ -57,9 +68,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ""
-    container_name: toktickit-client
+    container_name: habit-tracker-client
     restart: unless-stopped
     depends_on:
       - server
