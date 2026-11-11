@@ -140,6 +140,8 @@ Run from the repository root. Docker must be running and ports 3000 and 5173 fre
 | Stop and delete the data | `docker compose down -v` |
 | Root image only | `docker build .` |
 
+Windows line endings: `.gitattributes` sets `*.sh text eol=lf`, so `server/docker-entrypoint.sh` stays LF even with `core.autocrlf=true`. Without it, Git for Windows writes CRLF, the `#!/bin/sh\r` line cannot run in the Linux container, and `migrate` exits 255 with `exec ./docker-entrypoint.sh: no such file or directory`. A clone made before this file existed, or an old working copy, keeps the CRLF file until the file is checked out again; a fresh clone straight onto the branch (`git clone -b <branch>`) is the simple way.
+
 ### 7.4 Checks run in step 3 (Issue #49)
 
 Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chrome 157. Passwords were generated fake values and are not in any output.
@@ -155,5 +157,7 @@ Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chr
 | Persistence (R-04, local only; C-05 on GCP is separate) | A goal created as `participant1` is listed again after `docker compose down`, `docker compose up -d` and a new sign-in | `cfac799` |
 | Root image | `docker build .` succeeds; it runs as `node`, serves `/`, `/login`, `/api/health` and `/api/ready` from `/app/client/dist` and `/app/server/dist` | `cfac799` |
 | C-03 / TC-50: fresh clone | Empty folder, `git clone`, branch checked out, `server/.env` from `server/.env.example` with only its values filled (fake), `docker compose build --no-cache --pull`, `docker compose up -d`: all services up, `migrate` `Exited (0)`, both endpoints answer, `manager1` and `participant1` sign in. **27 seconds** from clone to sign-in (target 15 minutes, NFR-07). The base images were already on the machine, so their first download is not counted | `ad3300a` |
+| Windows line endings (review of PR #70 by projectnewy, Windows 11, `core.autocrlf=true`) | Red at `68f4e13`: `server/docker-entrypoint.sh` checked out with CRLF, `migrate` Exited (255), `exec ./docker-entrypoint.sh: no such file or directory`. The same red reproduced on macOS with `git clone -c core.autocrlf=true`. | `68f4e13` |
+| Same clone config after `.gitattributes` (`*.sh text eol=lf`) | Script is LF, `migrate` `Exited (0)`, `/api/health` and `/api/ready` answer, sign-in through `:5173` 200 (macOS, `autocrlf=true`; Windows is still the reviewer's check) | `daf6382` |
 
-Not run here: Windows (the reviewer's check), CI, any registry or GCP step.
+Not run here: Windows by the author (the reviewer's check), CI, any registry or GCP step.
