@@ -17,7 +17,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-COPY . .
+# Copy only the build inputs. The root .dockerignore does not apply to this
+# build context (./client), so `COPY . .` would also copy a local node_modules
+# and dist over the ones installed above.
+COPY index.html vite.config.js ./
+COPY src ./src/
 RUN npm run build
 
 # --- Stage 2: Serve built files with nginx (proxies /api -> server:3000) ------
