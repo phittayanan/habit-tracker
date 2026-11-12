@@ -1,6 +1,6 @@
 # Deployment guide (Lab 5)
 
-Version 1, Lab 5 step 2 (Issue #48). Written before any container, pipeline or GCP resource exists. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
+Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
 
 ## 1. Stack and how it differs from the starter kit
 
@@ -9,7 +9,7 @@ Version 1, Lab 5 step 2 (Issue #48). Written before any container, pipeline or G
 | Server | Node.js 22.16+ (checked on 24.14.0 and 26.8.1), Express 5, plain JavaScript | No TypeScript build. `server/scripts/build.js` copies `server/src/` to `server/dist/`; `npm start` runs `dist/index.js` |
 | Database access | Prisma 6.19, PostgreSQL 16, migrations in `server/prisma/migrations/` | Prisma 6 (not the kit's version); migrations run with `prisma migrate deploy` |
 | Client | React 19 with Vite 8, built to `client/dist/` | The built client is served by the API process (same origin); Vite only runs in development, where it proxies `/api` to port 3000 |
-| Packaging | One container with the API and the built client (ADR 0024) | Same plan as the kit; the Dockerfile is written in step 3 |
+| Packaging | One container with the API and the built client (ADR 0024) | Same plan as the kit; the Docker files were added in step 3 (section 7) |
 | Sessions | Rows in the `Session` table (ADR 0027) | Nothing is kept in server memory |
 
 Sources: SDS sections 7.1 and 7.4, ADR 0023, 0024, 0027, 0030.
@@ -92,3 +92,72 @@ No project number, key, password or connection string is recorded in this file.
 ## 6. Release procedure
 
 Completed in step 7: how a merge from `staging` into `main` is deployed, and how to find the running commit.
+
+## 7. Docker
+
+Added in step 3 (Issue #49) from the Lab 5 starter kit's 7 files. Local only: nothing here is pushed to a registry or deployed. GCP values come in step 5.
+
+### 7.1 Files and what changed from the kit
+
+| File | Used by | Change from the kit |
+|---|---|---|
+| `Dockerfile` (root) | CI and Cloud Run in later steps; one image with the API and the built client on `PORT` 3000 | No `VITE_API_URL` (the client reads none). The server is built with `npm run build` (copies `src/` to `dist/`). `server/src/app.js` finds `/app/client/dist` from `/app/server/dist` without a change |
+| `.dockerignore` | Root build context | None |
+| `docker-compose.yml` | Local run: `db`, `migrate`, `server`, `client` | Names are `habit-tracker-*`. `migrate` reads `SEED_MANAGER_PASSWORD`, `SEED_PARTICIPANT_PASSWORD` and `SEED_DEMO_DATA` from `server/.env`; no password is written in the file (the kit's `ADMIN_PASSWORD`/`DEMO_USER_PASSWORD` defaults are removed). `db` publishes no host port |
+| `server/Dockerfile` | `migrate` and `server` services | No `COPY tsconfig.json` (there is none); copies `scripts/` and builds with `npm run build` |
+| `server/docker-entrypoint.sh` | Both server images | Comment only; still ends with `exec "$@"` |
+| `client/Dockerfile` | `client` service (nginx) | Copies only `index.html`, `vite.config.js` and `src/`: the root `.dockerignore` does not apply to the `./client` context, so the kit's `COPY . .` copied a local `node_modules` and `dist` into the build. No `VITE_API_URL` |
+| `client/nginx.conf` | `client` service | `proxy_set_header Host $http_host` instead of `$host`, so the port reaches the server. The Origin check (`requireOrigin`, `server/src/middleware/auth.js:29`) compares the `Origin` host, port included, with `Host`; with `$host` sign-in through `:5173` returned 403 `ORIGIN_NOT_ALLOWED` |
+
+Sign-in works both through the nginx client on `http://localhost:5173` and through the server on `http://localhost:3000`, which also serves the built client.
+
+### 7.2 Settings
+
+| Setting | Where it comes from | Notes |
+|---|---|---|
+| `SEED_MANAGER_PASSWORD`, `SEED_PARTICIPANT_PASSWORD` | `server/.env` (copied from `server/.env.example`), read by `migrate` through `env_file` | No fallback. If either is missing the seed stops, `migrate` exits 1 and `server` does not start |
+| `SEED_DEMO_DATA` | `server/.env` | `true` also seeds the three demo templates |
+| `DATABASE_URL` | Built in `docker-compose.yml` from the `POSTGRES_*` values; it replaces the local URL in `server/.env` inside the containers | Points at the `db` container |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Shell or a root `.env`; otherwise the fallbacks in `docker-compose.yml` | The fallbacks are for a throwaway database on your own computer only. Whether a committed local fallback is acceptable is an open review question (Issue #49) |
+| `NODE_ENV`, `PORT`, `TZ` | `docker-compose.yml` and the Dockerfiles | `NODE_ENV=production`, so the session cookie is `Secure`; Chrome accepts it on `http://localhost` |
+
+No Dockerfile `ARG` or `ENV` holds a secret.
+
+### 7.3 Commands
+
+Run from the repository root. Docker must be running and ports 3000 and 5173 free.
+
+| Step | Command |
+|---|---|
+| Settings | `cp server/.env.example server/.env`, then set the two `SEED_*` passwords (and `SEED_DEMO_DATA=true` for demo templates) |
+| Build and start | `docker compose up --build -d` |
+| Check | `docker compose ps -a` (`db`, `server`, `client` up; `migrate` `Exited (0)`) |
+| Health and readiness | `curl --fail http://localhost:3000/api/health` and `curl --fail http://localhost:3000/api/ready` (`curl.exe` in PowerShell) |
+| Open | `http://localhost:5173` (nginx) or `http://localhost:3000` |
+| Logs | `docker compose logs migrate` or `docker compose logs server` |
+| Look in the database | `docker compose exec db psql -U habit_tracker -d habit_tracker` |
+| Stop (data kept) | `docker compose down` |
+| Stop and delete the data | `docker compose down -v` |
+| Root image only | `docker build .` |
+
+Windows line endings: `.gitattributes` sets `*.sh text eol=lf`, so `server/docker-entrypoint.sh` stays LF even with `core.autocrlf=true`. Without it, Git for Windows writes CRLF, the `#!/bin/sh\r` line cannot run in the Linux container, and `migrate` exits 255 with `exec ./docker-entrypoint.sh: no such file or directory`. A clone made before this file existed, or an old working copy, keeps the CRLF file until the file is checked out again; a fresh clone straight onto the branch (`git clone -b <branch>`) is the simple way.
+
+### 7.4 Checks run in step 3 (Issue #49)
+
+Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chrome 157. Passwords were generated fake values and are not in any output.
+
+| Check | Result | Commit |
+|---|---|---|
+| Kit files as copied | `docker compose build server` failed: `"/tsconfig.json": not found` | `28d53f2` |
+| Sign-in through `:5173` with the kit's `Host $host` | 403 `ORIGIN_NOT_ALLOWED`; through `:3000` 200 | `822cada` |
+| Same with `Host $http_host` | 200, cookie `HttpOnly; Secure; SameSite=Lax` | `60c62e1` |
+| `docker compose up --build -d` from an empty volume | `db`, `server`, `client` up; `migrate` `Exited (0)`; `curl --fail` on `/api/health` and `/api/ready` answer | `cfac799` |
+| `Secure` cookie on `http://localhost:5173` in the browser | Stored and sent back (`GET /api/goals` 200 after sign-in) | `cfac799` |
+| A missing seed password | `migrate` prints "Both SEED_MANAGER_PASSWORD and SEED_PARTICIPANT_PASSWORD are required." and exits 1 | `cfac799` |
+| Persistence (R-04, local only; C-05 on GCP is separate) | A goal created as `participant1` is listed again after `docker compose down`, `docker compose up -d` and a new sign-in | `cfac799` |
+| Root image | `docker build .` succeeds; it runs as `node`, serves `/`, `/login`, `/api/health` and `/api/ready` from `/app/client/dist` and `/app/server/dist` | `cfac799` |
+| C-03 / TC-50: fresh clone | Empty folder, `git clone`, branch checked out, `server/.env` from `server/.env.example` with only its values filled (fake), `docker compose build --no-cache --pull`, `docker compose up -d`: all services up, `migrate` `Exited (0)`, both endpoints answer, `manager1` and `participant1` sign in. **27 seconds** from clone to sign-in (target 15 minutes, NFR-07). The base images were already on the machine, so their first download is not counted | `ad3300a` |
+| Windows line endings (review of PR #70 by projectnewy, Windows 11, `core.autocrlf=true`) | Red at `68f4e13`: `server/docker-entrypoint.sh` checked out with CRLF, `migrate` Exited (255), `exec ./docker-entrypoint.sh: no such file or directory`. The same red reproduced on macOS with `git clone -c core.autocrlf=true`. | `68f4e13` |
+| Same clone config after `.gitattributes` (`*.sh text eol=lf`) | Script is LF, `migrate` `Exited (0)`, `/api/health` and `/api/ready` answer, sign-in through `:5173` 200 (macOS, `autocrlf=true`; Windows is still the reviewer's check) | `daf6382` |
+
+Not run here: Windows by the author (the reviewer's check), CI, any registry or GCP step.
