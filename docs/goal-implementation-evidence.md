@@ -131,20 +131,20 @@ A diagnostic test (not committed) recorded, after each key, the focused element,
 - **Smallest counterfactual:** removing only `Enter` makes Tab move focus on Linux. Adding `Escape` after `Enter` does too.
 - **What would have disproved it:** Tab reaching the page (`keydown Tab`) with focus still on the select, the select not matching `:open` after Enter, or the failure remaining without Enter. None happened. The app form is keyboard reachable on Linux: once the picker is closed, Tab moves on. So the cause is the test's key sequence, not the app; no app code changed.
 
-Fix (`50d09c2`): the test chooses the template by typing its first letter, `s`, on the closed select, then asserts the value and that Tab focuses Daily target. Typing a letter selects an option without opening the picker on both platforms tested. The rest of the journey (Tab order, focus outline, dates, Save, Cancel, no overflow, 44 px controls) is unchanged. The TC-48 procedure in `docs/sprints/sprint-1/README.md` lists Tab, Shift+Tab, Enter and Space; choosing an option still needs one more key (the old test used `ArrowDown` and `s`, the new one `s`). Its wording is unchanged.
+Fix (`50d09c2`; `bdecdbd` corrects its code comment, which claimed more platforms than were run): the test chooses the template by typing its first letter, `s`, on the closed select, then asserts the value and that Tab focuses Daily target. Typing a letter selects an option without opening the picker on both platforms tested. The rest of the journey (Tab order, focus outline, dates, Save, Cancel, no overflow, 44 px controls) is unchanged. The TC-48 procedure in `docs/sprints/sprint-1/README.md` lists Tab, Shift+Tab, Enter and Space; choosing an option still needs one more key (the old test used `ArrowDown` and `s`, the new one `s`). Its wording is unchanged.
 
 Runs (the diagnostic test and logs are kept outside the repository):
 
-| Environment | Test or suite | `8d69138` (before) | `50d09c2` (after) |
-|---|---|---|---|
-| Linux aarch64 container, Playwright 1.65.0, Chromium 158 | TC-47 / TC-48, both widths | 2 failed | 2 passed |
-| same | whole client suite | — | 44 passed |
-| same | server suite | — | 82 of 82 |
-| Linux x86-64 container, Google Chrome 157.0.8103.78 (`PLAYWRIGHT_CHANNEL=chrome`, as in the PR #71 CI job) | TC-47 / TC-48, both widths | 2 failed | 2 passed |
-| same | whole client suite | — | 44 passed |
-| same | server suite | — | 82 of 82 |
-| macOS 27.2.1, Node.js 26.8.1, Chromium 158 | whole client suite | — | 44 passed |
-| same | server suite | — | 82 of 82 |
-| macOS, Google Chrome 157.0.8103.51 | `goals.spec.js` | — | 6 passed |
+| Environment | Test or suite | `8d69138` (before) | `50d09c2` (fix) | `bdecdbd` (final test code) |
+|---|---|---|---|---|
+| Linux aarch64 container, Playwright 1.65.0, Chromium 158 | TC-47 / TC-48, both widths | 2 failed | 2 passed | in the suite below |
+| same | whole client suite | — | 44 passed | 44 passed |
+| same | server suite | — | 82 of 82 | 82 of 82 |
+| Linux x86-64 container, Google Chrome 157.0.8103.78 (`PLAYWRIGHT_CHANNEL=chrome`, as in the PR #71 CI job) | TC-47 / TC-48, both widths | 2 failed | 2 passed | in the suite below |
+| same | whole client suite | — | 44 passed | 44 passed |
+| same | server suite | — | 82 of 82 | 82 of 82 |
+| macOS 27.2.1, Node.js 26.8.1, Chromium 158 | whole client suite | — | 44 passed | 44 passed |
+| same | server suite | — | 82 of 82 | 82 of 82 |
+| macOS, Google Chrome 157.0.8103.51 | `goals.spec.js` | — | 6 passed | 6 passed |
 
 Commands: from `server/`, `npm test`; from `client/`, `npx playwright test`. Both used a disposable PostgreSQL 16 test database in Docker. In the Linux containers the source copy was made a Git snapshot so that TC-44 / TC-45's `git grep` scan of tracked files can run; without it that test exits 128 (one run, kept). Not run: Windows. The single macOS failure at 1280 px on 2026-11-10 (Issue #62) was not reproduced or investigated here.
