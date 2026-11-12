@@ -98,6 +98,8 @@ jobs:
       # After the server suite: both suites reset the same test database.
       - name: Browser tests (Playwright)
         working-directory: ./client
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
         run: |
           npx playwright install --with-deps chromium
           npm test

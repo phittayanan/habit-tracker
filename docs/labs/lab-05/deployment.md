@@ -186,11 +186,11 @@ Written before the workflow exists. Section 8.3 is filled in with the real runs 
 3. Deploy scripts (`deploy/`, copied from the kit unchanged in this step): `bash -n` on the three scripts, the two stub tests and the Python smoke-test unit tests. They run offline and need no GCP access. They do nothing against GCP until step 5.
 4. Client: `npm ci` and `npm run build`. The server's production-serving test needs `client/dist/index.html`, so this comes before the server tests.
 5. Server: `npm ci`, create the test database, `prisma migrate deploy` on both databases, seed the application database with the generated passwords, `npm test` (the unit and API tests).
-6. Browser tests: install Chromium for Playwright, then `npm test` in `client/` (it runs after the server suite because both reset the same test database).
+6. Browser tests: install Chromium for Playwright, then `npm test` in `client/` with `PLAYWRIGHT_CHANNEL=chrome` (the installed Google Chrome of the runner; the README names Chrome as the browser the tests were verified with). It runs after the server suite because both reset the same test database. The first run with the downloaded Chromium failed 3 of 44 browser tests (see 8.3).
 7. `docker build .` of the root `Dockerfile` (the image is not pushed).
 
 A failing step fails the job. Failed runs are kept and not re-run over (R-10).
 
 ### 8.3 Runs (C-01, R-05)
 
-Set in step 4 after the first runs: links to the green run on the Issue #50 PR into `staging`, the test counts and the tested commit. The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
+First run on the PR (commit `0a8280e`, run 43144991544): the deploy-script checks, client build and server suite passed (82 of 82); the browser step failed with 41 passed and 3 failed using the downloaded Chromium: the Goal keyboard test TC-47/TC-48 at both widths (the same test that fails on Windows, Issue #62) and the template edit page test at 375 px (a timeout while filling the login form). That run is kept (R-10). Set in step 4 after the later runs: links to the green run on the Issue #50 PR into `staging`, the test counts and the tested commit. The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
