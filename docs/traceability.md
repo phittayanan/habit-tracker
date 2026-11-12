@@ -66,7 +66,7 @@ Goal implementation evidence: [Issue #40](goal-implementation-evidence.md). AC-0
 | NFR-06 | Same screens, including F-01 (login); F-12 markup | Playwright keyboard run (AC-SYS.2); markup review | TC-48, TC-49 | 1; 2 and 3 for later screens |
 | NFR-07 | System: setup commands and docs | Timed clean-clone run (AC-SYS.3) | TC-50 | 1 documented; timed in Lab 5 step 3 (Issue #49): Docker fresh-clone run (C-03) 27 s on `ad3300a`, following `docs/labs/lab-05/deployment.md` section 7.3, not the README native setup |
 | NFR-08 | F-07, F-08, F-09 (rule code) | Coverage report (AC-SYS.4) | TC-51 | 1; 3 |
-| NFR-09 | System: CI | CI run on a PR (AC-SYS.5; run locally in Sprint 1) | TC-52 | 1 locally; CI from Lab 5 |
+| NFR-09 | System: CI | CI run on a PR (AC-SYS.5; run locally in Sprint 1) | TC-52 | 1 locally; CI from Lab 5: green `test-and-docker` run 43182003625 on `daaafc2` for Issue #50 (82 server tests, 44 browser tests, Docker build); see deployment.md 8.3 |
 
 ## Planned tests
 

@@ -161,3 +161,45 @@ Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chr
 | Same clone config after `.gitattributes` (`*.sh text eol=lf`) | Script is LF, `migrate` `Exited (0)`, `/api/health` and `/api/ready` answer, sign-in through `:5173` 200 (macOS, `autocrlf=true`; Windows is still the reviewer's check) | `daf6382` |
 
 Not run here: Windows by the author (the reviewer's check), CI, any registry or GCP step.
+
+## 8. Continuous integration (Lab 5 step 4, Issue #50)
+
+Written before the workflow exists. Section 8.3 is filled in with the real runs once the workflow has run.
+
+### 8.1 What it does
+
+`.github/workflows/ci-docker.yml`, workflow name "CI & Docker Build", one job with the id `test-and-docker` (the job name the later required-check setting and the deploy workflow refer to; do not rename it).
+
+| Item | Choice |
+|---|---|
+| Triggers | `pull_request` into `main` and into `staging`; `workflow_call` (the step 7 deploy workflow reuses it); `workflow_dispatch` (manual) |
+| Permissions | `contents: read` only |
+| Database | A PostgreSQL 16 service container with two databases: the application database and a separate test database (the tests refuse a `TEST_DATABASE_URL` equal to `DATABASE_URL`, `server/test/auth.test.js:18-19`). The database password is a throw-away value that exists only inside the job's service container |
+| Seed passwords | Generated at run time (`openssl rand`) and masked in the log; no password is written in the workflow file |
+| Runtimes | Node.js 24; Python 3.14 only for the offline deploy-script tests |
+| Actions | Pinned to a commit SHA with the version in a comment |
+
+### 8.2 Steps, in order
+
+1. Check out the repository without keeping the token.
+2. Set up Node.js 24 and Python 3.14.
+3. Deploy scripts (`deploy/`, copied from the kit unchanged in this step): `bash -n` on the three scripts, the two stub tests and the Python smoke-test unit tests. They run offline and need no GCP access. They do nothing against GCP until step 5.
+4. Client: `npm ci` and `npm run build`. The server's production-serving test needs `client/dist/index.html`, so this comes before the server tests.
+5. Server: `npm ci`, create the test database, `prisma migrate deploy` on both databases, seed the application database with the generated passwords, `npm test` (the unit and API tests).
+6. Browser tests: `npm test` in `client/` with `PLAYWRIGHT_CHANNEL=chrome` (the Google Chrome already installed on the runner, so no browser is downloaded; the README names Chrome as the browser the tests were verified with). It runs after the server suite because both reset the same test database. The first run with the downloaded Chromium failed 3 of 44 browser tests (see 8.3).
+7. `docker build .` of the root `Dockerfile` (the image is not pushed).
+
+A failing step fails the job. Failed runs are kept and not re-run over (R-10).
+
+### 8.3 Runs (C-01, R-05)
+
+All runs are kept (R-10).
+
+| Run | Commit | Result |
+|---|---|---|
+| [43144991544](https://github.com/phittayanan/habit-tracker/actions/runs/43144991544) | `0a8280e`, downloaded Chromium | Deploy-script checks, client build and server suite (82 of 82) passed. Browser tests 41 passed, 3 failed: Goal TC-47/TC-48 at both widths (Issue #62) and the template edit page test at 375 px (a timeout while filling the login form). Docker build skipped |
+| [43145730587](https://github.com/phittayanan/habit-tracker/actions/runs/43145730587) | `65fc246`, runner Chrome | Same, browser tests 42 passed, 2 failed (Goal TC-47/TC-48 only). Docker build skipped |
+| [43176082352](https://github.com/phittayanan/habit-tracker/actions/runs/43176082352) | `5f660bf`, runner Chrome, no browser download | Same 42 passed, 2 failed (Goal TC-47/TC-48 only, Issue #62). Docker build skipped |
+| [43182003625](https://github.com/phittayanan/habit-tracker/actions/runs/43182003625) | `daaafc2` (this branch after merging `staging` with the Issue #62 fix, PR #72) | **Green.** All steps passed: deploy-script checks, client build, server suite 82 of 82, browser tests 44 passed, Docker build (`docker build`, not pushed) |
+
+The run on `daaafc2` is the green run on the Issue #50 PR into `staging` (C-01, staging side). The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
