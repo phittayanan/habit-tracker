@@ -36,7 +36,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U ci -d habit_tracker"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -101,7 +101,6 @@ jobs:
         env:
           PLAYWRIGHT_CHANNEL: chrome
         run: |
-          npx playwright install --with-deps chromium
           npm test
 
       # The image is built to prove the Dockerfile still works; it is not pushed.
