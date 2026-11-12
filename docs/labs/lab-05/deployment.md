@@ -161,3 +161,36 @@ Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chr
 | Same clone config after `.gitattributes` (`*.sh text eol=lf`) | Script is LF, `migrate` `Exited (0)`, `/api/health` and `/api/ready` answer, sign-in through `:5173` 200 (macOS, `autocrlf=true`; Windows is still the reviewer's check) | `daf6382` |
 
 Not run here: Windows by the author (the reviewer's check), CI, any registry or GCP step.
+
+## 8. Continuous integration (Lab 5 step 4, Issue #50)
+
+Written before the workflow exists. Section 8.3 is filled in with the real runs once the workflow has run.
+
+### 8.1 What it does
+
+`.github/workflows/ci-docker.yml`, workflow name "CI & Docker Build", one job with the id `test-and-docker` (the job name the later required-check setting and the deploy workflow refer to; do not rename it).
+
+| Item | Choice |
+|---|---|
+| Triggers | `pull_request` into `main` and into `staging`; `workflow_call` (the step 7 deploy workflow reuses it); `workflow_dispatch` (manual) |
+| Permissions | `contents: read` only |
+| Database | A PostgreSQL 16 service container with two databases: the application database and a separate test database (the tests refuse a `TEST_DATABASE_URL` equal to `DATABASE_URL`, `server/test/auth.test.js:18-19`). The database password is a throw-away value that exists only inside the job's service container |
+| Seed passwords | Generated at run time (`openssl rand`) and masked in the log; no password is written in the workflow file |
+| Runtimes | Node.js 24; Python 3.14 only for the offline deploy-script tests |
+| Actions | Pinned to a commit SHA with the version in a comment |
+
+### 8.2 Steps, in order
+
+1. Check out the repository without keeping the token.
+2. Set up Node.js 24 and Python 3.14.
+3. Deploy scripts (`deploy/`, copied from the kit unchanged in this step): `bash -n` on the three scripts, the two stub tests and the Python smoke-test unit tests. They run offline and need no GCP access. They do nothing against GCP until step 5.
+4. Client: `npm ci` and `npm run build`. The server's production-serving test needs `client/dist/index.html`, so this comes before the server tests.
+5. Server: `npm ci`, create the test database, `prisma migrate deploy` on both databases, seed the application database with the generated passwords, `npm test` (the unit and API tests).
+6. Browser tests: install Chromium for Playwright, then `npm test` in `client/` (it runs after the server suite because both reset the same test database).
+7. `docker build .` of the root `Dockerfile` (the image is not pushed).
+
+A failing step fails the job. Failed runs are kept and not re-run over (R-10).
+
+### 8.3 Runs (C-01, R-05)
+
+Set in step 4 after the first runs: links to the green run on the Issue #50 PR into `staging`, the test counts and the tested commit. The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
