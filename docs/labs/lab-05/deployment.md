@@ -199,5 +199,7 @@ All runs are kept (R-10).
 |---|---|---|
 | [43144991544](https://github.com/phittayanan/habit-tracker/actions/runs/43144991544) | `0a8280e`, downloaded Chromium | Deploy-script checks, client build and server suite (82 of 82) passed. Browser tests 41 passed, 3 failed: Goal TC-47/TC-48 at both widths (Issue #62) and the template edit page test at 375 px (a timeout while filling the login form). Docker build skipped |
 | [43145730587](https://github.com/phittayanan/habit-tracker/actions/runs/43145730587) | `65fc246`, runner Chrome | Same, browser tests 42 passed, 2 failed (Goal TC-47/TC-48 only). Docker build skipped |
+| [43176082352](https://github.com/phittayanan/habit-tracker/actions/runs/43176082352) | `5f660bf`, runner Chrome, no browser download | Same 42 passed, 2 failed (Goal TC-47/TC-48 only, Issue #62). Docker build skipped |
+| [43182003625](https://github.com/phittayanan/habit-tracker/actions/runs/43182003625) | `daaafc2` (this branch after merging `staging` with the Issue #62 fix, PR #72) | **Green.** All steps passed: deploy-script checks, client build, server suite 82 of 82, browser tests 44 passed, Docker build (`docker build`, not pushed) |
 
-The Docker build step has not run in CI yet. The green run on the Issue #50 PR into `staging`, with its commit and counts, is added after Issue #62 is fixed and this branch is updated from `staging`. The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
+The run on `daaafc2` is the green run on the Issue #50 PR into `staging` (C-01, staging side). The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
