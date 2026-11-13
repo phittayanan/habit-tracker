@@ -1,6 +1,6 @@
 # Deployment guide (Lab 5)
 
-Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Version 5 (Issue #85) fills in section 6.6 and corrects the digest comparison in section 6.3. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
+Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Version 5 (Issue #85) fills in section 6.6 and corrects the digest comparison in section 6.3. Version 6 (Issue #67) adds section 6.7. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
 
 ## 1. Stack and how it differs from the starter kit
 
@@ -166,6 +166,26 @@ Read on 13 Nov 2026 after the merge. The public URL is the one in section 5.
 | Before and after screenshots | Kept by the owner and attached to the Issue #66 closing comment, not in the repository |
 
 The Console pages (Cloud Run revisions, Artifact Registry digests and manifest) were read, read-only, in the owner's signed-in browser session by Claude in Chrome; no `gcloud` or other GCP command was run by an AI agent.
+
+### 6.7 Data after redeploy, rollback and roll-forward (Lab 5 step 8, Issue #67)
+
+Done on 13 Nov 2026 on the public URL of section 5. The check uses one goal and one entry that a demo participant created. It is not a demo template: the seed resets those on every release (Issue #79, section 6.5). Release 2 contains documentation only and adds no migration, so the older image reads the same schema.
+
+| Item | Value |
+|---|---|
+| Release 1 (older image) | Tag `723efb02a593b0d13912054cc4fc475ede1ecf5d`, page label `build 723efb0` ([run 43439782760](https://github.com/phittayanan/habit-tracker/actions/runs/43439782760)) |
+| Release 2 (current image) | [PR #89](https://github.com/phittayanan/habit-tracker/pull/89), merge commit `ed4527bd549642e1668988d7409cb2eea49c89f0`, [run 43460770826](https://github.com/phittayanan/habit-tracker/actions/runs/43460770826): `test-and-docker` and `deploy` succeeded, `ROLLBACK: false`, migration job succeeded, smoke test passed. Revision `habit-tracker-00003-6rn`, image index `sha256:7c241acbf539ac595f8df8346665c3b572ac7f662c49ea28d05179c3dfab7630`, page label `build ed4527b` |
+| Record checked | Goal "Reading" (template Reading), daily target 3 pages, 2026-11-13 to 2026-11-26, Active; one entry `2026-11-13: 2 pages`. Created on release 2 (label `build ed4527b`); no password or account name in any screenshot |
+| Rollback | [Run 43463075320](https://github.com/phittayanan/habit-tracker/actions/runs/43463075320), started by hand on `main` with `image_tag` = release 1's commit. `test` skipped, "Build and push image" skipped, `ROLLBACK: true`, the log line "Rollback: reuse existing image; skip tests, build, migration and seed.", smoke test passed. Revision `habit-tracker-00004-z88` at 100%; page label `build 723efb0`; the same goal and entry were shown after a refresh |
+| Roll-forward | [Run 43463355931](https://github.com/phittayanan/habit-tracker/actions/runs/43463355931), started by hand on `main` with `image_tag` empty. `test-and-docker` ran, the image was built and pushed, the migration job succeeded, `ROLLBACK: false`, smoke test passed. Revision `habit-tracker-00005-sdh` at 100%; page label `build ed4527b`; the same goal and entry were shown after a refresh |
+| Screenshots | Three, taken by the owner on the public URL (address bar, label and record visible): before the rollback (`build ed4527b`), after the rollback (`build 723efb0`), after the roll-forward (`build ed4527b`). Attached to the Issue #67 closing comment, with the Cloud Run revision list; not in the repository |
+| Checker | phittayanan repeats the data check on the public URL and states what he checked in the Issue #67 closing comment |
+
+Two things to know:
+- A roll-forward of the same commit builds a new image and overwrites the tag. The tag `ed4527bd549642e1668988d7409cb2eea49c89f0` pointed to index `sha256:7c241acb...` after run 43460770826 and points to `sha256:d3e078e68926fa980e7ce43c65dc0b26c9a24f59f6f65e8c1831ad0c8e48672d` after run 43463355931, with the same source. A later rollback to that tag therefore serves the newer image. The tag of release 1 was not rebuilt by the rollback.
+- The roll-forward ran the migration job and the seed again. The data the user created stayed; only the demo templates and demo passwords are reset (section 6.5).
+
+No `gcloud` or other GCP command was run by an AI agent. The AI dispatched the two `Deploy` runs with `gh workflow run` at the owner's request and read the run logs.
 
 ## 7. Docker
 
