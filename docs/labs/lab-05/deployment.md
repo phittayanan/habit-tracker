@@ -1,6 +1,6 @@
 # Deployment guide (Lab 5)
 
-Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Version 5 (Issue #85) fills in section 6.6 and corrects the digest comparison in section 6.3. Version 6 (Issue #67) adds section 6.7. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
+Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Version 5 (Issue #85) fills in section 6.6 and corrects the digest comparison in section 6.3. Version 6 (Issue #67) adds section 6.7. Version 7 (Issue #65) adds section 5.1. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
 
 ## 1. Stack and how it differs from the starter kit
 
@@ -96,9 +96,28 @@ Step 5 (Issue #64): the owner signed in as `participant1` on the public URL, so 
 | Cloud Run service | `habit-tracker`: public, minimum 0 and maximum 3 instances, 512 MiB, 1 CPU, port 3000 |
 | Public URL | <https://habit-tracker-rfi4eg2u4q-as.a.run.app> |
 | Cloud Build source bucket | `gs://habit-tracker0cpe334_cloudbuild` (made by `gcloud builds submit`) |
-| GitHub environment, Workload Identity Federation, deployer service account | set in step 6 |
+| GitHub environment, Workload Identity Federation, deployer service account, required check | see section 5.1 (step 6) |
 
 No project number, key, password or connection string is recorded in this file.
+
+### 5.1 GitHub to Google Cloud login and the required check (Lab 5 step 6, Issue #65)
+
+Set up on 13 Nov 2026. phittayanan ran the GitHub settings and every Google Cloud command himself, one at a time, from the plan on Issue #65; no AI agent ran a Google Cloud command. projectnewy did the C-02 proof. Names only are recorded here: no variable value, key or project number.
+
+| Item | Value |
+|---|---|
+| GitHub environment | `demo`; deployment branches: `main` only |
+| Environment variables (not secrets) | `GCP_PROJECT_ID`, `GCP_REGION`, `WIF_PROVIDER`, `WIF_SERVICE_ACCOUNT`. `WIF_PROVIDER` holds the project number, so the values are not written anywhere in Git |
+| Workload Identity pool and provider | Pool `github-actions`, OIDC provider `github-main` (issuer `https://token.actions.githubusercontent.com`), state ACTIVE |
+| Attribute condition of the provider | Accepts only a token whose subject is this repository (by its numeric repository and owner IDs) in environment `demo`, branch `refs/heads/main`, and whose workflow file is `.github/workflows/deploy.yml`. A pull request, a fork or another workflow cannot log in |
+| Deployer service account | `habit-tracker-deployer`; no key file (`gcloud iam service-accounts keys list` returned "Listed 0 items.", read by phittayanan) |
+| Roles of the deployer | `roles/run.developer` on the project; `roles/artifactregistry.writer` on the repository `habit-tracker`; `roles/iam.serviceAccountUser` on `habit-tracker-runner`; `roles/iam.workloadIdentityUser` on the deployer itself, granted to the repository (by its ID) through the pool |
+| Ruleset `require-ci` | Active, no bypass, on `main` and `staging`: status check `test-and-docker` (GitHub Actions) is required, and "require branches to be up to date before merging" is on. It sits next to `protect-main-and-staging` (pull request with 1 approval, merge commit only, no deletion or force push) and `staging-requires-issue-link` (check `pr-issue-link` on `staging`) |
+| C-02 proof (R-06) | [PR #76](https://github.com/phittayanan/habit-tracker/pull/76) into `main` from the temporary branch `test/prove-gate`, tested commit `511c1ca`: [run 43396969194](https://github.com/phittayanan/habit-tracker/actions/runs/43396969194) failed on the one test `C-02 proof`; the PR page showed `test-and-docker` as Required and failing, the merge button disabled and "Merging is blocked". The PR was closed without merging and the branch deleted; the failed run is kept (R-10) |
+| Evidence | Screenshots of the blocked merge and of the ruleset are in the Issue #65 comment of 14 Nov 2026 (Figures 1 to 3), not in the repository |
+| In use | The keyless login worked in [run 43439782760](https://github.com/phittayanan/habit-tracker/actions/runs/43439782760) (release 1), in the rollback run 43463075320 and in the roll-forward run 43463355931 (section 6) |
+
+Checked and not checked. phittayanan read the environment, the four variable names, the ruleset, the provider state and the empty key list after setting them up (Issue #65 comments), and the C-02 PR page and run. projectnewy read the ruleset page on 14 Nov 2026 and the PR #76 page. The IAM roles above are as granted from the plan; the author of this section did not re-read the IAM policies in the Console. They are exercised by every deploy run, which would fail without them.
 
 ## 6. Release procedure
 
@@ -337,5 +356,5 @@ Keep everything running until the instructor announces the end of grading (hando
 5. Secrets `habit-tracker-database-url`, `habit-tracker-seed-manager-password`, `habit-tracker-seed-participant-password`
 6. Service account `habit-tracker-runner` and its project role binding `roles/cloudsql.client`
 7. Cloud Storage bucket `gs://habit-tracker0cpe334_cloudbuild`
-8. The resources added in steps 6 and 7 (GitHub connection, deployer service account), listed in this file by those steps
+8. The resources added in step 6 (section 5.1): service account `habit-tracker-deployer` and its role bindings, Workload Identity pool `github-actions` with provider `github-main`; and on GitHub the environment `demo` and the ruleset `require-ci`
 9. Last: the budget `cpe334-lab5-alerts`, or shut down the project `habit-tracker0cpe334`
