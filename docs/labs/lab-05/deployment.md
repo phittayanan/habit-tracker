@@ -1,6 +1,6 @@
 # Deployment guide (Lab 5)
 
-Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
+Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
 
 ## 1. Stack and how it differs from the starter kit
 
@@ -102,7 +102,61 @@ No project number, key, password or connection string is recorded in this file.
 
 ## 6. Release procedure
 
-Completed in step 7: how a merge from `staging` into `main` is deployed, and how to find the running commit.
+Written in step 7 (Issue #80, part of Issue #66) before the first release ran. The values for the first release (tag, commit, run, revision) are added to section 6.6 by Issue #66 after the deploy.
+
+### 6.1 What deploys and when
+
+`.github/workflows/deploy.yml` runs on every push to `main` (a merged release PR) and by hand for a rollback. `main` is the only branch that deploys: the GitHub environment `demo` accepts `main` only, and the Workload Identity condition (Issue #65) accepts only this workflow file, the branch `main` and the environment `demo`. The deploy job must stay in `deploy.yml`; moving it into another workflow file makes the login fail.
+
+| Step | What it does |
+|---|---|
+| `test` | Runs `ci-docker.yml` (job `test-and-docker`) again on the pushed commit |
+| Validate | Stops if a variable is missing or the image tag is not a full 40-character commit |
+| Login | `google-github-actions/auth` with the deployer service account; no key file |
+| Build and push | `docker build` of the root `Dockerfile` with `--build-arg BUILD_SHA=<commit>`; pushed as `asia-southeast1-docker.pkg.dev/habit-tracker0cpe334/habit-tracker/habit-tracker:<commit>` |
+| `deploy/release.sh` | Resolves the image to a `@sha256` digest, updates and runs the job `habit-tracker-migrate` (waits for it), updates the service `habit-tracker` with the same digest and sends 100% of traffic to the newest revision. A failed migration stops the script before the service changes |
+| `deploy/smoke_test.py` | No sign-in (ADR 0052): `/api/health`, `/api/ready`, and the page `/` must contain the first 7 characters of the deployed commit |
+| Summary | Commit, digest, URL and smoke result on the run page |
+
+### 6.2 Release steps
+
+1. Every feature PR is merged into `staging` first (required checks green, teammate review).
+2. Check that `staging` contains `main`: `git fetch origin && git merge-base --is-ancestor origin/main origin/staging && echo yes`. If not, sync first with a small Issue and PR that merges `main` into `staging` (as Issue #77, PR #78). Every release PR leaves a merge commit on `main` that `staging` does not have, so this is needed after each release.
+3. Open the release PR from `staging` into `main`. `Closes #N` does not work here (`main` is not the default branch); refer to the release Issue without a closing keyword. CI must be green on the final head.
+4. The teammate who did not open the PR reviews it with a specific check and merges it with a merge commit.
+5. The merge starts `Deploy` by itself. Read the run: the commit tag in the summary, the migration job, the smoke test.
+6. Tag `main` only after the run is green and the Cloud Run revision uses the commit that was merged (section 6.3). The tag for Lab 5 is `v1.1` (ADR 0052). A submitted tag never moves.
+7. Record the tag, commit, run link and revision in section 6.6.
+
+### 6.3 Find the running commit
+
+| Where | How |
+|---|---|
+| The app | The login page and the top bar show `build <first 7 characters of the commit>`; the page source holds `<meta name="build" content="<7 characters>">`. A local run shows `build dev` |
+| The run | The run summary lists the full commit tag and the image digest |
+| Cloud Run | The newest revision of `habit-tracker` uses the same image digest as the run summary; compare them in the Console (revision details) or with `gcloud run services describe habit-tracker --region asia-southeast1` (a human runs it) |
+
+### 6.4 Roll back
+
+Run the workflow `Deploy` by hand on `main` and enter `image_tag` = the full 40-character commit of an image that is already in Artifact Registry. Tests, build and migration are skipped; only the service is pointed back at that image. The smoke test then expects that commit in the page.
+
+A rollback does not undo a migration. If a migration after the target commit changed the schema in a way the older code cannot read, the older image can fail. Check the migrations between the two commits before a rollback.
+
+### 6.5 Known limits
+
+- The migration job runs the seed on every release. The seed overwrites the unit, minimum and maximum of the three demo templates and resets the three account passwords from the secrets (Issue #79). An edit to a demo template is lost on the next release until that Issue is fixed.
+- `deploy/deploy.sh` and `deploy/teardown.sh` still use the `toktickit` names of the kit and are not used by the workflow. Section 9 records that `deploy.sh` was not run.
+- The workflow has not run when this section is written. The first real run is the release of Issue #66.
+
+### 6.6 First release (filled in by Issue #66)
+
+| Item | Value |
+|---|---|
+| Release PR | |
+| Tag and commit on `main` | |
+| Deploy run | |
+| Cloud Run revision and image digest | |
+| Before and after screenshots | |
 
 ## 7. Docker
 
