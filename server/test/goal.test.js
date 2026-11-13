@@ -114,13 +114,28 @@ test('TC-54: max equality, Decimal boundary and validation/range/duplicate prece
   await post(body({ dailyTarget: 99999999.99 }), cookies.b).expect(201);
 });
 
+test('TC-78: a target not above the template minimum is rejected; just above is accepted; minimum 0 changes nothing (Issue #74, ADR 0054)', async () => {
+  const t = await db.template.create({ data: { name: 'Run', unit: 'minutes', minValue: 10, maxValue: 100, createdBy: manager.id } });
+  for (const dailyTarget of [10, 5, 0.01]) {
+    const r = await post(body({ templateId: t.id, dailyTarget }));
+    assert.equal(r.status, 400, `target ${dailyTarget}`); assert.equal(r.body.error.code, 'TARGET_NOT_ABOVE_TEMPLATE_MIN');
+    assert.equal(r.body.error.message, 'Daily target must be above the template minimum.');
+  }
+  assert.equal(await db.goal.count(), 0);
+  await post(body({ templateId: t.id, dailyTarget: 10.01 })).expect(201);
+  // The default template has minimum 0: 0 is a validation error, 0.01 is accepted.
+  assert.equal((await post(body({ dailyTarget: 0 }))).body.error.code, 'VALIDATION_ERROR');
+  await post(body({ dailyTarget: 0.01 })).expect(201);
+  assert.equal(await db.goal.count(), 2);
+});
+
 test('TC-55: ended allows new, different template and different owner; one-day/past goals accepted', async () => {
   const ended = await post(body({ startDate: day(-10), endDate: day(-1) }));
   assert.equal(ended.status, 201); assert.equal(ended.body.goal.state, 'ENDED');
   await post(body(), cookies.b).expect(201);
   await post(body({ participantId: b.id })).expect(201);
   const t2 = await db.template.create({ data: { name: 'Walk', unit: 'steps', minValue: 10, maxValue: 100, createdBy: manager.id } });
-  const r = await post(body({ templateId: t2.id, dailyTarget: 0.01, startDate: day(0), endDate: day(0), userId: b.id }));
+  const r = await post(body({ templateId: t2.id, dailyTarget: 10.01, startDate: day(0), endDate: day(0), userId: b.id }));
   assert.equal(r.status, 201); assert.equal(r.body.goal.state, 'ACTIVE');
   assert.equal(await db.goal.count({ where: { participantId: a.id } }), 3);
 });

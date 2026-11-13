@@ -224,3 +224,52 @@ test('demo seed upserts synthetic templates by name and can run twice', async ()
   for (const row of templates) assert.equal(row.creator.username, 'manager1');
   assert.equal(await db.template.count(), 3);
 });
+
+test('TC-76: demo seed keeps an edited template and still creates a missing one (Issue #79, ADR 0053)', async () => {
+  const env = {
+    ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL, SEED_DEMO_DATA: 'true',
+    SEED_MANAGER_PASSWORD: randomBytes(24).toString('base64url'),
+    SEED_PARTICIPANT_PASSWORD: randomBytes(24).toString('base64url'),
+  };
+  const runSeed = () => {
+    const seedCwd = mkdtempSync(join(tmpdir(), 'habit-template-seed-'));
+    try { execFileSync(process.execPath, [seedPath], { env: { ...env, PATH: '' }, cwd: seedCwd, stdio: 'pipe' }); }
+    finally { rmSync(seedCwd, { recursive: true, force: true }); }
+  };
+  runSeed();
+  // A Manager edits one demo template and retires another; a third is removed.
+  await db.template.update({ where: { name: 'Reading' }, data: { unit: 'chapters', minValue: 2, maxValue: 50 } });
+  await db.template.update({ where: { name: 'Walking' }, data: { state: 'RETIRED' } });
+  await db.template.delete({ where: { name: 'Water' } });
+  runSeed();
+  const reading = await db.template.findUniqueOrThrow({ where: { name: 'Reading' } });
+  assert.equal(reading.unit, 'chapters');
+  assert.equal(Number(reading.minValue), 2);
+  assert.equal(Number(reading.maxValue), 50);
+  const walking = await db.template.findUniqueOrThrow({ where: { name: 'Walking' } });
+  assert.equal(walking.state, 'RETIRED');
+  const water = await db.template.findUniqueOrThrow({ where: { name: 'Water' } });
+  assert.equal(water.unit, 'glasses');
+  assert.equal(await db.template.count(), 3);
+});
+
+test('TC-77: demo seed sets the password hashes again on every run (Issue #79, ADR 0053)', async () => {
+  const runSeed = (managerPassword, participantPassword) => {
+    const seedCwd = mkdtempSync(join(tmpdir(), 'habit-template-seed-'));
+    try {
+      execFileSync(process.execPath, [seedPath], { cwd: seedCwd, stdio: 'pipe', env: {
+        ...process.env, PATH: '', DATABASE_URL: process.env.TEST_DATABASE_URL, SEED_DEMO_DATA: 'true',
+        SEED_MANAGER_PASSWORD: managerPassword, SEED_PARTICIPANT_PASSWORD: participantPassword,
+      } });
+    } finally { rmSync(seedCwd, { recursive: true, force: true }); }
+  };
+  const first = [randomBytes(24).toString('base64url'), randomBytes(24).toString('base64url')];
+  const second = [randomBytes(24).toString('base64url'), randomBytes(24).toString('base64url')];
+  runSeed(...first);
+  runSeed(...second);
+  for (const user of await db.user.findMany({ where: { username: { in: ['manager1', 'participant1', 'participant2'] } } })) {
+    const index = user.role === 'MANAGER' ? 0 : 1;
+    assert.ok(await bcrypt.compare(second[index], user.passwordHash), `${user.username}: the new password must match`);
+    assert.ok(!(await bcrypt.compare(first[index], user.passwordHash)), `${user.username}: the old password must not match`);
+  }
+});
