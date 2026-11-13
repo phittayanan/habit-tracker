@@ -1,6 +1,6 @@
 # Deployment guide (Lab 5)
 
-Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
+Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
 
 ## 1. Stack and how it differs from the starter kit
 
@@ -22,12 +22,12 @@ Every setting comes from the environment. Locally the npm scripts load `server/.
 
 | Variable | Purpose | Secret | Local source | GCP source | Read at |
 |---|---|---|---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string | yes | `server/.env` | Secret Manager (set in step 5) | `server/prisma/schema.prisma:7`; the Prisma client in `server/src/index.js` and `server/prisma/seed.js` |
+| `DATABASE_URL` | PostgreSQL connection string | yes | `server/.env` | Secret Manager `habit-tracker-database-url` (service and migration job) | `server/prisma/schema.prisma:7`; the Prisma client in `server/src/index.js` and `server/prisma/seed.js` |
 | `PORT` | Port the server listens on; default 3000. It binds `0.0.0.0` | no | `server/.env` (optional) | Cloud Run sets it | `server/src/index.js:6` |
-| `NODE_ENV` | `production` makes the session cookie `Secure`; any other value does not | no | not set by any npm script; set it in `server/.env` only to try the production cookie | Cloud Run setting `production` | `server/src/services/session.js:7` |
-| `SEED_MANAGER_PASSWORD` | Password of the seeded Manager (`manager1`); required by the seed | yes | `server/.env` | Secret Manager (set in step 5) | `server/prisma/seed.js:4` |
-| `SEED_PARTICIPANT_PASSWORD` | Password of the seeded Participants (`participant1`, `participant2`); required by the seed | yes | `server/.env` | Secret Manager (set in step 5) | `server/prisma/seed.js:5` |
-| `SEED_DEMO_DATA` | `true` also seeds three demo templates; any other value or unset seeds accounts only | no | `server/.env` (optional) | Cloud Run setting (set in step 5) | `server/prisma/seed.js:15` |
+| `NODE_ENV` | `production` makes the session cookie `Secure`; any other value does not | no | not set by any npm script; set it in `server/.env` only to try the production cookie | Cloud Run setting `production` (service and migration job) | `server/src/services/session.js:7` |
+| `SEED_MANAGER_PASSWORD` | Password of the seeded Manager (`manager1`); required by the seed | yes | `server/.env` | Secret Manager `habit-tracker-seed-manager-password` (migration job only) | `server/prisma/seed.js:4` |
+| `SEED_PARTICIPANT_PASSWORD` | Password of the seeded Participants (`participant1`, `participant2`); required by the seed | yes | `server/.env` | Secret Manager `habit-tracker-seed-participant-password` (migration job only) | `server/prisma/seed.js:5` |
+| `SEED_DEMO_DATA` | `true` also seeds three demo templates; any other value or unset seeds accounts only | no | `server/.env` (optional) | Cloud Run setting `true` on the migration job (step 5) | `server/prisma/seed.js:15` |
 
 ### 2.2 Tests only (never set on GCP)
 
@@ -78,13 +78,24 @@ The seed updates the three seeded accounts' password hashes from the current env
 
 Not verified in this step: how the Origin check (`server/src/middleware/auth.js:29`, which compares the request's `Origin` host with its `Host` header) behaves behind Cloud Run. It is checked on the public URL in step 5.
 
+Step 5 (Issue #64): the owner signed in as `participant1` on the public URL, so the sign-in `POST` passed the Origin check behind Cloud Run.
+
 ## 5. GCP project
 
 | Item | Value |
 |---|---|
 | Project ID | `habit-tracker0cpe334` (Issue #47) |
 | Region | `asia-southeast1` (ADR 0030) |
-| Artifact Registry, Cloud SQL instance, database, Cloud Run service, secrets, runtime service account | set in step 5 |
+| Artifact Registry repository | `habit-tracker` (Docker, `asia-southeast1`) |
+| Image | `asia-southeast1-docker.pkg.dev/habit-tracker0cpe334/habit-tracker/habit-tracker`, tagged with the commit SHA |
+| Cloud SQL instance | `habit-tracker-pg`: PostgreSQL 16, Enterprise edition, `db-f1-micro`, 10 GB SSD, storage auto-increase off, daily backup 03:00 UTC, zone `asia-southeast1-c` |
+| Database and database user | `habit_tracker` and `habit_tracker` |
+| Runtime service account | `habit-tracker-runner@habit-tracker0cpe334.iam.gserviceaccount.com`: project role `roles/cloudsql.client` only, and `roles/secretmanager.secretAccessor` on each of the three secrets below only |
+| Secrets (Secret Manager) | `habit-tracker-database-url`, `habit-tracker-seed-manager-password`, `habit-tracker-seed-participant-password` |
+| Migration job (Cloud Run job) | `habit-tracker-migrate`: `npx prisma migrate deploy && npm run prisma:seed`, `SEED_DEMO_DATA=true` |
+| Cloud Run service | `habit-tracker`: public, minimum 0 and maximum 3 instances, 512 MiB, 1 CPU, port 3000 |
+| Public URL | <https://habit-tracker-rfi4eg2u4q-as.a.run.app> |
+| Cloud Build source bucket | `gs://habit-tracker0cpe334_cloudbuild` (made by `gcloud builds submit`) |
 | GitHub environment, Workload Identity Federation, deployer service account | set in step 6 |
 
 No project number, key, password or connection string is recorded in this file.
@@ -203,3 +214,45 @@ All runs are kept (R-10).
 | [43182003625](https://github.com/phittayanan/habit-tracker/actions/runs/43182003625) | `daaafc2` (this branch after merging `staging` with the Issue #62 fix, PR #72) | **Green.** All steps passed: deploy-script checks, client build, server suite 82 of 82, browser tests 44 passed, Docker build (`docker build`, not pushed) |
 
 The run on `daaafc2` is the green run on the Issue #50 PR into `staging` (C-01, staging side). The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
+
+## 9. First deployment (Lab 5 step 5, Issue #64)
+
+Done by hand in Cloud Shell on 13 Nov 2026 (00:00 to 00:35, +07), one command at a time, with the resource names in section 5. The kit's `deploy/deploy.sh` was not run: it still uses the TokTickIT names and secrets. The scripts in `deploy/` (`deploy.sh`, `release.sh`, `teardown.sh` and their tests) still use the `toktickit` names; step 7 (Issue #66) has to use the names in section 5.
+
+### 9.1 What was deployed
+
+| Item | Value |
+|---|---|
+| Commit | `761a408` on `staging` (merge of PR #71). `main` (`v1.0`) has no Docker files yet; the first release with them into `main` is step 7 (Issues #50, #66) |
+| Image | `asia-southeast1-docker.pkg.dev/habit-tracker0cpe334/habit-tracker/habit-tracker:761a408`, built with Cloud Build from the root `Dockerfile` |
+| Migration and seed | Job execution `habit-tracker-migrate-llqx2` succeeded: 4 migrations applied (`20261107000100_auth`, `20261108000100_template`, `20261108000200_goal`, `20261109000100_entry`); seed output "Seeded three accounts and three templates." The Reading, Walking and Water templates are sample data |
+| Service | `habit-tracker`, `DATABASE_URL` from Secret Manager, `NODE_ENV=production`; the service does not get the seed passwords |
+
+Passwords were generated with `openssl` and piped straight into Secret Manager; no password or connection string was typed, printed or written in a file.
+
+### 9.2 Checks
+
+| Check | Result |
+|---|---|
+| `curl --fail` on `/api/health` and `/api/ready` at the public URL | `{"status":"ok"}` and `{"status":"ready"}`; the home page returned HTTP 200 |
+| Sign-in on the public URL | The owner signed in as `participant1` |
+| Cloud SQL settings | `db-f1-micro`, 10 GB, `storageAutoResize: false`, `RUNNABLE` |
+| Runtime service account roles | Project: `roles/cloudsql.client` only. Each secret: `roles/secretmanager.secretAccessor` for `habit-tracker-runner` only |
+| Scaling | Minimum 0, maximum 3 (Console, Scaling) |
+| Budget | `cpe334-lab5-alerts` still in place (alerts only) |
+
+The screenshots (budget, Cloud SQL settings, signed-in public URL) are kept by the owner and go in the Issue #64 closing comment, not in the repository.
+
+### 9.3 Delete after the course
+
+Keep everything running until the instructor announces the end of grading (handout section 12). Save the evidence outside GCP first. Then delete, in this order:
+
+1. Cloud Run service `habit-tracker`
+2. Cloud Run job `habit-tracker-migrate`
+3. Cloud SQL instance `habit-tracker-pg` (this also deletes the database and user `habit_tracker`); it costs money every hour it exists
+4. Artifact Registry repository `habit-tracker` (all images)
+5. Secrets `habit-tracker-database-url`, `habit-tracker-seed-manager-password`, `habit-tracker-seed-participant-password`
+6. Service account `habit-tracker-runner` and its project role binding `roles/cloudsql.client`
+7. Cloud Storage bucket `gs://habit-tracker0cpe334_cloudbuild`
+8. The resources added in steps 6 and 7 (GitHub connection, deployer service account), listed in this file by those steps
+9. Last: the budget `cpe334-lab5-alerts`, or shut down the project `habit-tracker0cpe334`
