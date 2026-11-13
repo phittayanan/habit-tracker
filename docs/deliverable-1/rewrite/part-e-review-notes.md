@@ -46,3 +46,9 @@ These points compare the v1.0 contract files with the v1.0 code and tests. The c
 9. **F-10 has no code commit of its own.** PR #51 adds the privacy tests (`af813de`), but `df8f61b` changes only progress code. The ownership checks came with F-07 (goal list filter) and F-08 (`ownGoal` in the entry service). The privacy tests may therefore not have been seen failing before code, as the contract's definition of done asks. Check the evidence file before claiming it in Part F.
 10. **Points still "Open (proposal)" at v1.0.** The code follows these proposals, but the contracts still list them as open: OP-08.1 (400 for BR-01 and BR-03, 409 for BR-04), OP-08.2 (date required in the API), OP-08.4 (a value above the target is allowed), OP-08.7 (rule order), OP-09.2 (counts only, no percentage), OP-09.3 (0 of 0 before the start), OP-10.1 (TC-34 repeats 401 and 403), OP-10.2 (template endpoints are outside F-10). Each may need a recorded decision (ADR) before the report calls them decided.
 11. **Order of checks in Part C.1.** Part C.1 says that entry routes check the owner first. That is true for zod validation but not for broken JSON (note 1).
+
+## Decisions on these notes (phittayanan, 2026-11-13)
+
+- F-07, a past-dated goal blocked by an active goal on the same template: intended. No change.
+- F-07, a daily target below the template's minimum is accepted (TC-55): not intended; a defect in v1.0. Part F.6 lists it as a known limitation. The fix needs its own Issue and the rule for the lower limit decided first.
+- The nine open proposals (OP-04.9, OP-08.1, OP-08.2, OP-08.4, OP-08.7, OP-09.2, OP-09.3, OP-10.1, OP-10.2): confirmed as applied; Part E.0 says so.

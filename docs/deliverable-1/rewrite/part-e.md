@@ -63,6 +63,8 @@ NFR-05 to NFR-09 apply to the whole Sprint 1 build rather than to one feature, s
 
 Three points about the system checks were proposed by the authors and applied in Sprint 1 without a separate decision: the `AC-SYS.<n>` naming; verifying NFR-07 in Sprint 1 by following the README once, with the 15-minute target binding in Lab 5; and measuring NFR-08 over the rule service files with the Node test runner's coverage option.
 
+Nine smaller proposals inside the contracts (OP-04.9, OP-08.1, OP-08.2, OP-08.4, OP-08.7, OP-09.2, OP-09.3, OP-10.1, OP-10.2) were built and tested as proposed but never marked as decided in the contract files. They were confirmed as applied on 2026-11-13 (phittayanan), and the contracts below describe them as built.
+
 ## E.1 F-01 Login, logout and session {#e-f01}
 
 **Links.** FR-01, FR-02, FR-03, FR-04; NFR-01, NFR-04 (Part A). **Depends on** no other feature (Part B.1). **Contract written** 2026-11-07, first version in commit `b99a6ca` (Issue #30, PR #31); **built** in Issue #32, PR #34 (merged 2026-11-08, `6721633`).
