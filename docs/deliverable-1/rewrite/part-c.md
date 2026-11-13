@@ -40,7 +40,7 @@ Every rule is enforced on the server, so a request that breaks a rule is refused
 1. **Origin check** on POST, PATCH, PUT and DELETE (C.6).
 2. **Session check**: no valid session gives 401.
 3. **Role check**: the wrong role gives 403.
-4. **Validation and ownership** in the service: the input shape is checked with zod, and on entry routes the goal must belong to the session user (another Participant's goal gives 404). Entry routes check the owner first; goal and template routes validate first.
+4. **Validation and ownership** in the service: the input shape is checked with zod, and on entry routes the goal must belong to the session user (another Participant's goal gives 404). Entry routes check the owner first; goal and template routes validate first. A body that is not valid JSON is refused with 400 before either check.
 5. **Rule checks** in the service.
 6. **Write** through Prisma; database constraints catch anything that slips past, including two requests at once.
 
@@ -199,9 +199,9 @@ A Participant asking for another Participant's goal gets 404; a Manager asking f
 
 **Login** (`POST /api/auth/login`, JSON body with username and password):
 
-1. The server looks up the username. If it does not exist, it still compares the password against a fixed bcrypt hash of the same cost, so both failures take the same time (ADR 0051).
+1. The server looks up the username. If it does not exist, it still compares the password against a fixed bcrypt hash of the same cost, so both failures do comparable bcrypt work (ADR 0051).
 2. A wrong username or password gets 401 `INVALID_CREDENTIALS` with one shared message, and no session is made.
-3. On success the server deletes the user's previous session, creates a Session row with 32 random bytes as its ID and an expiry 8 hours ahead, and sets the cookie.
+3. On success the server deletes the session named by the cookie sent with the login, if there is one, creates a Session row with 32 random bytes as its ID and an expiry 8 hours ahead, and sets the cookie.
 
 **Cookie.** Named `sid`; HTTP-only, `SameSite=Lax`, path `/`, a lifetime of 8 hours, and `Secure` when `NODE_ENV=production`. It holds only the session ID.
 

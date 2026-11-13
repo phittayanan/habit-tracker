@@ -78,16 +78,16 @@ One contract per Sprint 1 feature: F-01, F-02, F-03, F-04, F-06, F-07, F-08, F-0
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| E-01 | Product Definition of Done: behaviour implemented, planned verification run, meaningful tests pass, review and integration done, setup and documents current, incomplete work disclosed (written once) | §3.5, §4.1 | E.0 | todo |
-| E-02 | Each contract: feature ID and linked FR, BR, NFR | §3.5 | E.n | todo |
-| E-03 | Each contract: behaviour, workflow, dependencies | §3.5 | E.n | todo |
-| E-04 | Each contract: business rules, validation, failure and boundary cases, permissions | §3.5 | E.n | todo |
-| E-05 | Each contract: UI behaviour; API methods, paths, request, response and error shapes; data fields, constraints, migrations; "no change" where a layer has none | §3.5, §4.1 | E.n | todo |
-| E-06 | Each contract: AC with stable IDs and observable outcomes, including negative, boundary and role cases (the only full AC text in the PDF) | §3.5 | E.n | todo |
-| E-07 | Each contract: STS rows with test ID, linked AC, level, precondition or input, action, expected result (the only full test design in the PDF) | §3.5 | E.n | todo |
-| E-08 | Every Sprint 1 AC maps to suitable verification: unit for logic, API and database for persistence and permissions, selected UI or end-to-end for key journeys | §3.5 | E.n | todo |
-| E-09 | Version history per contract: specification and test design before implementation, revisions visible and justified | §3.5 | E.n | todo |
-| E-10 | All Sprint 1 contracts, AC, STS and DoD appear directly in the PDF | §5 | Part E | todo |
+| E-01 | Product Definition of Done: behaviour implemented, planned verification run, meaningful tests pass, review and integration done, setup and documents current, incomplete work disclosed (written once) | §3.5, §4.1 | E.0 | written |
+| E-02 | Each contract: feature ID and linked FR, BR, NFR | §3.5 | E.n | written |
+| E-03 | Each contract: behaviour, workflow, dependencies | §3.5 | E.n | written |
+| E-04 | Each contract: business rules, validation, failure and boundary cases, permissions | §3.5 | E.n | written |
+| E-05 | Each contract: UI behaviour; API methods, paths, request, response and error shapes; data fields, constraints, migrations; "no change" where a layer has none | §3.5, §4.1 | E.n | written |
+| E-06 | Each contract: AC with stable IDs and observable outcomes, including negative, boundary and role cases (the only full AC text in the PDF) | §3.5 | E.n | written |
+| E-07 | Each contract: STS rows with test ID, linked AC, level, precondition or input, action, expected result (the only full test design in the PDF) | §3.5 | E.n | written |
+| E-08 | Every Sprint 1 AC maps to suitable verification: unit for logic, API and database for persistence and permissions, selected UI or end-to-end for key journeys | §3.5 | E.n | written |
+| E-09 | Version history per contract: specification and test design before implementation, revisions visible and justified | §3.5 | E.n | written |
+| E-10 | All Sprint 1 contracts, AC, STS and DoD appear directly in the PDF | §5 | Part E | written |
 
 ## Part F. Working Sprint 1 and verification (20 points)
 
