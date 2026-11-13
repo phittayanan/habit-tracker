@@ -299,17 +299,16 @@ A cookie session needs protection against cross-site requests. Decided on PR #23
 ## 7. Configuration and Deployment Plan
 
 ### 7.1 Environment variables (baseline, S-13 decided)
-Every setting comes from the environment. `.env` is never committed; `.env.example` holds placeholders only (L5 R-02, R-12). Names follow the kit; the table is the design baseline and is finalised in `docs/labs/lab-05/deployment.md` (to be written in Lab 5).
+Every setting comes from the environment. `.env` is never committed; `.env.example` holds placeholders only (L5 R-02, R-12). Names follow the kit; the table is the design baseline and is finalised in `docs/labs/lab-05/deployment.md`. `VITE_API_URL` was removed from the table in Lab 5 step 2 because no code reads it; the client calls relative `/api` paths (Issue #48).
 
 | Variable | Purpose | Secret | Local source | GCP source |
 |---|---|---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string | yes | `server/.env` | Secret Manager |
 | `PORT` | Port the server listens on (3000) | no | `server/.env` | Cloud Run sets it |
-| `NODE_ENV` | `development`, `test` or `production` | no | npm scripts | Cloud Run setting |
+| `NODE_ENV` | `production` makes the session cookie `Secure`; any other value does not | no | not set by any npm script; `server/.env` only to try the production cookie | Cloud Run setting `production` |
 | `SEED_MANAGER_PASSWORD` | Password for the seeded Manager | yes | `server/.env` | Secret Manager |
 | `SEED_PARTICIPANT_PASSWORD` | Password for the seeded Participants | yes | `server/.env` | Secret Manager |
 | `SEED_DEMO_DATA` | Whether the seed also loads demo templates | no | `server/.env` | Cloud Run setting |
-| `VITE_API_URL` | API base URL for the dev frontend only | no | `client/.env` | not used (same origin) |
 
 The container listens on `PORT` at `0.0.0.0`, keeps no data on its own disk and reads every setting from the environment (SG Ep. 3.3).
 

@@ -94,7 +94,10 @@ test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and can
   await expect(select.getByRole('option', { name: 'Sleep', exact: true })).toHaveCount(1);
   await expect(select).toBeFocused();
   expect(await select.evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
-  await page.keyboard.press('ArrowDown'); await page.keyboard.press('s'); await page.keyboard.press('Enter');
+  // Choose by typing the option's first letter on the closed select; the picker stays closed.
+  // On Linux Chrome, Enter opens the picker and the next Tab only closes it (Issue #62 reports
+  // the same failure on Windows); on macOS, ArrowDown opens it.
+  await page.keyboard.press('s');
   await expect(select).toHaveValue(String(template.id));
   await page.keyboard.press('Tab'); await expect(page.getByLabel('Daily target', { exact: true })).toBeFocused();
   await page.keyboard.type('12');

@@ -103,3 +103,48 @@ Implementation review: https://github.com/phittayanan/habit-tracker/pull/41, bas
 ### Review round 1
 
 projectnewy review 5818758376 asked TC-20 to spawn its child with `fileURLToPath`, because `new URL(...).pathname` is not a Windows filesystem path. `server/test/goal.test.js` now passes `fileURLToPath(new URL('./goal-process.js', import.meta.url))`. On macOS, `server/` `TEST_DATABASE_URL=<disposable-test-url> npm test` passed 41/41, including TC-20, after applying the three migrations to a new empty database. Windows and Git Bash were not run. The template-row lock question and OP-07.3/4/6 agreement were not changed.
+
+## Issue #62: template select keyboard step on Linux and Windows
+
+TC-47 / TC-48 (`client/test/goals.spec.js`, "goals screens fit and keyboard alone opens, submits and cancels form") failed on Windows (Issue #62) and on the Linux CI job of PR #71, at both widths. It passed on macOS.
+
+- **Expected:** after `ArrowDown`, `s`, `Enter` on the focused Template select, the value is the Sleep template and one `Tab` focuses Daily target.
+- **Observed on Linux, staging `8d69138`:** the value is right (line 98 passes), but `Tab` leaves focus on the select. Line 99 fails with `toBeFocused`, "Received: inactive", at 375 px and 1280 px: 2 failed.
+
+A diagnostic test (not committed) recorded, after each key, the focused element, the select value, whether the select matched `:open`, and which `keydown`, `change` and `focusin` events reached the page. Results, Chromium 158.0.8127.18 at 1280 px:
+
+| Keys after the select has focus | Linux | macOS |
+|---|---|---|
+| `ArrowDown` | value changes, picker stays closed | picker opens, value unchanged |
+| `s` | no further change | value changes |
+| `Enter` | **picker opens** | no change; the picker stays marked open |
+| `Tab` | **no page event; picker closes; focus stays on the select** | `keydown Tab` reaches the page; Daily target gets focus |
+| `Enter`, `Tab` only | picker opens, then Tab only closes it | Tab moves focus |
+| `ArrowDown`, `s`, `Tab` (no `Enter`) | Tab moves focus | Tab moves focus |
+| `ArrowDown`, `s`, `Enter`, `Escape`, `Tab` | Escape closes the picker, Tab moves focus | Tab moves focus |
+| `ArrowDown`, `s`, `Enter`, `Tab`, `Tab` | the second Tab moves focus | the first Tab already moves focus |
+| `s`, `Tab` | value changes with the picker closed; Tab moves focus | same |
+
+- **Trigger:** the test presses `Enter` on a closed select.
+- **Masking condition:** the browser's select behaviour per platform. On Linux, Enter opens the picker and the open picker consumes the next Tab to close itself. On macOS, Enter does not do this, so the same keys pass. Issue #62 reports the same symptom on Windows; Windows was not run in this task.
+- **Visible symptom:** line 99, Daily target not focused after Tab.
+- **Smallest counterfactual:** removing only `Enter` makes Tab move focus on Linux. Adding `Escape` after `Enter` does too.
+- **What would have disproved it:** Tab reaching the page (`keydown Tab`) with focus still on the select, the select not matching `:open` after Enter, or the failure remaining without Enter. None happened. The app form is keyboard reachable on Linux: once the picker is closed, Tab moves on. So the cause is the test's key sequence, not the app; no app code changed.
+
+Fix (`50d09c2`; `bdecdbd` corrects its code comment, which claimed more platforms than were run): the test chooses the template by typing its first letter, `s`, on the closed select, then asserts the value and that Tab focuses Daily target. Typing a letter selects an option without opening the picker on both platforms tested. The rest of the journey (Tab order, focus outline, dates, Save, Cancel, no overflow, 44 px controls) is unchanged. The TC-48 procedure in `docs/sprints/sprint-1/README.md` lists Tab, Shift+Tab, Enter and Space; choosing an option still needs one more key (the old test used `ArrowDown` and `s`, the new one `s`). Its wording is unchanged.
+
+Runs (the diagnostic test and logs are kept outside the repository):
+
+| Environment | Test or suite | `8d69138` (before) | `50d09c2` (fix) | `bdecdbd` (final test code) |
+|---|---|---|---|---|
+| Linux aarch64 container, Playwright 1.65.0, Chromium 158 | TC-47 / TC-48, both widths | 2 failed | 2 passed | in the suite below |
+| same | whole client suite | — | 44 passed | 44 passed |
+| same | server suite | — | 82 of 82 | 82 of 82 |
+| Linux x86-64 container, Google Chrome 157.0.8103.78 (`PLAYWRIGHT_CHANNEL=chrome`, as in the PR #71 CI job) | TC-47 / TC-48, both widths | 2 failed | 2 passed | in the suite below |
+| same | whole client suite | — | 44 passed | 44 passed |
+| same | server suite | — | 82 of 82 | 82 of 82 |
+| macOS 27.2.1, Node.js 26.8.1, Chromium 158 | whole client suite | — | 44 passed | 44 passed |
+| same | server suite | — | 82 of 82 | 82 of 82 |
+| macOS, Google Chrome 157.0.8103.51 | `goals.spec.js` | — | 6 passed | 6 passed |
+
+Commands: from `server/`, `npm test`; from `client/`, `npx playwright test`. Both used a disposable PostgreSQL 16 test database in Docker. In the Linux containers the source copy was made a Git snapshot so that TC-44 / TC-45's `git grep` scan of tracked files can run; without it that test exits 128 (one run, kept). Not run: Windows. The single macOS failure at 1280 px on 2026-11-10 (Issue #62) was not reproduced or investigated here.

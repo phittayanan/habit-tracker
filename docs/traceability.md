@@ -64,9 +64,9 @@ Goal implementation evidence: [Issue #40](goal-implementation-evidence.md). AC-0
 | NFR-04 | F-01 | API and unit tests: cookie flag, aged session, logged-out session (AC-01.1, AC-01.4, AC-01.7) | TC-06, TC-46, TC-03, TC-63 | 1 |
 | NFR-05 | Sprint 1 screens of F-01 (login), F-03, F-04, F-06 to F-09; later screens | Playwright at 375 px and 1280 px (AC-SYS.1) | TC-47 | 1; 2 and 3 for later screens |
 | NFR-06 | Same screens, including F-01 (login); F-12 markup | Playwright keyboard run (AC-SYS.2); markup review | TC-48, TC-49 | 1; 2 and 3 for later screens |
-| NFR-07 | System: setup commands and docs | Timed clean-clone run (AC-SYS.3) | TC-50 | 1 documented; timed in Lab 5 |
+| NFR-07 | System: setup commands and docs | Timed clean-clone run (AC-SYS.3) | TC-50 | 1 documented; timed in Lab 5 step 3 (Issue #49): Docker fresh-clone run (C-03) 27 s on `ad3300a`, following `docs/labs/lab-05/deployment.md` section 7.3, not the README native setup |
 | NFR-08 | F-07, F-08, F-09 (rule code) | Coverage report (AC-SYS.4) | TC-51 | 1; 3 |
-| NFR-09 | System: CI | CI run on a PR (AC-SYS.5; run locally in Sprint 1) | TC-52 | 1 locally; CI from Lab 5 |
+| NFR-09 | System: CI | CI run on a PR (AC-SYS.5; run locally in Sprint 1) | TC-52 | 1 locally; CI from Lab 5: green `test-and-docker` run 43182003625 on `daaafc2` for Issue #50 (82 server tests, 44 browser tests, Docker build); see deployment.md 8.3 |
 
 ## Planned tests
 
@@ -148,12 +148,15 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-72 | Template edit: merged range below, duplicate name 409, own name accepted | Unit and API |
 | TC-73 | Template edit form: a valid change shows in the table; an edit of a used template shows the API message | Browser |
 | TC-74 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on the template, `POST /api/goals` waits, then reads the template as committed | API and database |
+| TC-75 | Lab 5 technical check (Issues #66, #80, ADR 0052; no feature ID): the build label shows on the login page and in the top bar | Browser |
+| none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 
 ## Coverage Gaps
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
 - AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). The five system checks for NFR-05 to NFR-09 (TC-47, TC-48, TC-50, TC-51, TC-52) have AC-SYS.1 to AC-SYS.5 in `docs/sprints/sprint-1/README.md` (Issue #8). Sprint 2 and 3 rows have none by design.
 - Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Template create and view checks have passed for Issue #36 on `5435e89`, including TC-47/48 on the template list and new form at 375px and 1280px. F-04 tests (TC-12, TC-13 with the edit-versus-goal race, TC-18, TC-71, TC-72, TC-73, and TC-47/48 on the edit form) pass locally for Issue #53 on `3d1ccbb`, and TC-08 now audits `PATCH /api/templates/:id`; teammate review is pending. The Sprint 2 retire refusal (TC-19) remains planned. TC-08 independently discovers implemented API routes from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Issue #36 adds `GET /api/templates` and `POST /api/templates` to that coverage. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
+- `GET /api/ready` answering 503 when the database cannot be reached (F-02 section 5, SDS 4.4) has an automated test, `server/test/ready.test.js`, added in Issue #48. It has no TC number because no planned test covers it; no new TC was added in Issue #48 (projectnewy left the choice to the worker, who kept the numbering unchanged); the reviewer may ask for one. The 503 behavior already existed, so that test passed the first time it ran.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
 - The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.

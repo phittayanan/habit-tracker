@@ -1,0 +1,108 @@
+# CI & Docker Build (Lab 5 step 4, Issue #50; adapted from the Lab 5 starter kit).
+# Runs on every pull request into main or staging, by hand, and as a reusable
+# workflow (the deploy workflow of step 7 calls it). It does not deploy anything.
+# Do not rename the job id `test-and-docker`: the required-check setting (step 6)
+# and the deploy workflow (step 7) refer to it.
+name: CI & Docker Build
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [main, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer run on the same ref cancels the older one.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Temporary PostgreSQL for the tests only. The password is a throw-away value
+    # that lives inside this job's service container; it is not a project secret.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci_throwaway
+          POSTGRES_DB: habit_tracker
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d habit_tracker"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # Two different databases: the tests refuse a TEST_DATABASE_URL equal to DATABASE_URL.
+      DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker?schema=public
+      TEST_DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker_test?schema=public
+      PGPASSWORD: ci_throwaway
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      # Python is only needed for the offline deploy-script tests below.
+      - name: Setup Python 3.14
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+
+      # Offline: no access to GCP. These scripts do nothing against GCP until step 5.
+      - name: Check deployment scripts without accessing GCP
+        run: |
+          bash -n deploy/deploy.sh deploy/teardown.sh deploy/release.sh
+          bash deploy/tests/test_deploy_stub.sh
+          bash deploy/tests/test_release_stub.sh
+          python3 -m unittest discover -s deploy/tests -p 'test_*.py'
+
+      # Built first: the server's production-serving test needs client/dist/index.html.
+      - name: Install and build client
+        working-directory: ./client
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install, migrate, seed and test server
+        working-directory: ./server
+        run: |
+          npm ci
+          psql -h localhost -U ci -d habit_tracker -c 'CREATE DATABASE habit_tracker_test'
+          npx prisma migrate deploy
+          DATABASE_URL="$TEST_DATABASE_URL" npx prisma migrate deploy
+          # Seed passwords are generated for this run only and masked in the log.
+          SEED_MANAGER_PASSWORD="$(openssl rand -hex 16)"
+          SEED_PARTICIPANT_PASSWORD="$(openssl rand -hex 16)"
+          echo "::add-mask::$SEED_MANAGER_PASSWORD"
+          echo "::add-mask::$SEED_PARTICIPANT_PASSWORD"
+          export SEED_MANAGER_PASSWORD SEED_PARTICIPANT_PASSWORD
+          npm run prisma:seed
+          npm test
+
+      # After the server suite: both suites reset the same test database.
+      - name: Browser tests (Playwright)
+        working-directory: ./client
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
+        run: |
+          npm test
+
+      # The image is built to prove the Dockerfile still works; it is not pushed.
+      - name: Verify production Dockerfile builds
+        run: docker build -t habit-tracker:ci .
