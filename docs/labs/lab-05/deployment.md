@@ -1,6 +1,6 @@
 # Deployment guide (Lab 5)
 
-Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
+Version 1, Lab 5 step 2 (Issue #48), written before any container, pipeline or GCP resource existed. Version 2, Lab 5 step 3 (Issue #49), adds section 7 (Docker). Version 3, Lab 5 step 5 (Issue #64), fills in section 5 with the GCP resources of the first deploy and adds section 9. Version 4, Lab 5 step 7 (Issue #80), writes section 6. Version 5 (Issue #85) fills in section 6.6 and corrects the digest comparison in section 6.3. Sections marked "set in step N" are completed in that step. No secret value is written here, only names and where each value comes from.
 
 ## 1. Stack and how it differs from the starter kit
 
@@ -102,7 +102,7 @@ No project number, key, password or connection string is recorded in this file.
 
 ## 6. Release procedure
 
-Written in step 7 (Issue #80, part of Issue #66) before the first release ran. The values for the first release (tag, commit, run, revision) are added to section 6.6 by Issue #66 after the deploy.
+Written in step 7 (Issue #80, part of Issue #66) before the first release ran; section 6.6 holds the values of the first release (Issue #85).
 
 ### 6.1 What deploys and when
 
@@ -134,7 +134,7 @@ Written in step 7 (Issue #80, part of Issue #66) before the first release ran. T
 |---|---|
 | The app | The login page and the top bar show `build <first 7 characters of the commit>`; the page source holds `<meta name="build" content="<7 characters>">`. A local run shows `build dev` |
 | The run | The run summary lists the full commit tag and the image digest |
-| Cloud Run | The newest revision of `habit-tracker` uses the same image digest as the run summary; compare them in the Console (revision details) or with `gcloud run services describe habit-tracker --region asia-southeast1` (a human runs it) |
+| Cloud Run | The newest revision of `habit-tracker` shows the digest of the linux/amd64 image. The run summary shows the digest of the image index that `docker push` uploaded; the amd64 image is listed inside that index. The two numbers are therefore not equal strings. To compare: in Artifact Registry open the digest from the run summary, tab Manifest, and check that the digest in the Cloud Run revision (Console revision details, or `gcloud run services describe habit-tracker --region asia-southeast1`, which a human runs) is one of the `manifests` entries with `linux/amd64`. The other entry is the build attestation |
 
 ### 6.4 Roll back
 
@@ -149,17 +149,23 @@ A rollback does not undo a migration. If a migration after the target commit cha
 - The migration job runs the seed on every release. The seed overwrites the unit, minimum and maximum of the three demo templates and resets the three account passwords from the secrets (Issue #79). An edit to a demo template is lost on the next release until that Issue is fixed.
 - `deploy/deploy.sh` and `deploy/teardown.sh` still use the `toktickit` names of the kit and are not used by the workflow. Section 9 records that `deploy.sh` was not run.
 - `deploy/tests/test_deploy_workflow.py` matches text in `deploy.yml`. It guards against renames and a missing name or variable, but it does not prove the workflow works: only a run does.
-- The workflow has not run when this section is written. The first real run is the release of Issue #66.
+- The workflow ran for the first time on 2026-11-13 (section 6.6).
 
-### 6.6 First release (filled in by Issue #66)
+### 6.6 First release (Lab 5 step 7, Issues #66 and #85)
+
+Read on 13 Nov 2026 after the merge. The public URL is the one in section 5.
 
 | Item | Value |
 |---|---|
-| Release PR | |
-| Tag and commit on `main` | |
-| Deploy run | |
-| Cloud Run revision and image digest | |
-| Before and after screenshots | |
+| Release PR | [#84](https://github.com/phittayanan/habit-tracker/pull/84), `staging` (`f57d634`) into `main`, merge commit, merged by projectnewy; the change PR into `staging` was [#81](https://github.com/phittayanan/habit-tracker/pull/81) (Issue #80), approved by projectnewy |
+| Tag and commit on `main` | `v1.1` (annotated) on `723efb02a593b0d13912054cc4fc475ede1ecf5d`, the merge commit of #84. `v1.0` is unchanged |
+| Deploy run | [43439782760](https://github.com/phittayanan/habit-tracker/actions/runs/43439782760), event `push` on `723efb0`: `test-and-docker` and `deploy` succeeded. The log shows `ROLLBACK: false`, so the migration job ran (a failed migration would have stopped `release.sh` before the service update; none did); the smoke test passed (`/api/health`, `/api/ready`, page with `build 723efb0`) |
+| Image in Artifact Registry | Tag `723efb02a593b0d13912054cc4fc475ede1ecf5d` is the OCI image index `sha256:722c4bd0776a0a5dd44d90839888b6d39fadf8d91c734f2092152ed45710a8b9`. Its manifest lists the linux/amd64 image `sha256:374a5279f33b20d8b28219285eb29a3b1d856b8ba9de6e3a8cecb27fc72ff408` and an attestation `sha256:3cab102f0df639b0b691e383a880195cd15fac396820c09a474aec7e22070074` |
+| Cloud Run revision | `habit-tracker-00002-ps9`, 100% of traffic ("to latest"), deployed by the deployer service account through gcloud; its image digest is `374a5279…`, the amd64 image inside the index above. The previous revision `habit-tracker-00001-q48` has 0% |
+| Public URL | Health and readiness answered and the page source held `<meta name="build" content="723efb0">` on 2026-11-13 |
+| Before and after screenshots | Kept by the owner and attached to the Issue #66 closing comment, not in the repository |
+
+The Console pages (Cloud Run revisions, Artifact Registry digests and manifest) were read, read-only, in the owner's signed-in browser session by Claude in Chrome; no `gcloud` or other GCP command was run by an AI agent.
 
 ## 7. Docker
 
