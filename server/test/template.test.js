@@ -252,3 +252,24 @@ test('TC-76: demo seed keeps an edited template and still creates a missing one 
   assert.equal(water.unit, 'glasses');
   assert.equal(await db.template.count(), 3);
 });
+
+test('TC-77: demo seed sets the password hashes again on every run (Issue #79, ADR 0053)', async () => {
+  const runSeed = (managerPassword, participantPassword) => {
+    const seedCwd = mkdtempSync(join(tmpdir(), 'habit-template-seed-'));
+    try {
+      execFileSync(process.execPath, [seedPath], { cwd: seedCwd, stdio: 'pipe', env: {
+        ...process.env, PATH: '', DATABASE_URL: process.env.TEST_DATABASE_URL, SEED_DEMO_DATA: 'true',
+        SEED_MANAGER_PASSWORD: managerPassword, SEED_PARTICIPANT_PASSWORD: participantPassword,
+      } });
+    } finally { rmSync(seedCwd, { recursive: true, force: true }); }
+  };
+  const first = [randomBytes(24).toString('base64url'), randomBytes(24).toString('base64url')];
+  const second = [randomBytes(24).toString('base64url'), randomBytes(24).toString('base64url')];
+  runSeed(...first);
+  runSeed(...second);
+  for (const user of await db.user.findMany({ where: { username: { in: ['manager1', 'participant1', 'participant2'] } } })) {
+    const index = user.role === 'MANAGER' ? 0 : 1;
+    assert.ok(await bcrypt.compare(second[index], user.passwordHash), `${user.username}: the new password must match`);
+    assert.ok(!(await bcrypt.compare(first[index], user.passwordHash)), `${user.username}: the old password must not match`);
+  }
+});
