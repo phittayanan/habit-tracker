@@ -50,5 +50,5 @@ These points compare the v1.0 contract files with the v1.0 code and tests. The c
 ## Decisions on these notes (phittayanan, 2026-11-13)
 
 - F-07, a past-dated goal blocked by an active goal on the same template: intended. No change.
-- F-07, a daily target below the template's minimum is accepted (TC-55): not intended; a defect in v1.0. Part F.6 lists it as a known limitation. The fix needs its own Issue and the rule for the lower limit decided first.
+- F-07, a daily target below the template's minimum is accepted (TC-55): not intended; a defect in v1.0. Part F.6 lists it as a known limitation. Fix tracked in Issue #74; the lower-limit rule must be decided first.
 - The nine open proposals (OP-04.9, OP-08.1, OP-08.2, OP-08.4, OP-08.7, OP-09.2, OP-09.3, OP-10.1, OP-10.2): confirmed as applied; Part E.0 says so.
