@@ -6,6 +6,8 @@ This Part splits the 17 features of Part B across the three course sprints. For 
 
 ## D.1 The three sprints {#d-1}
 
+![Figure D-1. Roadmap of the 17 features across the three sprints. Inside Sprint 1 the arrows give the build order; for later features, "needs" lists the features they depend on.](img/d-roadmap.svg)
+
 | | Sprint 1 | Sprint 2 | Sprint 3 |
 |---|---|---|---|
 | **Checkpoint** | Deliverable 1. Handout date 8 Nov 2026; LEB2 due date 15 Nov 2026 23:59 (read 2026-11-13) | Deliverable 2, 29 Nov 2026 (handout) | Final delivery, 13 Dec 2026 (handout) |
