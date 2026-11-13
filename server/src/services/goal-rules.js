@@ -5,6 +5,7 @@ export function bangkokToday(instant = new Date()) {
 }
 export const goalState = (endDate, today) => today <= endDate ? 'ACTIVE' : 'ENDED';
 export const targetWithinMaximum = (target, maximum) => target <= maximum;
+export const targetAboveMinimum = (target, minimum) => target > minimum;
 export const hasActiveGoal = (endDates, today) => endDates.some(end => goalState(end, today) === 'ACTIVE');
 
 function validTarget(value) {
