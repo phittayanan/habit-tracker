@@ -34,6 +34,20 @@ This Part splits the 17 features of Part B across the three course sprints. For 
 
 **Making it fit.** The nine features were planned as five build Issues in the order of D.1: auth (F-01, F-02), templates (F-03, F-04, F-06), goals (F-07), entries (F-08), and progress with privacy (F-09, F-10). Template edit (F-04) was then split into its own Issue after goals, giving six build Issues (Part F.5). A cut line was agreed in advance: drop F-04 first, then show F-09 as a bare number, and never cut login, the two roles, a tested rule or a finished journey. No cut was needed: all nine features are in the `v1.0` release.
 
+**If a sprint finishes early.** Spare time goes, in this order, to:
+
+1. Closing the sprint's own gaps: missing tests and the known limits listed in Part F.
+2. Starting the next sprint's features in the order of D.1.
+3. Improving the look or adding to a feature, for example after seeing another habit tracker. Only the idea is taken; no logo, image or brand.
+
+Every such change follows the normal path, so a later release never changes silently:
+
+- an Issue that records the idea;
+- an ADR when it changes a design decision (a new look would replace ADR 0044, plain screens with colour only on the calendar);
+- an approved change in Part B.5 when it changes scope, agreed by both students;
+- the contract and a failing test before the code;
+- the next release. A release that has already been submitted is never changed.
+
 **Risks carried forward.**
 
 - Sprint 2 holds six features, and Labs 5, 6 and 7 fall in the same weeks (Group Work Specification §4). Lab evidence is kept apart from feature work.
