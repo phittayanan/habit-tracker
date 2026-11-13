@@ -25,14 +25,14 @@ Status values: `todo`, `written`, `checked`.
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| A-01 | Stakeholder problem and chosen context | §3.1 | A.1 | todo |
-| A-02 | Actors and their responsibilities | §3.1 | A.2 | todo |
-| A-03 | Product scope and explicit exclusions | §3.1 | A.3 | todo |
-| A-04 | FR with stable IDs, describing observable behaviour | §3.1 | A.4 | todo |
-| A-05 | BR with stable IDs, as meaningful domain rules (full rule text lives here only) | §3.1 | A.5 | todo |
-| A-06 | Important NFR with measurable target, practical verification method and the sprint that verifies it | §3.1 | A.6 | todo |
-| A-07 | Significant assumptions | §3.1 | A.7 | todo |
-| A-08 | Design decisions, questions and their resolution | §3.1, §4.1 | A.8 | todo |
+| A-01 | Stakeholder problem and chosen context | §3.1 | A.1 | written |
+| A-02 | Actors and their responsibilities | §3.1 | A.2 | written |
+| A-03 | Product scope and explicit exclusions | §3.1 | A.3 | written |
+| A-04 | FR with stable IDs, describing observable behaviour | §3.1 | A.4 | written |
+| A-05 | BR with stable IDs, as meaningful domain rules (full rule text lives here only) | §3.1 | A.5 | written |
+| A-06 | Important NFR with measurable target, practical verification method and the sprint that verifies it | §3.1 | A.6 | written |
+| A-07 | Significant assumptions | §3.1 | A.7 | written |
+| A-08 | Design decisions, questions and their resolution | §3.1, §4.1 | A.8 | written |
 
 ## Part B. Feature inventory and traceability (10 points)
 
