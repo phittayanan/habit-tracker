@@ -171,7 +171,7 @@ Progress and streaks are computed from entries each time, so an edit needs no ex
 ### 3.6 Database setup, migrations and seed data
 - **Setup:** PostgreSQL 16 (the kit's version). The connection comes only from `DATABASE_URL` (section 7).
 - **Migrations:** Prisma migrations, applied with `prisma migrate deploy`. They are additive only (add tables or columns), so an older image still works after a rollback (SG Ep. 0.4). Each migration is committed with the feature that needs it.
-- **Seed:** a script that is safe to run twice (the kit's `npm run prisma:seed`). It creates synthetic data only: one Manager, at least two Participants (the cross-account tests need two), and a few templates. Seeded passwords are read from environment variables, never written in code or the repository (SG Ep. 2.2). Account names are open (SRS A-9).
+- **Seed:** a script that is safe to run twice (the kit's `npm run prisma:seed`). It creates synthetic data only: one Manager, at least two Participants (the cross-account tests need two), and a few templates. Seeded passwords are read from environment variables, never written in code or the repository (SG Ep. 2.2). Account names are open (SRS A-9). The seed creates a demo template only when no template of that name exists and never changes an existing one, so a Manager's edit survives a release; it sets the password hash of the three seeded accounts from the environment on every run (ADR 0053).
 - **Tests:** ADR 0035 says the tests run against a real test database. That the suite uses its own database and resets and seeds it before each run is a proposal (S-15).
 
 ## 4. Interface Design
