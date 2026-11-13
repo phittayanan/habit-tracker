@@ -1,6 +1,6 @@
 # 0052. Deploy smoke test, build label and release tag
 
-Status: decided by the owner for implementation in Issue #80; teammate review pending
+Status: accepted (decided by the owner; projectnewy approved the implementation in PR #81 on 2026-11-13)
 
 ## Decision
 
