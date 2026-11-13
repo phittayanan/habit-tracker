@@ -68,9 +68,9 @@ Status values: `todo`, `written`, `checked`.
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| D-01 | For each sprint: goal, feature IDs, dependencies, completion outcome | §3.4, §4.1 | D.1 | todo |
-| D-02 | The three sprints together cover the product baseline | §3.4 | D.1 | todo |
-| D-03 | Why Sprint 1 has its scope | §4.1 | D.2 | todo |
+| D-01 | For each sprint: goal, feature IDs, dependencies, completion outcome | §3.4, §4.1 | D.1 | written |
+| D-02 | The three sprints together cover the product baseline | §3.4 | D.1 | written |
+| D-03 | Why Sprint 1 has its scope | §4.1 | D.2 | written |
 
 ## Part E. Sprint 1 engineering contracts (20 points)
 
