@@ -30,7 +30,8 @@ if (!managerPassword || !participantPassword) {
         const manager = await tx.user.findUniqueOrThrow({ where: { username: 'manager1' } });
         for (const [name, unit, minValue, maxValue] of demoTemplates) {
           const data = { unit, minValue, maxValue, createdBy: manager.id };
-          await tx.template.upsert({ where: { name }, create: { name, ...data }, update: data });
+          // Create only when missing: an existing template keeps a Manager's edits (ADR 0053).
+          await tx.template.upsert({ where: { name }, create: { name, ...data }, update: {} });
         }
       }
     });
