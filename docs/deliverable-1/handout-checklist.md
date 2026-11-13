@@ -93,37 +93,37 @@ One contract per Sprint 1 feature: F-01, F-02, F-03, F-04, F-06, F-07, F-08, F-0
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| F-01 | Brief setup summary: dependencies, environment-variable examples, database setup, migrations and seed, run, build and test commands | §4.4 | F.1 | todo |
-| F-02 | Safe test access via the local seed procedure; synthetic data; no real passwords, tokens or secrets | §4.4 | F.1 | todo |
-| F-03 | Release commit named once for the demonstration set, with any exception | §4.2 | F.2 | todo |
-| F-04 | Scenario 1: complete normal journey through UI, API and database, then retrieval of the saved result | §3.6, §4.2 | F.2 | todo |
-| F-05 | Scenario 2: meaningful business-rule or boundary rejection with the expected failure shown | §3.6, §4.2 | F.2 | todo |
-| F-06 | Scenario 3: login and logout, plus a forbidden role or ownership operation | §3.6, §4.2 | F.2 | todo |
-| F-07 | Each scenario labelled with feature and AC IDs, role, starting conditions, brief steps, expected and actual result | §4.2 | F.2 | todo |
-| F-08 | Backend or API test evidence for protected operations (hiding a button is not authorization) | §3.6, §4.2 | F.2 | todo |
-| F-09 | Automated checks for valid and invalid login, unauthenticated protected requests, forbidden role operations | §3.6 | F.3 | todo |
-| F-10 | Build and test commands, tested commit, readable output with passing, failing and skipped counts | §3.6, §4.2 | F.3 | todo |
-| F-11 | Results table: each Sprint 1 AC → planned test ID → actual test file and name → result; automated and manual checks marked apart (results by ID only, no AC text) | §4.2 | F.3 | todo |
-| F-12 | Test excerpt 1: an important domain rule, with setup, assertion and result | §4.2 | F.4 | todo |
-| F-13 | Test excerpt 2: a role or ownership restriction, with setup, assertion and result | §4.2 | F.4 | todo |
-| F-14 | TDD evidence: the intended test failing before the fix and passing after, with versions | §3.5, §4.2 | F.4 | todo |
-| F-15 | Two completed Issues with their PRs: feature and contract IDs, branches, author and reviewer, a substantive review, integration into staging and main (the only Issue and PR links in the PDF) | §3.6, §4.2 | F.5 | todo |
-| F-16 | Final board status and release reference | §4.2 | F.5 | todo |
-| F-17 | Short history sequence with commit IDs and dates: contracts and test design recorded before implementation | §3.5, §4.2 | F.5 | todo |
-| F-18 | Short contribution table showing both students and pair work | §3.6, §4.2 | F.6 | todo |
-| F-19 | Brief AI-use declaration | §4.2 | F.6 | todo |
-| F-20 | Known incomplete work, failed and skipped tests | §3.6, §4.2 | F.6 | todo |
+| F-01 | Brief setup summary: dependencies, environment-variable examples, database setup, migrations and seed, run, build and test commands | §4.4 | F.1 | written |
+| F-02 | Safe test access via the local seed procedure; synthetic data; no real passwords, tokens or secrets | §4.4 | F.1 | written |
+| F-03 | Release commit named once for the demonstration set, with any exception | §4.2 | F.2 | written |
+| F-04 | Scenario 1: complete normal journey through UI, API and database, then retrieval of the saved result | §3.6, §4.2 | F.2 | written |
+| F-05 | Scenario 2: meaningful business-rule or boundary rejection with the expected failure shown | §3.6, §4.2 | F.2 | written |
+| F-06 | Scenario 3: login and logout, plus a forbidden role or ownership operation | §3.6, §4.2 | F.2 | written |
+| F-07 | Each scenario labelled with feature and AC IDs, role, starting conditions, brief steps, expected and actual result | §4.2 | F.2 | written |
+| F-08 | Backend or API test evidence for protected operations (hiding a button is not authorization) | §3.6, §4.2 | F.2 | written |
+| F-09 | Automated checks for valid and invalid login, unauthenticated protected requests, forbidden role operations | §3.6 | F.3 | written |
+| F-10 | Build and test commands, tested commit, readable output with passing, failing and skipped counts | §3.6, §4.2 | F.3 | written |
+| F-11 | Results table: each Sprint 1 AC → planned test ID → actual test file and name → result; automated and manual checks marked apart (results by ID only, no AC text) | §4.2 | F.3 | written |
+| F-12 | Test excerpt 1: an important domain rule, with setup, assertion and result | §4.2 | F.4 | written |
+| F-13 | Test excerpt 2: a role or ownership restriction, with setup, assertion and result | §4.2 | F.4 | written |
+| F-14 | TDD evidence: the intended test failing before the fix and passing after, with versions | §3.5, §4.2 | F.4 | written |
+| F-15 | Two completed Issues with their PRs: feature and contract IDs, branches, author and reviewer, a substantive review, integration into staging and main (the only Issue and PR links in the PDF) | §3.6, §4.2 | F.5 | written |
+| F-16 | Final board status and release reference | §4.2 | F.5 | written |
+| F-17 | Short history sequence with commit IDs and dates: contracts and test design recorded before implementation | §3.5, §4.2 | F.5 | written |
+| F-18 | Short contribution table showing both students and pair work | §3.6, §4.2 | F.6 | written |
+| F-19 | Brief AI-use declaration | §4.2 | F.6 | written |
+| F-20 | Known incomplete work, failed and skipped tests | §3.6, §4.2 | F.6 | written |
 
 ## Sprint 1 outcome the evidence must show (§2)
 
 | ID | Handout requirement | Ref | Shown in | Status |
 |---|---|---|---|---|
-| O-01 | Working increment released on `main` with documented local setup | §2 | F.1, F.5 | todo |
-| O-02 | Complete domain journey through UI, API or application layer, and database | §2 | F.2 | todo |
-| O-03 | Real login, logout and current-user identity; at least two meaningful roles | §2 | C.6, F.2 | todo |
-| O-04 | A meaningful domain transaction or state transition with business-rule validation | §2 | E, F.2 | todo |
-| O-05 | Automated tests for domain rules, persistence, access restrictions, and selected UI or end-to-end journeys | §2 | F.3 | todo |
-| O-06 | Issues, feature branches, teammate-reviewed PRs, staging integration, accepted release on `main` | §2 | F.5 | todo |
+| O-01 | Working increment released on `main` with documented local setup | §2 | F.1, F.5 | written |
+| O-02 | Complete domain journey through UI, API or application layer, and database | §2 | F.2 | written |
+| O-03 | Real login, logout and current-user identity; at least two meaningful roles | §2 | C.6, F.2 | written |
+| O-04 | A meaningful domain transaction or state transition with business-rule validation | §2 | E, F.2 | written |
+| O-05 | Automated tests for domain rules, persistence, access restrictions, and selected UI or end-to-end journeys | §2 | F.3 | written |
+| O-06 | Issues, feature branches, teammate-reviewed PRs, staging integration, accepted release on `main` | §2 | F.5 | written |
 
 ## Submission checklist (§5)
 
