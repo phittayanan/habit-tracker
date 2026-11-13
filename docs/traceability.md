@@ -148,7 +148,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-72 | Template edit: merged range below, duplicate name 409, own name accepted | Unit and API |
 | TC-73 | Template edit form: a valid change shows in the table; an edit of a used template shows the API message | Browser |
 | TC-74 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on the template, `POST /api/goals` waits, then reads the template as committed | API and database |
-| TC-80 | Lab 5 technical check (Issues #66, #80, ADR 0052; no feature ID): the build label shows on the login page and in the top bar | Browser |
+| TC-75 | Lab 5 technical check (Issues #66, #80, ADR 0052; no feature ID): the build label shows on the login page and in the top bar | Browser |
 | none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 
 ## Coverage Gaps

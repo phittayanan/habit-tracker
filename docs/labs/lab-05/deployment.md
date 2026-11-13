@@ -124,7 +124,7 @@ Written in step 7 (Issue #80, part of Issue #66) before the first release ran. T
 2. Check that `staging` contains `main`: `git fetch origin && git merge-base --is-ancestor origin/main origin/staging && echo yes`. If not, sync first with a small Issue and PR that merges `main` into `staging` (as Issue #77, PR #78). Every release PR leaves a merge commit on `main` that `staging` does not have, so this is needed after each release.
 3. Open the release PR from `staging` into `main`. `Closes #N` does not work here (`main` is not the default branch); refer to the release Issue without a closing keyword. CI must be green on the final head.
 4. The teammate who did not open the PR reviews it with a specific check and merges it with a merge commit.
-5. The merge starts `Deploy` by itself. Read the run: the commit tag in the summary, the migration job, the smoke test.
+5. The merge starts `Deploy` by itself. Read the run: the commit tag in the summary, the migration job, the smoke test. On the first run, read the `Rollback:` line in the summary: it must say `false`. If it says `true`, stop and fix the workflow before anything else, because a rollback skips the migration.
 6. Tag `main` only after the run is green and the Cloud Run revision uses the commit that was merged (section 6.3). The tag for Lab 5 is `v1.1` (ADR 0052). A submitted tag never moves.
 7. Record the tag, commit, run link and revision in section 6.6.
 
@@ -138,6 +138,8 @@ Written in step 7 (Issue #80, part of Issue #66) before the first release ran. T
 
 ### 6.4 Roll back
 
+**Which commits can be a target.** Only a commit built by `deploy.yml` after PR #81: its image tag is the full 40-character commit and its page carries the build tag the smoke test looks for. The image running before the first release (tag `761a408`, from step 5) cannot be a target: its 7-character tag is rejected by the 40-character check, and its page has no build tag, so the smoke test would fail even if the service were pointed back. The first release therefore has no one-click way back. Before the release, the owner notes the digest of the running image outside Git, so it can be restored by hand in the Console if needed.
+
 Run the workflow `Deploy` by hand on `main` and enter `image_tag` = the full 40-character commit of an image that is already in Artifact Registry. Tests, build and migration are skipped; only the service is pointed back at that image. The smoke test then expects that commit in the page.
 
 A rollback does not undo a migration. If a migration after the target commit changed the schema in a way the older code cannot read, the older image can fail. Check the migrations between the two commits before a rollback.
@@ -146,6 +148,7 @@ A rollback does not undo a migration. If a migration after the target commit cha
 
 - The migration job runs the seed on every release. The seed overwrites the unit, minimum and maximum of the three demo templates and resets the three account passwords from the secrets (Issue #79). An edit to a demo template is lost on the next release until that Issue is fixed.
 - `deploy/deploy.sh` and `deploy/teardown.sh` still use the `toktickit` names of the kit and are not used by the workflow. Section 9 records that `deploy.sh` was not run.
+- `deploy/tests/test_deploy_workflow.py` matches text in `deploy.yml`. It guards against renames and a missing name or variable, but it does not prove the workflow works: only a run does.
 - The workflow has not run when this section is written. The first real run is the release of Issue #66.
 
 ### 6.6 First release (filled in by Issue #66)
