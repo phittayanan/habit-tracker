@@ -1,5 +1,5 @@
 import { computeProgress } from './progress-rules.js';
-import { bangkokToday, goalState, targetWithinMaximum, hasActiveGoal } from './goal-rules.js';
+import { bangkokToday, goalState, targetWithinMaximum, targetAboveMinimum, hasActiveGoal } from './goal-rules.js';
 const dateText = value => value.toISOString().slice(0, 10);
 const dateValue = text => new Date(`${text}T00:00:00Z`);
 export function toGoal(row, today) {
@@ -27,6 +27,7 @@ export async function createGoal(db, user, data) {
     const [template] = await tx.$queryRaw`SELECT id, name, unit, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${data.templateId} FOR UPDATE`;
     if (!template) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Choose an existing template.' };
     if (!targetWithinMaximum(data.dailyTarget, Number(template.maxValue))) return { ok: false, status: 400, code: 'TARGET_ABOVE_TEMPLATE_MAX', message: 'Daily target must not exceed the template maximum.' };
+    if (!targetAboveMinimum(data.dailyTarget, Number(template.minValue))) return { ok: false, status: 400, code: 'TARGET_NOT_ABOVE_TEMPLATE_MIN', message: 'Daily target must be above the template minimum.' };
     // Compute today after waiting for the lock, so a Bangkok midnight during a wait
     // cannot leave an ended goal blocking a new one.
     const today = bangkokToday();

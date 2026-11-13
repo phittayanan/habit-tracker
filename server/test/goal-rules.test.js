@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseGoalCreate, targetWithinMaximum, hasActiveGoal, bangkokToday, goalState } from '../src/services/goal-rules.js';
+import { parseGoalCreate, targetWithinMaximum, targetAboveMinimum, hasActiveGoal, bangkokToday, goalState } from '../src/services/goal-rules.js';
 const valid = { templateId: 1, dailyTarget: 24, startDate: '2026-11-10', endDate: '2026-11-12' };
 test('Goal unit rules: positive exact decimals, real dates and end-date order', () => {
   for (const dailyTarget of [0.01, 0.29, 1, 24, 99999999.99]) assert.equal(parseGoalCreate({ ...valid, dailyTarget }).ok, true);
@@ -11,6 +11,10 @@ test('Goal unit rules: positive exact decimals, real dates and end-date order', 
   assert.equal(parseGoalCreate({ ...valid, endDate: '2026-11-09' }).ok, false);
   assert.equal(parseGoalCreate().ok, false);
   assert.deepEqual(parseGoalCreate({ ...valid, userId: 99 }).data, valid);
+});
+test('TC-78 unit: the target must be above the template minimum (Issue #74, ADR 0054)', () => {
+  assert.equal(targetAboveMinimum(10, 10), false); assert.equal(targetAboveMinimum(5, 10), false); assert.equal(targetAboveMinimum(0.01, 10), false);
+  assert.equal(targetAboveMinimum(10.01, 10), true); assert.equal(targetAboveMinimum(0.01, 0), true);
 });
 test('Goal unit BR-05/BR-06 and target maximum: ended, future, exact boundary', () => {
   assert.equal(targetWithinMaximum(24, 24), true); assert.equal(targetWithinMaximum(24.01, 24), false);
