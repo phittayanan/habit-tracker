@@ -42,7 +42,7 @@ The seed creates three synthetic accounts: `manager1`, `participant1` and `parti
 
 ## F.2 Program demonstrations {#f-2}
 
-All screenshots: release `64831f7`, desktop width 1280 px, taken with a scripted headless browser on a local run of the built app on 2026-11-13 (Bangkok date 13 Nov). No exceptions.
+All screenshots: release `64831f7`, browser width 800 px (desktop layout), taken with a scripted headless browser on a local run of the built app on 2026-11-13 (Bangkok date 13 Nov). No exceptions.
 
 ### Scenario 1: full journey, then the saved result after a restart {#scenario-1}
 

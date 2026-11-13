@@ -12,14 +12,14 @@ Status values: `todo`, `written`, `checked`.
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| H-01 | Both students' names and IDs (IDs added to the local PDF only, never in Git) | §4 | Front page | todo |
-| H-02 | Selected theme and context | §4 | Front page | todo |
-| H-03 | One repository URL | §4 | Front page | todo |
-| H-04 | Submitted release tag and commit | §4 | Front page | todo |
-| H-05 | Table of contents with page numbers | §4.1 | Front, Contents | todo |
-| H-06 | Navigation table: one row per Part A–F with page range and relevant IDs, using in-PDF page references | §4.3 | Front, Navigation | todo |
-| H-07 | Headings A–F in the handout's order | §4.1 | Whole PDF | todo |
-| H-08 | Text, diagrams, tables and screenshots readable at normal viewing size | §4.1 | Whole PDF | todo |
+| H-01 | Both students' names and IDs (IDs added to the local PDF only, never in Git) | §4 | Front page | written |
+| H-02 | Selected theme and context | §4 | Front page | written |
+| H-03 | One repository URL | §4 | Front page | written |
+| H-04 | Submitted release tag and commit | §4 | Front page | written |
+| H-05 | Table of contents with page numbers | §4.1 | Front, Contents | written |
+| H-06 | Navigation table: one row per Part A–F with page range and relevant IDs, using in-PDF page references | §4.3 | Front, Navigation | written |
+| H-07 | Headings A–F in the handout's order | §4.1 | Whole PDF | written |
+| H-08 | Text, diagrams, tables and screenshots readable at normal viewing size | §4.1 | Whole PDF | written |
 
 ## Part A. SRS and product scope (10 points)
 
