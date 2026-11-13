@@ -64,55 +64,55 @@ The two students and the course staff build and assess the product. They are not
 
 ## A.4 Business rules (BR) {#a-4}
 
-A business rule is a domain constraint the server must enforce whatever the screen allows. Each rule is tested at the level shown; the tests are listed per acceptance criterion in Part E.
+A business rule is a domain constraint the server must enforce whatever the screen allows. The sprint that builds each rule and the tests that verify it are in Part B.2.
 
-| ID | Rule | Decision | Sprint | Verified by |
-|---|---|---|---|---|
-| BR-01 | An entry may only be recorded for today or an earlier day, and only for a day between its goal's start date and end date, both included. Any other date is refused. | ADR 0005 | 1 | Unit and API tests |
-| BR-02 | Every date is a day in the Asia/Bangkok time zone, the same for every user. | ADR 0006 | 1 | Unit tests around Bangkok midnight |
-| BR-03 | A template's lowest value must be below its highest value. An entry's value must lie between the two, both included. | ADR 0007 | 1 | Unit and API tests at, below and above each limit |
-| BR-04 | A goal has at most one entry per day. A second entry for the same goal and day is refused (409); the Participant changes the existing entry instead (from Sprint 2, BR-11). | ADR 0008 | 1 | API test |
-| BR-05 | A Participant has at most one active goal per template (active as defined in BR-06, so a goal that starts in the future already counts). | ADR 0010 | 1 | API test |
-| BR-06 | A goal is Active from the day it is created until its end date has passed, and Ended after that. The state is worked out from the dates each time and is never stored or set by hand. | ADR 0012 | 1 | Unit tests on the start day, end day and the day after |
-| BR-07 | Progress is the number of days met out of the days so far. A day is met when its entry is at least the daily target. The days so far run from the start date to today, or to the end date once the goal has ended; a goal that has not started has 0 of 0. | ADR 0013 | 1 | Unit tests on met, missed and empty days |
-| BR-08 | A Manager may edit a template only while no goal uses it. Once a goal uses it, it can only be retired. A retired template cannot start a new goal; goals that already use it carry on. | ADR 0017 | Edit 1; retire 2 | API tests |
-| BR-09 | A Participant can never create, edit or retire a template. | ADR 0018 | 1 | API tests (403) |
-| BR-10 | A Participant's goals and entries are visible only to that Participant. A Manager or another Participant is refused. | ADR 0019 | 1 | API tests across three accounts |
-| BR-11 | An entry may be edited or deleted on any day inside its goal's period; progress and streaks are then worked out again. | ADR 0009 | 2 | — |
-| BR-12 | Changing a goal's target takes effect from today. Earlier days are still judged against the old target, so every version of the goal is kept. | ADR 0011 | 2 | — |
-| BR-13 | A streak counts consecutive days met. One missed day sets it back to zero. Today does not break the streak until today is over. | ADR 0015 | 3 | — |
-| BR-14 | A reminder (a time and weekdays, per goal) is stored and shown. Nothing is sent. | ADR 0016 | 3 | — |
-| BR-15 | On the calendar a day is green when every goal was met, yellow when some were, red when none were, and grey when nothing was recorded. | ADR 0040, 0045, 0046 | 2 | — |
+| ID | Rule | Decision |
+|---|---|---|
+| BR-01 | An entry may only be recorded for today or an earlier day, and only for a day between its goal's start date and end date, both included. Any other date is refused. | ADR 0005 |
+| BR-02 | Every date is a day in the Asia/Bangkok time zone, the same for every user. | ADR 0006 |
+| BR-03 | A template's lowest value must be below its highest value. An entry's value must lie between the two, both included. | ADR 0007 |
+| BR-04 | A goal has at most one entry per day. A second entry for the same goal and day is refused (409); the Participant changes the existing entry instead (from Sprint 2, BR-11). | ADR 0008 |
+| BR-05 | A Participant has at most one active goal per template (active as defined in BR-06, so a goal that starts in the future already counts). | ADR 0010 |
+| BR-06 | A goal is Active from the day it is created until its end date has passed, and Ended after that. The state is worked out from the dates each time and is never stored or set by hand. | ADR 0012 |
+| BR-07 | Progress is the number of days met out of the days so far. A day is met when its entry is at least the daily target. The days so far run from the start date to today, or to the end date once the goal has ended; a goal that has not started has 0 of 0. | ADR 0013 |
+| BR-08 | A Manager may edit a template only while no goal uses it. Once a goal uses it, it can only be retired. A retired template cannot start a new goal; goals that already use it carry on. | ADR 0017 |
+| BR-09 | A Participant can never create, edit or retire a template. | ADR 0018 |
+| BR-10 | A Participant's goals and entries are visible only to that Participant. A Manager or another Participant is refused. | ADR 0019 |
+| BR-11 | An entry may be edited or deleted on any day inside its goal's period; progress and streaks are then worked out again. | ADR 0009 |
+| BR-12 | Changing a goal's target takes effect from today. Earlier days are still judged against the old target, so every version of the goal is kept. | ADR 0011 |
+| BR-13 | A streak counts consecutive days met. One missed day sets it back to zero. Today does not break the streak until today is over. | ADR 0015 |
+| BR-14 | A reminder (a time and weekdays, per goal) is stored and shown. Nothing is sent. | ADR 0016 |
+| BR-15 | On the calendar a day is green when every goal was met, yellow when some were, red when none were, and grey when nothing was recorded. | ADR 0040, 0045, 0046 |
 
 ## A.5 Functional requirements (FR) {#a-5}
 
-Each FR is behaviour a user or a test can observe.
+Each FR is behaviour a user or a test can observe. Its feature, sprint and tests are in Part B.2.
 
-| ID | Requirement | Decision | Sprint |
-|---|---|---|---|
-| FR-01 | A user logs in with a seeded username and password. A correct login creates a session row in the database and sets an HTTP-only cookie that carries only the session ID. A wrong login creates no session and gives the same answer whether the username or the password was wrong. | ADR 0027, 0051 | 1 |
-| FR-02 | A logged-in user logs out. The session row is deleted, and the old cookie stops working at once. | ADR 0027 | 1 |
-| FR-03 | A logged-in user can ask who they are and gets their display name and role. A request to any protected path without a valid session gets 401. | ADR 0027 | 1 |
-| FR-04 | A session lasts 8 hours from login and is not extended by use. After that every protected request gets 401. | ADR 0028 | 1 |
-| FR-05 | A Manager creates a template with a name, a free-text unit and a lowest and highest value per day. A lowest value that is not below the highest is refused. | ADR 0007, 0043 | 1 |
-| FR-06 | A Manager sees all templates in a table (name, unit, range, active or retired) with New and Edit actions. A Retire action joins it in Sprint 2. | ADR 0043 | 1 |
-| FR-07 | A Manager edits a template's name, unit or range while no goal uses it, and is refused once a goal uses it. | ADR 0017 | 1 |
-| FR-08 | A Manager retires a template. It no longer appears for new goals; goals that already use it keep working. | ADR 0017 | 2 |
-| FR-09 | A Participant sees every active template, read-only. | ADR 0018 | 1 |
-| FR-10 | A Participant creates a goal with a "+ New goal" form: template, daily target, start date and end date. The target must be above 0 and not above the template's highest value. A second active goal on the same template is refused. | ADR 0010, 0049 | 1 |
-| FR-11 | A Participant records a day's value by typing a number. The template's unit is shown. A refused entry (BR-01, BR-03, BR-04) shows a message that says why. | ADR 0008, 0039 | 1 |
-| FR-12 | A Participant sees each goal's progress as days met out of days so far. | ADR 0013 | 1 |
-| FR-13 | A Participant sees only their own goals, entries and progress. Asking for another Participant's data is refused. | ADR 0019 | 1 |
-| FR-14 | A Manager asking for any Participant's goals or entries is refused. | ADR 0019 | 1 |
-| FR-15 | After login a Participant first sees this month's calendar. On a desktop the calendar is on the left and a side panel on the right shows the chosen day (today at first) with a number box for every goal. | ADR 0037, 0045, 0047 | 2 |
-| FR-16 | The calendar colours each day by BR-15. | ADR 0040, 0045, 0046 | 2 |
-| FR-17 | A Participant edits or deletes an entry on any day inside the goal's period. | ADR 0009 | 2 |
-| FR-18 | A Participant changes a goal's target from today on; earlier days keep the old target. | ADR 0011 | 2 |
-| FR-19 | Two buttons above the calendar switch between Calendar and List. The list shows the same month's records by date, newest first. | ADR 0014, 0041, 0048 | 2 |
-| FR-20 | A Participant sees the current streak next to each goal and the best streak on the goal's detail page. | ADR 0015, 0042 | 3 |
-| FR-21 | A Participant stores a reminder time and weekdays for a goal; the app shows them and sends nothing. | ADR 0016 | 3 |
-| FR-22 | Everyone gets the same layout; the menu items depend on the role. The server still checks every request. | ADR 0026 | 1 |
-| FR-23 | A Participant's request to create, edit or retire a template is refused with 403 and changes nothing. | ADR 0018 | 1 (create, edit); 2 (retire) |
+| ID | Requirement | Decision |
+|---|---|---|
+| FR-01 | A user logs in with a seeded username and password. A correct login creates a session row in the database and sets an HTTP-only cookie that carries only the session ID. A wrong login creates no session and gives the same answer whether the username or the password was wrong. | ADR 0027, 0051 |
+| FR-02 | A logged-in user logs out. The session row is deleted, and the old cookie stops working at once. | ADR 0027 |
+| FR-03 | A logged-in user can ask who they are and gets their display name and role. A request to any protected path without a valid session gets 401. | ADR 0027 |
+| FR-04 | A session lasts 8 hours from login and is not extended by use. After that every protected request gets 401. | ADR 0028 |
+| FR-05 | A Manager creates a template with a name, a free-text unit and a lowest and highest value per day. A lowest value that is not below the highest is refused. | ADR 0007, 0043 |
+| FR-06 | A Manager sees all templates in a table (name, unit, range, active or retired) with New and Edit actions. A Retire action joins it in Sprint 2. | ADR 0043 |
+| FR-07 | A Manager edits a template's name, unit or range while no goal uses it, and is refused once a goal uses it. | ADR 0017 |
+| FR-08 | A Manager retires a template. It no longer appears for new goals; goals that already use it keep working. | ADR 0017 |
+| FR-09 | A Participant sees every active template, read-only. | ADR 0018 |
+| FR-10 | A Participant creates a goal with a "+ New goal" form: template, daily target, start date and end date. The target must be above 0 and not above the template's highest value. A second active goal on the same template is refused. | ADR 0010, 0049 |
+| FR-11 | A Participant records a day's value by typing a number. The template's unit is shown. A refused entry (BR-01, BR-03, BR-04) shows a message that says why. | ADR 0008, 0039 |
+| FR-12 | A Participant sees each goal's progress as days met out of days so far. | ADR 0013 |
+| FR-13 | A Participant sees only their own goals, entries and progress. Asking for another Participant's data is refused. | ADR 0019 |
+| FR-14 | A Manager asking for any Participant's goals or entries is refused. | ADR 0019 |
+| FR-15 | After login a Participant first sees this month's calendar. On a desktop the calendar is on the left and a side panel on the right shows the chosen day (today at first) with a number box for every goal. | ADR 0037, 0045, 0047 |
+| FR-16 | The calendar colours each day by BR-15. | ADR 0040, 0045, 0046 |
+| FR-17 | A Participant edits or deletes an entry on any day inside the goal's period. | ADR 0009 |
+| FR-18 | A Participant changes a goal's target from today on; earlier days keep the old target. | ADR 0011 |
+| FR-19 | Two buttons above the calendar switch between Calendar and List. The list shows the same month's records by date, newest first. | ADR 0014, 0041, 0048 |
+| FR-20 | A Participant sees the current streak next to each goal and the best streak on the goal's detail page. | ADR 0015, 0042 |
+| FR-21 | A Participant stores a reminder time and weekdays for a goal; the app shows them and sends nothing. | ADR 0016 |
+| FR-22 | Everyone gets the same layout; the menu items depend on the role. The server still checks every request. | ADR 0026 |
+| FR-23 | A Participant's request to create, edit or retire a template is refused with 403 and changes nothing. | ADR 0018 |
 
 ## A.6 Non-functional requirements (NFR) {#a-6}
 

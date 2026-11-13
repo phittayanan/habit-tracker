@@ -38,12 +38,12 @@ Status values: `todo`, `written`, `checked`.
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| B-01 | Features with stable IDs, short description, related requirements, dependencies and planned sprint | §3.2 | B.1 | todo |
-| B-02 | Requirement → feature or responsibility → sprint and verification table covering every baseline FR, BR and important NFR (AC as ID ranges; full AC in Part E) | §3.2, §4.1 | B.2 | todo |
-| B-03 | Cross-cutting requirements linked to features or a named system responsibility, with the sprint that sets it up and the sprint that verifies it | §3.2 | B.3 | todo |
-| B-04 | Later-sprint requirements have a feature or responsibility and a sprint now | §3.2 | B.2 | todo |
-| B-05 | Uncovered requirements shown explicitly | §3.2, §4.1 | B.4 | todo |
-| B-06 | Approved changes shown explicitly | §3.2, §4.1 | B.5 | todo |
+| B-01 | Features with stable IDs, short description, related requirements, dependencies and planned sprint | §3.2 | B.1 | written |
+| B-02 | Requirement → feature or responsibility → sprint and verification table covering every baseline FR, BR and important NFR (AC as ID ranges; full AC in Part E) | §3.2, §4.1 | B.2 | written |
+| B-03 | Cross-cutting requirements linked to features or a named system responsibility, with the sprint that sets it up and the sprint that verifies it | §3.2 | B.3 | written |
+| B-04 | Later-sprint requirements have a feature or responsibility and a sprint now | §3.2 | B.2, B.4 | written |
+| B-05 | Uncovered requirements shown explicitly | §3.2, §4.1 | B.4 | written |
+| B-06 | Approved changes shown explicitly | §3.2, §4.1 | B.5 | written |
 
 ## Part C. System-Level SDS (15 points)
 
