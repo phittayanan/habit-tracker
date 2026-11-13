@@ -49,20 +49,20 @@ Status values: `todo`, `written`, `checked`.
 
 | ID | Handout requirement | Ref | Home | Status |
 |---|---|---|---|---|
-| C-01 | Selected stack and each component's role across UI, API or application layer, and database | §3.3 | C.1 | todo |
-| C-02 | How the components communicate | §3.3 | C.1 | todo |
-| C-03 | Where business rules are enforced | §3.3 | C.1 | todo |
-| C-04 | Major entities, fields, relationships, important constraints and ownership links (the only full data model in the PDF) | §3.3 | C.2 | todo |
-| C-05 | Database setup, migrations and reproducible seed data | §3.3 | C.2 | todo |
-| C-06 | Diagram where it clarifies the architecture or the data model | §3.3, §4.1 | C.1, C.2 | todo |
-| C-07 | Main screens and navigation | §3.3 | C.3 | todo |
-| C-08 | Shared UI behaviour: validation, loading, empty and error states | §3.3 | C.3 | todo |
-| C-09 | API approach: endpoint conventions, request and response shape, validation, safe error handling | §3.3 | C.4 | todo |
-| C-10 | Role and permission matrix: who may perform each protected operation and which records they may access; backend enforcement, not hidden controls (the only full matrix in the PDF) | §3.3 | C.5 | todo |
-| C-11 | Credential handling and password hashing | §3.3 | C.6 | todo |
-| C-12 | Session creation and expiry, current-user retrieval, logout | §3.3 | C.6 | todo |
-| C-13 | Environment variables, secret handling, database configuration | §3.3 | C.7 | todo |
-| C-14 | Planned GCP deployment components; fit for Docker packaging and durable storage; no real secrets in Git or client code | §3.3 | C.7 | todo |
+| C-01 | Selected stack and each component's role across UI, API or application layer, and database | §3.3 | C.1 | written |
+| C-02 | How the components communicate | §3.3 | C.1 | written |
+| C-03 | Where business rules are enforced | §3.3 | C.1 | written |
+| C-04 | Major entities, fields, relationships, important constraints and ownership links (the only full data model in the PDF) | §3.3 | C.2 | written |
+| C-05 | Database setup, migrations and reproducible seed data | §3.3 | C.2 | written |
+| C-06 | Diagram where it clarifies the architecture or the data model | §3.3, §4.1 | C.1, C.2 | written |
+| C-07 | Main screens and navigation | §3.3 | C.3 | written |
+| C-08 | Shared UI behaviour: validation, loading, empty and error states | §3.3 | C.3 | written |
+| C-09 | API approach: endpoint conventions, request and response shape, validation, safe error handling | §3.3 | C.4 | written |
+| C-10 | Role and permission matrix: who may perform each protected operation and which records they may access; backend enforcement, not hidden controls (the only full matrix in the PDF) | §3.3 | C.5 | written |
+| C-11 | Credential handling and password hashing | §3.3 | C.6 | written |
+| C-12 | Session creation and expiry, current-user retrieval, logout | §3.3 | C.6 | written |
+| C-13 | Environment variables, secret handling, database configuration | §3.3 | C.7 | written |
+| C-14 | Planned GCP deployment components; fit for Docker packaging and durable storage; no real secrets in Git or client code | §3.3 | C.7 | written |
 
 ## Part D. Three-sprint plan (5 points)
 
