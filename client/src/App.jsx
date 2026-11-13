@@ -4,6 +4,7 @@ import { TemplateForm, TemplateList } from './templates.jsx';
 
 import { GoalForm, GoalList } from './goals.jsx';
 
+const build = import.meta.env.VITE_BUILD_SHA;
 const firstPage = user => user.role === 'MANAGER' ? '/templates' : '/goals';
 
 export function App({ extraPage }) {
@@ -82,6 +83,7 @@ export function App({ extraPage }) {
       <label>Password<input name="password" type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></label>
       <button type="submit" disabled={busy}>Log in</button>
       <div className="loading" role="status">{busy ? 'Logging in…' : ''}</div>
+      <p className="build">build {build}</p>
     </form>
   </main>;
 
@@ -102,6 +104,7 @@ export function App({ extraPage }) {
         const next = `/${label.toLowerCase()}`;
         return <a key={label} href={next} aria-current={path === next ? 'page' : undefined} onClick={event => follow(event, next)}>{label}</a>;
       })}</nav>
+      <span className="build">build {build}</span>
       <button type="button" onClick={logout} disabled={busy}>Log out</button>
     </header>
     <main className="shell">

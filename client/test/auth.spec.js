@@ -137,3 +137,10 @@ test('TC-47 / TC-48: approved width, no overflow, keyboard-only form/menu/logout
   await expect(page).toHaveURL(/\/login$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('TC-80: the build label shows on the login page and in the top bar (ADR 0052)', async ({ page }) => {
+  await page.goto('/login');
+  await expect(page.getByText(/^build [0-9a-f]{7}$|^build dev$/)).toBeVisible();
+  await logIn(page);
+  await expect(page.locator('header.topbar').getByText(/^build [0-9a-f]{7}$|^build dev$/)).toBeVisible();
+});

@@ -70,7 +70,7 @@ jobs:
           bash -n deploy/deploy.sh deploy/teardown.sh deploy/release.sh
           bash deploy/tests/test_deploy_stub.sh
           bash deploy/tests/test_release_stub.sh
-          python3 -m unittest discover -s deploy/tests -p 'test_smoke.py'
+          python3 -m unittest discover -s deploy/tests -p 'test_*.py'
 
       # Built first: the server's production-serving test needs client/dist/index.html.
       - name: Install and build client
