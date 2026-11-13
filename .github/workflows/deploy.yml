@@ -1,0 +1,112 @@
+# Deploy (Lab 5 step 7, Issues #66 and #80; adapted from the Lab 5 starter kit).
+# Runs on every push to `main` (a merged release PR) and by hand for a rollback.
+# Steps: run the CI job again -> log in to Google Cloud without a key file -> build and push
+# the image tagged with the commit -> migrate and update Cloud Run (deploy/release.sh) ->
+# smoke test (deploy/smoke_test.py) -> write a summary. Nothing secret is in this file.
+# Do not rename: the job `test-and-docker` (in ci-docker.yml), the environment `demo`, and the
+# variables GCP_PROJECT_ID, GCP_REGION, WIF_PROVIDER, WIF_SERVICE_ACCOUNT. The Workload Identity
+# condition (Issue #65) accepts only this file, branch `main` and environment `demo`; keep the
+# deploy job in this file.
+# MANUAL ROLLBACK: run this workflow by hand on `main` and enter `image_tag` = the full 40-character
+# commit of an image that already exists. Tests, build and migration are skipped. A rollback does
+# not undo a migration (see docs/labs/lab-05/deployment.md section 6).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Rollback: full commit SHA of an existing image. Empty = test, build and deploy this commit.'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+# Queue releases; never interrupt a running migration or deployment.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  # Runs the CI workflow (its job id is `test-and-docker`). Skipped for a rollback.
+  test:
+    if: github.ref == 'refs/heads/main' && !inputs.image_tag
+    uses: ./.github/workflows/ci-docker.yml
+
+  deploy:
+    needs: test
+    if: >-
+      always() && !cancelled() && github.ref == 'refs/heads/main' &&
+      (needs.test.result == 'success' ||
+       (github.event_name == 'workflow_dispatch' && inputs.image_tag != '' && needs.test.result == 'skipped'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: demo
+    permissions:
+      contents: read
+      id-token: write # keyless Google Cloud login (Workload Identity Federation)
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      SERVICE_NAME: habit-tracker
+      MIGRATE_JOB_NAME: habit-tracker-migrate
+      # Image tag = commit SHA (or the rollback SHA that was typed in).
+      IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
+      ROLLBACK: ${{ inputs.image_tag != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate deployment settings
+        env:
+          WIF_PROVIDER: ${{ vars.WIF_PROVIDER }}
+          WIF_SERVICE_ACCOUNT: ${{ vars.WIF_SERVICE_ACCOUNT }}
+        run: |
+          test -n "$PROJECT_ID" && test -n "$REGION"
+          test -n "$WIF_PROVIDER" && test -n "$WIF_SERVICE_ACCOUNT"
+          [[ "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]] || { echo 'Image tag must be a full 40-character commit SHA.'; exit 1; }
+
+      - name: Authenticate to Google Cloud without a key
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      # The commit becomes the build label shown in the app (ADR 0052). Skipped for a rollback.
+      - name: Build and push image
+        if: env.ROLLBACK != 'true'
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/habit-tracker/habit-tracker:$IMAGE_TAG"
+          docker build --build-arg BUILD_SHA=$IMAGE_TAG --tag "$IMAGE" .
+          docker push "$IMAGE"
+
+      # Verify the image, run the migration job, update the service (all in deploy/release.sh).
+      # Exports SERVICE_URL and DEPLOYED_IMAGE for the next steps.
+      - name: Verify image, migrate and deploy
+        run: bash deploy/release.sh
+
+      - name: Setup Python 3.14
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Smoke test public URL
+        run: python3 deploy/smoke_test.py "$SERVICE_URL" "$IMAGE_TAG"
+
+      - name: Record deployment
+        run: |
+          {
+            echo '### Habit Tracker deployment'
+            echo "- Commit image tag: \`$IMAGE_TAG\`"
+            echo "- Digest: \`$DEPLOYED_IMAGE\`"
+            echo "- Rollback: $ROLLBACK"
+            echo "- URL: $SERVICE_URL"
+            echo '- Smoke test: passed (health, readiness, build label equals the commit).'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -22,7 +22,7 @@ class SmokeTests(unittest.TestCase):
         return {
             '/api/health': b'{"status":"ok"}',
             '/api/ready': b'{"status":"ready"}',
-            '/': b'<html><body>build 1234567</body></html>',
+            '/': b'<html><head><meta name="build" content="1234567"></head></html>',
         }[path]
 
     def test_public_checks_pass_when_page_shows_the_deployed_commit(self):

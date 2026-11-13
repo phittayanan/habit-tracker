@@ -46,7 +46,11 @@ WORKDIR /app/client
 COPY client/package*.json ./
 RUN npm ci
 COPY client/ ./
-# The client calls relative /api paths on the same origin; no build argument.
+# The client calls relative /api paths on the same origin. The only build argument is
+# the commit shown as the build label (ADR 0052); it is not a secret. Declared here, after
+# npm ci, so the dependency layer stays cached when only the commit changes.
+ARG BUILD_SHA=dev
+ENV VITE_BUILD_SHA=$BUILD_SHA
 RUN npm run build
 
 # ============================================================================
