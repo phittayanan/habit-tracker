@@ -6,7 +6,7 @@ This Part splits the 17 features of Part B across the three course sprints. For 
 
 ## D.1 The three sprints {#d-1}
 
-![Figure D-1. Roadmap of the 17 features across the three sprints. Inside Sprint 1 the arrows give the build order; for later features, "needs" lists the features they depend on.](img/d-roadmap.svg)
+![Figure D-1. Timeline of the three sprints with their features, the project checkpoints, the lab due dates and the exam periods.](img/d-timeline.svg)
 
 | | Sprint 1 | Sprint 2 | Sprint 3 |
 |---|---|---|---|
