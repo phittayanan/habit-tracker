@@ -37,7 +37,7 @@ State by date (today is the Asia/Bangkok date): Active when `today <= end_date` 
 
 ## 4. Validation and failure cases
 
-Checks run in this order (SDS 2.2): session (401), role (403), validation (400), rules (409). The status codes for rule rejections follow the SDS proposal S-16, which is still open: `409 ACTIVE_GOAL_EXISTS` follows that proposal, and `400 TARGET_ABOVE_TEMPLATE_MAX` is the code for the decided A-4 rule, which S-16 does not cover (OP-07.6).
+Checks run in this order (SDS 2.2): session (401), role (403), validation (400), rules (409). The status codes for rule rejections follow the SDS proposal S-16, which is still open: `409 ACTIVE_GOAL_EXISTS` follows that proposal, and `400 TARGET_ABOVE_TEMPLATE_MAX` is the code for the decided A-4 rule, which S-16 does not cover (OP-07.6). `400 TARGET_NOT_ABOVE_TEMPLATE_MIN` is the code for the lower limit added by Issue #74 (ADR 0054).
 
 | Case | Result | Error code |
 |---|---|---|
@@ -48,13 +48,14 @@ Checks run in this order (SDS 2.2): session (401), role (403), validation (400),
 | `startDate` or `endDate` missing or not `YYYY-MM-DD` | 400 | `VALIDATION_ERROR` |
 | `endDate` before `startDate` | 400 | `VALIDATION_ERROR` |
 | `dailyTarget` above the template's `max_value` | 400 | `TARGET_ABOVE_TEMPLATE_MAX` |
+| `dailyTarget` not above the template's `min_value` (equal to it or below it) | 400 | `TARGET_NOT_ABOVE_TEMPLATE_MIN` (Issue #74, ADR 0054); message "Daily target must be above the template minimum." |
 | The caller already has a goal on this template that is not Ended | 409 | `ACTIVE_GOAL_EXISTS` |
 
-When a request breaks more than one row, the first one in this table is returned: all validation rows (schema, dates) come before the rule rows (`TARGET_ABOVE_TEMPLATE_MAX`, `ACTIVE_GOAL_EXISTS`), whatever their order of listing in the request. Example: a target of 30.555 for a template with maximum 24 gets `400 VALIDATION_ERROR` (more than 2 decimal places), not `TARGET_ABOVE_TEMPLATE_MAX`. Example: target 25 for a template with maximum 24 and a missing `startDate` gets `400 VALIDATION_ERROR`, not `TARGET_ABOVE_TEMPLATE_MAX`.
+When a request breaks more than one row, the first one in this table is returned: all validation rows (schema, dates) come before the rule rows (`TARGET_ABOVE_TEMPLATE_MAX`, `TARGET_NOT_ABOVE_TEMPLATE_MIN`, `ACTIVE_GOAL_EXISTS`), whatever their order of listing in the request. Example: a target of 30.555 for a template with maximum 24 gets `400 VALIDATION_ERROR` (more than 2 decimal places), not `TARGET_ABOVE_TEMPLATE_MAX`. Example: target 25 for a template with maximum 24 and a missing `startDate` gets `400 VALIDATION_ERROR`, not `TARGET_ABOVE_TEMPLATE_MAX`.
 
 Unknown body fields (for example `participantId` or `userId`) are stripped by the validation schema and do not cause an error (decided, OP-07.7).
 
-Boundaries: a target equal to `max_value` is accepted; `startDate` equal to `endDate` is accepted (a one-day goal); an end date in the past is accepted (the goal is Ended at once; decided, OP-07.2).
+Boundaries: a target equal to `max_value` is accepted; a target equal to `min_value` is rejected, and a template whose minimum equals its maximum can take no goal (ADR 0054); `startDate` equal to `endDate` is accepted (a one-day goal); an end date in the past is accepted (the goal is Ended at once; decided, OP-07.2).
 
 ## 5. Permissions
 
@@ -118,6 +119,7 @@ Errors: 400, 401, 403, 409 as in section 4.
 | AC-07.7 | A target above the template's `max_value` gets 400 `TARGET_ABOVE_TEMPLATE_MAX`; a target equal to it is accepted |
 | AC-07.8 | A Manager gets 403 `FORBIDDEN` and an anonymous caller gets 401 `UNAUTHENTICATED`; nothing is stored |
 | AC-07.9 | The "+ New goal" form creates the goal through the API, shows the rejection message for a rule failure and keeps the typed values |
+| AC-07.11 | A target equal to the template's `min_value`, or below it, gets 400 `TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; a target 0.01 above the minimum is accepted. On a template whose minimum is 0 the rule changes nothing (Issue #74, ADR 0054) |
 | AC-07.10 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on that template, `POST /api/goals` waits and completes only after the lock is released, and then reads the template's values as they are at that moment |
 
 ## 10. Test specification
@@ -134,6 +136,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-55 | AC-07.2, AC-07.4 | API | A has an Ended goal G1 on T1 (end `D-1`); B has an **active** goal on T1 | A creates a goal on T1; A creates a goal on T2; the body of one request carries B's ID | Both of A's requests accepted (201); stored owner is A, never B |
 | TC-60 | AC-07.9 | Browser | A logged in; T exists | Open the form, submit a valid goal, then submit a second goal on T | The first goal appears; the second shows the API message and keeps the typed values |
 | TC-74 | AC-07.10 | API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
+| TC-78 | AC-07.11 | API and unit | A logged in; template T (min 10, max 100); template S (min 0, max 24) | `POST /api/goals` for T with target 10, then 5, then 0.01, then 10.01; unit: the rule function with the same values; `POST /api/goals` for S with target 0, then 0.01 | T: 10, 5 and 0.01 each get `400 TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; 10.01 is accepted (201). S: 0 gets `400 VALIDATION_ERROR` (target must be above 0), 0.01 is accepted (201) |
 
 ## 11. Definition of done
 
@@ -170,6 +173,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 
 | 2026-11-08 | Issue #40 implementation evidence: owner-confirmed existing API behaviors, Goal tests-first history, local validation and remaining human review recorded in section 14; requirements unchanged | phittayanan (owner-only implementation authorization); teammate implementation review pending |
 | 2026-11-10 | Issue #56: recorded projectnewy's acceptance of OP-07.3, OP-07.4, OP-07.6 and the ownership change (section 12, section 14); behaviour and requirements unchanged | projectnewy accepted on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
+| 2026-11-14 | Issue #74: a target must also be above the template's `min_value` (section 4 error table and boundaries, AC-07.11, TC-78); SRS A-4 revised; decided in ADR 0054 | projectnewy decided on 2026-11-14; phittayanan's agreement is checked in the PR review |
 
 ## 14. Implementation evidence — Issue #40
 

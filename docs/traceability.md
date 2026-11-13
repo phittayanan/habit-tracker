@@ -37,7 +37,7 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/54) |
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.10 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | 1 | #28, #38, #40, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
+| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78 | 1 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
 | BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.12 | TC-23 to TC-30, TC-56, TC-58, TC-61 | 1 | #28, #38, #42, #9 |
 | BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.8 | TC-31, TC-32, TC-59 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
@@ -52,7 +52,7 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
 
-Goal implementation evidence: [Issue #40](goal-implementation-evidence.md). AC-07.1/2 → TC-20; AC-07.3 → TC-21; AC-07.4 → TC-55; AC-07.5 → TC-22; AC-07.6/8 → TC-53; AC-07.7 → TC-54; AC-07.9 → TC-60; AC-07.10 → TC-74. `server/test/goal.test.js` covers the API/database cases; `server/test/goal-rules.test.js` adds rule units; `client/test/goals.spec.js` covers TC-60 and Goal TC-47/48 at both widths. TC-08's independent discovery now includes both `/api/goals` methods and their implicit HEAD protection. Goal rule coverage is local evidence for NFR-08; this is not a claim of CI coverage or completion of the later BR-01 to BR-07 rules.
+Goal implementation evidence: [Issue #40](goal-implementation-evidence.md). AC-07.1/2 → TC-20; AC-07.3 → TC-21; AC-07.4 → TC-55; AC-07.5 → TC-22; AC-07.6/8 → TC-53; AC-07.7 → TC-54; AC-07.9 → TC-60; AC-07.10 → TC-74; AC-07.11 → TC-78. `server/test/goal.test.js` covers the API/database cases; `server/test/goal-rules.test.js` adds rule units; `client/test/goals.spec.js` covers TC-60 and Goal TC-47/48 at both widths. TC-08's independent discovery now includes both `/api/goals` methods and their implicit HEAD protection. Goal rule coverage is local evidence for NFR-08; this is not a claim of CI coverage or completion of the later BR-01 to BR-07 rules.
 
 ## NFR -> Feature -> Verification -> Test
 
@@ -151,6 +151,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-75 | Lab 5 technical check (Issues #66, #80, ADR 0052; no feature ID): the build label shows on the login page and in the top bar | Browser |
 | TC-76 | Demo seed keeps an edited template: after a Manager edits a demo template, running the seed again leaves the unit, minimum and maximum as edited and still creates a missing demo template (Issue #79, ADR 0053; no feature ID) | API and database |
 | TC-77 | Seed sets the password hash again on every run: a second run with other `SEED_*_PASSWORD` values replaces the hashes, so the new passwords match and the old ones no longer do (Issue #79, ADR 0053 decision 2; no feature ID) | API and database |
+| TC-78 | A daily target not above the template minimum is rejected with `TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; a target just above it is accepted; on a template with minimum 0 a target of 0 still gets `VALIDATION_ERROR` (Issue #74, ADR 0054, AC-07.11) | API and unit |
 | none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 
 ## Coverage Gaps
