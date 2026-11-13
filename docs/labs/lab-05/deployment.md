@@ -165,7 +165,7 @@ A rollback does not undo a migration. If a migration after the target commit cha
 
 ### 6.5 Known limits
 
-- The migration job runs the seed on every release. The seed overwrites the unit, minimum and maximum of the three demo templates and resets the three account passwords from the secrets (Issue #79). An edit to a demo template is lost on the next release until that Issue is fixed.
+- The migration job runs the seed on every release. Since Issue #79 (ADR 0053) the seed creates a demo template only when no template of that name exists, so a Manager's edit stays; it still sets the password hash of the three accounts from the secrets on every release. The images of releases 1 and 2 and of the rollback and roll-forward runs (section 6.7) still hold the old seed, which overwrote the unit, minimum and maximum of the three demo templates. The fix reaches Cloud Run with the next release of `main`.
 - `deploy/deploy.sh` and `deploy/teardown.sh` still use the `toktickit` names of the kit and are not used by the workflow. Section 9 records that `deploy.sh` was not run.
 - `deploy/tests/test_deploy_workflow.py` matches text in `deploy.yml`. It guards against renames and a missing name or variable, but it does not prove the workflow works: only a run does.
 - The workflow ran for the first time on 2026-11-13 (section 6.6).
@@ -188,7 +188,7 @@ The Console pages (Cloud Run revisions, Artifact Registry digests and manifest) 
 
 ### 6.7 Data after redeploy, rollback and roll-forward (Lab 5 step 8, Issue #67)
 
-Done on 13 Nov 2026 on the public URL of section 5. The check uses one goal and one entry that a demo participant created. It is not a demo template: the seed resets those on every release (Issue #79, section 6.5). Release 2 contains documentation only and adds no migration, so the older image reads the same schema.
+Done on 13 Nov 2026 on the public URL of section 5. The check uses one goal and one entry that a demo participant created. It is not a demo template: the seed of those images reset the demo templates on every release (Issue #79 fixed it afterwards, section 6.5). Release 2 contains documentation only and adds no migration, so the older image reads the same schema.
 
 | Item | Value |
 |---|---|
@@ -202,7 +202,7 @@ Done on 13 Nov 2026 on the public URL of section 5. The check uses one goal and 
 
 Two things to know:
 - A roll-forward of the same commit builds a new image and overwrites the tag. The tag `ed4527bd549642e1668988d7409cb2eea49c89f0` pointed to index `sha256:7c241acb...` after run 43460770826 and points to `sha256:d3e078e68926fa980e7ce43c65dc0b26c9a24f59f6f65e8c1831ad0c8e48672d` after run 43463355931, with the same source. A later rollback to that tag therefore serves the newer image. The tag of release 1 was not rebuilt by the rollback.
-- The roll-forward ran the migration job and the seed again. The data the user created stayed; only the demo templates and demo passwords are reset (section 6.5).
+- The roll-forward ran the migration job and the seed again. The data the user created stayed; only the demo templates and demo passwords were reset (the old seed, section 6.5).
 
 No `gcloud` or other GCP command was run by an AI agent. The AI dispatched the two `Deploy` runs with `gh workflow run` at the owner's request and read the run logs.
 
