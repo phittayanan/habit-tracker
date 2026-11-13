@@ -119,8 +119,8 @@ Errors: 400, 401, 403, 409 as in section 4.
 | AC-07.7 | A target above the template's `max_value` gets 400 `TARGET_ABOVE_TEMPLATE_MAX`; a target equal to it is accepted |
 | AC-07.8 | A Manager gets 403 `FORBIDDEN` and an anonymous caller gets 401 `UNAUTHENTICATED`; nothing is stored |
 | AC-07.9 | The "+ New goal" form creates the goal through the API, shows the rejection message for a rule failure and keeps the typed values |
-| AC-07.11 | A target equal to the template's `min_value`, or below it, gets 400 `TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; a target 0.01 above the minimum is accepted. On a template whose minimum is 0 the rule changes nothing (Issue #74, ADR 0054) |
 | AC-07.10 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on that template, `POST /api/goals` waits and completes only after the lock is released, and then reads the template's values as they are at that moment |
+| AC-07.11 | A target equal to the template's `min_value`, or below it, gets 400 `TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; a target 0.01 above the minimum is accepted. On a template whose minimum is 0 the rule changes nothing (Issue #74, ADR 0054) |
 
 ## 10. Test specification
 
@@ -173,7 +173,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 
 | 2026-11-08 | Issue #40 implementation evidence: owner-confirmed existing API behaviors, Goal tests-first history, local validation and remaining human review recorded in section 14; requirements unchanged | phittayanan (owner-only implementation authorization); teammate implementation review pending |
 | 2026-11-10 | Issue #56: recorded projectnewy's acceptance of OP-07.3, OP-07.4, OP-07.6 and the ownership change (section 12, section 14); behaviour and requirements unchanged | projectnewy accepted on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
-| 2026-11-14 | Issue #74: a target must also be above the template's `min_value` (section 4 error table and boundaries, AC-07.11, TC-78); SRS A-4 revised; decided in ADR 0054 | projectnewy decided on 2026-11-14; phittayanan's agreement is checked in the PR review |
+| 2026-11-14 | Issue #74: a target must also be above the template's `min_value` (section 4 error table and boundaries, AC-07.11, TC-78); SRS A-4 revised; decided in ADR 0054 | projectnewy decided on 2026-11-14; phittayanan agreed in his review of PR #95 (https://github.com/phittayanan/habit-tracker/pull/95) |
 
 ## 14. Implementation evidence — Issue #40
 

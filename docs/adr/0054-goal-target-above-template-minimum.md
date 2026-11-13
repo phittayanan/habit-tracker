@@ -1,6 +1,6 @@
 # 0054. A goal's daily target must be above the template's minimum
 
-Status: decided by projectnewy on 2026-11-14 for Issue #74; phittayanan's agreement (Issue #74 asks for both students) is checked in the PR review
+Status: accepted. Decided by projectnewy on 2026-11-14 for Issue #74; phittayanan agreed in his review of PR #95 on 2026-11-14 (Issue #74 asks for both students)
 
 ## Decision
 
@@ -22,4 +22,4 @@ Status: decided by projectnewy on 2026-11-14 for Issue #74; phittayanan's agreem
 
 ## Source
 
-Issue #74, marked as unintended by phittayanan on 2026-11-13 while reviewing the Deliverable 1 report (Issue #11). The two questions it left open (the exact limit, and the database check) were answered by projectnewy on 2026-11-14 in the session for Issue #74.
+Issue #74, marked as unintended by phittayanan on 2026-11-13 while reviewing the Deliverable 1 report (Issue #11). The two questions it left open (the exact limit, and the database check) were answered by projectnewy on 2026-11-14 in the session for Issue #74. phittayanan agreed to both answers in his review of PR #95 the same day.
