@@ -13,7 +13,7 @@ Figures 6 and 7 show the service and the database in the Console.
 - Before: release 2, commit `ed4527b`, revision `habit-tracker-00003-6rn` (Figure 3).
 - Rollback: [run 43463075320](https://github.com/phittayanan/habit-tracker/actions/runs/43463075320), started by hand with the commit of release 1 (`723efb0`) as `image_tag`. Tests, build and migration were skipped (`ROLLBACK: true`); Cloud Run served release 1 (revision `habit-tracker-00004-z88`) and the same record was there (Figure 4).
 - Roll-forward: [run 43463355931](https://github.com/phittayanan/habit-tracker/actions/runs/43463355931), through the full pipeline (revision `habit-tracker-00005-sdh`); the record was still there (Figure 5).
-- Later release: release 3 ([run 43481215940](https://github.com/phittayanan/habit-tracker/actions/runs/43481215940), revision `habit-tracker-00006-nj6`) ran the migration job again. TO FILL: the same record on the page that shows `build 50f5605` (Figure 8).
+- Later release: release 3 ([run 43481215940](https://github.com/phittayanan/habit-tracker/actions/runs/43481215940), revision `habit-tracker-00006-nj6`) ran the migration job again. The same record was still there on the live page, which shows `build 50f5605` (Figure 8, read on 15 November 2026).
 
 The teammate repeated the check on the public URL and wrote what was checked in [PR #90](https://github.com/phittayanan/habit-tracker/pull/90). In step 8 the two runs were dispatched with `gh workflow run` by Claude Code at projectnewy's request and checked from their logs; no Console or `gcloud` change was made by an AI agent in steps 6 to 9. In step 5 (Issue #64) an AI agent ran the first 20 guide steps in Cloud Shell after phittayanan read and approved each command; this is recorded in `docs/ai-use.md`.
 
@@ -26,3 +26,5 @@ The teammate repeated the check on the public URL and wrote what was checked in 
 ![Figure 6. R-03: Cloud Run service `habit-tracker` in the Console, Security tab: the service is publicly accessible because `allUsers` has been granted permission on it. Read on 14 November 2026; the line with the default URL (it holds the project number) is cropped out.](img/cloudrun-security-public.png){narrow}
 
 ![Figure 7. R-03: Cloud SQL instance `habit-tracker-pg` in the Console: running, PostgreSQL 16 (16.15), Enterprise edition, 1 vCPU, region asia-southeast1, single zone. Read on 14 November 2026; no IP address or project number is shown.](img/cloudsql-instance.png)
+
+![Figure 8. C-05 (R-04): the live page after release 3. Label `build 50f5605`, goal "Reading" (3 pages, 2026-11-13 to 2026-11-26) with the entry 2026-11-13: 2 pages, made before releases 2 and 3. Public URL, read on 15 November 2026; the bookmarks bar is cropped out.](img/live-record-v1.3.png)
