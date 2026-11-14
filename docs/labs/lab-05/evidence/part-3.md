@@ -8,6 +8,16 @@ Figures 6 and 7 show the service and the database in the Console.
 
 **C-04 (R-03), the domain workflow on the live URL: UI, API and database.** A participant signs in, creates a goal on a template and records an entry; the goal and the entry are listed again afterwards. The sign-in and the pages are the UI; the goal and entry calls are the API; the list that survives a restart is read from Cloud SQL. Figures 3 to 5 show the result on the public URL. Each deployment also runs a smoke test with no sign-in (`deploy/smoke_test.py`): `/api/health`, `/api/ready` (which queries the database) and the page, which must carry the commit that was deployed (ADR 0052). The test passed in [run 43439782760](https://github.com/phittayanan/habit-tracker/actions/runs/43439782760), [run 43460770826](https://github.com/phittayanan/habit-tracker/actions/runs/43460770826) and [run 43481215940](https://github.com/phittayanan/habit-tracker/actions/runs/43481215940).
 
+C-04 access restriction on the live URL (command output, not a screenshot). A request with no session cookie to a goals endpoint is refused, read-only, on 14 November 2026 at 18:23 GMT:
+
+```
+curl -i https://habit-tracker-rfi4eg2u4q-as.a.run.app/api/goals
+HTTP/1.1 401 Unauthorized
+{"error":{"code":"UNAUTHENTICATED","message":"Please log in."}}
+```
+
+The rule rejection of the domain (a goal's daily target must be above the template minimum, `400 TARGET_NOT_ABOVE_TEMPLATE_MIN`, ADR 0054) is tested as TC-78 and ran in CI before release 3. It was not run against the live URL, so that no extra record is added to the demo data.
+
 **C-05 (R-04), data before and after a restart and a redeploy.** Issue [#67](https://github.com/phittayanan/habit-tracker/issues/67), section 6.7 of `deployment.md`. The record is the goal "Reading" (3 pages a day, 2026-11-13 to 2026-11-26) with one entry, `2026-11-13: 2 pages`, created by a demo participant on release 2.
 
 - Before: release 2, commit `ed4527b`, revision `habit-tracker-00003-6rn` (Figure 3).
@@ -27,4 +37,4 @@ The teammate repeated the check on the public URL and wrote what was checked in 
 
 ![Figure 7. R-03: Cloud SQL instance `habit-tracker-pg` in the Console: running, PostgreSQL 16 (16.15), Enterprise edition, 1 vCPU, region asia-southeast1, single zone. Read on 14 November 2026; no IP address or project number is shown.](img/cloudsql-instance.png)
 
-![Figure 8. C-05 (R-04): the live page after release 3. Label `build 50f5605`, goal "Reading" (3 pages, 2026-11-13 to 2026-11-26) with the entry 2026-11-13: 2 pages, made before releases 2 and 3. Public URL, read on 15 November 2026; the bookmarks bar is cropped out.](img/live-record-v1.3.png)
+![Figure 8. C-05 (R-04): the live page after release 3. Label `build 50f5605`, goal "Reading" (3 pages, 2026-11-13 to 2026-11-26) with the entry 2026-11-13: 2 pages, made on release 2, before the rollback and release 3. Public URL, read on 15 November 2026; the bookmarks bar is cropped out.](img/live-record-v1.3.png)

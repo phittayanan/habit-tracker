@@ -48,12 +48,12 @@ h1 { font-size: 18pt; margin: 0 0 8pt; }
 h2 { font-size: 14pt; margin: 12pt 0 6pt; }
 h1, h2, h3 { break-after: avoid; }
 table { border-collapse: collapse; width: 100%; margin: 6pt 0 10pt; font-size: 11pt; }
-th, td { border: 0.5pt solid #999; padding: 2.5pt 4pt; vertical-align: top; text-align: left; overflow-wrap: anywhere; }
+th, td { border: 0.5pt solid #999; padding: 2.5pt 4pt; vertical-align: top; text-align: left; overflow-wrap: break-word; }
 th { background: #eee; }
 tr { break-inside: avoid; }
-code { font-family: "Courier New", Courier, monospace; font-size: 10.5pt; overflow-wrap: anywhere; }
-pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 10.5pt; }
-a { color: #0b3d91; overflow-wrap: anywhere; }
+code { font-family: "Courier New", Courier, monospace; font-size: 10.5pt; overflow-wrap: break-word; }
+pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: break-word; font-size: 10.5pt; }
+a { color: #0b3d91; overflow-wrap: break-word; }
 figure { margin: 8pt auto 12pt; break-inside: avoid; }
 figure img { display: block; width: 100%; box-sizing: border-box; border: 1px solid #999; }
 figure.narrow img { width: 70%; margin: 0 auto; }

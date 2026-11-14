@@ -6,7 +6,7 @@
 
 **C-03 (R-01), fresh clone builds and runs.** Section 7.4 of `deployment.md` records the checks per commit. In short: an empty folder, `git clone`, `server/.env` from `server/.env.example`, `docker compose build --no-cache --pull`, `docker compose up -d`; the services start, `migrate` exits 0, `/api/health` and `/api/ready` answer and `manager1` and `participant1` sign in, 27 seconds after the clone (target 15 minutes, NFR-07; macOS, Docker 29.7.2). The review of PR #70 by the teammate on Windows 11 with `core.autocrlf=true` found a real defect (shell scripts checked out with CRLF, `migrate` exited 255, commit `68f4e13`); the fix is `.gitattributes` (`*.sh text eol=lf`, commit `daf6382`) and the same clone then passed. Review: [CHANGES_REQUESTED](https://github.com/phittayanan/habit-tracker/pull/70#pullrequestreview-5863418894), then [APPROVED](https://github.com/phittayanan/habit-tracker/pull/70#pullrequestreview-5868245992).
 
-**C-03 again on the submitted tag, on Windows.** On 14 November 2026 the same check was run on tag `v1.3` (commit `50f5605`), Windows 11, Docker 29.8.1, `core.autocrlf=true` (section 7.4 of `deployment.md`, last row). Output of the run, the two seed passwords not shown:
+**C-03 again on the submitted tag, on Windows.** On 14 November 2026 the same check was run on tag `v1.3` (commit `50f5605`), Windows 11, Docker 29.8.1, `core.autocrlf=true` (section 7.4 of `deployment.md`, last row; this row was added by [PR #98](https://github.com/phittayanan/habit-tracker/pull/98) on branch `staging`, so it is not in the file at the tag). Output of the run, the two seed passwords not shown:
 
 ```
 git -c core.autocrlf=true clone --branch v1.3 ...   HEAD 50f5605; docker-entrypoint.sh: POSIX shell script (LF)
