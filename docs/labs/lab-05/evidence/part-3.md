@@ -4,7 +4,7 @@
 
 **GCP service and database.** Cloud Run service `habit-tracker` (minimum 0, maximum 3 instances, port 3000) reads `DATABASE_URL` and the seed passwords from Secret Manager and connects to Cloud SQL `habit-tracker-pg` (PostgreSQL 16, database and user `habit_tracker`) through its runtime service account (the Cloud SQL Client role and access to its three secrets, as recorded in section 5). The migration is a Cloud Run job, `habit-tracker-migrate`, that every release runs before the service is updated. All names, sizes and roles are in section 5 of [`deployment.md`](https://github.com/phittayanan/habit-tracker/blob/v1.3/docs/labs/lab-05/deployment.md); the first deployment and its checks are section 9 (Issue [#64](https://github.com/phittayanan/habit-tracker/issues/64), PR [#73](https://github.com/phittayanan/habit-tracker/pull/73)). No password, key or project number is in Git, in an Issue or in a figure.
 
-TO FILL: Figure 6 (Cloud Run service in the Console) and Figure 7 (Cloud SQL instance in the Console), project number and IP address cropped.
+Figures 6 and 7 show the service and the database in the Console.
 
 **C-04 (R-03), the domain workflow on the live URL: UI, API and database.** A participant signs in, creates a goal on a template and records an entry; the goal and the entry are listed again afterwards. The sign-in and the pages are the UI; the goal and entry calls are the API; the list that survives a restart is read from Cloud SQL. Figures 3 to 5 show the result on the public URL. Each deployment also runs a smoke test with no sign-in (`deploy/smoke_test.py`): `/api/health`, `/api/ready` (which queries the database) and the page, which must carry the commit that was deployed (ADR 0052). The test passed in [run 43439782760](https://github.com/phittayanan/habit-tracker/actions/runs/43439782760), [run 43460770826](https://github.com/phittayanan/habit-tracker/actions/runs/43460770826) and [run 43481215940](https://github.com/phittayanan/habit-tracker/actions/runs/43481215940).
 
@@ -22,3 +22,7 @@ The teammate repeated the check on the public URL and wrote what was checked in 
 ![Figure 4. C-05 (R-04): after the rollback. Label `build 723efb0` (release 1 image), the same goal and entry. Run 43463075320, revision `habit-tracker-00004-z88`.](img/c05-2-after-rollback.png){narrow}
 
 ![Figure 5. C-05 (R-04): after the roll-forward. Label `build ed4527b`, the same goal and entry. Run 43463355931, revision `habit-tracker-00005-sdh`.](img/c05-3-after-roll-forward.png){narrow}
+
+![Figure 6. R-03: Cloud Run service `habit-tracker` in the Console, Security tab: the service is publicly accessible because `allUsers` has been granted permission on it. Read on 14 November 2026; the line with the default URL (it holds the project number) is cropped out.](img/cloudrun-security-public.png){narrow}
+
+![Figure 7. R-03: Cloud SQL instance `habit-tracker-pg` in the Console: running, PostgreSQL 16 (16.15), Enterprise edition, 1 vCPU, region asia-southeast1, single zone. Read on 14 November 2026; no IP address or project number is shown.](img/cloudsql-instance.png)
