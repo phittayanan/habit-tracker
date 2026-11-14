@@ -62,7 +62,7 @@ figcaption { font-size: 11pt; margin-top: 3pt; }
 `;
 const footer = '<div style="width:100%;font-family:Times New Roman,serif;font-size:10pt;text-align:center;color:#555"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
-const parts = source.split(/\n(?=# )/).map(p => p.trim()).filter(Boolean);
+const parts = source.split(/\n(?=# )/).map(p => p.trim()).filter(p => p.startsWith('# '));
 const html = parts.map(md => '<div class="part">' + marked.parse(
   md.replace(/^!\[([^\]]+)\]\(([^)]+)\)(\{narrow\})?$/gm, (_, cap, src, narrow) =>
     `<figure${narrow ? ' class="narrow"' : ''}><img src="${src}" alt="${cap.replace(/"/g, '&quot;')}"><figcaption>${marked.parseInline(cap)}</figcaption></figure>`)) + '</div>').join('\n');
