@@ -32,7 +32,7 @@ Both students took part in every area (R-11). Owner and checker are the two stud
 | 7 Deploy workflow, release | [#66](https://github.com/phittayanan/habit-tracker/issues/66), [#80](https://github.com/phittayanan/habit-tracker/issues/80) | phittayanan | [#81](https://github.com/phittayanan/habit-tracker/pull/81), release PR [#84](https://github.com/phittayanan/habit-tracker/pull/84), checked by projectnewy | `deploy.yml`, build label, first release |
 | 8 Data after restart and rollback | [#67](https://github.com/phittayanan/habit-tracker/issues/67) | projectnewy | [#89](https://github.com/phittayanan/habit-tracker/pull/89), [#90](https://github.com/phittayanan/habit-tracker/pull/90), checked by phittayanan | Second release, rollback, roll-forward |
 | Fixes found on the way | [#79](https://github.com/phittayanan/habit-tracker/issues/79), [#74](https://github.com/phittayanan/habit-tracker/issues/74) | projectnewy | [#92](https://github.com/phittayanan/habit-tracker/pull/92), [#95](https://github.com/phittayanan/habit-tracker/pull/95), release PR [#96](https://github.com/phittayanan/habit-tracker/pull/96), checked by phittayanan | Seed keeps edited templates; goal target above the minimum |
-| 9 This PDF | [#68](https://github.com/phittayanan/habit-tracker/issues/68), [#97](https://github.com/phittayanan/habit-tracker/issues/97) | shared | TO FILL (PR of this source) | Evidence index |
+| 9 This PDF | [#68](https://github.com/phittayanan/habit-tracker/issues/68), [#97](https://github.com/phittayanan/habit-tracker/issues/97) | shared | [#98](https://github.com/phittayanan/habit-tracker/pull/98) | Evidence index |
 
 ## Evidence index
 
