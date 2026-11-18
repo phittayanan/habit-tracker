@@ -9,6 +9,8 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - Busy files (database schema, `package.json`, route index): before asking for review, check for another open PR on the same file and update your branch from `staging`.
 - Never push to `main` or `staging`. Never force push. Push only your own branch.
 - Never merge or approve your own PR. The teammate reviews it, and the review must state a specific check, question, finding or reason ("LGTM" does not count).
+- Review format (ADR 0055): "What I checked" (numbered, each with the commit or file and the result), then "Findings", each labelled `issue (blocking)` (must change before merge; the review is "Requesting changes"), `issue` (change in this PR, or the author says why not), `suggestion` (optional) or `question` (needs an answer in the thread).
+- Moving Issue cards on board 12 is the agent's job: move the card at each event in ADR 0055 and read it back. People do not move cards.
 - Fill in every part of the PR template: Issue link, feature/AC IDs, what changed, tests run with output, reviewer check.
 
 ## Spec and tests first
