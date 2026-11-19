@@ -26,7 +26,7 @@ var call = async (method, path, body) => { const r = await fetch(path, { method,
 var D = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 ```
 
-   Replace `<G>` in the steps below by the goal number you read in step S4. A reload clears the helper, so paste it again after any reload (pasting it twice on the same page is harmless).
+   Replace `<G>` and `<P2>` in the steps below by the numbers you read in step S4. A reload clears the helper, so paste it again after any reload (pasting it twice on the same page is harmless).
 
 ## Synthetic inputs
 
@@ -47,7 +47,7 @@ var D = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 | S1 | Open the application URL in a browser that has no session (a private window) and log in as **P2** with the credentials from the private handoff. | The goals page opens. |
 | S2 | Press "+ New goal". Choose **Walking**, **Daily target** `5000`, **Start date** `D` (the default), **End date** `D+6`. Press **Save**. | The goals page lists a goal: Walking, "Daily target: 5000 steps", `D` – `D+6`, **Active**, **"0 of 1 days met"**. |
 | S3 | In the Walking goal, leave **Date** as `D`, type **Value (steps)** `6000`, press **Save entry**. | The entry list shows "`D`: 6000 steps". Progress **"1 of 1 days met"**. |
-| S4 | Open the Console, paste the helper, then paste `(await (await fetch('/api/goals')).json()).goals.filter(g => g.template.name === 'Walking').map(g => g.id)` and press Enter. | One number is printed in square brackets, for example `[17]`. Write it down: it is `<G>`. |
+| S4 | Open the Console, paste the helper, then paste `(await (await fetch('/api/goals')).json()).goals.filter(g => g.template.name === 'Walking').map(g => g.id)` and press Enter. Then run `(await (await fetch('/api/auth/me')).json()).user.id` and press Enter. | The first command prints one number in square brackets, for example `[17]`: write it down as `<G>`. The second prints one number, for example `3`: it is the id of P2; write it down as `<P2>`. |
 | S5 | Press "Log out". | The login screen shows again. |
 
 ### Part A: another Participant cannot see or change P2's records (Participant P1)
@@ -60,7 +60,7 @@ var D = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 | A4 | Run `await call('GET', '/api/goals/<G>/entries')`. | `404 {"error":{"code":"GOAL_NOT_FOUND","message":"Goal not found."}}` (no entry of P2 is shown). |
 | A5 | Run `await call('POST', '/api/goals/<G>/entries', { entryDate: D, value: 1 })`. | `404 {"error":{"code":"GOAL_NOT_FOUND","message":"Goal not found."}}` |
 | A6 | Run `await call('GET', '/api/goals/999999/entries')`, then `await call('POST', '/api/goals/999999/entries', { entryDate: D, value: 1 })`. | Both print exactly the same text as A4 and A5: `404 {"error":{"code":"GOAL_NOT_FOUND","message":"Goal not found."}}`. A request for P2's goal and a request for a goal that does not exist cannot be told apart. |
-| A7 | Run `var T = (await (await fetch('/api/templates')).json()).templates.find(t => t.name === 'Walking').id;` and then `await call('POST', '/api/goals', { templateId: T, dailyTarget: 5000, startDate: D, endDate: D, participantId: 1 })`. (The id of another user in the body must be ignored. Start and end are both `D`: a one-day goal.) | The printed text starts with `201 ` and holds a goal with `"templateId"` equal to `T`. The request was accepted and the extra field `participantId` was ignored. |
+| A7 | Replace `<P2>` by the number from S4 and run `var T = (await (await fetch('/api/templates')).json()).templates.find(t => t.name === 'Walking').id;` and then `await call('POST', '/api/goals', { templateId: T, dailyTarget: 5000, startDate: D, endDate: D, participantId: <P2> })`. (The id of P2 in the body must be ignored; the goal must belong to the caller, P1. Start and end are both `D`: a one-day goal.) | The printed text starts with `201 ` and holds a goal with `"templateId"` equal to `T`. The request was accepted and the extra field `participantId` was ignored. |
 | A8 | Reload the page (F5) and read the goals page. | The goals page of **P1** now lists a Walking goal ("Daily target: 5000 steps", `D` – `D`, Active). It is P1's own goal: the id sent in the body did not give the goal to another user. |
 | A9 | Press "Log out". Log in as **P2**. Look at the Walking goal. | The entry list still shows only "`D`: 6000 steps" (P1's attempted value 1 was not stored), progress **"1 of 1 days met"**, and the page lists exactly the goals P2 made (no second Walking goal). |
 | A10 | Press "Log out". | The login screen shows again. |
@@ -101,7 +101,7 @@ var D = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 
 ## Pass rule
 
-PASS only if every step gives its expected result: each forbidden request is refused with the status and message shown, no refused request stores anything (checked in A7, B4, C6 and D5), and no refusal shows data of another account. A refused request that succeeds, a different status (for example 403 where 404 is expected), a goal of P2 visible to P1, to M1 or to an anonymous visitor, or an entry of 1 stored on P2's goal is FAIL: record the step number and what you saw. If you cannot reach the application or log in, record BLOCKED with the reason (BLOCKED is not a pass). If your browser blocks the console, record BLOCKED for the console steps and tell the Product Team; do not mark them PASS.
+PASS only if every step gives its expected result: each forbidden request is refused with the status and message shown, no refused request stores anything (checked in A9, B7, C6 and D5; A7 is the one request that is accepted), and no refusal shows data of another account. A refused request that succeeds, a different status (for example 403 where 404 is expected), a goal of P2 visible to P1, to M1 or to an anonymous visitor, or an entry of 1 stored on P2's goal is FAIL: record the step number and what you saw. If you cannot reach the application or log in, record BLOCKED with the reason (BLOCKED is not a pass). If your browser blocks the console, record BLOCKED for the console steps and tell the Product Team; do not mark them PASS.
 
 ## Result record (the UAT Team fills this in; do not copy the expected results)
 
@@ -110,7 +110,7 @@ PASS only if every step gives its expected result: each forbidden request is ref
 | Tester name and team | |
 | Date and time | |
 | Tested version (revision or tag shown in the handoff) | |
-| Real date used for `D`, and the number `<G>` | |
+| Real date used for `D`, the number `<G>` and the number `<P2>` | |
 | Actual result per step (for each console step, paste the printed text) | |
 | PASS / FAIL / BLOCKED | |
 | Evidence IDs (screenshots, console output) | |
