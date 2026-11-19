@@ -1,6 +1,6 @@
 # Lab 6 UAT handoff package (Product Team to UAT Team)
 
-Lab 6 Part A, Issue #103. This file is what the partner team (the UAT Team) needs to run our Sprint 1 UAT cases without a verbal explanation. It holds **no password, token or student ID**: credentials go through the private course handoff only. Items marked **TO FILL (#104)** are facts that only the check on the deployed app (Issue #104) can confirm; this file does not guess them. Sections 1 to 9 are for the UAT Team. Section 10 is for the Product Team only.
+Lab 6 Part A, Issue #103. This file is what the partner team (the UAT Team) needs to run our Sprint 1 UAT cases without a verbal explanation. It holds **no password, token or student ID**: credentials go through the private course handoff only. Items marked **TO FILL (#104)** are facts that only the check on the deployed app (Issue #104) can confirm; this file does not guess them. This file is for the UAT Team. The Product Team's reset and release checks are in `reset-runbook.md`, which the UAT Team does not need.
 
 Product: habit tracker (a Program Manager defines habit templates, a Participant sets daily goals and records daily values, and sees days met). Repository: <https://github.com/phittayanan/habit-tracker> (public).
 
@@ -19,7 +19,7 @@ Acceptance applies only to the release written in this table, and only to the Sp
 
 ## 2. Address
 
-Application URL: <https://habit-tracker-rfi4eg2u4q-as.a.run.app> (public Cloud Run service, region `asia-southeast1`). The service scales to zero, so the first request after a quiet period can take a few seconds; wait and reload before you record a failure. Use a current Chrome, Edge or Firefox. UAT-03 needs the browser console (F12).
+Application URL: <https://habit-tracker-rfi4eg2u4q-as.a.run.app> (public Cloud Run service, region `asia-southeast1`). The service scales to zero, so the first request after a quiet period can take a few seconds; wait and reload before you record a failure. Use a current Chrome (the browser the repository's own browser tests use). UAT-03 needs the browser console (F12).
 
 ## 3. Scope accepted for test (Sprint 1 only)
 
@@ -54,7 +54,7 @@ All data you create is synthetic. Do not enter real personal data. Do not use an
 | Data | State before the first case |
 |---|---|
 | Templates (demo data) | Water: `glasses`, 1 to 12. Reading: `pages`, 1 to 100. Walking: `steps`, 0 to 20000. **TO FILL (#104):** confirm the deployed database has these three (the migration job seeds them with `SEED_DEMO_DATA=true`). If one is missing, record BLOCKED for the cases that need it (table in section 6) and tell the Product Team. |
-| Goals and entries | None for P1 and P2. |
+| Goals and entries | Expected: none for P1 and P2. **TO FILL (#104):** check the live database. `docs/labs/lab-05/deployment.md` section 6.7 records a Reading goal (to 2026-11-26) with one entry made by a demo participant; if it belongs to P1 or P2, the cases that expect no goals (UAT-02 precondition 4) will not match until the Product Team resolves it. |
 | Other templates | None named `UAT-02 Squats`, `UAT-03 Probe` or `UAT-04 Stretch`. |
 
 ## 6. The cases, their order and their data
@@ -68,11 +68,11 @@ Each case file has its own preconditions, numbered steps with exact expected res
 | UAT-03 | `uat-cases/UAT-03-forbidden-role-and-ownership.md` | Forbidden role and ownership | P1, P2, M1, anonymous | Walking | P2: Walking goal with 1 entry; P1: Walking goal |
 | UAT-04 | `uat-cases/UAT-04-state-and-persistence.md` | State, history and persistence | M1, P1 | nothing seeded | Template `UAT-04 Stretch` (range 1 to 60); P1: two goals on it |
 
-**Sequence.** The four cases are independent: each makes its own data and none needs another's result. Run them in the order UAT-01, 02, 03, 04. A different order works. Inside one case, run the parts in the written order and in one sitting; each case that depends on today's date (UAT-03, UAT-04) must be finished **before 24:00 Asia/Bangkok** on the day you start it. Do not run a case twice without a reset (section 7).
+**Sequence.** The four cases are independent: each makes its own data and none needs another's result. Run them in the order UAT-01, 02, 03, 04. A different order works. Inside one case, run the parts in the written order and in one sitting; **all four cases** use today's date (UAT-01 and UAT-02 count "days met" from days before today up to today, UAT-03 and UAT-04 also), so finish each case **before 24:00 Asia/Bangkok** on the day you start it; a run across midnight gives a false FAIL. (UAT-01 and UAT-02 do not say so in their own files; this sentence applies to them.) Do not run a case twice without a reset (section 7).
 
 ## 7. Reset and cleanup
 
-You do not reset the database. A template cannot be deleted in Sprint 1, so a second run of UAT-02 or UAT-04 hits a duplicate name. Between runs, or after a corrected release, ask the Product Team to reset by writing which case you want to run again; the Product Team confirms when it is done, and you start only after that confirmation. A reset removes only the goals, entries and `UAT-*` templates listed in section 6; it keeps the three accounts and the three demo templates.
+You do not reset the database. A template cannot be deleted in Sprint 1, so a second run of UAT-02 or UAT-04 hits a duplicate name. Between runs, or after a corrected release, ask the Product Team to reset and write which case you want to run again. A reset is for all four cases together: it removes every goal and entry of P1 and P2 and the `UAT-*` templates, and keeps the three accounts and the three demo templates, so the leftovers of the other cases go too. The Product Team confirms when it is done, and you start only after that confirmation.
 
 ## 8. Recording results and reporting findings
 
@@ -99,32 +99,10 @@ You do not reset the database. A template cannot be deleted in Sprint 1, so a se
 
 **Known limits (not defects):** the first request after a quiet period is slow (scale to zero); the Sprint 2 and 3 items in section 3 are absent; a deployment re-sets the three passwords from the secrets and keeps all data (`docs/labs/lab-05/deployment.md` section 6.5).
 
-## 10. Product Team only: reset and release check (not for the UAT Team)
-
-Run by the owner of the GCP project (Issue #104). **TO FILL (#104):** the method used to reach the database (Cloud SQL instance `habit-tracker-pg`, database `habit_tracker`), the time, and the row counts before and after. Take or confirm a backup first (daily backup at 03:00 UTC). Read the counts with `SELECT` before any `DELETE`. This SQL has **not** been run yet; #104 runs it first on the live database in a transaction and checks the counts:
-
-```sql
-BEGIN;
--- 1. count what will go
-SELECT count(*) FROM "Entry" WHERE goal_id IN (SELECT id FROM "Goal" WHERE participant_id IN (SELECT id FROM "User" WHERE username IN ('participant1', 'participant2')));
-SELECT count(*) FROM "Goal" WHERE participant_id IN (SELECT id FROM "User" WHERE username IN ('participant1', 'participant2'));
-SELECT id, name FROM "Template" WHERE name IN ('UAT-02 Squats', 'UAT-03 Probe', 'UAT-04 Stretch', 'UAT-04 Stretch 2');
--- 2. delete in this order (entries, goals, then the UAT templates)
-DELETE FROM "Entry" WHERE goal_id IN (SELECT id FROM "Goal" WHERE participant_id IN (SELECT id FROM "User" WHERE username IN ('participant1', 'participant2')));
-DELETE FROM "Goal" WHERE participant_id IN (SELECT id FROM "User" WHERE username IN ('participant1', 'participant2'));
-DELETE FROM "Template" WHERE name IN ('UAT-02 Squats', 'UAT-03 Probe', 'UAT-04 Stretch', 'UAT-04 Stretch 2');
--- 3. check: no goal or entry is left, the three demo templates are still there
-SELECT name, unit, min_value, max_value FROM "Template" ORDER BY name;
--- COMMIT only if the counts are as expected; otherwise ROLLBACK
-```
-
-Before the UAT Team starts, the Product Team also confirms: the deployed `build` text matches section 1; `GET /api/health` and `GET /api/ready` answer; each of `manager1`, `participant1`, `participant2` can log in with the password that was sent privately; the credentials were sent only through the private course handoff. Before any redeploy, tell the UAT Team in the agreed channel.
-
-## 11. Schedule
+## 10. Schedule
 
 | Session | Date and time (Asia/Bangkok) |
 |---|---|
 | First UAT run by the partner team | **TO FILL** |
 | Findings answered and corrections released | **TO FILL** |
 | Retest and the partner's decision | **TO FILL** |
-| Final PDF due on LEB2 | 22 November 2026, 23:59 |
