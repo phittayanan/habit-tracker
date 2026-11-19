@@ -1,6 +1,6 @@
 # 0056. UAT case IDs stay outside `docs/traceability.md`
 
-Status: decided by projectnewy on 2026-11-19 (asked in the review of PR #112, Issue #99: "use what you think is best"); phittayanan's agreement is pending in the review of this PR
+Status: decided by projectnewy on 2026-11-19 (asked in the review of PR #112, Issue #99: "use what you think is best"); phittayanan agreed in the review of PR #112 on 2026-11-19
 
 ## Decision
 
