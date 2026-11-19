@@ -7,6 +7,7 @@
 # Needs: PostgreSQL 16 tools (initdb, pg_ctl, psql), Node, and `npm ci` already run in server/.
 # Run from anywhere:  bash docs/labs/lab-06/reset/check-uat-reset.sh
 set -uo pipefail
+export LC_ALL=C LANG=C
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../../../.." && pwd)"
@@ -36,7 +37,7 @@ WORK="$(mktemp -d)"
 cleanup() { pg_ctl -D "$WORK/data" -m immediate stop >/dev/null 2>&1; rm -rf "$WORK"; }
 trap cleanup EXIT
 
-initdb -D "$WORK/data" -U check --auth=trust >/dev/null || exit 2
+initdb -D "$WORK/data" -U check --auth=trust --locale=C --encoding=UTF8 >/dev/null || exit 2
 pg_ctl -D "$WORK/data" -o "-p $PORT -k $WORK -c listen_addresses=127.0.0.1" -l "$WORK/pg.log" -w start >/dev/null || { cat "$WORK/pg.log"; exit 2; }
 export PGHOST=127.0.0.1 PGPORT="$PORT" PGUSER=check
 createdb uatreset || exit 2
