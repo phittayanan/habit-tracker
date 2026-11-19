@@ -1,6 +1,6 @@
 # Team workflow (read first)
 
-Two students build this CPE 334 group project with Claude Code. The product lives in `docs/`; this file holds only the working rules. Work goes step by step: each step waits for a human review.
+Two students build this CPE 334 group project with Claude Code. The product lives in `docs/`; this file holds only the working rules. Work goes step by step: each PR waits for the teammate's review, and you may start your next own Issue meanwhile (ADR 0057).
 
 ## Branches and PRs
 - One Issue -> one branch -> one PR. Branch from `staging` and name it `feat/|fix/|docs/|chore/<issue-number>-<slug>`.
@@ -20,7 +20,7 @@ Two students build this CPE 334 group project with Claude Code. The product live
 
 ## Decisions
 - Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record each decision as its own file in `docs/adr/` (`NNN-short-name.md`).
-- Work until blocked (ADR 0057): after opening a PR, start your next own Issue that has no open "blocked by" Issue, branched from `staging`. At most 2 of your PRs wait for review at once; review the teammate's waiting PR before starting new work; never take the teammate's Issue unless they agree and the assignee changes.
+- Work until blocked (ADR 0057): add a "blocked by" link when an Issue needs another merged first; after opening a PR, start your next own Issue that has no open "blocked by" Issue, branched from `staging`. At most 2 of your PRs wait for review at once; review the teammate's waiting PR before starting new work; never take the teammate's Issue unless they agree and the assignee changes.
 
 ## Releases
 - After each release PR from `staging` into `main`, tag `main` `vS.N` (Sprint 1 = `v1.0`).
