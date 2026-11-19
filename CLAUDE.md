@@ -6,7 +6,7 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - One Issue -> one branch -> one PR. Branch from `staging` and name it `feat/|fix/|docs/|chore/<issue-number>-<slug>`.
 - Open the PR into `staging`. Only the release PR goes from `staging` into `main`, with a tag.
 - Commit titles use Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:`. GitHub's merge-commit titles are exempt.
-- Busy files (database schema, `package.json`, route index): before asking for review, check for another open PR on the same file and update your branch from `staging`.
+- Busy files (database schema, `package.json`, route index, `docs/ai-use.md`): before asking for review, check for another open PR on the same file and update your branch from `staging`; the PR that merges second fixes the conflict.
 - Never push to `main` or `staging`. Never force push. Push only your own branch.
 - Never merge or approve your own PR. The teammate reviews it, and the review must state a specific check, question, finding or reason ("LGTM" does not count).
 - Review format (ADR 0055): "What I checked" (numbered, each with the commit or file and the result), then "Findings", each labelled `issue (blocking)` (must change before merge; the review is "Requesting changes"), `issue` (change in this PR, or the author says why not), `suggestion` (optional) or `question` (needs an answer in the thread).
@@ -20,7 +20,7 @@ Two students build this CPE 334 group project with Claude Code. The product live
 
 ## Decisions
 - Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record each decision as its own file in `docs/adr/` (`NNN-short-name.md`).
-- Do not run ahead: finish the current step, open the PR, and stop for review.
+- Work until blocked (ADR 0057): after opening a PR, start your next own Issue that has no open "blocked by" Issue, branched from `staging`. At most 2 of your PRs wait for review at once; review the teammate's waiting PR before starting new work; never take the teammate's Issue unless they agree and the assignee changes.
 
 ## Releases
 - After each release PR from `staging` into `main`, tag `main` `vS.N` (Sprint 1 = `v1.0`).
