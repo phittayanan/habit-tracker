@@ -7,8 +7,8 @@ Lab 6 Part A, Issue #101. Sprint 1 scope only. This case is written for the UAT 
 | Case ID | UAT-03 |
 | Category | Forbidden role and ownership |
 | Requirements | FR-13, FR-14, FR-22, FR-23; BR-09, BR-10; NFR-02, NFR-03 |
-| Acceptance criteria | AC-02.2, AC-02.3, AC-02.4, AC-02.5, AC-06.2, AC-06.3, AC-10.1, AC-10.2, AC-10.3, AC-10.4, AC-10.5, AC-10.7 (contracts: `docs/sprints/sprint-1/F-02-roles.md`, `F-06-template-view.md`, `F-10-privacy.md`) |
-| Purpose | Show that a Participant cannot see or change another Participant's goals and entries, that a Manager is refused every goal and entry operation, that a Participant cannot create a template, and that an anonymous caller gets nothing. For every refusal, show that the protected data did not change and was not disclosed. |
+| Acceptance criteria | AC-02.2, AC-02.3, AC-02.4, AC-02.5, AC-04.7, AC-06.2, AC-06.3, AC-10.1, AC-10.2, AC-10.3, AC-10.4, AC-10.5, AC-10.6, AC-10.7 (contracts: `docs/sprints/sprint-1/F-02-roles.md`, `F-04-template-edit.md`, `F-06-template-view.md`, `F-10-privacy.md`) |
+| Purpose | Show that a Participant cannot see or change another Participant's goals and entries (and cannot give a goal to another user), that a Manager is refused every goal and entry operation, that a Participant cannot create or edit a template, and that an anonymous caller gets nothing. For every refusal, show that the protected data did not change and was not disclosed. |
 | Roles | Participants **P1** and **P2**, Manager **M1**, and an anonymous visitor |
 | Test type | Manual, in the browser. Some steps send one request from the browser console (F12, Console tab) because the screens do not offer the forbidden action; the exact text to paste is given. |
 
@@ -18,7 +18,7 @@ Lab 6 Part A, Issue #101. Sprint 1 scope only. This case is written for the UAT 
 2. Template **Walking** exists and is active: unit `steps`, minimum 0, maximum 20000. The demo data seeds it (`SEED_DEMO_DATA=true`, `docs/labs/lab-05/deployment.md`); the handoff package (Issue #103) states whether the deployed database has it. If it is missing, record BLOCKED and tell the Product Team.
 3. Account **P2** has **no goal on Walking**, and **P1** has none either. No template is named **UAT-03 Probe**. If this is a second run, the Product Team resets the data as the handoff says before you start.
 4. Today is `D`, the date in Asia/Bangkok. Write the real date in the result table; for example, if `D` is 2026-11-20, then `D+6` is 2026-11-26.
-5. Run the parts in order S, A, B, C, D in one sitting. This case uses its own data (the Walking goal of P2) and does not depend on UAT-01 or UAT-02, but it can run after them.
+5. Run the parts in order S, A, B, C, D in one sitting, and **finish before 24:00 Asia/Bangkok on day `D`**: after midnight the progress text of P2's goal becomes "1 of 2 days met", which is correct behaviour but no longer the expected text. This case uses its own data (the Walking goal of P2) and does not depend on UAT-01 or UAT-02, but it can run after them.
 6. **Console helper.** In steps that say "Console", press F12, open the Console tab, and paste the helper below, then press Enter. The first time, the browser may ask you to type `allow pasting` before it accepts a paste. Every call prints `<status> <body>`.
 
 ```js
@@ -60,18 +60,23 @@ var D = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 | A4 | Run `await call('GET', '/api/goals/<G>/entries')`. | `404 {"error":{"code":"GOAL_NOT_FOUND","message":"Goal not found."}}` (no entry of P2 is shown). |
 | A5 | Run `await call('POST', '/api/goals/<G>/entries', { entryDate: D, value: 1 })`. | `404 {"error":{"code":"GOAL_NOT_FOUND","message":"Goal not found."}}` |
 | A6 | Run `await call('GET', '/api/goals/999999/entries')`, then `await call('POST', '/api/goals/999999/entries', { entryDate: D, value: 1 })`. | Both print exactly the same text as A4 and A5: `404 {"error":{"code":"GOAL_NOT_FOUND","message":"Goal not found."}}`. A request for P2's goal and a request for a goal that does not exist cannot be told apart. |
-| A7 | Press "Log out". Log in as **P2**. Look at the Walking goal. | The entry list still shows only "`D`: 6000 steps" (P1's attempted value 1 was not stored) and progress **"1 of 1 days met"**. |
-| A8 | Press "Log out". | The login screen shows again. |
+| A7 | Run `var T = (await (await fetch('/api/templates')).json()).templates.find(t => t.name === 'Walking').id;` and then `await call('POST', '/api/goals', { templateId: T, dailyTarget: 5000, startDate: D, endDate: D, participantId: 1 })`. (The id of another user in the body must be ignored. Start and end are both `D`: a one-day goal.) | The printed text starts with `201 ` and holds a goal with `"templateId"` equal to `T`. The request was accepted and the extra field `participantId` was ignored. |
+| A8 | Reload the page (F5) and read the goals page. | The goals page of **P1** now lists a Walking goal ("Daily target: 5000 steps", `D` – `D`, Active). It is P1's own goal: the id sent in the body did not give the goal to another user. |
+| A9 | Press "Log out". Log in as **P2**. Look at the Walking goal. | The entry list still shows only "`D`: 6000 steps" (P1's attempted value 1 was not stored), progress **"1 of 1 days met"**, and the page lists exactly the goals P2 made (no second Walking goal). |
+| A10 | Press "Log out". | The login screen shows again. |
 
-### Part B: a Participant cannot create or edit a template (Participant P1)
+### Part B: a Participant cannot create or edit a template (Participant P1; AC-06.3, AC-04.7)
 
 | Step | Action | Expected result |
 |---|---|---|
 | B1 | Log in as **P1** and open "Templates" in the menu. | A read-only table with the columns Name, Unit and Range (`min–max`) lists the active templates, for example Walking `0–20000`. There is no "New" button, no Edit column and no State column. |
 | B2 | In the browser address bar change the page address to `/templates/new` and press Enter (the same address as the application, with `/templates/new` at the end). | The top bar is still shown and the page says **"This page is not available for your role."** There is no template form. |
 | B3 | Open the Console, paste the helper, then run `await fetch('/api/templates', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Role': 'MANAGER' }, body: JSON.stringify({ name: 'UAT-03 Probe', unit: 'x', minValue: 1, maxValue: 5, role: 'MANAGER' }) }).then(async r => r.status + ' ' + await r.text())`. | `403 {"error":{"code":"FORBIDDEN","message":"You do not have permission to do this."}}` (the `role` field and the `X-Role` header changed nothing). |
-| B4 | Open "Templates" again (reload the page). | The table has no row named `UAT-03 Probe`. |
-| B5 | Press "Log out". | The login screen shows again. |
+| B4 | Open the Console, paste the helper, then run `var W = (await (await fetch('/api/templates')).json()).templates.find(t => t.name === 'Walking').id; W` . | The id of the Walking template is printed (a number). Write it down. |
+| B5 | In the browser address bar change the page address to `/templates/<W>/edit` (the application address with `/templates/` , the number `W` and `/edit` at the end) and press Enter. | The top bar is still shown and the page says **"This page is not available for your role."** There is no edit form. |
+| B6 | Open the Console, paste the helper, then run `await call('PATCH', '/api/templates/' + W, { maxValue: 12 })` and `await call('PATCH', '/api/templates/999999', { maxValue: 12 })`. | Both print `403 {"error":{"code":"FORBIDDEN","message":"You do not have permission to do this."}}` (an existing and an unknown id get the same answer: the role is refused before the id is looked at). |
+| B7 | Open "Templates" again (reload the page). | The table has no row named `UAT-03 Probe`, and Walking still shows the range `0–20000` (the edit was not applied). |
+| B8 | Press "Log out". | The login screen shows again. |
 
 ### Part C: a Manager is refused every goal and entry operation (Manager M1)
 
@@ -113,4 +118,4 @@ PASS only if every step gives its expected result: each forbidden request is ref
 
 ## Cleanup and sequence
 
-After this case P2 has an active Walking goal with one entry (6000), and nothing else was created: the refused requests stored no template and no entry. Before you run UAT-03 again, the Product Team resets P2's Walking goal as the handoff says (Issue #103). UAT-03 does not depend on UAT-01 or UAT-02.
+After this case P2 has an active Walking goal with one entry (6000), and P1 has one Walking goal (made in A7); the refused requests stored no template and no entry. Before you run UAT-03 again, the Product Team resets the Walking goals of P1 and P2 as the handoff says (Issue #103). UAT-03 does not depend on UAT-01 or UAT-02.
