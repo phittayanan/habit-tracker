@@ -15,7 +15,7 @@ Lab 6 Part A, Issue #99. Sprint 1 scope only. This case is written for the UAT T
 ## Preconditions
 
 1. The deployed release and URL are the ones named in the handoff; write the version you see into the result table.
-2. Template **Water** exists and is active: unit `glasses`, minimum 1, maximum 12.
+2. Template **Water** exists and is active: unit `glasses`, minimum 1, maximum 12. The demo data seeds it (`SEED_DEMO_DATA=true`, `docs/labs/lab-05/deployment.md`); the handoff package (Issue #103) states whether the deployed database has it. If it is missing, you cannot run this case: record BLOCKED and tell the Product Team, who create the template (a Manager, with exactly these values) before you retry.
 3. Account **P1** has **no goal on Water** (rule BR-05: one active goal per template; a second one would be refused). If P1 already has one, reset the data as the handoff says before you start.
 4. Today is `D`, the date in Asia/Bangkok (the rule is the same whatever the tester's browser time zone). Write the real dates in the result table, for example, if `D` is 2026-11-20 then `D-2` is 2026-11-18 and `D+27` is 2026-12-17.
 
@@ -38,10 +38,10 @@ Lab 6 Part A, Issue #99. Sprint 1 scope only. This case is written for the UAT T
 | 2 | Log in as **P1** with the credentials from the private handoff. | The goals page opens (a Participant's first page). The top bar has the menu items "Goals" and "Templates" and a "Log out" control. With no goals, the page shows "No goals yet" and a visible "+ New goal" button. |
 | 3 | Press "+ New goal". | A form shows a template dropdown (Water is in the list), a daily target box, a start date (default: today, `D`), an end date and a Save button. |
 | 4 | Choose Water. | The unit `glasses` is shown next to the target box. |
-| 5 | Enter target **8**, start date **`D-2`**, end date **`D+27`**. Press Save. | The form accepts it (no error message). The goals page lists one goal: Water, target 8 glasses, the two dates, state **Active**, and the text **"0 of 3 days met"** (the days so far are `D-2`, `D-1` and `D`, and there are no entries yet). |
-| 6 | In the Water row, set the date box to `D-2`, the number box to **8**, press Save. | The page shows the entry "8 glasses" for `D-2`. The progress text becomes **"1 of 3 days met"** (8 reaches the target 8). |
-| 7 | Set the date box to `D-1`, the number box to **6**, press Save. | The page shows the entry "6 glasses" for `D-1`. The progress text stays **"1 of 3 days met"** (6 is below the target 8, but the day still counts in the 3). |
-| 8 | Set the date box to `D` (it should already be today's date), the number box to **10**, press Save. | The page shows the entry "10 glasses" for `D`. The progress text becomes **"2 of 3 days met"** (10 is above 8). |
+| 5 | Enter target **8**, start date **`D-2`**, end date **`D+27`**. Press Save. | The form accepts it (no error message). The goals page lists one goal: Water, "Daily target: 8 glasses", the two dates (`D-2` – `D+27`), state **Active**, and the text **"0 of 3 days met"** (the days so far are `D-2`, `D-1` and `D`, and there are no entries yet). |
+| 6 | In the Water goal, set the **Date** box to `D-2`, the **Value (glasses)** box to **8**, press **Save entry**. | The entry list shows "`D-2`: 8 glasses" (the date as `YYYY-MM-DD`). The progress text becomes **"1 of 3 days met"** (8 reaches the target 8). |
+| 7 | Set the **Date** box to `D-1`, the **Value (glasses)** box to **6**, press **Save entry**. (The Date box keeps `D-2` after step 6, so change it.) | The entry list shows "`D-1`: 6 glasses" and still "`D-2`: 8 glasses". The progress text stays **"1 of 3 days met"** (6 is below the target 8, but the day still counts in the 3). |
+| 8 | Set the **Date** box to `D` (after step 7 it still shows `D-1`, so change it to today's date), the **Value (glasses)** box to **10**, press **Save entry**. | The entry list shows "`D`: 10 glasses" together with the two earlier entries. The progress text becomes **"2 of 3 days met"** (10 is above 8). |
 | 9 | Reload the page (F5). | The goal, the three entries (8, 6 and 10 glasses, on `D-2`, `D-1` and `D`) and the text **"2 of 3 days met"** are all still there. |
 | 10 | Press "Log out". | The login screen shows again. Pressing the browser's Back button does not show the goals page with data (the session is gone; a protected page sends you back to the login screen). |
 
