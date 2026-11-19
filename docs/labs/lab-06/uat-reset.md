@@ -30,7 +30,7 @@ The goals and entries of `participant1` and `participant2` include any that were
 | R-2 | After `COMMIT`, every user, every session and every template whose name does not start with `UAT-` is unchanged (same rows) |
 | R-3 | After `ROLLBACK`, no row of any table has changed |
 | R-4 | If a template named `UAT-...` has a goal of another account, the script fails and no row is deleted |
-| R-5 | A second run after a `COMMIT` deletes nothing and fails with no error |
+| R-5 | A second run after a `COMMIT` deletes nothing and ends without an error |
 
 ## Human steps on the deployed database (not run by an AI)
 
