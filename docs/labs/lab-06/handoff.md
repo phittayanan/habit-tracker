@@ -1,6 +1,6 @@
 # Lab 6 UAT handoff package (Product Team to UAT Team)
 
-Lab 6 Part A, Issue #103. This file is what the partner team (the UAT Team) needs to run our Sprint 1 UAT cases without a verbal explanation. It holds **no password, token or student ID**: credentials go through the private course handoff only. Items marked **TO FILL (#104)** are facts that only the check on the deployed app (Issue #104) can confirm; this file does not guess them. This file is for the UAT Team. The Product Team's reset and release checks are in `reset-runbook.md`, which the UAT Team does not need.
+Lab 6 Part A, Issue #103. This file is what the partner team (the UAT Team) needs to run our Sprint 1 UAT cases without a verbal explanation. It holds **no password, token or student ID**: credentials go through the private course handoff only. The version and live-data facts come from the Product Team's preparation record `release-check.md` (Issue #104, ADR 0060), which is the owner's report; items marked **TO FILL (partner)** can only be agreed with the partner team, which is not identified yet. This file is for the UAT Team. The Product Team's reset and release checks are in `reset-runbook.md`, which the UAT Team does not need.
 
 Product: habit tracker (a Program Manager defines habit templates, a Participant sets daily goals and records daily values, and sees days met). Repository: <https://github.com/phittayanan/habit-tracker> (public).
 
@@ -11,8 +11,8 @@ Acceptance applies only to the release written in this table, and only to the Sp
 | Item | Value |
 |---|---|
 | Sprint 1 baseline release | tag `v1.0`, commit `64831f7`, 2026-11-10 (the first Sprint 1 release on `main`) |
-| Version under test | **TO FILL (#104)**. The cases need the goal-target rule of ADR 0054 (a target equal to the template minimum is refused; UAT-02 expects it), which is in tag `v1.3`, commit `50f5605d266d881b4afba3f8ac96d40882f26fd2` (2026-11-14), and not in `v1.0`. Proposed: `v1.3`, if #104 finds that the deployed revision is that commit. |
-| Deployed Cloud Run revision | **TO FILL (#104)**. Last recorded in `docs/labs/lab-05/deployment.md` section 6.8: revision `habit-tracker-00006-nj6`, page shows `build 50f5605`. |
+| Version under test | Tag `v1.3`, commit `50f5605d266d881b4afba3f8ac96d40882f26fd2` (2026-11-14), recorded in `release-check.md`. The cases need the goal-target rule of ADR 0054 (a target equal to the template minimum is refused; UAT-02 expects it), which is in `v1.3` and not in `v1.0`. The Product Team confirms the `build` text again just before you start. |
+| Deployed Cloud Run revision | `habit-tracker-00006-nj6`, serving 100% of traffic; the page showed `build 50f5605` (owner's report in `release-check.md`, 2026-11-20). If a redeploy changes it, the Product Team tells you first and gives the new value. |
 | How you read the version | The login page and the top bar show `build <first 7 characters of the commit>`. Write what you see in your result record. If it differs from the row above, stop and ask the Product Team. |
 | Sprint 1 contract | The documents in `docs/sprints/sprint-1/` (F-01 to F-04, F-06 to F-10) at the version-under-test commit, with `docs/srs.md` and the ADRs. |
 | Changes during testing | The Product Team tells you **before** it deploys anything that could affect your testing. A deployment changes the version; your acceptance then names the version you actually tested. |
@@ -53,8 +53,8 @@ All data you create is synthetic. Do not enter real personal data. Do not use an
 
 | Data | State before the first case |
 |---|---|
-| Templates (demo data) | Water: `glasses`, 1 to 12. Reading: `pages`, 1 to 100. Walking: `steps`, 0 to 20000. **TO FILL (#104):** confirm the deployed database has these three (the migration job seeds them with `SEED_DEMO_DATA=true`). If one is missing, record BLOCKED for the cases that need it (table in section 6) and tell the Product Team. |
-| Goals and entries | Expected: none for P1 and P2. **TO FILL (#104):** check the live database. `docs/labs/lab-05/deployment.md` section 6.7 records a Reading goal (to 2026-11-26) with one entry made by a demo participant; if it belongs to P1 or P2, the steps that expect no goals will not match until the Product Team resolves it: for P2, UAT-02 precondition 4; for P1, UAT-01 step 2 ("No goals yet") and UAT-03 A2. |
+| Templates (demo data) | Water: `glasses`, 1 to 12. Reading: `pages`, 1 to 100. Walking: `steps`, 0 to 20000. After the reset the owner reported three templates and no `UAT-` template (`release-check.md`); the report does not name the three, so the Product Team checks that these three exist just before you start. If one is missing, record BLOCKED for the cases that need it (table in section 6) and tell the Product Team. |
+| Goals and entries | None for P1 and P2: the owner reported zero goals and zero entries after the reset (`release-check.md`). The reset removed one goal and one entry of P1, probably the Lab 5 Reading record, which is not confirmed. The Product Team confirms the same counts again just before you start; if a goal exists, the steps that expect none will not match: for P2, UAT-02 precondition 4; for P1, UAT-01 step 2 ("No goals yet") and UAT-03 A2. |
 | Other templates | None named `UAT-02 Squats`, `UAT-03 Probe` or `UAT-04 Stretch`. |
 
 ## 6. The cases, their order and their data
@@ -68,7 +68,7 @@ Each case file has its own preconditions, numbered steps with exact expected res
 | UAT-03 | `uat-cases/UAT-03-forbidden-role-and-ownership.md` | Forbidden role and ownership | P1, P2, M1, anonymous | Walking | P2: Walking goal with 1 entry; P1: Walking goal |
 | UAT-04 | `uat-cases/UAT-04-state-and-persistence.md` | State, history and persistence | M1, P1 | nothing seeded | Template `UAT-04 Stretch` (range 1 to 60); P1: two goals on it |
 
-**Sequence.** The four cases are independent: each makes its own data and none needs another's result. Run them in the order UAT-01, 02, 03, 04. A different order works. Inside one case, run the parts in the written order and in one sitting; **all four cases** use today's date (UAT-01 and UAT-02 count "days met" from days before today up to today, UAT-03 and UAT-04 also), so finish each case **before 24:00 Asia/Bangkok** on the day you start it; a run across midnight gives a false FAIL. (UAT-01 does not say so in its own file; UAT-02 says only that its steps run in one sitting on one date `D`; this sentence applies to both.) Do not run a case twice without a reset (section 7).
+**Sequence.** The four cases are not independent after a reset: run them in the order **UAT-01, UAT-02, UAT-03, UAT-04**. UAT-01 step 2 needs P1 to have no goal, UAT-02 precondition 4 needs P2 to have no goal, and UAT-03 leaves a Walking goal for P2 and P1; so UAT-03 before UAT-02 breaks UAT-02, and UAT-01 must come before the others. Each case makes its own data and needs no other case's result. Inside one case, run the parts in the written order and in one sitting; **all four cases** use today's date (UAT-01 and UAT-02 count "days met" from days before today up to today, UAT-03 and UAT-04 also), so finish each case **before 24:00 Asia/Bangkok** on the day you start it; a run across midnight gives a false FAIL. (UAT-01 does not say so in its own file; UAT-02 says only that its steps run in one sitting on one date `D`; this sentence applies to both.) Do not run a case twice without a reset (section 7); to use another order, ask for a reset between the cases.
 
 ## 7. Reset and cleanup
 
@@ -80,7 +80,7 @@ You do not reset the database. A template cannot be deleted in Sprint 1, so a se
 
 **Finding report (for every actual failure):** send one report each with: your Issue ID, product owner (this team), reporter, tested version, the case and step, preconditions and data, the numbered steps to reproduce, the expected result (copied from the case), the actual result, the severity with a reason, and evidence. Say whether you think it is a defect against specified behaviour or a request for a new feature; the Product Team decides and answers with one of: accepted defect, duplicate (with the original's ID), not a defect, enhancement, each with a reason tied to the Sprint 1 contract.
 
-**Channel and answer time:** **TO FILL (#104)** by both teams (an Issue in your own repository linked to ours, or the agreed chat; the Product Team keeps a copy of every report as text). The Product Team answers each report within **TO FILL** hours.
+**Channel and answer time:** **TO FILL (partner)**, agreed by both teams (an Issue in your own repository linked to ours, or the agreed chat; the Product Team keeps a copy of every report as text). The Product Team answers each report within **TO FILL (partner)** hours.
 
 **Severity, by user impact (proposal, the Product Team may adjust it in review):**
 
@@ -103,6 +103,6 @@ You do not reset the database. A template cannot be deleted in Sprint 1, so a se
 
 | Session | Date and time (Asia/Bangkok) |
 |---|---|
-| First UAT run by the partner team | **TO FILL** |
-| Findings answered and corrections released | **TO FILL** |
-| Retest and the partner's decision | **TO FILL** |
+| First UAT run by the partner team | **TO FILL (partner)** |
+| Findings answered and corrections released | **TO FILL (partner)** |
+| Retest and the partner's decision | **TO FILL (partner)** |
