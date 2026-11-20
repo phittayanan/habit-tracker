@@ -1,6 +1,6 @@
 # 0058. The UAT accounts are the three seeded accounts
 
-Status: decided by phittayanan in the session of Issue #104 on 2026-11-19 ("ตกลง"); projectnewy to confirm in the review of the Issue #104 PR
+Status: decided by phittayanan in the session of Issue #104 on 2026-11-19 ("ตกลง"); confirmed by projectnewy on 2026-11-20 in [PR #119 review round 2](https://github.com/phittayanan/habit-tracker/pull/119#pullrequestreview-5991873085)
 
 ## Decision
 

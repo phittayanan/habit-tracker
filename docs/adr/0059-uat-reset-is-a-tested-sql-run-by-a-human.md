@@ -1,6 +1,6 @@
 # 0059. The UAT reset is a tested SQL script that a human runs, after a backup
 
-Status: decided by phittayanan in the session of Issue #104 on 2026-11-19 ("ตกลงตามนี้"); projectnewy to confirm in the review of the Issue #104 PR
+Status: decided by phittayanan in the session of Issue #104 on 2026-11-19 ("ตกลงตามนี้"); confirmed by projectnewy on 2026-11-20 in [PR #119 review round 2](https://github.com/phittayanan/habit-tracker/pull/119#pullrequestreview-5991873085)
 
 ## Decision
 
