@@ -80,7 +80,7 @@ You do not reset the database. A template cannot be deleted in Sprint 1, so a se
 
 **Finding report (for every actual failure):** send one report each with: your Issue ID, product owner (this team), reporter, tested version, the case and step, preconditions and data, the numbered steps to reproduce, the expected result (copied from the case), the actual result, the severity with a reason, and evidence. Say whether you think it is a defect against specified behaviour or a request for a new feature; the Product Team decides and answers with one of: accepted defect, duplicate (with the original's ID), not a defect, enhancement, each with a reason tied to the Sprint 1 contract.
 
-**Channel and answer time:** **TO FILL (partner)**, agreed by both teams (an Issue in your own repository linked to ours, or the agreed chat; the Product Team keeps a copy of every report as text). The Product Team answers each report within **TO FILL (partner)** hours.
+**Channel:** the Product Team proposes **GitHub Issues in this repository**: <https://github.com/phittayanan/habit-tracker/issues>, one Issue per finding, with the report fields above. The repository is public, so put no password, token, session cookie or real personal data in an Issue or a screenshot (section 9). If your team prefers an Issue in your own repository linked to ours, or another channel, say so before the first run; the Product Team keeps a copy of every report as text either way, and **the UAT Team confirms the channel at the start of Lab 6 Part B**. **Answer time:** no commitment is written yet; the Product Team adds one if both teams agree on it (**TO FILL (partner)**).
 
 **Severity, by user impact (proposal, the Product Team may adjust it in review):**
 
