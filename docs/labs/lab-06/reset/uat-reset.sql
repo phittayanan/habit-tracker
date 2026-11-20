@@ -19,7 +19,7 @@ SELECT 'before: ' ||
   (SELECT count(*) FROM "User") || ' users, ' ||
   (SELECT count(*) FROM "Template") || ' templates in all' AS counts;
 
--- Entries first, then goals, then templates: every foreign key is ON DELETE RESTRICT.
+-- Delete entries before goals and goals before templates because both foreign keys use ON DELETE RESTRICT.
 DELETE FROM "Entry"
 WHERE goal_id IN (
   SELECT g.id FROM "Goal" g JOIN "User" u ON u.id = g.participant_id

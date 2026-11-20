@@ -30,9 +30,11 @@ Source: [phittayanan's report on Issue #104](https://github.com/phittayanan/habi
 | Check | Result reported by the owner |
 |---|---|
 | Cloud Run and app | Console showed `habit-tracker-00006-nj6` serving 100% of traffic. The page showed build `50f5605`. Health and readiness both returned 200. |
-| Cloud SQL backup | On-demand backup at 19 Nov 2026 23:43:22, as reported. |
-| Reset | Committed. It removed one goal and one entry from P1. After reset, the owner reported zero goals, zero entries, zero UAT templates, three users and three templates. |
+| Cloud SQL backup | On-demand backup at 19 Nov 2026 23:43:22, as reported. The backup name was not recorded in the owner report. |
+| Reset | Committed. It removed one goal and one entry from P1. The full before-count line and reset time were not recorded in the owner report. After reset, the owner reported zero goals, zero entries, zero UAT templates, three users and three templates. |
 | Seeded account access | The owner logged in successfully as M1, P1 and P2. |
+
+The reset report gives the account and counts. The deleted goal and entry are consistent with the Lab 5 Reading record, which also consisted of one goal and one entry. The report does not identify the goal by name or ID, so that match is unconfirmed. The Reading screenshots are preserved in the Lab 5 PDF evidence (Part 3, C-05) and the record is described in [the Lab 5 deployment log, section 6.7](../lab-05/deployment.md#67-data-after-redeploy-rollback-and-roll-forward-lab-5-step-8-issue-67). Recovering the deleted rows after the commit would require the pre-reset backup.
 
 ## Pending for the handoff
 

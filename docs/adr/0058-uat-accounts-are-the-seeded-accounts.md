@@ -6,7 +6,7 @@ Status: decided by phittayanan in the session of Issue #104 on 2026-11-19 ("à¸•à
 
 1. The Lab 6 UAT accounts are the accounts the seed already creates: **M1** = `manager1`, **P1** = `participant1`, **P2** = `participant2` (`server/prisma/seed.js`). No account is added and the seed does not change.
 2. The two Participants share the password the seed reads from the secret `habit-tracker-seed-participant-password`; M1 uses `habit-tracker-seed-manager-password` (`docs/labs/lab-05/deployment.md` section 2). phittayanan sends the values to the partner team privately. They are never written in Git, an Issue, a PR or a comment.
-3. The passwords must be random values used only for this application, long enough that the public URL cannot be guessed into. A real password of a student is never used.
+3. Use long, randomly generated passwords dedicated to this application. Never use a student's real password. On 2026-11-20, phittayanan confirmed that the live test passwords meet these requirements.
 
 ## Reasons
 
