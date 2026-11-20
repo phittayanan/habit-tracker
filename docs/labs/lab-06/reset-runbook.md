@@ -6,7 +6,7 @@ Lab 6 Part A, Issue #103 (moved out of `handoff.md` in the review of PR #118). N
 
 A reset is for all four cases together, not per case. It removes **every goal and entry of `participant1` and `participant2`**, and the templates `UAT-02 Squats` and `UAT-04 Stretch`, plus `UAT-03 Probe` and `UAT-04 Stretch 2`, which exist only if a refused request wrongly succeeded (UAT-03 B3, UAT-04 F2). It keeps the three accounts and the demo templates. If a UAT Team wants to run one case again, the leftovers of the other cases go too; say so in the agreed channel.
 
-**Check before the first reset.** `docs/labs/lab-05/deployment.md` section 6.7 records a goal "Reading" (2026-11-13 to 2026-11-26, Active) with one entry, created by "a demo participant" on the live database. If it belongs to `participant1` or `participant2` the reset removes it, and the UAT cases that expect no goals (UAT-02 precondition 4) fail without it. Find its owner first, decide whether to keep that record (Lab 5 evidence) or delete it, and write the decision in the Issue #104 comment.
+**Check before the first reset.** `docs/labs/lab-05/deployment.md` section 6.7 records a goal "Reading" (2026-11-13 to 2026-11-26, Active) with one entry, created by "a demo participant" on the live database. If it belongs to `participant1` or `participant2` the reset removes it, and the steps that expect no goals fail if it stays: for P2, UAT-02 precondition 4; for P1, UAT-01 step 2 and UAT-03 A2. Find its owner first, decide whether to keep that record (Lab 5 evidence) or delete it, and write the decision in the Issue #104 comment.
 
 ## 2. Reset script
 

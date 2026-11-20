@@ -54,7 +54,7 @@ All data you create is synthetic. Do not enter real personal data. Do not use an
 | Data | State before the first case |
 |---|---|
 | Templates (demo data) | Water: `glasses`, 1 to 12. Reading: `pages`, 1 to 100. Walking: `steps`, 0 to 20000. **TO FILL (#104):** confirm the deployed database has these three (the migration job seeds them with `SEED_DEMO_DATA=true`). If one is missing, record BLOCKED for the cases that need it (table in section 6) and tell the Product Team. |
-| Goals and entries | Expected: none for P1 and P2. **TO FILL (#104):** check the live database. `docs/labs/lab-05/deployment.md` section 6.7 records a Reading goal (to 2026-11-26) with one entry made by a demo participant; if it belongs to P1 or P2, the cases that expect no goals (UAT-02 precondition 4) will not match until the Product Team resolves it. |
+| Goals and entries | Expected: none for P1 and P2. **TO FILL (#104):** check the live database. `docs/labs/lab-05/deployment.md` section 6.7 records a Reading goal (to 2026-11-26) with one entry made by a demo participant; if it belongs to P1 or P2, the steps that expect no goals will not match until the Product Team resolves it: for P2, UAT-02 precondition 4; for P1, UAT-01 step 2 ("No goals yet") and UAT-03 A2. |
 | Other templates | None named `UAT-02 Squats`, `UAT-03 Probe` or `UAT-04 Stretch`. |
 
 ## 6. The cases, their order and their data
