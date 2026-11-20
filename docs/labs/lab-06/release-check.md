@@ -38,5 +38,5 @@ The reset report gives the account and counts. The deleted goal and entry are co
 
 ## Pending for the handoff
 
-- The partner team's login confirmation and the completed handoff are still open under the current Issue #104 criteria. The owner proposed tracking private credential delivery and the partner team's first logins in Part B, pending agreement with projectnewy.
+- Issue #104 records the Product Team's preparation checks above. Issue #103 uses the build, revision and starting data in the handoff. The Product Team delivers credentials privately, and the UAT Team confirms login with all three labels at the start of Lab 6 Part B. See [ADR 0060](../../adr/0060-separate-uat-preparation-from-partner-login.md).
 - At handoff, use the confirmed build and revision and verify the starting data required by each UAT case. Tell the UAT Team before any change to the live release during UAT.
