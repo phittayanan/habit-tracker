@@ -23,13 +23,13 @@ One row per case. PASS/FAIL/BLOCKED: BLOCKED is not a pass and needs a reason. F
 
 | Case ID | Tester name / team | Date and time | Tested version | Inputs | Actual result | PASS / FAIL / BLOCKED (+ reason) | Evidence ID |
 |---|---|---|---|---|---|---|---|
-| _(partner case ID)_ | | | | | | | E-B-xx |
-| _(partner case ID)_ | | | | | | | E-B-xx |
+| _(partner case ID)_ | | | | | | | E-B2-xx |
+| _(partner case ID)_ | | | | | | | E-B2-xx |
 
 ## Evidence register
 
-Sheet §4.2 (p.6): each screenshot or log excerpt has an ID, the action, expected and actual result, the time and the tested revision. Screenshots are stored next to this file in `evidence/`, named `E-B-xx-<case-id>-<short-action>.png`.
+Evidence IDs in this half are `E-B2-01`, `E-B2-02`, …; the first half (#105) uses `E-B1-xx` (agreed in the #105 and #106 comments, 2026-11-25). Sheet §4.2 (p.6): each screenshot or log excerpt has an ID, the action, expected and actual result, the time and the tested revision. Screenshots are stored next to this file in `evidence/`, named `E-B2-xx-<case-id>-<short-action>.png`.
 
 | Evidence ID | Case ID | Action | Expected (from partner case) | Actual (observed) | Protected-state check (rejected operations) | Time | Tested revision | File |
 |---|---|---|---|---|---|---|---|---|
-| E-B-xx | | | | | | | | |
+| E-B2-xx | | | | | | | | |
