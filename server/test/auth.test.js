@@ -103,6 +103,21 @@ test('TC-02 regression: a successful dummy comparison still cannot authenticate 
   assert.equal(await db.session.count(), 0);
 });
 
+test('TC-81: a username with a NUL character is an unknown username, not a server error', async t => {
+  const compare = t.mock.method(bcrypt, 'compare');
+  const responses = [];
+  for (const username of ['nobody', 'no\u0000body']) {
+    const response = await request(app).post('/api/auth/login').send({ username, password });
+    assert.equal(response.status, 401, `status for ${JSON.stringify(username)}`);
+    assert.equal(response.headers['set-cookie'], undefined);
+    responses.push(response.body);
+  }
+  assert.deepEqual(responses[0], error('INVALID_CREDENTIALS', 'Username or password is incorrect.'));
+  assert.deepEqual(responses[1], responses[0]);
+  assert.equal(await db.session.count(), 0);
+  assert.equal(compare.mock.callCount(), 2, 'One real bcrypt comparison for each unknown username, including the NUL one');
+});
+
 test('TC-03: logout deletes session and clears cookie; replay and anonymous logout fail', async () => {
   const cookie = cookieOf(await login());
   const response = await request(app).post('/api/auth/logout').set('Cookie', cookie);
