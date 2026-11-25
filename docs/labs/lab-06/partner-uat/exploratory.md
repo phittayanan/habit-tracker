@@ -18,7 +18,7 @@ Lab 6 Part B/C, Issue #122. Optional extra testing outside the agreed UAT cases 
 | Item | Record |
 |---|---|
 | Human exploratory testing | Allowed by the partner team (group chat, before 2026-11-25; recorded in the #122 handover). |
-| AI agent operating the deployed app | phittayanan reported on 2026-11-25 (in the Claude Code session for #122) that the partner team approved it, on the condition that no password leaks. Evidence: screenshot of the group-chat message, `E-B2X-09` — **TO ADD** (phittayanan). |
+| AI agent operating the deployed app | phittayanan reported on 2026-11-25 (in the Claude Code session for #122) that the partner team approved it, on the condition that no password leaks. Written confirmation `E-B2X-09`: the partner team member asamapornch posted it on this repository's PR #123 (https://github.com/phittayanan/habit-tracker/pull/123#issuecomment-7157104617) on 2026-11-25 15:30 Asia/Bangkok, after the tests (~14:56–14:57); it names the agent, the signed-in browser, the `EXP-PT-` inputs and the no-password condition. |
 | Change to the #106 rule | #106 said "no agent browser automation on the partner's deployed app". For #122 phittayanan changed this on 2026-11-25: the agent may operate the deployed app in phittayanan's own Chrome, in a session phittayanan signed in to, for the items phittayanan approved (X-01, X-02). This row is that record. |
 | Password | The agent never typed, saw or stored a password. The Chrome tab was already signed in as MANAGER (`manager@example.com`) when the agent opened the app. |
 | Who ran each item | X-01, X-02: Claude Code (Claude in Chrome), after phittayanan's approval ("ทำให้ได้เลยตาม spec"). X-03: localhost only, not run on the deployed app (phittayanan's decision). |
@@ -57,7 +57,7 @@ Files are in `evidence/`. Screenshots show the page only (no browser bar or pers
 | E-B2X-06 | X-02 | Status of the form's `PUT /templates/3` | 400 | 500 `INTERNAL_ERROR` | 2026-11-25 ~14:57 | s65da36e2-00009-b4s (handoff) | `evidence/E-B2X-06-X-02-put-templates-500.txt` |
 | E-B2X-07 | X-02 | Cancel, reload; template list | `UAT-04-PP` unchanged | `UAT-04-PP · times · 0–20`; no `EXP-PT` template | 2026-11-25 ~14:57 | s65da36e2-00009-b4s (handoff) | `evidence/E-B2X-07-X-02-after-reload-UAT-04-PP-unchanged.jpg` |
 | E-B2X-08 | X-03 (and X-01/X-02 on localhost) | `curl` against the partner's backend on localhost | 400 | 500 for the NUL character and for the 110,000-character name; 400 at 99,000 and 102,000 | 2026-11-25 ~14:51 | Commit `0619c07` on localhost, not the deployed revision | `evidence/E-B2X-08-X-03-localhost-nul-500.txt` |
-| E-B2X-09 | Consent | Partner team's message allowing the AI agent | Consent and its scope | **TO ADD** (phittayanan's screenshot, cropped) | — | — | — |
+| E-B2X-09 | Consent | Partner team's written confirmation, posted by asamapornch on PR #123 | Consent and its scope | AI agent (Claude Code) allowed on 2026-11-25 in phittayanan's signed-in browser, for template inputs named `EXP-PT-…`; no password shared with or typed by the agent | 2026-11-25 15:30 (posted after the tests) | n/a | [PR #123 comment](https://github.com/phittayanan/habit-tracker/pull/123#issuecomment-7157104617) |
 
 ## Hand-over to #107
 
