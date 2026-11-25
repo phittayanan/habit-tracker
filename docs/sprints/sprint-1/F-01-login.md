@@ -111,7 +111,7 @@ No response carries `password`, `passwordHash` or the session ID in the body.
 | AC | Observable outcome |
 |---|---|
 | AC-01.1 | A valid login gets 200 with the user's `id`, `username`, `displayName` and `role`, and a `Set-Cookie` with the session ID that is `HttpOnly`, `SameSite=Lax` and `Path=/`; sending that cookie to `GET /api/auth/me` then gets 200 |
-| AC-01.2 | An unknown username and a wrong password each get `401 INVALID_CREDENTIALS` with the same message, no `Set-Cookie`, and no new session |
+| AC-01.2 | An unknown username and a wrong password each get `401 INVALID_CREDENTIALS` with the same message, no `Set-Cookie`, and no new session. This holds for any username text, including one with a NUL character (no account can have such a username, so it is an unknown username) |
 | AC-01.3 | A login body that is not JSON, or has a missing, empty or non-string `username` or `password`, gets `400 VALIDATION_ERROR` and no cookie |
 | AC-01.4 | Logout gets 204 and clears the cookie; the old cookie value then gets `401 UNAUTHENTICATED` on `GET /api/auth/me`; logout with no session gets `401 UNAUTHENTICATED` |
 | AC-01.5 | `GET /api/auth/me` returns the display name and role of the session user, for a Manager and for a Participant. No auth response contains a password, a password hash or the session ID in the body |
@@ -140,6 +140,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | TC-45 | AC-01.8 | Script | Seed password values from the environment | Search the Git-tracked files for each value | No match |
 | TC-46 | AC-01.1 | API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
 | TC-65 | AC-01.10 | Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens. Log out: the login screen. Manager: the Manager's first page |
+| TC-81 | AC-01.2 | API | A exists; no user named `nobody` | `POST /api/auth/login` with username `nobody`, then with a username that contains a NUL character (JSON `"no\u0000body"`), each with any password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; no Session row; the NUL case is not a 500 (Issue #128, from the partner finding #126) |
 
 ## 11. Definition of done
 
@@ -175,6 +176,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 |---|---|---|
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): TC-05 uses auth only; host-only Origin check and forwarded HTTPS case in TC-64; login timing proposal OP-01.12; record partner agreement on existing proposals | pending (partner re-check) |
+| 2026-11-25 | Issue #128, from the partner UAT finding #126: AC-01.2 states that it holds for any username text, including a NUL character; TC-81 added | pending (reviewer phittayanan) |
 
 ## 14. Implementation evidence
 
