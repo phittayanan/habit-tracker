@@ -37,12 +37,12 @@ Common data for both reports: product owner team "Habit and Activity Tracker" (a
   1. In Create template, type Name `UAT-00-WHEEL-PP`, Unit `test`, Min value `1`, Max value `50`. Do not press Create.
   2. Click the Max value field so it stays focused (it shows 50).
   3. With the pointer over the field, scroll the mouse wheel down 3 clicks.
-  4. Click the Min value field (it shows 1) and scroll the wheel down 1 click.
-  5. Click outside the fields, then scroll the wheel over the Max value field.
+  4. Click outside the fields (no field focused), then scroll the wheel over the Max value field.
+  5. Click the Min value field (it shows 1) and scroll the wheel down 1 click.
 - **Expected result:** scrolling the page with the wheel does not change a value the user typed.
-- **Actual result:** step 3: Max value changes from 50 to 49.97 (0.01 per click; the page also scrolls slightly). Step 4: Min value changes from 1 to 0.99. Step 5: no change while the field is not focused (as seen by the tester).
+- **Actual result:** step 3: Max value changes from 50 to 49.97 (0.01 per click; the page also scrolls slightly). Step 4: no change while no field is focused (as seen by the tester). Step 5: Min value changes from 1 to 0.99.
 - **Severity (proposal):** minor. No data is lost and the value is visible before submit, but a user who scrolls the page with the wheel to reach Create while a number field is focused can submit a changed value without noticing, for example a template with the range 1 to 49.99.
-- **Defect or enhancement:** we do not know the cause in the partner's code and do not guess it. The partner's package does not state a behaviour, so we ask the partner to classify it with a reason tied to their contract.
+- **Defect or enhancement:** we think it is an **enhancement** (input handling), not a failure of a specified behaviour, because the partner's package states no behaviour for it. We do not know the cause in the partner's code and do not guess it. We ask the partner to classify it with a reason tied to their contract.
 - **Related observation (not proven):** during UAT-02 a template was created with the range 1 to 49.99 although 50 was intended; this is consistent with the behaviour, but we cannot prove that the wheel caused it.
 - **Evidence:** E-B1-30 (Max 50 before), E-B1-31 (Max 49.97 after 3 clicks), E-B1-32 (fields not focused, no change), E-B1-33 (Min 0.99 after 1 click); the manager account is in the top bar. Details in `partner-uat/first-half.md`.
 
@@ -55,6 +55,7 @@ Common data for both reports: product owner team "Habit and Activity Tracker" (a
 - **Expected result:** 400 `VALIDATION_ERROR` and the server's message shown verbatim; the form keeps the typed values; the template is not created or changed.
 - **Actual result:** create: the form shows "An unexpected error occurred." and `POST /templates` returns 500 `{"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred."}}` (request body 110,060 bytes). Edit: the same message and `PUT /templates/3` returns 500 with the same body (110,063 bytes). After a reload the template list is unchanged (10 templates, none starting with `EXP-PT`; `UAT-04-PP` still `times · 0–20`). The edit stored nothing.
 - **Severity (proposal):** minor. A normal user is not affected (the input is far beyond 100 characters and the application stays up); the contract's required 400 is not returned for an oversized body, and the user sees a generic message instead of the validation message.
+- **Defect or enhancement:** we think it is a **defect** against AC-02.11 and NFR-05: the contract says a name over 100 characters returns 400, and the deployed app returns 500 for an oversized name. We ask the partner to classify it with a reason tied to their contract.
 - **Observation on a local copy (not on the deployed app):** with the partner's public code at `0619c07` on a local database, names of 99,000 and 102,000 characters returned 400, and 110,000 returned 500. We did not verify the cause and offer a hypothesis only: the request body size passes a default limit before validation. We ask the partner to classify the report.
 - **Evidence:** E-B2X-01 (list before), E-B2X-02 and E-B2X-05 (the error under the create and edit forms), E-B2X-03 and E-B2X-06 (status 500 and body), E-B2X-04 and E-B2X-07 (list after reload, unchanged); E-B2X-08 is the local observation. Details in `partner-uat/exploratory.md`.
 - **Note on consent:** the partner team's written permission for the AI agent covers "template inputs named EXP-PT-…". The edit used such a name on an existing template; it stored nothing. Written consent: E-B2X-09 (a comment of asamapornch on our PR #123).
@@ -62,6 +63,6 @@ Common data for both reports: product owner team "Habit and Activity Tracker" (a
 ## 3. What is still open
 
 - Open the two Issues in the partner's repository (projectnewy) and record their links and the date here.
-- Check our repository and the partner team's results again for findings on our app; triage each one here within 24 hours.
+- Check our repository and the partner team's results again for findings on our app; triage each one here within 24 hours. Re-run both checks before Issue #109: `gh issue list --repo phittayanan/habit-tracker --state all` and `gh issue list --repo asamapornch/habit-activity-tracker --state all`, and ask the partner team whether they sent anything by another route.
 - For every accepted critical or major defect: Part D (Issue #108), with a failing test first.
 - The partner team's classification of B1-01 and B2-01 and the time they answered; record them here.
