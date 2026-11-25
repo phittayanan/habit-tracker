@@ -18,12 +18,12 @@ Rules we follow when one arrives: reproduce and clarify before dismissing; never
 
 The reports below follow the sheet's fields: Issue ID, product owner and team, reporter, tested version, linked case and requirement, preconditions and data, reproduction steps, expected result, actual result, severity with its reason, and evidence. The severity is by user impact and is a proposal; the partner classifies each report.
 
-**Status: prepared, not sent.** Nothing has been opened in the partner's repository yet. Opening an Issue there is an outward action that projectnewy takes after reading it; this file is updated with the Issue link and date when it is sent.
+**Status: sent on 2026-11-25.** Both reports were opened as GitHub Issues in the partner's repository on 2026-11-25 at about 18:12 Asia/Bangkok (11:12 UTC), one Issue per finding, by projectnewy (the `gh` account of this team) after reading them. The text of each Issue is the report below, with a header table and links to the evidence files in this repository. The partner has not answered yet; their classification and the time of the answer are recorded here when they arrive.
 
 | Report ID | Source | Case / requirement | Title | Proposed severity | Status | Evidence |
 |---|---|---|---|---|---|---|
-| B1-01 | Observation during UAT-02 and UAT-05 preparation (#105) | none (outside the cases); the partner's package states no behaviour | Mouse wheel changes the value of a focused number field | minor | prepared, not sent | E-B1-30 to E-B1-33 (`partner-uat/evidence/`) |
-| B2-01 | Exploratory testing X-01 and X-02 (#122), confirmed by phittayanan | AC-02.11, AC-02.17, NFR-05 of the partner's contract | A template name of about 110,000 characters returns 500 instead of 400, on create and on edit | minor | prepared, not sent | E-B2X-01 to E-B2X-07 (`partner-uat/evidence/`) |
+| B1-01 | Observation during UAT-02 and UAT-05 preparation (#105) | none (outside the cases); the partner's package states no behaviour | Mouse wheel changes the value of a focused number field | minor | sent 2026-11-25: [asamapornch/habit-activity-tracker#60](https://github.com/asamapornch/habit-activity-tracker/issues/60); no answer yet | E-B1-30 to E-B1-33 (`partner-uat/evidence/`) |
+| B2-01 | Exploratory testing X-01 and X-02 (#122), confirmed by phittayanan | AC-02.11, AC-02.17, NFR-05 of the partner's contract | A template name of about 110,000 characters returns 500 instead of 400, on create and on edit | minor | sent 2026-11-25: [asamapornch/habit-activity-tracker#61](https://github.com/asamapornch/habit-activity-tracker/issues/61); no answer yet | E-B2X-01 to E-B2X-07 (`partner-uat/evidence/`) |
 
 Not reported: X-03 of #122 (a NUL character in a template name or login email returns 500). It was seen on localhost only and not confirmed on the deployed app, so it is not sent.
 
@@ -62,7 +62,7 @@ Common data for both reports: product owner team "Habit and Activity Tracker" (a
 
 ## 3. What is still open
 
-- Open the two Issues in the partner's repository (projectnewy) and record their links and the date here.
+- Done: the two Issues were opened in the partner's repository on 2026-11-25 (links in section 2). Not done: tell the partner team in the group chat that the Issues exist, and send them our result sheet for UAT-01 to UAT-06.
 - Check our repository and the partner team's results again for findings on our app; triage each one here within 24 hours. Re-run both checks before Issue #109: `gh issue list --repo phittayanan/habit-tracker --state all` and `gh issue list --repo asamapornch/habit-activity-tracker --state all`, and ask the partner team whether they sent anything by another route.
 - For every accepted critical or major defect: Part D (Issue #108), with a failing test first.
 - The partner team's classification of B1-01 and B2-01 and the time they answered; record them here.
