@@ -1,0 +1,8 @@
+E-B2X-06 (Issue #122, X-02) — response log captured in the page, 2026-11-25 ~14:57 Asia/Bangkok
+Deployed app: https://s65da36e2-4d7hbszvwq-as.a.run.app (handoff revision s65da36e2-00009-b4s), signed in as MANAGER.
+Method: same fetch wrapper as E-B2X-03. Edit form of UAT-04-PP (id 3) was pre-filled with
+name UAT-04-PP, unit times, min 0, max 20; only Name was replaced; the form was submitted by clicking Save.
+Request body: {"name":"EXP-PT-02-" + 110,000 x 'x', "unit":"times", "minValue":0, "maxValue":20}
+
+[{"url":"/templates/3","method":"PUT","bytes":110063,"status":500,
+  "body":"{\"error\":{\"code\":\"INTERNAL_ERROR\",\"message\":\"An unexpected error occurred.\"}}"}]
