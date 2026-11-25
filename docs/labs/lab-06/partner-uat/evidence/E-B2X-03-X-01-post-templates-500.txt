@@ -1,0 +1,8 @@
+E-B2X-03 (Issue #122, X-01) — response log captured in the page, 2026-11-25 ~14:57 Asia/Bangkok
+Deployed app: https://s65da36e2-4d7hbszvwq-as.a.run.app (handoff revision s65da36e2-00009-b4s), signed in as MANAGER.
+Method: a wrapper around window.fetch in the open tab recorded the status and the first 200 characters
+of the response body of the form's own request. The form was submitted by clicking Create.
+Request body: {"name":"EXP-PT-01-" + 110,000 x 'x', "unit":"km", "minValue":0, "maxValue":10}
+
+[{"url":"/templates","method":"POST","bytes":110060,"status":500,
+  "body":"{\"error\":{\"code\":\"INTERNAL_ERROR\",\"message\":\"An unexpected error occurred.\"}}"}]
