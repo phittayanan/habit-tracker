@@ -20,7 +20,9 @@ function acceptableDecimal(value) {
 }
 
 const decimal = message => z.number({ error: message }).refine(acceptableDecimal, { error: message });
-const text = (message, max) => z.string({ error: message }).trim().min(1, { error: message }).max(max, { error: message });
+// AC-03.3, AC-04.4: PostgreSQL text cannot hold a NUL character, so refuse it here instead of failing in the database.
+const text = (message, max) => z.string({ error: message }).trim().min(1, { error: message }).max(max, { error: message })
+  .refine(value => !value.includes('\u0000'), { error: message });
 const createBody = z.object({
   name: text(nameMessage, 100),
   unit: text(unitMessage, 30),

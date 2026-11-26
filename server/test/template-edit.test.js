@@ -139,6 +139,8 @@ test('TC-71: invalid edits are validation errors, an unknown id is 404, anonymou
     [{ name: null }, 'Name must be 1 to 100 characters.'],
     [{ unit: 'u'.repeat(31) }, 'Unit must be 1 to 30 characters.'],
     [{ maxValue: 100000000 }, 'Maximum must be a number with at most 2 decimal places.'],
+    [{ unit: 'X\u0000Y' }, 'Unit must be 1 to 30 characters.'],
+    [{ name: 'N\u0000M' }, 'Name must be 1 to 100 characters.'],
   ];
   for (const [body, message] of bodies) {
     const response = await patch(t.id, body);

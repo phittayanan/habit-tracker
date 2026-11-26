@@ -124,6 +124,8 @@ test('TC-68: invalid template bodies are validation errors and anonymous calls s
     { ...valid, maxValue: 10.555 },
     { ...valid, minValue: 100000000 },
     { ...valid, maxValue: -100000000 },
+    { ...valid, name: 'Re\u0000ad' },
+    { ...valid, unit: 'pa\u0000ges' },
   ];
   for (const body of bodies) {
     const payload = { ...body };
