@@ -206,6 +206,10 @@ Two things to know:
 
 No `gcloud` or other GCP command was run by an AI agent. The AI dispatched the two `Deploy` runs with `gh workflow run` at the owner's request and read the run logs.
 
+### 6.8 Third release (Issues #79 and #74)
+
+Release PR [#96](https://github.com/phittayanan/habit-tracker/pull/96), `staging` into `main`, merge commit `50f5605d266d881b4afba3f8ac96d40882f26fd2`, tag `v1.3` (annotated). It carries the seed fix (PR #92, ADR 0053), the goal-target rule (PR #95, ADR 0054) and documentation; no migration. [Deploy run 43481215940](https://github.com/phittayanan/habit-tracker/actions/runs/43481215940): `test-and-docker` and `deploy` succeeded, `ROLLBACK: false`, migration job `habit-tracker-migrate-66vl4` completed, smoke test passed, revision `habit-tracker-00006-nj6` serving 100% of traffic, image index `sha256:983689e12917a5dee763b200e1fedd6ab8ed0df45687b78b5a6dcec7aaed27bf`. The public page shows `build 50f5605`. Read from the run log and the public page on 14 Nov 2026; the revision list and the record after this release are in the PDF evidence (Part 3 and Part 4).
+
 ## 7. Docker
 
 Added in step 3 (Issue #49) from the Lab 5 starter kit's 7 files. Local only: nothing here is pushed to a registry or deployed. GCP values come in step 5.
@@ -272,8 +276,9 @@ Run on macOS with Docker Desktop (Docker 29.7.2, Compose 5.5.0) and headless Chr
 | C-03 / TC-50: fresh clone | Empty folder, `git clone`, branch checked out, `server/.env` from `server/.env.example` with only its values filled (fake), `docker compose build --no-cache --pull`, `docker compose up -d`: all services up, `migrate` `Exited (0)`, both endpoints answer, `manager1` and `participant1` sign in. **27 seconds** from clone to sign-in (target 15 minutes, NFR-07). The base images were already on the machine, so their first download is not counted | `ad3300a` |
 | Windows line endings (review of PR #70 by projectnewy, Windows 11, `core.autocrlf=true`) | Red at `68f4e13`: `server/docker-entrypoint.sh` checked out with CRLF, `migrate` Exited (255), `exec ./docker-entrypoint.sh: no such file or directory`. The same red reproduced on macOS with `git clone -c core.autocrlf=true`. | `68f4e13` |
 | Same clone config after `.gitattributes` (`*.sh text eol=lf`) | Script is LF, `migrate` `Exited (0)`, `/api/health` and `/api/ready` answer, sign-in through `:5173` 200 (macOS, `autocrlf=true`; Windows is still the reviewer's check) | `daf6382` |
+| C-03 / TC-50 on the submitted tag `v1.3`, Windows 11 (14 Nov 2026, projectnewy; run by Claude Code, no password printed) | `git -c core.autocrlf=true clone --branch v1.3` into an empty folder (`docker-entrypoint.sh` is LF), `server/.env` from `server/.env.example` with only the two seed passwords changed, `docker compose build --no-cache --pull` (exit 0), `docker compose up -d`: `db` healthy, `server` and `client` up, `migrate` `Exited (0)`; `/api/health` answers `{"status":"ok"}` and `/api/ready` `{"status":"ready"}` through `:5173`; `participant1` signs in (200) and `GET /api/goals` with the session answers 200. **63 seconds** from clone to sign-in (target 15 minutes, NFR-07; Docker 29.8.1, Compose 5.5.1; some base images were cached). `docker compose down -v` ran afterwards | `50f5605` |
 
-Not run here: Windows by the author (the reviewer's check), CI, any registry or GCP step.
+Not run in the original step 3: Windows by the author (the reviewer's check), CI, any registry or GCP step. The Windows run on the submitted tag is the row above.
 
 ## 8. Continuous integration (Lab 5 step 4, Issue #50)
 

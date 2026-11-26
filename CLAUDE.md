@@ -1,14 +1,16 @@
 # Team workflow (read first)
 
-Two students build this CPE 334 group project with Claude Code. The product lives in `docs/`; this file holds only the working rules. Work goes step by step: each step waits for a human review.
+Two students build this CPE 334 group project with Claude Code. The product lives in `docs/`; this file holds only the working rules. Work goes step by step: each PR waits for the teammate's review, and you may start your next own Issue meanwhile (ADR 0057).
 
 ## Branches and PRs
 - One Issue -> one branch -> one PR. Branch from `staging` and name it `feat/|fix/|docs/|chore/<issue-number>-<slug>`.
 - Open the PR into `staging`. Only the release PR goes from `staging` into `main`, with a tag.
 - Commit titles use Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:`. GitHub's merge-commit titles are exempt.
-- Busy files (database schema, `package.json`, route index): before asking for review, check for another open PR on the same file and update your branch from `staging`.
+- Busy files (database schema, `package.json`, route index, `docs/ai-use.md`): before asking for review, check for another open PR on the same file and update your branch from `staging`; the PR that merges second fixes the conflict.
 - Never push to `main` or `staging`. Never force push. Push only your own branch.
 - Never merge or approve your own PR. The teammate reviews it, and the review must state a specific check, question, finding or reason ("LGTM" does not count).
+- Review format (ADR 0055): "What I checked" (numbered, each with the commit or file and the result), then "Findings", each labelled `issue (blocking)` (must change before merge; the review is "Requesting changes"), `issue` (change in this PR, or the author says why not), `suggestion` (optional) or `question` (needs an answer in the thread).
+- Moving Issue cards on board 12 is the agent's job: move the card at each event in ADR 0055 and read it back. People do not move cards.
 - Fill in every part of the PR template: Issue link, feature/AC IDs, what changed, tests run with output, reviewer check.
 
 ## Spec and tests first
@@ -18,7 +20,7 @@ Two students build this CPE 334 group project with Claude Code. The product live
 
 ## Decisions
 - Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record each decision as its own file in `docs/adr/` (`NNN-short-name.md`).
-- Do not run ahead: finish the current step, open the PR, and stop for review.
+- Work until blocked (ADR 0057): add a "blocked by" link when an Issue needs another merged first; after opening a PR, start your next own Issue that has no open "blocked by" Issue, branched from `staging`. At most 2 of your PRs wait for review at once; review the teammate's waiting PR before starting new work; never take the teammate's Issue unless they agree and the assignee changes.
 
 ## Releases
 - After each release PR from `staging` into `main`, tag `main` `vS.N` (Sprint 1 = `v1.0`).
