@@ -6,9 +6,21 @@ No critical or major defect was received. We still corrected both accepted minor
 
 {{include:../resolution.md|## 1. Version table}}
 
+### GCP evidence for the deployed corrected revision
+
+Command output, not Console screenshots: collected read-only with the gcloud CLI (E-D-02 also the Artifact Registry API) by phittayanan with Claude Code, and [posted on PR #137](https://github.com/phittayanan/habit-tracker/pull/137#issuecomment-7198932906); the Cloud Console required two-step verification for the account. **Read on 2026-11-27 about 00:11 Asia/Bangkok, not at deploy time** (the revision was created 2026-11-26 18:01); the deploy-time record is the deploy run and phittayanan's comment on #126 at 18:03. Manual, read-only.
+
+![**E-D-01**, 2026-11-27 00:11. Action: list the revisions and traffic. Expected: the corrected revision is ready and serves the traffic. Actual: `habit-tracker-00007-7pd` (`v1.4`) is ready with 100% of traffic; `00006-nj6` (`v1.3`) is the one before it.](img/E-D-01-cloud-run-revision-traffic.png)
+
+![**E-D-02**, 2026-11-27 00:11. Action: follow each commit tag to the image of its revision. Expected: the revision runs the image built from the release commit. Actual: tag `056ee5c…` → index `sha256:3a412d8…` → linux/amd64 `sha256:552adfe…`, the image of `00007-7pd`; tag `50f5605…` → `sha256:983689e…` → `sha256:a5da715…`, the image of `00006-nj6`.](img/E-D-02-image-chain.png)
+
 ## D.2 Correction chain: triage, RED, GREEN, review, release, retest
 
 {{include:../resolution.md|## 3. Part D}}
+
+### Smoke check of the deployed URL
+
+![**E-D-03**, 2026-11-27 00:11, revision `habit-tracker-00007-7pd` (E-D-01). Action: request `/api/health` and `/api/ready`. Expected: 200. Actual: both 200. Read after the deploy; the smoke step of the deploy run is the check made at deploy time.](img/E-D-03-smoke-check.png)
 
 ## D.3 Regression tests (excerpt of the test changes from `v1.3` to `v1.4`)
 
@@ -76,6 +88,7 @@ Both students used AI coding assistants (Claude Code; Codex for part of Issue #1
 | Part B, X-01 and X-02 | **Operated the partner's deployed app** in phittayanan's signed-in browser (page script and clicks), and read their public code. Consent reported before the test; written confirmation posted afterwards (E-B2X-09) | Chose the items, signed in, decided the results |
 | Part C | Drafted triage comments, reports and records; posted Issues and comments after a student asked or approved. A first version of `findings.md` was out of date on the partner's answers until review | Classified findings, approved and sent the texts |
 | Part D, fixes | Wrote spec changes, failing tests and fixes, ran them on disposable local databases | Reviewed the other student's fix, repeated or checked RED and GREEN, merged, released and deployed |
+| Part D, GCP evidence | Read the Cloud Run, Artifact Registry and health data with read-only commands for E-D-01 to E-D-03 (phittayanan's session, as the posting comment says); placed the three images in this PDF | phittayanan collected and posted the evidence |
 | Part D, retest of the partner's fixes | **Operated the partner's deployed app** in projectnewy's signed-in Chrome for #61, and created one template there. projectnewy reported that the partner allowed it; the agent saw no written confirmation for that day, and the written consent E-B2X-09 was for the earlier test. For #60 it did not operate the app | projectnewy signed in, ran the #60 check with a real mouse and approved the posted results |
 | Reviews and this PDF | Drafted PR reviews, marked "AI-assisted"; assembled this PDF from the repository records | Students read and approved the reviews before posting; the PDF is checked by the other student |
 
@@ -87,6 +100,7 @@ No AI tool typed or was given a password.
 
 Added for this PDF:
 
+- **The GCP evidence (E-D-01 to E-D-03) was read on 2026-11-27**, after the deploy and after the partner's retest, and is command output, not Console screenshots.
 - **The partner's evidence** for its retest and UAT runs is in its repository, not in this PDF; the texts it posted to us are printed in the Appendix.
 - **Partner version labels** come from the partner's package and deploy runs, because their app shows no revision text.
 - **Our retests of the partner's fixes** have no screenshot in the repository (D.4).
