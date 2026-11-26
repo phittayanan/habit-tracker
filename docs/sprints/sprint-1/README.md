@@ -29,8 +29,8 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 | F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | #53 / PR #54 |
 | F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
 | F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29, #38 / PR #39 | #40 / PR #41 |
-| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.12 (12) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61 | #28 / PR #29, #38 / PR #39 | #42 / PR #43 |
-| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.8 (8) | TC-31, TC-32, TC-59 | #28 / PR #29 | #44 / PR #51 |
+| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.18 (18) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89 | #139 (Lab 7 revision); #28 / PR #29, #38 / PR #39 | #42 / PR #43 |
+| F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.10 (10) | TC-31, TC-32, TC-59, TC-87, TC-88 | #28 / PR #29 | #44 / PR #51 |
 | F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | #44 / PR #51 |
 
 Contract Issues and PRs: #30 and PR #31 for F-01 to F-06, #28 and PR #29 for F-07 to F-10. Build Issues follow the five groups in `docs/sprints/plan.md` ("Feasibility"): Auth, Template, Goal, Entry, and Progress with privacy.
@@ -77,11 +77,11 @@ Conventions that every contract shares (SDS 2.2, 4.3; ADR 0025):
 | `ENTRY_DATE_IN_FUTURE` | 400 | Entry date after today (Asia/Bangkok) | F-08 |
 | `ENTRY_DATE_OUTSIDE_GOAL` | 400 | Entry date before the goal's start or after its end | F-08 |
 | `VALUE_OUT_OF_RANGE` | 400 | Value outside the template's minimum and maximum | F-08 |
-| `ENTRY_ALREADY_EXISTS` | 409 | An entry already exists for this goal and day | F-08 |
+| `DAILY_TOTAL_ABOVE_MAX` | 409 | The entry would take the day total above the template's maximum (Lab 7; replaces `ENTRY_ALREADY_EXISTS`) | F-08 |
 
 ### Data Contracts
 
-All migrations are additive (SDS 3.6). The `Role` enum has `PARTICIPANT` and `MANAGER`. The four decimal columns use `Decimal(10, 2)`.
+All Sprint 1 migrations are additive (SDS 3.6). The Lab 7 migration drops one unique index (F-08 section 8). The `Role` enum has `PARTICIPANT` and `MANAGER`. The four decimal columns use `Decimal(10, 2)`.
 
 | Table | Created by | Key constraints |
 |---|---|---|
@@ -89,7 +89,7 @@ All migrations are additive (SDS 3.6). The `Role` enum has `PARTICIPANT` and `MA
 | `Session` | F-01 | random text id; `user_id` reference, on delete cascade; `expires_at` = `created_at` plus 8 hours |
 | `Template` | F-03 | unique `name`; check `min_value < max_value`; `state` `ACTIVE` or `RETIRED`; `created_by` reference to `User` |
 | `Goal` | F-07 | `participant_id` and `template_id` references; check `daily_target > 0`; check `end_date >= start_date`; the state is computed from the dates, not stored |
-| `Entry` | F-08 | `goal_id` reference, on delete restrict; unique (`goal_id`, `entry_date`) |
+| `Entry` | F-08 | `goal_id` reference, on delete restrict; non-unique index (`goal_id`, `entry_date`) (Lab 7; before: unique) |
 
 `Goal` and `Entry` carry the ownership link: an Entry belongs to a Participant through its Goal. The seed creates `manager1`, `participant1` and `participant2` from environment variables, never from code (F-01). `docs/system-sds.md` section 3 has the full model.
 
@@ -180,11 +180,17 @@ Every test of the nine contracts in one table (handout D1 §3.5: "Map all Sprint
 | TC-26 | AC-08.4 | Entry on today and on boundary days accepted | Unit and API |
 | TC-27 | AC-08.5, AC-08.12 | "Today" is the Bangkok date at 23:59:59 and 00:00:00 (process run with `TZ=UTC`), for the future-date check and the UI's default date | Unit |
 | TC-28 | AC-08.6 | Value below, at and above each limit | Unit and API |
-| TC-29 | AC-08.7 | Second entry for the same day returns 409 | API |
+| TC-29 | AC-08.7 | (Revised, Lab 7) A second entry for the same day within the day maximum is stored | API |
 | TC-30 | AC-08.3, AC-08.11 | Ended goal: an entry dated after its end is rejected; an entry dated inside its period is accepted | Unit and API |
 | TC-56 | AC-08.8, AC-08.9 | Entry input validation and access: missing or malformed date or value, value with more than 2 decimal places or outside `Decimal(10, 2)`; Manager, anonymous, another Participant's goal and unknown goal refused | API |
 | TC-58 | AC-08.1 | A saved entry is returned after the app restarts | API and database |
 | TC-61 | AC-08.10 | Entry form shows the API message for a rejected value and keeps the typed value | Browser |
+| TC-82 | AC-08.13 | Day total below, at and above the template maximum; per day and per goal | Unit and API |
+| TC-83 | AC-08.14 | Day total is exact to 2 decimal places | Unit and API |
+| TC-84 | AC-08.15 | Two requests at once and a held goal-row lock cannot take the day total above the maximum | API and database |
+| TC-85 | AC-08.16 | The day-total rule is checked after validation, date and range rules | Unit and API |
+| TC-86 | AC-08.17 | The goals page lists several entries of a day with the day total | Browser |
+| TC-89 | AC-08.18 | The migration keeps existing entries and removes the unique index | API and database |
 
 #### F-09 Progress (days met)
 
@@ -193,6 +199,8 @@ Every test of the nine contracts in one table (handout D1 §3.5: "Map all Sprint
 | TC-31 | AC-09.1, AC-09.2, AC-09.3, AC-09.4, AC-09.5 | Days met counts for met, missed and empty days | Unit |
 | TC-32 | AC-09.7 | Progress shown on the goals page | Browser |
 | TC-59 | AC-09.6, AC-09.7, AC-09.8 | Journey: a Manager creates a template through the UI; a Participant creates a goal, reads "0 of 1", records a value, reads "1 of 1", restarts, reads again; Manager and anonymous refused | Browser and API |
+| TC-87 | AC-09.9 | A day is met by the exact sum of its entries and counts once | Unit |
+| TC-88 | AC-09.10 | A day becomes met when a second entry brings the total to the target, also after a restart | Browser and API |
 
 #### F-10 Participant data privacy
 
@@ -254,9 +262,11 @@ Collected from section 13 of each contract. The rule: a contract is changed by a
 | 2026-11-07 | F-08 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
 | 2026-11-08 | F-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |
 | 2026-11-09 | F-08 | Issue #42 implementation evidence recorded in section 14 and `docs/entry-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
+| 2026-11-27 | F-08 | Lab 7 (Issue #139): several entries per day with a day-total maximum; AC-08.7 revised, AC-08.13 to AC-08.18; TC-29 and TC-61 revised, TC-82 to TC-86, TC-89 added | projectnewy (author); teammate review pending |
 | 2026-11-07 | F-09 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-09 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
 | 2026-11-10 | F-09 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
+| 2026-11-27 | F-09 | Lab 7 (Issue #139): a day is met by its day total; AC-09.9, AC-09.10; TC-87, TC-88 | projectnewy (author); teammate review pending |
 | 2026-11-07 | F-10 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-10 | Review round 1 (PR #29): error codes added to every expected result, "ignored" changed to "stripped" with OP-10.3, menu wording corrected | pending (partner re-check) |
 | 2026-11-10 | F-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
@@ -309,3 +319,4 @@ The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issu
 |---|---|---|
 | 2026-11-08 | First draft (Issue #8) | pending |
 | 2026-11-08 | Review round 1 (PR #35): the contract index no longer has carriage returns in its titles, so it renders as nine rows of seven cells (checked in GitHub's rendered view); Product Definition of Done item 4 follows the five agreed build groups; TC-47 uses `document.documentElement.scrollWidth` and `window.innerWidth` | pending (partner re-check) |
+| 2026-11-27 | Lab 7 (Issue #139): contract index, error codes, data contracts and test specification updated for ADR 0061. The "Implementation status" section describes Sprint 1 as built; the Lab 7 change is not yet implemented | projectnewy (author); teammate review pending |

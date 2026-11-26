@@ -1,6 +1,6 @@
 # 0008. Second entry on the same day
 
-Status: accepted
+Status: replaced by ADR 0061 (Lab 7, Issue #139, 2026-11-27)
 Design ID: D-07 (Issue #3)
 
 ## Decision

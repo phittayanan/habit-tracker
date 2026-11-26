@@ -104,7 +104,7 @@ erDiagram
 | name | text | not null, unique | A duplicate name is refused with 409 (S-4, decided) |
 | unit | text | not null | Free text; spelling is not checked (ADR 0007) |
 | min_value | decimal | not null | Per entry |
-| max_value | decimal | not null, `min_value < max_value` | Database check (BR-03) |
+| max_value | decimal | not null, `min_value < max_value` | Database check (BR-03). Limits each entry, and also the total of one goal's day (BR-04, ADR 0061) |
 | state | `ACTIVE` or `RETIRED` | not null, default `ACTIVE` | Retire is built in Sprint 2 (FR-08); the column exists from the start |
 | created_by | reference to User | not null | The Manager who created it |
 | created_at | timestamp | not null | |
@@ -122,7 +122,7 @@ erDiagram
 
 The goal's state (Active or Ended) is not a column. It is computed from the dates (ADR 0012, BR-06).
 
-**Entry** (ADR 0005, ADR 0008)
+**Entry** (ADR 0005, ADR 0061)
 | Field | Type | Constraint | Note |
 |---|---|---|---|
 | id | integer | primary key | |
@@ -130,7 +130,7 @@ The goal's state (Active or Ended) is not a column. It is computed from the date
 | entry_date | date | not null | |
 | value | decimal | not null | Range checked against the template (BR-03) |
 | created_at | timestamp | not null | |
-| | | **unique (goal_id, entry_date)** | One entry per goal per day (BR-04). The database enforces it even under two requests at once |
+| | | index (goal_id, entry_date), not unique | Several entries per goal and day (BR-04, ADR 0061). The service locks the goal row (`SELECT ... FOR UPDATE`), sums the day, checks the maximum and inserts in one transaction, so two requests at once cannot take the day total above it |
 
 Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed precision; the scale is set in the contracts (S-2, decided).
 
@@ -145,10 +145,10 @@ Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed 
 | BR-01 entry date today or earlier, inside the goal period | Service (needs the goal and "today") | TC-24 to TC-26 |
 | BR-02 day is an Asia/Bangkok date | Service computes "today" | TC-27 |
 | BR-03 value inside the template range; min below max | Service for the entry range; database check for min below max | TC-10, TC-28 |
-| BR-04 one entry per goal per day | Database unique constraint, mapped to a 409 | TC-29 |
+| BR-04 day total not above the template maximum | Service, inside a transaction that locks the goal row | TC-29, TC-82 to TC-85 |
 | BR-05 one active goal per template per Participant | Service, inside a transaction (S-6, decided) | TC-21 |
 | BR-06 goal state from dates | Computed; no stored state | TC-22, TC-30 |
-| BR-07 progress is days met | Computed from entries | TC-31 |
+| BR-07 progress is days met | Computed from the day totals of the entries, added exactly to 2 decimal places | TC-31, TC-87, TC-88 |
 | BR-08 edit a template only while no goal uses it | Service (checks for goals on the template) | TC-12, TC-13 |
 | BR-09, BR-10 role and ownership | Role and ownership checks (2.2) | TC-17, TC-18, TC-33 to TC-35 |
 | BR-11 edit or delete an entry inside the goal period (Sprint 2) | Service; progress and streaks are recomputed from entries | TC-38 |
@@ -209,8 +209,8 @@ Exact wording of the messages is set in each feature contract.
 
 ### 4.3 API conventions (ADR 0025)
 - REST over JSON. Paths start with `/api`. Resource names are plural nouns.
-- **Status codes:** 200 and 201 for success; 204 for success with no body; **400** when the request itself is invalid, including a date or value that breaks BR-01 or BR-03 (proposal, S-16); 401 for no valid session; 403 for a valid session whose role may not do this; **404** when the record does not exist, and for another Participant's goal or entry, so its existence is not revealed (S-7, decided); **409** when the request conflicts with data already stored: a second entry on the same day (BR-04), a second active goal on a template (BR-05), an edit of a template that a goal uses (BR-08) or a duplicate template name (S-4); 500 for a server fault. A Manager's request for a Participant's data still gets 403, for the wrong role.
-- **Error body:** `{ "error": { "code": "ENTRY_ALREADY_EXISTS", "message": "..." } }`. `code` is a stable name tests can check; `message` is plain language for the user.
+- **Status codes:** 200 and 201 for success; 204 for success with no body; **400** when the request itself is invalid, including a date or value that breaks BR-01 or BR-03 (proposal, S-16); 401 for no valid session; 403 for a valid session whose role may not do this; **404** when the record does not exist, and for another Participant's goal or entry, so its existence is not revealed (S-7, decided); **409** when the request conflicts with data already stored: an entry that would take the day total above the template maximum (BR-04), a second active goal on a template (BR-05), an edit of a template that a goal uses (BR-08) or a duplicate template name (S-4); 500 for a server fault. A Manager's request for a Participant's data still gets 403, for the wrong role.
+- **Error body:** `{ "error": { "code": "DAILY_TOTAL_ABOVE_MAX", "message": "..." } }`. `code` is a stable name tests can check; `message` is plain language for the user.
 - **Validation:** every request body, parameter and query is validated on the server before any rule runs. The validation library is zod (S-8, decided). Unknown fields are never stored; whether the schema ignores or refuses them is set in the first contract.
 - **Safe errors:** responses never carry a stack trace, SQL, file path, secret or another user's data. The full detail goes to the server log only. Login failures give the same message for an unknown user and a wrong password.
 - **Dates and numbers:** dates are `YYYY-MM-DD` strings (Asia/Bangkok dates); values are numbers.
@@ -351,7 +351,7 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 | Database sessions, 8 hours, bcrypt | 0027, 0028, 0029 |
 | Fixed Asia/Bangkok day | 0006 |
 | Free-text unit with a per-entry range | 0007 |
-| One entry per goal per day | 0008 |
+| Several entries per day, day total capped at the template maximum | 0061 (replaces 0008) |
 | Daily-target goal with start and end dates; one active goal per template | 0010 |
 | Goal state from dates, not stored | 0012 |
 | Progress as days met | 0013 |
