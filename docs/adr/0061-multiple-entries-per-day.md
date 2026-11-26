@@ -11,7 +11,7 @@ Status: decided by projectnewy, owner of [Issue #139](https://github.com/phittay
 5. The daily target rule does not change: above the template's minimum and not above its maximum (SRS A-4, ADR 0054).
 6. Entries still cannot be edited or deleted. That is FR-17 (Sprint 2).
 
-Items 3 and 5 were chosen by projectnewy from the options below. Error code, list order, the day-total display and negative values are proposals in F-08 (OP-08.9 to OP-08.12).
+Items 3 and 5 were chosen by projectnewy from the options below. The error code, list order, day-total display and negative values (F-08 OP-08.9 to OP-08.12) were drafted by Claude Code and accepted as drafted by projectnewy on 2026-11-27.
 
 ## Why
 

@@ -169,10 +169,10 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | OP-08.6 | An entry dated inside the period of a goal that has already ended | Decided on PR #29 (Q1): allowed (ADR 0012, BR-01); AC-08.11, TC-30 |
 | OP-08.7 | Which code when a request breaks several rules | Open (proposal from review point 10): `ENTRY_DATE_IN_FUTURE`, then `ENTRY_DATE_OUTSIDE_GOAL`, then `VALUE_OUT_OF_RANGE`, then `DAILY_TOTAL_ABOVE_MAX` (Lab 7; before: `ENTRY_ALREADY_EXISTS`) |
 | OP-08.8 | How the Sprint 1 goals page chooses the day | Decided on PR #29 (Q9): a date box next to the value box, defaulting to today in Asia/Bangkok |
-| OP-08.9 | Code and status for a day total above the maximum | Open (proposal, Lab 7): `409 DAILY_TOTAL_ABOVE_MAX`, because the request conflicts with stored entries (SDS S-16) |
-| OP-08.10 | Order of several entries on one date | Open (proposal, Lab 7): newest saved first |
-| OP-08.11 | How the goals page shows a day with several entries | Open (proposal, Lab 7): every entry, plus "Day total: {total} {unit}" for each day |
-| OP-08.12 | Templates may allow negative values (F-03 OP-03.5), so a later entry can lower a day total | Open (proposal, Lab 7): only the upper limit is checked on the total; each entry stays inside the template range. A day that was met can then become not met |
+| OP-08.9 | Code and status for a day total above the maximum | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: `409 DAILY_TOTAL_ABOVE_MAX`, because the request conflicts with stored entries (SDS S-16) |
+| OP-08.10 | Order of several entries on one date | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: newest saved first |
+| OP-08.11 | How the goals page shows a day with several entries | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: every entry, plus "Day total: {total} {unit}" for each day |
+| OP-08.12 | Templates may allow negative values (F-03 OP-03.5), so a later entry can lower a day total | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: only the upper limit is checked on the total; each entry stays inside the template range. A day that was met can then become not met |
 | OP-08.13 | Whether a day may exceed the template maximum, and whether the daily target rule changes | Decided by projectnewy on 2026-11-27 (ADR 0061): the day total is not above `max_value`; the target rule (SRS A-4) is unchanged. Teammate review pending |
 
 ## 13. Revision history
