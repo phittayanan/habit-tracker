@@ -142,13 +142,13 @@ Both chains follow the same order: triage → fix Issue → spec change → fail
 - **Conditions:** none. They ask us to close #126 and #127.
 - **Leftover test data:** their `EXP-*` and `UAT-*` templates and goals are still on our deployed app (listed in #130).
 
+The comment says it was prepared with the help of an AI assistant (Claude Code) and decided by asamapornch and warunwora.
+
 **Our answer** (phittayanan, 2026-11-26, Asia/Bangkok):
 
 - #126 and #127: we agreed with the retest results and closed both as completed at 22:01, each with the chain from triage to retest.
 - #130: we recorded the decision as given, said that the partner's test records stay on the app (synthetic, clearly named, and matching both teams' evidence; no action needed from them), said that the written OK ended with the retest, and closed #130 at 22:04.
 - #108 (release and redeploy) was closed at 22:04: the corrected revision is live and was retested.
-
-The comment says it was prepared with the help of an AI assistant (Claude Code) and decided by asamapornch and warunwora.
 
 ## 4. Contributions (Lab 6)
 
