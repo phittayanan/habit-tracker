@@ -18,8 +18,16 @@ comment() { # record ID, repository, comment id
     { IFS='|' read -r who when url; printf '\n### %s Comment by %s, %s\n\nSource: <%s>\n' "$1" "$who" "$when" "$url"; }
   gh api "repos/$2/issues/comments/$3" --jq .body | fence
 }
+finding() { # record ID, Issue number in our repository: the report as the partner filed it
+  gh api "repos/$OURS/issues/$2" --jq '"\(.user.login)|\(.created_at)|\(.html_url)|\(.title)"' |
+    { IFS='|' read -r who when url title; printf '\n### %s Report by %s, filed %s: %s\n\nSource: <%s>\n' "$1" "$who" "$when" "$title" "$url"; }
+  gh api "repos/$OURS/issues/$2" --jq .body | fence
+}
 {
-  echo '## Review texts of the fix and release pull requests'
+  echo '## Findings received about our product, as filed by the partner team'
+  finding 'F-126' 126
+  finding 'F-127' 127
+  echo; echo '## Review texts of the fix and release pull requests'
   review 129 6060732067; review 132 6071653008; review 135 6072909741
   echo; echo '## Independent retest of our fixes (by the partner team)'
   comment 'RT-126' $OURS 7194992804

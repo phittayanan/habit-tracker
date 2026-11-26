@@ -28,4 +28,30 @@ Both reports were answered within 24 hours (about three hours after filing). No 
 
 {{include:../findings.md|### Report B2-01}}
 
-The common data of both reports: product owner "Habit and Activity Tracker"; reporter, the UAT team of this project; tested version `s65da36e2-00009-b4s`, `main` `0619c07`; date 2026-11-25; account MANAGER. The two reports received about our product are the Issues [#126](https://github.com/phittayanan/habit-tracker/issues/126) and [#127](https://github.com/phittayanan/habit-tracker/issues/127); their expected and actual results are summarised in C.1, and the retests are RT-126 and RT-127 in the Appendix.
+The common data of both reports: product owner "Habit and Activity Tracker"; reporter, the UAT team of this project; tested version `s65da36e2-00009-b4s`, `main` `0619c07`; date 2026-11-25; account MANAGER. The two reports received about our product are the Issues [#126](https://github.com/phittayanan/habit-tracker/issues/126) and [#127](https://github.com/phittayanan/habit-tracker/issues/127); their reports as filed, with the steps, expected and actual results and request evidence, are F-126 and F-127 in the Appendix; C.1 has our classification, and the retests are RT-126 and RT-127.
+
+## C.5 Evidence of the two reports we sent
+
+All of it: the partner's deployed app, revision `s65da36e2-00009-b4s`, 2026-11-25, account MANAGER. These show the behaviour **before** the partner's fixes.
+
+### B1-01: the mouse wheel changes a focused number field (manual)
+
+![**E-B1-30**, 14:28:38. Action: Max value 50 typed, field focused, before scrolling. Expected: the typed value stays. Actual at this point: 50.](../partner-uat/evidence/E-B1-30-observation-wheel-max-before.png)
+
+![**E-B1-31**, 14:28:50. Action: 3 wheel clicks over the focused field. Expected: 50. Actual: **49.97**.](../partner-uat/evidence/E-B1-31-observation-wheel-max-after.png)
+
+![**E-B1-33**, 14:30:36. Action: 1 wheel click over the focused Min value field, which held 1. Expected: 1. Actual: **0.99**.](../partner-uat/evidence/E-B1-33-observation-wheel-min.png)
+
+### B2-01: a very long template name returns 500 (AI agent operating the browser, see Part D)
+
+![**E-B2X-02**, about 14:56. Action: create with a 110,010-character name. Expected: 400 with the validation message. Actual: "An unexpected error occurred."](../partner-uat/evidence/E-B2X-02-X-01-create-long-name-error.jpg)
+
+**E-B2X-03**, the response of that request, as captured in the page (expected 400, actual 500):
+
+{{text:../partner-uat/evidence/E-B2X-03-X-01-post-templates-500.txt}}
+
+![**E-B2X-05**, about 14:57. Action: edit with a long name, Save. Expected: 400 with the validation message. Actual: "An unexpected error occurred."](../partner-uat/evidence/E-B2X-05-X-02-edit-UAT-04-PP-long-name-error.jpg)
+
+**E-B2X-06**, the response of that request (expected 400, actual 500):
+
+{{text:../partner-uat/evidence/E-B2X-06-X-02-put-templates-500.txt}}

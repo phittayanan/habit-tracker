@@ -3,6 +3,7 @@
 // The parts do not copy the Lab 6 records. A line `{{include:path}}` prints a whole file, and
 // `{{include:path|## 3.}}` prints the section whose heading starts with that text; paths are relative to
 // this folder and the headings move down so the part keeps its own outline. `{{CASE_MAP}}` is the table
+// `{{text:path}}` prints a text file, such as a captured log, as it is. `{{CASE_MAP}}` is the table
 // from each UAT case to its requirement and criterion IDs (ADR 0056), read from the case files.
 // `{{PAGES_<part>}}` is the page range of a part, counted by rendering that part alone.
 // Names and student IDs are never in Git: set LAB6_IDENTITY to a JSON file outside the repository with
@@ -89,6 +90,7 @@ if (!identity) console.warn('LAB6_IDENTITY is not set: names and student IDs sta
 const sources = parts.map(([id, file]) => {
   let text = read(join(here, file)).replace(/<!--[\s\S]*?-->\n?/g, '')
     .replace(/^\{\{include:([^}]+)\}\}$/gm, (_, spec) => include(spec))
+    .replace(/^\{\{text:([^}]+)\}\}$/gm, (_, path) => ['````text', read(join(here, path)).trim(), '````'].join('\n'))
     .replace('{{CASE_MAP}}', caseMap);
   if (identity) for (const k of keys) text = text.replaceAll(`{{${k}}}`, identity[k]);
   const titles = [];

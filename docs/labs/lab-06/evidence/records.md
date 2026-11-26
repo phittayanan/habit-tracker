@@ -1,3 +1,136 @@
+## Findings received about our product, as filed by the partner team
+
+### F-126 Report by asamapornch, filed 2026-11-25T14:39:10Z: NUL character in the login username returns 500 instead of 401
+
+Source: <https://github.com/phittayanan/habit-tracker/issues/126>
+
+````text
+Report from the UAT team of the Habit and Activity Tracker project (asamapornch, warunwora), Lab 6 Part B/C, about your Sprint 1 release. One Issue per finding. It contains no password, token or cookie. Part of the test was operated by an AI agent under the testers' supervision (declared in our report).
+
+| Field | Entry |
+|---|---|
+| Product owner / team | Habit tracker (phittayanan, projectnewy) |
+| Reporter | UAT team: asamapornch, warunwora |
+| Tested version | Tag v1.3, commit 50f5605d266d881b4afba3f8ac96d40882f26fd2, built and run LOCALLY (isolated Docker + PostgreSQL). The deployed app was NOT tested. |
+| Date / time | 2026-11-25, 21:26 Asia/Bangkok |
+| Role | none (before login) |
+
+- **Case / requirement:** exploratory testing (outside the agreed UAT cases), measured against your own contract: **AC-01.2** — *"An unknown username and a wrong password each get `401 INVALID_CREDENTIALS` with the same message, no `Set-Cookie`, and no new session"* (`docs/sprints/sprint-1/F-01-login.md`, line 114).
+
+- **Preconditions and data:** no account signed in; tested directly against a freshly built, local, throwaway instance of your repository (isolated PostgreSQL, random local-only seed passwords generated for this session and never saved or printed — not reused for anything, deleted after the test). No request was sent to the deployed app or to any other URL.
+
+- **Endpoint:** `POST /api/auth/login` (`server/src/routes/auth.js:15`).
+
+- **Code read (file:line), at commit `50f5605`:**
+  - `server/src/routes/auth.js:7` — validation schema: `z.object({ username: z.string().trim().min(1), password: z.string().min(1) })`
+  - `server/src/routes/auth.js:15–21` — the login handler: parses the body against the schema (line 16), then calls `authenticate(db, parsed.data, ...)` (line 18) with **no try/catch** around the call
+  - `server/src/services/auth.js:11` — `authenticate()` passes the username straight into `db.user.findUnique({ where: { username: credentials.username } })`
+  - `server/src/app.js:35–43` — the app's single generic error-handling middleware; it special-cases `entity.parse.failed`/`entity.too.large` (lines 36–40), and falls through to `500 INTERNAL_ERROR` for everything else (line 42), with the comment *"Do not print ORM errors: they may include sensitive query parameters."*
+
+- **Steps to reproduce:**
+  1. `POST /api/auth/login` with `{"username":"nouser-exp-tn","password":"<any value>"}` (control — an ordinary unknown username, no NUL).
+  2. `POST /api/auth/login` with `{"username":"nouser-exp-tn\^@X","password":"<any value>"}` (same but the username contains an embedded NUL character, `\^@`, as a JSON escape).
+
+- **Expected result:** both requests get `401 INVALID_CREDENTIALS` with the same message, no `Set-Cookie` (AC-01.2).
+
+- **Actual result:**
+  - Step 1 (control): `401 {"error":{"code":"INVALID_CREDENTIALS","message":"Username or password is incorrect."}}`, no `Set-Cookie`. **Matches** AC-01.2.
+  - Step 2 (NUL username): `500 {"error":{"code":"INTERNAL_ERROR","message":"Something went wrong. Please try again."}}`, no `Set-Cookie`. **Differs** from AC-01.2.
+
+- **Severity (proposal):** Minor. No data is lost, no session is issued, and no sensitive information is exposed in the response; the process stayed up and kept serving requests. It is nonetheless a real, trivially reproducible wrong status code on a predictable, specific input, not a cosmetic issue.
+
+- **Defect or enhancement:** We think it is a **defect** against AC-01.2: the contract specifies `401 INVALID_CREDENTIALS` for any unknown username, with no stated exception for its content, and a NUL-containing string is still a non-empty string per the schema at `auth.js:7`. We did not guess the cause beyond what the code shows (the `findUnique` query parameter reaching PostgreSQL, which rejects embedded NUL bytes, uncaught by any try/catch in the route) and ask the partner to classify it with a reason tied to their contract.
+
+- **Evidence:**
+  - **E-L1-01** (control — ordinary unknown username): request `POST /api/auth/login {"username":"nouser-exp-tn","password":"<any value>"}`; response `401 {"error":{"code":"INVALID_CREDENTIALS","message":"Username or password is incorrect."}}`, no `Set-Cookie`.
+  - **E-L1-02** (NUL-containing username): request `POST /api/auth/login {"username":"nouser-exp-tn\^@X","password":"<any value>"}`; response `500 {"error":{"code":"INTERNAL_ERROR","message":"Something went wrong. Please try again."}}`, no `Set-Cookie`.
+  - Both requests were sent exactly once each, to `http://localhost:4100` only (an isolated local Docker instance of this repository at the tested commit); no request was sent to any deployed URL. No request was retried to try to force a difference.
+
+- **Note on consent / AI use:** part of this test (building and running the local Docker stack, and sending the two curl requests above) was operated by an AI agent under the testers' supervision, as declared above. No password, token or cookie value is included anywhere in this report; the seed passwords generated for the local instance were random, never printed, and deleted after the test.
+- Related finding: a NUL character in a template name or unit also gives 500 — see #127; it may share the same root cause.
+
+## What we ask
+
+Please classify this report (accepted defect, duplicate, not a defect, enhancement) with a reason tied to your Sprint 1 contract, and tell us when you can answer.
+
+
+
+````
+
+### F-127 Report by warunwora, filed 2026-11-25T14:55:47Z: NUL character in a template name or unit returns 500 instead of the documented validation/success response (create and edit)
+
+Source: <https://github.com/phittayanan/habit-tracker/issues/127>
+
+````text
+### Steps to reproduce
+
+Report from the UAT team of the Habit and Activity Tracker project (asamapornch, warunwora), Lab 6 Part B/C, about your Sprint 1 release. One Issue per finding. It contains no password, token or cookie. Part of the test was operated by an AI agent under the testers' supervision (declared in our report).
+
+| Field | Entry |
+|---|---|
+| Product owner / team | Habit tracker (phittayanan, projectnewy) |
+| Reporter | UAT team: asamapornch, warunwora |
+| Tested version | Tag v1.3, commit 50f5605d266d881b4afba3f8ac96d40882f26fd2, built and run LOCALLY (isolated Docker + PostgreSQL). The deployed app was NOT tested. |
+| Date/time | 2026-11-25, Asia/Bangkok (same local test session recorded in `LOCAL-1-result.md`; that file does not record a clock time for individual requests, so none is given here) |
+| Role | Manager (manager1) |
+
+**Preconditions and data:** Manager account `manager1` signed in; tested directly against a freshly built, local, throwaway instance of your repository (isolated PostgreSQL, random local-only seed passwords generated for that session and never saved or printed, not reused for anything, deleted after the test). No request was sent to the deployed app or to any other URL.
+
+**Endpoint:** `POST /api/templates` (create) and `PATCH /api/templates/:id` (edit), `server/src/routes/templates.js:16` and `:25`. (Edit uses `PATCH`, not `PUT`; this codebase has no `PUT` route for templates.)
+
+**Steps to reproduce** (verbatim from our local test record, rows 1 and 2):
+1. `POST /api/templates` as manager1: `{"name":"EXP-LOCAL-NUL\^@X","unit":"x","minValue":1,"maxValue":10}`
+2. `PATCH /api/templates/1` as manager1 (template unused): `{"unit":"X\^@Y"}`
+
+### Expected
+
+**Case/requirement:** exploratory testing (outside the agreed UAT cases), measured against your own contract. The directly relevant acceptance criteria are:
+
+- **AC-03.1** (`docs/sprints/sprint-1/F-03-template-create.md`, §9): "A Manager who sends a valid request gets 201 and a template with `state` `ACTIVE`; it then appears in the Manager's `GET /api/templates` and is still there after the app restarts. Unknown fields such as `"state": "RETIRED"` are stripped, and the request is accepted"
+- **AC-03.3** (same file, §9): "A missing, empty or non-string `name` or `unit`, a name or unit over the length limit, and a missing or non-numeric `minValue` or `maxValue`, or one with more than 2 decimal places, get `400 VALIDATION_ERROR` and nothing is stored"
+- **AC-04.1** (`docs/sprints/sprint-1/F-04-template-edit.md`, §9): "A Manager who edits an unused template (any subset of name, unit, minimum, maximum) gets 200 with the new values, and `GET /api/templates` then shows them"
+- **AC-04.4** (same file, §9): "An empty body, a field with a wrong type or more than 2 decimal places, and a non-integer id get `400 VALIDATION_ERROR`; an unknown id gets `404 TEMPLATE_NOT_FOUND`; an anonymous edit gets `401 UNAUTHENTICATED`; nothing changes"
+
+**Honest statement on contract basis:** we read all of `F-03-template-create.md` and `F-04-template-edit.md` in full (both are present at the tested tag/commit) and searched them for any mention of NUL characters or control characters. Neither file mentions NUL or control characters anywhere. No AC says a NUL-containing `name` or `unit` must be refused, and none says it must be accepted either. We are not claiming a written requirement names this exact input. What we can say is narrower: a NUL-containing string is a present, non-empty string within the length limit, so it does not match any of the specific invalid cases AC-03.3 and AC-04.4 enumerate; by the contract's own structure, an input that is not one of the listed invalid cases should fall under AC-03.1/AC-04.1 ("a valid request... gets 201/200"). The actual behavior is neither: it is a `500` that AC-03.3/AC-04.4 also do not describe. We rely on this structural gap, not on a direct textual rule about NUL.
+
+**Expected result:** per AC-03.1, step 1 gets `201` with the template stored. Per AC-04.1, step 2 gets `200` with the template updated.
+
+### Actual
+
+**Actual result:**
+- Step 1 (create): `500 {"error":{"code":"INTERNAL_ERROR","message":"Something went wrong. Please try again."}}`. Differs.
+- Step 2 (edit): `500 {"error":{"code":"INTERNAL_ERROR","message":"Something went wrong. Please try again."}}`. Differs.
+
+**Severity (proposal):** Minor, by user impact. No data is lost, nothing is stored by either request, and no protected data is exposed in the response. The server process stayed up and kept serving other requests. It is nonetheless a real, reproducible wrong status code on a specific input, on two separate endpoints, so it is not purely cosmetic.
+
+**Defect or enhancement:** We think this is a defect, on a narrower basis than a direct textual rule: AC-03.3 and AC-04.4 each give a complete, specific list of inputs that must be refused, and a NUL-containing `name`/`unit` is not on either list; AC-03.1/AC-04.1 say a request that is not one of those listed failures should succeed. Getting `500` is consistent with neither AC. We state the strength of this basis honestly: no AC names NUL or control characters, so we are not claiming the contract was violated word for word; we are claiming the two ACs together leave no room for a `500` on this input. We ask you to classify it with a reason tied to your contract. We did not guess beyond what the code shows (the validator's `text()` helper accepts the NUL byte; the database then rejects it; only Prisma code `P2002` is caught, everything else is re-thrown to the generic 500 handler).
+
+**Code read (file:line), at commit `50f5605`:**
+- `server/src/services/template.js:23`: the shared validator `const text = (message, max) => z.string({ error: message }).trim().min(1, { error: message }).max(max, { error: message });` accepts any non-empty, within-length string, including one containing `\^@`.
+- `server/src/services/template.js:24-29`: `createBody` applies `text()` to `name` and `unit`. Lines 43-48: `editBody` applies the same (optional) for edit.
+- `server/src/services/template.js:116-127` (`createTemplate`) and `:74-95` (`editTemplate`): the `try/catch` only recognizes Prisma code `P2002` (duplicate name); any other error is re-thrown.
+- `server/src/routes/templates.js:16-24` and `:25-33`: both handlers forward errors with `next(error)`.
+- `server/src/app.js:35-43`: the generic error handler special-cases `entity.parse.failed`/`entity.too.large` and falls through to `500 INTERNAL_ERROR` for everything else.
+
+**Evidence:**
+- E-L1-03 (create): request `POST /api/templates {"name":"EXP-LOCAL-NUL\^@X","unit":"x","minValue":1,"maxValue":10}`; response `500 {"error":{"code":"INTERNAL_ERROR","message":"Something went wrong. Please try again."}}`.
+- E-L1-04 (edit): request `PATCH /api/templates/1 {"unit":"X\^@Y"}`; response `500 {"error":{"code":"INTERNAL_ERROR","message":"Something went wrong. Please try again."}}`.
+- Both requests were sent once each, to `http://localhost:4100` only (an isolated local Docker instance of this repository at the tested commit). No request was sent to any deployed URL. Nothing was retried to force a difference.
+
+**Note on consent/AI use:** part of this test (building and running the local Docker stack, and sending the requests above) was operated by an AI agent under the testers' supervision, as declared above. No password, token or cookie value is included anywhere in this report.
+
+**Related finding:** a NUL character in the login username gives the same `500` response, reported separately as https://github.com/phittayanan/habit-tracker/issues/126 . It may share the same root cause (the same validator pattern and the same generic error handler).
+
+## What we ask
+
+Please classify this report (accepted defect, duplicate, not a defect, enhancement) with a reason tied to your Sprint 1 contract, and tell us when you can answer.
+
+### Files this Issue will change
+
+None. This is a report from the UAT team of another project. We will not change your code; the fix is yours to decide.
+
+````
+
 ## Review texts of the fix and release pull requests
 
 ### R-129 Review of PR 129 by phittayanan, 2026-11-25T15:43:08Z, head 6cb474e
