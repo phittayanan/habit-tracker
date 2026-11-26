@@ -1,0 +1,7 @@
+# read at 2026-11-26T17:11:52Z (UTC), post-deployment smoke check, read-only
+
+$ curl -s -w ' HTTP %{http_code}\n' https://habit-tracker-rfi4eg2u4q-as.a.run.app/api/health
+{"status":"ok"} HTTP 200
+
+$ curl -s -w ' HTTP %{http_code}\n' https://habit-tracker-rfi4eg2u4q-as.a.run.app/api/ready
+{"status":"ready"} HTTP 200

@@ -1,0 +1,15 @@
+# read at 2026-11-26T17:11:46Z (UTC), gcloud CLI, read-only
+
+$ gcloud run revisions list --service habit-tracker --region asia-southeast1 --project habit-tracker0cpe334 --limit 3 --format='table(metadata.name:label=REVISION,status.conditions[0].status:label=READY,metadata.creationTimestamp:label=CREATED_UTC)'
+REVISION                 READY  CREATED_UTC
+habit-tracker-00007-7pd  True   2026-11-26T11:01:41.293364Z
+habit-tracker-00006-nj6  True   2026-11-13T18:21:38.457041Z
+habit-tracker-00005-sdh  True   2026-11-13T16:34:11.530918Z
+
+$ gcloud run services describe habit-tracker --region asia-southeast1 --project habit-tracker0cpe334 --format='yaml(status.latestReadyRevisionName,status.traffic)'
+status:
+  latestReadyRevisionName: habit-tracker-00007-7pd
+  traffic:
+  - latestRevision: true
+    percent: 100
+    revisionName: habit-tracker-00007-7pd

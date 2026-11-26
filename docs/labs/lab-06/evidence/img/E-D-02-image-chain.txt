@@ -1,0 +1,22 @@
+# read at 2026-11-26T17:11:48Z (UTC), gcloud CLI and Artifact Registry API, read-only
+
+$ gcloud run revisions describe habit-tracker-00007-7pd --region asia-southeast1 --project habit-tracker0cpe334 --format='value(spec.containers[0].image)'
+asia-southeast1-docker.pkg.dev/habit-tracker0cpe334/habit-tracker/habit-tracker@sha256:552adfec62b9329d1c666c69a71a8ec17d6e3fccafcfbe979af47b7228928302
+
+$ gcloud run revisions describe habit-tracker-00006-nj6 --region asia-southeast1 --project habit-tracker0cpe334 --format='value(spec.containers[0].image)'
+asia-southeast1-docker.pkg.dev/habit-tracker0cpe334/habit-tracker/habit-tracker@sha256:a5da715ffccd8f4325c419cc99f6ca07fdc013c52044aa3f884f3fe7d26afcf4
+
+$ gcloud artifacts docker tags list asia-southeast1-docker.pkg.dev/habit-tracker0cpe334/habit-tracker/habit-tracker --project habit-tracker0cpe334 --format='table(tag.basename():label=TAG,version.basename():label=INDEX_DIGEST)' | grep -E 'TAG|^056ee5c|^50f5605'
+Listing items under project habit-tracker0cpe334, location asia-southeast1, repository habit-tracker.
+
+TAG                                       INDEX_DIGEST
+056ee5c59d1292ad0805f8f5c8c80e1c0e2c3636  sha256:3a412d828dbce15246693f6424e70c4f6d6e4bb69ece488ae6e703804033cc03
+50f5605d266d881b4afba3f8ac96d40882f26fd2  sha256:983689e12917a5dee763b200e1fedd6ab8ed0df45687b78b5a6dcec7aaed27bf
+
+$ curl -H 'Authorization: Bearer <token>' https://asia-southeast1-docker.pkg.dev/v2/habit-tracker0cpe334/habit-tracker/habit-tracker/manifests/sha256:3a412d828dbc…  # platforms in the index
+sha256:552adfec62b9329d1c666c69a71a8ec17d6e3fccafcfbe979af47b7228928302 linux/amd64
+sha256:52991c922461c6621916561a34368ae0ba84f79f19a351fc1219d0df731797e9 unknown/unknown
+
+$ curl -H 'Authorization: Bearer <token>' https://asia-southeast1-docker.pkg.dev/v2/habit-tracker0cpe334/habit-tracker/habit-tracker/manifests/sha256:983689e12917…  # platforms in the index
+sha256:a5da715ffccd8f4325c419cc99f6ca07fdc013c52044aa3f884f3fe7d26afcf4 linux/amd64
+sha256:f6972697336902c0d13cec85e8e8a04ecdf99a845619938a28a869b369324c2c unknown/unknown
