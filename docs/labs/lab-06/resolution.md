@@ -2,7 +2,7 @@
 
 Lab 6, Issue #110. This file is the Part C summary and the Part D record for **our own product** (we are the Product Team here). Our work as the UAT Team on the partner's product is in `partner-uat/` and `findings.md` section 2. The evidence PDF (Issue #109) takes its Part C and D text from this file. It holds no password, token or student ID.
 
-Status date: 2026-11-26, about 22:00 Asia/Bangkok. Every fact below names its source. Anything not done yet is marked **pending** and is not claimed.
+Status date: 2026-11-26, about 22:30 Asia/Bangkok. Every fact below names its source. Anything not done yet is marked **pending** and is not claimed.
 
 ## 1. Version table
 
@@ -17,7 +17,7 @@ Status date: 2026-11-26, about 22:00 Asia/Bangkok. Every fact below names its so
 | Corrected release | PR #135 (`staging` `13a2df6` into `main`), merge commit `056ee5c59d1292ad0805f8f5c8c80e1c0e2c3636`, annotated tag `v1.4` | PR #135; `git cat-file -p v1.4` |
 | Deployed corrected revision | Cloud Run `habit-tracker-00007-7pd`, page label `build 056ee5c` | deploy run [45806178753](https://github.com/phittayanan/habit-tracker/actions/runs/45806178753); phittayanan's comment on #126, 2026-11-26 18:03 Asia/Bangkok |
 
-**Merge commits.** `056ee5c` is GitHub's merge commit of PR #135, so its commit ID differs from the `staging` head `13a2df6` it carries; the deployed image is built from `056ee5c`. The code difference between `v1.3` and `v1.4` is five files: `server/src/services/auth.js`, `server/src/services/template.js` and three test files under `server/test/` (26 insertions, 2 deletions; review of PR #135, check 2). No migration or seed file changed. The rest of the diff is documents and evidence.
+**Merge commits.** `056ee5c` is GitHub's merge commit of PR #135, so its commit ID differs from the `staging` head `13a2df6` it carries; the deployed image is built from `056ee5c`. The code difference between `v1.3` and `v1.4` is five files under `server/`: `server/src/services/auth.js`, `server/src/services/template.js` and three test files under `server/test/` (26 insertions, 2 deletions; review of PR #135, check 2). No migration or seed file changed. The rest of the diff is documents and evidence, plus `CLAUDE.md` and one line of `.github/CODEOWNERS` (team rules, not app code).
 
 ## 2. Part C: findings received about our product
 
@@ -25,9 +25,9 @@ The partner team (UAT Team, "Habit and Activity Tracker": asamapornch, warunwora
 
 | Finding | Reporter, filed (Asia/Bangkok) | Contract | Classification and severity | Reason (short; full text in the triage comment) | Owner | Fix status | Disposition |
 |---|---|---|---|---|---|---|---|
-| [#126](https://github.com/phittayanan/habit-tracker/issues/126) NUL character in the login username returns 500 instead of 401 | asamapornch, 2026-11-25 21:39 | F-01 AC-01.2 | **Accepted defect, minor.** Triage by projectnewy 2026-11-25 21:43 (4 min after filing). The partner agreed at 21:56. | AC-01.2 gives `401 INVALID_CREDENTIALS` for any unknown username and names no exception, so a written requirement is not met; not an enhancement. Minor: a normal user does not type a NUL character, no session is issued, nothing is stored or exposed, the app keeps serving. | projectnewy (fix), phittayanan (review) | Fixed in #128 / PR #129; released in `v1.4`, deployed 2026-11-26 | Retest **PASS** by asamapornch on `v1.4` (2026-11-26 21:33); the partner asks us to close #126 |
-| [#127](https://github.com/phittayanan/habit-tracker/issues/127) NUL character in a template name or unit returns 500 (create and edit) | warunwora, 2026-11-25 21:55 | F-03 AC-03.1, AC-03.3; F-04 AC-04.1, AC-04.4 | **Accepted defect, minor.** Triage by phittayanan 2026-11-26 16:19 (within 24 h). | The ACs give such a request only two outcomes, success or a listed `400`; `500` is neither. We reproduced all four requests (create and edit, NUL in `name` and in `unit`) on a disposable local database: all `500`, nothing stored. Minor for the same reasons as #126. | phittayanan (fix), projectnewy (review) | Fixed in #131 / PR #132; released in `v1.4`, deployed 2026-11-26 | Retest **PASS** by asamapornch on `v1.4` (2026-11-26 21:33); the partner asks us to close #127 |
-| [#130](https://github.com/phittayanan/habit-tracker/issues/130) UAT results and notices | asamapornch, 2026-11-26 15:48 | none | Not a finding: the partner's own label ("not a defect report") | Their UAT results on `v1.3` and notices. We answered on 2026-11-26 17:24 and gave the written OK for the retest requests at 18:03. | phittayanan | none needed | Carries the partner's final decision (section 3.4) |
+| [#126](https://github.com/phittayanan/habit-tracker/issues/126) NUL character in the login username returns 500 instead of 401 | asamapornch, 2026-11-25 21:39 | F-01 AC-01.2 | **Accepted defect, minor.** Triage by projectnewy 2026-11-25 21:43 (4 min after filing). The partner agreed at 21:56. | AC-01.2 gives `401 INVALID_CREDENTIALS` for any unknown username and names no exception, so a written requirement is not met; not an enhancement. Minor: a normal user does not type a NUL character, no session is issued, nothing is stored or exposed, the app keeps serving. | projectnewy (fix), phittayanan (review) | Fixed in #128 / PR #129; released in `v1.4`, deployed 2026-11-26 | Retest **PASS** by asamapornch on `v1.4` (2026-11-26 21:33). **Closed** by phittayanan as completed, 2026-11-26 22:01 |
+| [#127](https://github.com/phittayanan/habit-tracker/issues/127) NUL character in a template name or unit returns 500 (create and edit) | warunwora, 2026-11-25 21:55 | F-03 AC-03.1, AC-03.3; F-04 AC-04.1, AC-04.4 | **Accepted defect, minor.** Triage by phittayanan 2026-11-26 16:19 (within 24 h). | The ACs give such a request only two outcomes, success or a listed `400`; `500` is neither. We reproduced all four requests (create and edit, NUL in `name` and in `unit`) on a disposable local database: all `500`, nothing stored. Minor for the same reasons as #126. | phittayanan (fix), projectnewy (review) | Fixed in #131 / PR #132; released in `v1.4`, deployed 2026-11-26 | Retest **PASS** by asamapornch on `v1.4` (2026-11-26 21:33). **Closed** by phittayanan as completed, 2026-11-26 22:01 |
+| [#130](https://github.com/phittayanan/habit-tracker/issues/130) UAT results and notices | asamapornch, 2026-11-26 15:48 | none | Not a finding: the partner's own label ("not a defect report") | Their UAT results on `v1.3` and notices. We answered on 2026-11-26 17:24 and gave the written OK for the retest requests at 18:03. | phittayanan | none needed | Carries the partner's final decision (section 3.4). We acknowledged it and closed #130, 2026-11-26 22:04 |
 
 No duplicate, no not-defect and no enhancement was received. No critical or major defect was reported. Both accepted defects are minor, and we chose to **fix** both rather than ask the partner to accept them as known limitations. So the controlled defect exercise of sheet section 3.5 is not needed.
 
@@ -142,6 +142,12 @@ Both chains follow the same order: triage → fix Issue → spec change → fail
 - **Conditions:** none. They ask us to close #126 and #127.
 - **Leftover test data:** their `EXP-*` and `UAT-*` templates and goals are still on our deployed app (listed in #130).
 
+**Our answer** (phittayanan, 2026-11-26, Asia/Bangkok):
+
+- #126 and #127: we agreed with the retest results and closed both as completed at 22:01, each with the chain from triage to retest.
+- #130: we recorded the decision as given, said that the partner's test records stay on the app (synthetic, clearly named, and matching both teams' evidence; no action needed from them), said that the written OK ended with the retest, and closed #130 at 22:04.
+- #108 (release and redeploy) was closed at 22:04: the corrected revision is live and was retested.
+
 The comment says it was prepared with the help of an AI assistant (Claude Code) and decided by asamapornch and warunwora.
 
 ## 4. Contributions (Lab 6)
@@ -157,14 +163,15 @@ From the Issue assignees, PR authors and reviewers on GitHub. "Pair" means both 
 | Part D: fixes | fix #131 / PR #132 (spec, RED, GREEN) | fix #128 / PR #129 (spec, RED, GREEN) |
 | Part D: reviews | reviewed PR #129 | reviewed PR #132, #134 and #135 |
 | Part D: release | sync PR #134, release PR #135, tag `v1.4`, deploy check, notices (#108, #133) | merged PR #132, #134 and #135 (phittayanan merged PR #129) |
+| UAT Team: retest of the partner's fixes | — | partner #61 (B2-01, PASS) and partner #60 (B1-01, PASS for Min and Max), 2026-11-26 |
+| UAT Team: acceptance decision on the partner's release | posted on partner #68, 2026-11-26 22:10 (Accepted with documented minor limitations; decided by both students) | agreed the decision |
 | Write-up | this file and the AI-use rows (#110) | the evidence PDF (#109) |
 
 ## 5. Limitations
 
 - **Scope of the acceptance** (section 3.4): the UAT cases ran on `v1.3`; on `v1.4` only the four retest requests ran. The partner's decision excludes anything outside its result files and any change after `v1.4`.
 - **Partner evidence file** `RETEST-126-127-result.md` was not yet linked from their repository at the status time.
-- **Test data left on the deployed app:** the partner's `EXP-*` and `UAT-*` templates and goals; how to remove them is not decided.
-- **#126 and #127 are still open** at the status time; the partner asked us to close them.
+- **Test data left on the deployed app:** the partner's `EXP-*` and `UAT-*` templates and goals stay, by our decision on #130 (synthetic, named, and matching the evidence).
 - **The deployed fix was not exercised by us.** We checked health, readiness and the build label on the deployed revision, not the NUL requests; the partner's retest is the deployed check.
 - **The NUL message.** A template name with a NUL character gets the length message ("Name must be 1 to 100 characters."), which does not name the real problem. The contract asks for no new message (review of PR #132, suggestion 1).
 - **Timing of the NUL login path** was not measured: the review checked that the bcrypt comparison still runs, not that the time matches an ordinary unknown username (review of PR #129, "Not checked").
