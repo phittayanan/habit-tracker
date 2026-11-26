@@ -12,7 +12,7 @@
 | Partner team "Habit and Activity Tracker" | GitHub |
 |---|---|
 | {{PARTNER_1_NAME}} | [asamapornch](https://github.com/asamapornch) |
-| {{PARTNER_2_NAME}} (the name as their UAT package gives it) | [warunwora](https://github.com/warunwora) |
+| {{PARTNER_2_NAME}} | [warunwora](https://github.com/warunwora) |
 
 ## Our product (we are the Product Team)
 
