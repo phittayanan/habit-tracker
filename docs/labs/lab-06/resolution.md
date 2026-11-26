@@ -2,7 +2,7 @@
 
 Lab 6, Issue #110. This file is the Part C summary and the Part D record for **our own product** (we are the Product Team here). Our work as the UAT Team on the partner's product is in `partner-uat/` and `findings.md` section 2. The evidence PDF (Issue #109) takes its Part C and D text from this file. It holds no password, token or student ID.
 
-Status date: 2026-11-26, about 21:30 Asia/Bangkok. Every fact below names its source. Anything not done yet is marked **pending** and is not claimed.
+Status date: 2026-11-26, about 22:00 Asia/Bangkok. Every fact below names its source. Anything not done yet is marked **pending** and is not claimed.
 
 ## 1. Version table
 
@@ -25,9 +25,9 @@ The partner team (UAT Team, "Habit and Activity Tracker": asamapornch, warunwora
 
 | Finding | Reporter, filed (Asia/Bangkok) | Contract | Classification and severity | Reason (short; full text in the triage comment) | Owner | Fix status | Disposition |
 |---|---|---|---|---|---|---|---|
-| [#126](https://github.com/phittayanan/habit-tracker/issues/126) NUL character in the login username returns 500 instead of 401 | asamapornch, 2026-11-25 21:39 | F-01 AC-01.2 | **Accepted defect, minor.** Triage by projectnewy 2026-11-25 21:43 (4 min after filing). The partner agreed at 21:56. | AC-01.2 gives `401 INVALID_CREDENTIALS` for any unknown username and names no exception, so a written requirement is not met; not an enhancement. Minor: a normal user does not type a NUL character, no session is issued, nothing is stored or exposed, the app keeps serving. | projectnewy (fix), phittayanan (review) | Fixed in #128 / PR #129; released in `v1.4`, deployed 2026-11-26 | Open: waiting for the partner's retest; the partner closes #126 |
-| [#127](https://github.com/phittayanan/habit-tracker/issues/127) NUL character in a template name or unit returns 500 (create and edit) | warunwora, 2026-11-25 21:55 | F-03 AC-03.1, AC-03.3; F-04 AC-04.1, AC-04.4 | **Accepted defect, minor.** Triage by phittayanan 2026-11-26 16:19 (within 24 h). | The ACs give such a request only two outcomes, success or a listed `400`; `500` is neither. We reproduced all four requests (create and edit, NUL in `name` and in `unit`) on a disposable local database: all `500`, nothing stored. Minor for the same reasons as #126. | phittayanan (fix), projectnewy (review) | Fixed in #131 / PR #132; released in `v1.4`, deployed 2026-11-26 | Open: waiting for the partner's retest; the partner closes #127 |
-| [#130](https://github.com/phittayanan/habit-tracker/issues/130) UAT results and notices | asamapornch, 2026-11-26 15:48 | none | Not a finding: the partner's own label ("not a defect report") | Their UAT results on `v1.3` and notices. We answered on 2026-11-26 17:24 and gave the written OK for the retest requests at 18:03. | phittayanan | none needed | Open, for the final decision |
+| [#126](https://github.com/phittayanan/habit-tracker/issues/126) NUL character in the login username returns 500 instead of 401 | asamapornch, 2026-11-25 21:39 | F-01 AC-01.2 | **Accepted defect, minor.** Triage by projectnewy 2026-11-25 21:43 (4 min after filing). The partner agreed at 21:56. | AC-01.2 gives `401 INVALID_CREDENTIALS` for any unknown username and names no exception, so a written requirement is not met; not an enhancement. Minor: a normal user does not type a NUL character, no session is issued, nothing is stored or exposed, the app keeps serving. | projectnewy (fix), phittayanan (review) | Fixed in #128 / PR #129; released in `v1.4`, deployed 2026-11-26 | Retest **PASS** by asamapornch on `v1.4` (2026-11-26 21:33); the partner asks us to close #126 |
+| [#127](https://github.com/phittayanan/habit-tracker/issues/127) NUL character in a template name or unit returns 500 (create and edit) | warunwora, 2026-11-25 21:55 | F-03 AC-03.1, AC-03.3; F-04 AC-04.1, AC-04.4 | **Accepted defect, minor.** Triage by phittayanan 2026-11-26 16:19 (within 24 h). | The ACs give such a request only two outcomes, success or a listed `400`; `500` is neither. We reproduced all four requests (create and edit, NUL in `name` and in `unit`) on a disposable local database: all `500`, nothing stored. Minor for the same reasons as #126. | phittayanan (fix), projectnewy (review) | Fixed in #131 / PR #132; released in `v1.4`, deployed 2026-11-26 | Retest **PASS** by asamapornch on `v1.4` (2026-11-26 21:33); the partner asks us to close #127 |
+| [#130](https://github.com/phittayanan/habit-tracker/issues/130) UAT results and notices | asamapornch, 2026-11-26 15:48 | none | Not a finding: the partner's own label ("not a defect report") | Their UAT results on `v1.3` and notices. We answered on 2026-11-26 17:24 and gave the written OK for the retest requests at 18:03. | phittayanan | none needed | Carries the partner's final decision (section 3.4) |
 
 No duplicate, no not-defect and no enhancement was received. No critical or major defect was reported. Both accepted defects are minor, and we chose to **fix** both rather than ask the partner to accept them as known limitations. So the controlled defect exercise of sheet section 3.5 is not needed.
 
@@ -127,11 +127,22 @@ Both chains follow the same order: triage → fix Issue → spec change → fail
 | Retest request #126 | Posted 2026-11-26 18:03: an ordinary unknown username and a username with an embedded NUL character, both expected `401 INVALID_CREDENTIALS` with the same body and no `Set-Cookie`. |
 | Retest request #127 | Posted 2026-11-26 18:03: a template create with a NUL in `name` and an edit of an unused template with a NUL in `unit`, both expected `400 VALIDATION_ERROR` with nothing stored or changed. |
 | Written OK for the partner's requests to our app | Posted on #130 at 18:03 (scope: the retest of #126 and #127 only, the three agreed accounts, synthetic data). |
-| Partner retest result (tester, version, result, evidence) | **Pending.** Not received at the status time. |
-| Re-run of affected UAT cases | **Pending** (the partner's choice which cases are affected). |
-| Final Sprint 1 decision by the UAT Team | **Pending.** Only the partner team can record it (Accepted, Accepted with documented minor limitations, or Not Accepted), with tester names, the version `v1.4` / `build 056ee5c`, the date and evidence. |
+| Retest #126 (comment of asamapornch, 2026-11-26 21:33) | **PASS.** Tester asamapornch, manual, in a browser, about 21:10 to 21:30. Version `v1.4`, `build 056ee5c`, commit `056ee5c`, revision `habit-tracker-00007-7pd` (build label read on the page and in `/api/health`). Unknown ordinary username: `401 INVALID_CREDENTIALS`, "Username or password is incorrect.", no session. Username with a NUL character: `401` with the identical body, no session (checked with `/api/auth/me` after each attempt). |
+| Retest #127 (comment of asamapornch, 2026-11-26 21:33) | **PASS.** Same tester, time and version, account `manager1`. Create with a NUL in `name`: `400 VALIDATION_ERROR` ("Name must be 1 to 100 characters."), template list unchanged. Edit with a NUL in `unit`: `400 VALIDATION_ERROR` ("Unit must be 1 to 30 characters."), the template read back unchanged (id 18, `EXP-EditA`, unit `a`, 1 to 10, ACTIVE). The edited template was an unused one the partner had created during its own exploratory testing; none of our three seed templates was unused. |
+| Partner's evidence | Their result file `RETEST-126-127-result.md`, which they say they will link from their repository (not linked at the status time). |
+| Re-run of affected UAT cases | Not re-run: the partner's decision rests on UAT-01 to UAT-04 and EXP-1 on `v1.3` plus the four retest requests on `v1.4`. The fixes change only the NUL input paths (section 1). |
 
-This section is updated in the same PR when the partner answers. If no answer arrives before submission, the PDF reports the retest and the decision as pending, with the requests above as the evidence that they were asked for.
+**Final Sprint 1 decision by the UAT Team** (comment of asamapornch on #130, 2026-11-26 21:45 Asia/Bangkok):
+
+- **Decision: Accepted, no blocking conditions.**
+- **Version:** UAT-01 to UAT-04 and EXP-1 on `v1.3` (`50f5605`); the fixes for #126 and #127 retested on `v1.4`, `build 056ee5c`, commit `056ee5c59d1292ad0805f8f5c8c80e1c0e2c3636`, revision `habit-tracker-00007-7pd`.
+- **Date:** 2026-11-26. **Decided by:** asamapornch and warunwora. UAT-01 to UAT-04 and EXP-1 were run by asamapornch with warunwora present; the retest was run by asamapornch alone.
+- **Basis:** UAT-01 to UAT-04 and EXP-1 PASS; the two minor defects fixed in `v1.4`; retest 4 of 4 PASS.
+- **Not covered:** anything outside the cases in their result files, and any change to our app after `v1.4`.
+- **Conditions:** none. They ask us to close #126 and #127.
+- **Leftover test data:** their `EXP-*` and `UAT-*` templates and goals are still on our deployed app (listed in #130).
+
+The comment says it was prepared with the help of an AI assistant (Claude Code) and decided by asamapornch and warunwora.
 
 ## 4. Contributions (Lab 6)
 
@@ -150,7 +161,10 @@ From the Issue assignees, PR authors and reviewers on GitHub. "Pair" means both 
 
 ## 5. Limitations
 
-- **Retest and decision pending** (section 3.4). Until the partner records its decision, Sprint 1 acceptance of `v1.4` is not claimed.
+- **Scope of the acceptance** (section 3.4): the UAT cases ran on `v1.3`; on `v1.4` only the four retest requests ran. The partner's decision excludes anything outside its result files and any change after `v1.4`.
+- **Partner evidence file** `RETEST-126-127-result.md` was not yet linked from their repository at the status time.
+- **Test data left on the deployed app:** the partner's `EXP-*` and `UAT-*` templates and goals; how to remove them is not decided.
+- **#126 and #127 are still open** at the status time; the partner asked us to close them.
 - **The deployed fix was not exercised by us.** We checked health, readiness and the build label on the deployed revision, not the NUL requests; the partner's retest is the deployed check.
 - **The NUL message.** A template name with a NUL character gets the length message ("Name must be 1 to 100 characters."), which does not name the real problem. The contract asks for no new message (review of PR #132, suggestion 1).
 - **Timing of the NUL login path** was not measured: the review checked that the bcrypt comparison still runs, not that the time matches an ordinary unknown username (review of PR #129, "Not checked").
