@@ -112,12 +112,15 @@ td.id { white-space: nowrap; }
 table.wide { font-size: 7.8pt; line-height: 1.2; }
 table.wide code { font-size: 7.2pt; }
 th { background: #eee; overflow-wrap: normal; }
-table.wide th { overflow-wrap: anywhere; }
 tr { break-inside: avoid; }
 code { font-family: "Courier New", Courier, monospace; font-size: 9.5pt; overflow-wrap: anywhere; }
 pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 9.5pt; }
 pre code { font-size: 9pt; }
 a { color: #0b3d91; overflow-wrap: anywhere; }
+/* In a table, a word breaks only if it cannot fit: with "anywhere" a narrow column shrank to one character.
+   Code and links with a long unbroken token keep "anywhere", or their table would be wider than the page. */
+table.wide th { overflow-wrap: break-word; }
+table code.short, table a.short { overflow-wrap: break-word; }
 figure { margin: 6pt auto 10pt; break-inside: avoid; text-align: center; }
 figure img { max-width: 100%; max-height: 98mm; border: 1px solid #999; }
 figcaption { font-size: 10pt; margin-top: 3pt; text-align: left; }
@@ -145,10 +148,11 @@ try {
     // The evidence registers end in a repository file name column. It squeezes the other columns, and the
     // evidence ID already names the file (evidence/<ID>-...), so the PDF leaves that column out.
     await page.evaluate(() => document.querySelectorAll('table').forEach(t => { if (t.rows[0].cells.length >= 6 && t.rows[0].cells[t.rows[0].cells.length - 1].textContent.trim() === 'File') [...t.rows].forEach(r => r.deleteCell(-1)); }));
+    await page.evaluate(() => document.querySelectorAll('table code, table a').forEach(e => { if (e.textContent.split(/\s+/).every(w => w.length <= 12)) e.classList.add('short'); }));
     // Tables with six or more columns use the small print so they fit on A4.
     await page.evaluate(() => document.querySelectorAll('table').forEach(t => { if (t.rows[0].cells.length >= 6) t.classList.add('wide'); }));
-    // Evidence and case IDs stay on one line.
-    await page.evaluate(() => document.querySelectorAll('td').forEach(td => { if (/^(E-B[0-9X]+-[0-9]+|UAT-0[0-9]|Appendix)$/.test(td.textContent.trim())) td.classList.add('id'); }));
+    // Evidence IDs, case IDs and Issue numbers stay on one line.
+    await page.evaluate(() => document.querySelectorAll('td').forEach(td => { if (/^(E-B[0-9X]+-[0-9]+|UAT-0[0-9]|Appendix|#[0-9]+)$/.test(td.textContent.trim())) td.classList.add('id'); }));
     await page.emulateMedia({ media: 'print' });
     const pdf = await page.pdf({ path: pdfPath, format: 'A4', printBackground: true, displayHeaderFooter: true, headerTemplate: '<span></span>', footerTemplate: footer, margin: { top: '15mm', bottom: '17mm', left: '13mm', right: '13mm' } });
     return (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
