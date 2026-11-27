@@ -151,6 +151,13 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
   await expect(water.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
+  // Nor can the box close or another day open while the edit is saved: no Discard question, the box stays.
+  if (phone()) {
+    await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeDisabled();
+    await page.keyboard.press('Escape');
+  } else await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(opened).toBeVisible();
   release();
   await expect(water.getByText('7 / 8 glasses', { exact: true })).toBeVisible();
   await page.unroute('**/api/goals/*/entries/*');

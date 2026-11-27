@@ -167,7 +167,8 @@ test('TC-147 / TC-08: roles, ownership and wrong entry ids for both routes; a se
   // a goal or entry that is not the caller's, and 400 only on the caller's own entry (section 4, orders 3 to 5).
   const malformed = (goalId, entryId, cookie) => request(app).patch(url(goalId, entryId)).set('Cookie', cookie).set('Content-Type', 'application/json').send('{');
   for (const [goalId, entryId, cookie, status, code] of [[w.id, e5.id, cookies.b, 404, 'GOAL_NOT_FOUND'], [99999, e5.id, cookies.b, 404, 'GOAL_NOT_FOUND'],
-    [w.id, bEntry.id, cookies.a, 404, 'ENTRY_NOT_FOUND'], [w.id, 'abc', cookies.a, 404, 'ENTRY_NOT_FOUND'], [w.id, e5.id, cookies.a, 400, 'VALIDATION_ERROR']]) {
+    [w.id, bEntry.id, cookies.a, 404, 'ENTRY_NOT_FOUND'], [w.id, 'abc', cookies.a, 404, 'ENTRY_NOT_FOUND'], [w.id, 99999, cookies.a, 404, 'ENTRY_NOT_FOUND'], ['abc', e5.id, cookies.a, 404, 'GOAL_NOT_FOUND'],
+    [w.id, e5.id, cookies.a, 400, 'VALIDATION_ERROR']]) {
     const r = await malformed(goalId, entryId, cookie);
     assert.equal(r.status, status, `${goalId}/${entryId}`); assert.equal(r.body.error.code, code, `${goalId}/${entryId}`);
   }
