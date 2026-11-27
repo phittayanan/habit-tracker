@@ -90,11 +90,11 @@ Open items:
 
 ## 4. Retrospective
 
-Each student answered in their own words: phittayanan in Thai, translated by Claude Code and checked by phittayanan; projectnewy in English on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215873068), drafted with Claude Code and reviewed by projectnewy (their note). projectnewy's answers are copied as written. phittayanan revised their "What will change?" answer on 2026-11-27 after PR #163 was merged (commit `fb23e1d`, reviewed in PR #169).
+Each student answered in their own words: phittayanan in Thai, translated by Claude Code and checked by phittayanan; projectnewy in English on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215873068), drafted with Claude Code and reviewed by projectnewy (their note). projectnewy's answers are copied as written. phittayanan revised their "What helped?" and "What will change?" answers on 2026-11-27 after PR #163 was merged (commit `fb23e1d`, reviewed in PR #169).
 
 | Question | phittayanan | projectnewy |
 |---|---|---|
-| What helped? | Running the tests in CI. | Reviewing the contract and the code before merging caught real problems: a decimal example in the contract that could not fail, and TC-89 passing CI but failing on Windows. |
+| What helped? | Writing the failing tests before the code: the 21 failures on the old code showed each new rule was really tested, and CI ran both test suites on every PR before merge. | Reviewing the contract and the code before merging caught real problems: a decimal example in the contract that could not fail, and TC-89 passing CI but failing on Windows. |
 | What hurt? | Our working hours did not match, so sometimes a PR was opened and it was not clear whether a review was needed. | Work waited in a chain of reviews, and extra rounds came from docs/ai-use.md merge conflicts and from the sync PR that the release needed before it could be merged. |
 | What will change? | Four of my PRs on 2026-11-27 needed changes for claims that did not match their sources or for missed sheet items. Before I ask for a review, a second AI agent that has not seen the work will check each factual claim against its file or log and the PR against the sheet or Issue checklist. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
 

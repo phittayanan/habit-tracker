@@ -21,7 +21,7 @@ The revised SRS, system SDS, feature list, F-08 and F-09 feature SDS (acceptance
 | Record | Who, when (+07:00) | Result |
 |---|---|---|
 | R-143-6079956119 | phittayanan, 2026-11-27 03:06, on `6f27fac` | Approved, with nine checks and three findings; with the follow-up comments, seven points (A.1, section 6) |
-| C-143-1 to C-143-5 | both students, 2026-11-27 03:28 to 12:28 | Follow-up points and their answers |
+| C-143-1, C-143-2, C-143-4, C-143-5 | both students, 2026-11-27 03:28 to 12:28 | Follow-up points and their answers |
 | R-143-6083813777 | phittayanan, 2026-11-27 12:20, on `eda4c6b` | Re-check of the fixes, approved |
 | Merge | phittayanan, 2026-11-27 12:38 (`c4ba749`) | Before `761d87e` (12:54) and `bbf12a2` (12:59) |
 

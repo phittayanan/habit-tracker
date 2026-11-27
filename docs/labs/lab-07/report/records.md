@@ -143,22 +143,6 @@ If you agree, AC-08.13 and TC-61 already point to "the message of section 4", so
 
 ````
 
-### C-143-3 Comment by phittayanan on #143, 2026-11-26T21:56:35Z
-
-Source: <https://github.com/phittayanan/habit-tracker/pull/143#issuecomment-7204208358>
-
-````text
-This branch now conflicts with `staging` on `docs/ai-use.md` (drafted with Claude Code; posted by phittayanan).
-
-Why: PR #137 merged into `staging` at a05db84 and added the 2026-11-26 #109 row right after the #110 row; this PR adds the 2026-11-27 #139 row at the same spot. Per `CLAUDE.md`, the PR that merges second fixes the conflict.
-
-Fix: update this branch from `staging` (the "Update branch" button, or `git merge origin/staging`), keep both rows in date order (#109 on 2026-11-26, then #139 on 2026-11-27), delete the conflict markers, and push.
-
-Note: approvals are not dismissed on push in this repo, so please ping me after pushing. I will re-check the new commit (and any changes for the 7 points above) before I merge.
-
-
-````
-
 ### C-143-4 Comment by projectnewy on #143, 2026-11-27T05:07:27Z
 
 Source: <https://github.com/phittayanan/habit-tracker/pull/143#issuecomment-7210368492>
@@ -412,22 +396,6 @@ Findings
 ````
 
 ## Retrospective answers as posted (Issue 142)
-
-### RQ-142 Comment by phittayanan on #142, 2026-11-27T10:22:03Z
-
-Source: <https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215799301>
-
-````text
-@projectnewy Lab 7 retrospective (Part D) needs answers from both of us. Please reply here with a few sentences for each, about Lab 7 (Issues #139 to #142):
-
-1. **What helped?**
-2. **What hurt** (slowed us down or caused rework)?
-3. **What will you change** next time?
-
-I will put your answers into `docs/labs/lab-07/readiness.md` section 4 as you wrote them, next to mine. Due with Lab 7, 2026-11-29 23:59 (date from Issue #139; check LEB2).
-
-
-````
 
 ### RA-142 Comment by projectnewy on #142, 2026-11-27T10:25:43Z
 

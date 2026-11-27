@@ -8,6 +8,7 @@ cd "$(dirname "$0")"
 OURS=phittayanan/habit-tracker
 TOP=$(git rev-parse --show-toplevel)
 fence() { echo; echo '````text'; tr -d '\r'; echo; echo '````'; }
+# C-143-3 (merge-conflict steps) and RQ-142 (the request for answers) are left out: not assessed (PR #169).
 # Each record is pinned to the ID that was checked, so a later review or comment cannot replace it.
 review() { # PR number, review ID
   gh api "repos/$OURS/pulls/$1/reviews/$2" --jq '"\(.user.login)|\(.submitted_at)|\(.state)|\(.commit_id[0:7])|\(.html_url)"' |
@@ -29,7 +30,7 @@ issue() { # record ID, Issue number: the body as filed
   issue 'CR-139' 139
   echo; echo '## Review of the revised contract, before any test or code (PR 143)'
   review 143 6079956119; review 143 6083813777
-  comment 'C-143-1' 143 7202728642; comment 'C-143-2' 143 7203404404; comment 'C-143-3' 143 7204208358
+  comment 'C-143-1' 143 7202728642; comment 'C-143-2' 143 7203404404
   comment 'C-143-4' 143 7210368492; comment 'C-143-5' 143 7210662024
   echo; echo '## Review of the tests and code (PR 146)'
   review 146 6084399396; comment 'C-146-1' 146 7211667897; review 146 6084528918
@@ -38,7 +39,7 @@ issue() { # record ID, Issue number: the body as filed
   echo; echo '## Review of the metrics and readiness (PR 163)'
   review 163 6086779392; review 163 6086886889
   echo; echo '## Retrospective answers as posted (Issue 142)'
-  comment 'RQ-142' 142 7215799301; comment 'RA-142' 142 7215873068
+  comment 'RA-142' 142 7215873068
 } > records.md
 # Old and new contract text: the accepted Sprint 1 release against the merged revised contract (PR 143).
 git -C "$TOP" diff --no-color --unified=1 v1.4 c4ba749 -- docs/srs.md docs/system-sds.md docs/features.md docs/adr/0008-one-entry-per-day.md \

@@ -1,6 +1,6 @@
 # Part D: Release readiness and retrospective
 
-The texts were reviewed by projectnewy in PR #163 (records R-163 in the Appendix): changes requested on `daefb86`, then approved on `7452f46`. One later change is reviewed in PR #169 instead: phittayanan's revised "What will change?" answer in D.3 (`fb23e1d`).
+The texts were reviewed by projectnewy in PR #163 (records R-163 in the Appendix): changes requested on `daefb86`, then approved on `7452f46`. One later change is reviewed in PR #169 instead: phittayanan's revised "What helped?" and "What will change?" answers in D.3.
 
 ## D.1 Release readiness
 

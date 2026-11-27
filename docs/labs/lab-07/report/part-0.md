@@ -42,6 +42,6 @@ The sheet asks for instructor/TA approval before implementation. Issue #139 reco
 | B | Commits in order, RED and GREEN output, regression suites, code diff, review and integration, release, deployment, post-deployment checks with screenshots | {{PAGES_B}} | TC-29, TC-61, TC-82 to TC-90; R-146, R-149, R-147, R-162; run 45969767744; E-pre-release, E-PD-00 to E-PD-12 |
 | C | Five metrics with definitions, windows, values and embedded source data; interpretation | {{PAGES_C}} | M1 to M5, S1 to S5 |
 | D | Readiness checklist and decision, open items, technical debt, retrospective, contribution, AI use, limitations | {{PAGES_D}} | R-163, RA-142 |
-| Appendix | Records as posted on GitHub (change request, reviews, comments), old/new contract text, test diff | {{PAGES_X}} | CR-139, R-*, C-*, RQ-142, RA-142 |
+| Appendix | Records as posted on GitHub (change request, reviews, comments), old/new contract text, test diff | {{PAGES_X}} | CR-139; R-143, R-146, R-149, R-147, R-162, R-163; C-143-1, C-143-2, C-143-4, C-143-5, C-146-1; RA-142 |
 
 All times are Asia/Bangkok (+07:00) unless a line says UTC; the GitHub records in the Appendix are UTC. All data in this PDF is synthetic. This PDF holds no password or token.
