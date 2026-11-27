@@ -187,16 +187,16 @@ One layout for everyone: a top bar with the user's name, the role's menu items a
 | Template list: a table (name, unit, min-max, active or retired) with New and Edit. Retire appears in Sprint 2 | Manager | 1 | FR-06, ADR 0043 |
 | Template form (create and edit) | Manager | 1 | FR-05, FR-07 |
 | Templates: active templates, read-only | Participant | 1 | FR-09, ADR 0018 |
-| Goals page: the Participant's goals with computed progress. A plain page in Sprint 1 | Participant | 1 | FR-10, FR-12; SRS A-3 |
+| Goals page: the Participant's goals with computed progress. A plain page in Sprint 1; kept unchanged at `/goals` in Sprint 2, menu "Goals" (ADR 0073) | Participant | 1 | FR-10, FR-12; SRS A-3 |
 | New goal form: template dropdown, daily target, start and end dates | Participant | 1 | FR-10, ADR 0049 |
 | Record a day: a number box with the unit shown, per goal | Participant | 1 | FR-11, ADR 0039 |
-| Month calendar (Monday first, month arrows) with the chosen day (today at start) in a side panel on desktop and a centre box on phone: every goal active that day with a Check in input by template kind (− / + or a 15-minute bar) and a typed row. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). Contract: `docs/sprints/sprint-2/F-11-month-calendar.md` | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021, ADR 0063 to ADR 0069 |
+| Month calendar at `/calendar`, the Participant's first page (Monday first, month arrows) with the chosen day (today at start) in a side panel on desktop and a centre box on phone: every goal active that day with a Check in input by template kind (− / + or a 15-minute bar) and a typed row. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). Contract: `docs/sprints/sprint-2/F-11-month-calendar.md` | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021, ADR 0063 to ADR 0069 |
 | Calendar colours: green all met, yellow some met, red none met, grey nothing recorded, each with a sign; today live | Participant | 2 | FR-16, ADR 0040, ADR 0045, ADR 0046, ADR 0070 |
 | Calendar and List switch (list is grouped by day, newest first, for the same month) | Participant | 2 | FR-19, ADR 0041, ADR 0048, ADR 0071 |
 | Goal detail page with the best streak | Participant | 3 | FR-20, ADR 0042 |
 | Reminder settings on a goal | Participant | 3 | FR-21 |
 
-Sprint 1 does not build the calendar; the calendar becomes the Participant's first screen in Sprint 2 (SRS A-3). The look is plain, with colour only on the calendar (ADR 0044). Desktop is designed first, and the screens also work at 375 px wide (ADR 0038, NFR-05).
+Sprint 1 does not build the calendar; the calendar becomes the Participant's first screen in Sprint 2 (SRS A-3), on its own page `/calendar`, and the goals page stays (ADR 0073). The look is plain, with colour only on the calendar (ADR 0044). Desktop is designed first, and the screens also work at 375 px wide (ADR 0038, NFR-05).
 
 ### 4.2 Shared UI behaviour
 | State | Behaviour |
@@ -398,4 +398,4 @@ The SRS and `docs/features.md` need a one-line change for each of these two; bot
 |---|---|---|
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: `max_value` also caps the day total and the `Entry` index is not unique (3.2); BR-04 and BR-07 enforcement (3.4); status codes and error example (4.3); decision list | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
-| 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072 | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072; after the PR #167 review, `/calendar` and the kept goals page (4.1, ADR 0073) | pending (reviewer projectnewy) |

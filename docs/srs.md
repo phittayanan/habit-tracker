@@ -97,7 +97,7 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-12 | A Participant sees computed progress for a goal: days met out of days so far. | ADR 0013 | 1 |
 | FR-13 | A Participant sees only their own goals, entries and progress. Requests for another Participant's data are refused. | ADR 0019 | 1 |
 | FR-14 | A Manager's request for any Participant's goals or entries is refused. | ADR 0019 | 1 |
-| FR-15 | After login a Participant sees this month's calendar first. On desktop the calendar is on the left and a side panel on the right shows the chosen day (today at start); on a phone the day opens in a centre box. The day shows every goal active that day with an input for its kind and a typed number. The streak is not shown here; it comes in Sprint 3 with FR-20 (decided on PR #23). | ADR 0037, ADR 0047, ADR 0045, ADR 0063 to ADR 0069 | 2 (see A-3) |
+| FR-15 | After login a Participant sees this month's calendar first (its own page; the Sprint 1 goals page stays, ADR 0073). On desktop the calendar is on the left and a side panel on the right shows the chosen day (today at start); on a phone the day opens in a centre box. The day shows every goal active that day with an input for its kind and a typed number. The streak is not shown here; it comes in Sprint 3 with FR-20 (decided on PR #23). | ADR 0037, ADR 0047, ADR 0045, ADR 0063 to ADR 0069, ADR 0073, ADR 0074 | 2 (see A-3) |
 | FR-16 | The calendar colours each day green, yellow, red or grey per BR-15. | ADR 0040, ADR 0045, ADR 0046 | 2 (see A-3) |
 | FR-17 | A Participant edits or deletes an entry on any day inside the goal period. | ADR 0009 | 2 |
 | FR-18 | A Participant changes a goal's target from today on. Earlier days keep the old target. | ADR 0011 | 2 |
@@ -188,4 +188,4 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 |---|---|---|
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
-| 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases; after the PR #167 review, FR-15 names the kept goals page (ADR 0073) | pending (reviewer projectnewy) |
