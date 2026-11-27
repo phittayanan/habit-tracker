@@ -32,6 +32,8 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 
 Missed day: a day so far that has entries whose total is below the target. Empty day: a day so far with no entry. Both count in `daysSoFar` and not in `daysMet`.
 
+Sprint 2 (F-14, ADR 0075): "the daily target" in BR-07 means the target of that day: the `GoalTarget` version with the latest effective date on or before it, or `daily_target` when the goal has no version. For a goal never changed the result is the same as in Sprint 1.
+
 ## 4. Validation and failure cases
 
 Reading progress has no request body. It fails only on access:
@@ -134,6 +136,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | 2026-11-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 | 2026-11-27 | Lab 7, Issue #139: a day is met by its day total (BR-07; AC-09.1, AC-09.2, AC-09.6 revised, AC-09.9 and AC-09.10 added; TC-87, TC-88; ADR 0061). TC-31, TC-32 and TC-59 keep their expected results | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Review of PR #143: the exactness example in AC-09.9 and TC-87 is now 0.7 + 0.1 against 0.8, because the old one could not fail; OP-09.4 | projectnewy (author); re-checked by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777) |
+| 2026-11-27 | Issue #150: days met uses the target of each day (section 3) | pending (reviewer phittayanan) |
 
 ## 14. Implementation evidence — Issue #44
 

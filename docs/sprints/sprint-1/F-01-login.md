@@ -68,7 +68,7 @@ The acting user always comes from the Session row named by the cookie, never fro
 ## 6. UI behaviour
 
 - **Login screen** (SDS 4.1): username box, password box (masked), "Log in" button. No sign-up and no "forgot password" link (ADR 0004).
-- On success the browser opens the role's first page (F-02, OP-02.1).
+- On success the browser opens the role's first page (F-02, OP-02.1): from Sprint 2 a Participant's is `/calendar` (ADR 0073).
 - A rejected login shows the API `message` above the form, keeps the typed username and clears the password box. While the request runs the button is disabled (SDS 4.2).
 - **Log out** is in the top bar on every page (ADR 0026; F-02). After logout the browser shows the login screen.
 - Any API answer of 401 returns the user to the login screen (SDS 4.2; tested in F-02, TC-67).
@@ -139,7 +139,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | TC-44 | AC-01.8 | API | Seed run with test passwords | Read every `password_hash` in the user table | Each matches the bcrypt format and verifies with `bcryptjs` against its test password; none equals the plaintext |
 | TC-45 | AC-01.8 | Script | Seed password values from the environment | Search the Git-tracked files for each value | No match |
 | TC-46 | AC-01.1 | API and unit | A exists | Log in; read `Set-Cookie`. Unit: build the cookie options with `NODE_ENV=production` and with `test` | `HttpOnly`, `SameSite=Lax`, `Path=/` present; `Secure` only in production |
-| TC-65 | AC-01.10 | Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens. Log out: the login screen. Manager: the Manager's first page |
+| TC-65 | AC-01.10 | Browser | Seeded test Manager and A; app started on the test database | Log in as A with a wrong password; then with the right one; press "Log out". Log in as the Manager | Wrong password: the API message is shown, the username kept, the password box empty. Right one: A's first page opens (`/goals` in Sprint 1, `/calendar` from Sprint 2, ADR 0073 point 4). Log out: the login screen. Manager: the Manager's first page |
 | TC-81 | AC-01.2 | API | A exists; no user named `nobody` | `POST /api/auth/login` with username `nobody`, then with a username that contains a NUL character (JSON `"no\u0000body"`), each with any password | Both get `401 INVALID_CREDENTIALS` with identical bodies; no `Set-Cookie`; no Session row; the NUL case is not a 500 (Issue #128, from the partner finding #126) |
 
 ## 11. Definition of done
@@ -177,6 +177,7 @@ Fixtures: each test starts from its own data with one Manager and Participants A
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): TC-05 uses auth only; host-only Origin check and forwarded HTTPS case in TC-64; login timing proposal OP-01.12; record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-25 | Issue #128, from the partner UAT finding #126: AC-01.2 states that it holds for any username text, including a NUL character; TC-81 added | pending (reviewer phittayanan) |
+| 2026-11-27 | Re-check of PR #167 ([review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487), Issue #151): the Participant's first page is `/calendar` from Sprint 2 (section 6, TC-65; ADR 0073 point 4) | pending (reviewer projectnewy) |
 
 ## 14. Implementation evidence
 

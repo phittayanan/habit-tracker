@@ -32,25 +32,25 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #36, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7; AC-03.8, AC-03.9 (kind, Sprint 2) | TC-09, TC-10, TC-68, TC-69, TC-70; TC-118, TC-119 | 1; kind 2 | #30, #36, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/37); #151 (kind contract), #168 (kind, [evidence](template-kind-implementation-evidence.md)) |
 | BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #53, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/54) |
-| BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
+| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6; AC-04.8 (kind, Sprint 2) | TC-12, TC-13, TC-71, TC-72, TC-73; TC-129 | 1; kind 2 | #30, #53, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/54), #168 (kind, [evidence](template-kind-implementation-evidence.md)) |
+| BR-08 | FR-08 | F-05 | AC-05.1 to AC-05.8 | TC-14, TC-15, TC-19, TC-140 to TC-143 | 2 | #150 ([contract](sprints/sprint-2/F-05-template-retire.md)), #152 ([evidence](template-retire-implementation-evidence.md)) |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78 | 1 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
-| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19 | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90 | 1 | #28, #38, #42, #9, #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
+| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11; AC-07.12, AC-07.13 (Time target, Sprint 2) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78; TC-128, TC-131 | 1; Time target 2 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41), #168 (kind, [evidence](template-kind-implementation-evidence.md)) |
+| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19; AC-08.20, AC-08.21 (Time value, Sprint 2) | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90; TC-127, TC-131 | 1; Time value 2 | #28, #38, #42, #9, #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)), #168 (kind, [evidence](template-kind-implementation-evidence.md)) |
 | BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.10 | TC-31, TC-32, TC-59, TC-87, TC-88 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51), #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
 | BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
-| none | FR-15 | F-11 | later | TC-36 | 2 | none yet |
-| BR-15 | FR-16 | F-12 | later | TC-37 | 2 | none yet |
-| BR-11 | FR-17 | F-13 | later | TC-38 | 2 | none yet |
-| BR-12 | FR-18 | F-14 | later | TC-39 | 2 | none yet |
-| none | FR-19 | F-15 | later | TC-40 | 2 | none yet |
-| BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
-| BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
+| none | FR-15 | F-11 | AC-11.1 to AC-11.13 | TC-36, TC-110 to TC-117, TC-120, TC-121, TC-130, TC-47, TC-48 | 2 | #151 ([contract](sprints/sprint-2/F-11-month-calendar.md)), #155 ([evidence](calendar-implementation-evidence.md); TC-117 and the List step of TC-110 run in #156, ADR 0097) |
+| BR-15 | FR-16 | F-12 | AC-12.1 to AC-12.6 | TC-37, TC-49, TC-117, TC-122, TC-123, TC-124 | 2 | #151 ([contract](sprints/sprint-2/F-12-day-colours.md)), #156 ([evidence](colours-list-implementation-evidence.md)) |
+| BR-11 | FR-17 | F-13 | AC-13.1 to AC-13.10 | TC-38, TC-144 to TC-151 | 2 | #150 ([contract](sprints/sprint-2/F-13-entry-edit-delete.md)), #154 |
+| BR-12 | FR-18 | F-14 | AC-14.1 to AC-14.9 | TC-39, TC-152 to TC-159 | 2 | #150 ([contract](sprints/sprint-2/F-14-goal-change.md)), #153 (ADR 0092, ADR 0093) |
+| none | FR-19 | F-15 | AC-15.1 to AC-15.6 | TC-40, TC-121, TC-125, TC-126, TC-47, TC-48 | 2 | #151 ([contract](sprints/sprint-2/F-15-calendar-list.md)), #156 ([evidence](colours-list-implementation-evidence.md)) |
+| BR-13 | FR-20 | F-16 | AC-16.1 to AC-16.9 | TC-41, TC-42, TC-160 to TC-166 | 3 | #157 ([contract](sprints/sprint-3/F-16-streaks.md)); no code Issue yet |
+| BR-14 | FR-21 | F-17 | AC-17.1 to AC-17.9 | TC-43, TC-167 to TC-175 | 3 | #157 ([contract](sprints/sprint-3/F-17-stored-reminder.md)), #158 |
 | none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-09 | FR-23 | F-06, F-04 | AC-06.3, AC-04.7 | TC-17, TC-18 (create, edit); TC-19 (retire, Sprint 2) | 1 | #30, #36, #53, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37), #152 (retire, [evidence](template-retire-implementation-evidence.md)) |
 
 Goal implementation evidence: [Issue #40](goal-implementation-evidence.md). AC-07.1/2 → TC-20; AC-07.3 → TC-21; AC-07.4 → TC-55; AC-07.5 → TC-22; AC-07.6/8 → TC-53; AC-07.7 → TC-54; AC-07.9 → TC-60; AC-07.10 → TC-74; AC-07.11 → TC-78. `server/test/goal.test.js` covers the API/database cases; `server/test/goal-rules.test.js` adds rule units; `client/test/goals.spec.js` covers TC-60 and Goal TC-47/48 at both widths. TC-08's independent discovery now includes both `/api/goals` methods and their implicit HEAD protection. Goal rule coverage is local evidence for NFR-08; this is not a claim of CI coverage or completion of the later BR-01 to BR-07 rules.
 
@@ -109,7 +109,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-33 | Participant B's read and write of Participant A's goals and entries refused | API |
 | TC-34 | Manager read and write of goals and entries refused | API |
 | TC-35 | Participant sees only own goals, entries and progress | API and browser |
-| TC-36 | Calendar is first after login; side panel shows chosen day | Browser |
+| TC-36 | Calendar is first after login (Monday first); the panel shows the chosen day's active goals | Browser |
 | TC-37 | Colour per combination of goals met | Unit |
 | TC-38 | Edit and delete an entry, then recompute | API and unit |
 | TC-39 | Past days judged against the old target | Unit |
@@ -161,16 +161,78 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-88 | A day becomes met with a second entry, also after a restart | Browser and API |
 | TC-89 | The Lab 7 migration keeps existing entries | API and database |
 | TC-90 | Negative values: only the upper limit is checked on the day total | API |
+| TC-110 | Month arrows: back to earlier months, not past the current month; the List follows | Browser |
+| TC-111 | A future day cannot be opened; today and past days open | Browser |
+| TC-112 | A day with no active goal says "No goals on this day." | Browser |
+| TC-113 | Count input: − / + by 1, not below +0 or past what fits; Done saves one entry | Browser |
+| TC-114 | Time input: 15-minute bar by pointer and arrow keys; Check in saves whole minutes | Browser |
+| TC-115 | Typed row saves exact amounts; a rejected save shows the API message | Browser and API |
+| TC-116 | Closing with an unsaved amount asks before discarding | Browser |
+| TC-117 | A save updates the card, the sign and the calendar colour without a reload | Browser |
+| TC-118 | Template kind on create: default Count; Time stores unit minutes and whole numbers; bad kind refused | API and database |
+| TC-119 | Template form Kind choice and the Kind column | Browser |
+| TC-120 | `GET /api/calendar` shape, month default and bad month | API |
+| TC-121 | `GET /api/calendar` privacy: own goals only; Manager 403; anonymous 401 | API |
+| TC-122 | Editing or deleting an entry changes the day state (after F-13) | API |
+| TC-123 | Day state uses the target valid that day (after F-14) | Unit and API |
+| TC-124 | Today's state is live | API |
+| TC-125 | List grouped by day, newest first, with "No entries" days | Browser |
+| TC-126 | Time shown as hours and minutes | Unit |
+| TC-127 | A Time entry must be whole minutes | API |
+| TC-128 | A Time goal target must be whole minutes | API |
+| TC-129 | Template kind change: allowed while unused, whole numbers for Time, refused when used | API |
+| TC-130 | First page `/calendar`; menu Calendar, Goals, Templates; TC-07, TC-32, TC-59, TC-61, TC-65, TC-86 and TC-47/TC-48 pass with only their steps into the goals page changed (ADR 0073 point 4); Manager refused on `/calendar` | Browser |
+| TC-131 | Time values outside the calendar: typed in minutes with an hours-and-minutes hint, shown in hours and minutes | Browser |
+| TC-140 | Retire again, edit after retire and bad ids refused | API |
+| TC-141 | Retire in the browser with confirmation; the row and the Participant lists after it | Browser |
+| TC-142 | Retire against goal creation, and two retires, on one template at once | API and database |
+| TC-143 | Retire by keyboard at both widths | Browser |
+| TC-144 | Edit on an ended goal and a retired template | API |
+| TC-145 | Invalid edit values refused | API |
+| TC-146 | Day-total cap on edit and delete | API |
+| TC-147 | Entry edit and delete access and unknown ids | API |
+| TC-148 | Concurrent create and edit keep the day cap | API and database |
+| TC-149 | Edit and delete on the goals page | Browser |
+| TC-150 | Edit and delete in the day box | Browser |
+| TC-151 | Entry edit and delete by keyboard at both widths | Browser |
+| TC-152 | Target change stored as versions, same day replaced | API and database |
+| TC-153 | Change on a goal not yet started | API and database |
+| TC-154 | Target change refusals and boundaries | API |
+| TC-155 | Target change access | API |
+| TC-156 | Goal version migration keeps goals and progress | API and database |
+| TC-157 | First version on create; fallback without a version | API and database |
+| TC-158 | Change target on the goals page | Browser |
+| TC-159 | Change target by keyboard at both widths | Browser |
+| TC-160 | Streaks of a goal not started, ended, and of one day | Unit |
+| TC-161 | Streaks use the target of each day | Unit |
+| TC-162 | Edit and delete change the streaks | API |
+| TC-163 | Streak fields, goal detail and access | API |
+| TC-164 | Detail page refusals in the browser | Browser |
+| TC-165 | Current streak on today's calendar cards only | Browser |
+| TC-166 | Goal detail by keyboard at both widths | Browser |
+| TC-167 | No sending library or job is added | Review |
+| TC-168 | Saving replaces the reminder; one per goal | API and database |
+| TC-169 | Removing a reminder | API |
+| TC-170 | Reminder time and weekday validation | API and unit |
+| TC-171 | No reminder change on an ended goal | API |
+| TC-172 | Reminder access | API |
+| TC-173 | Set, change and remove a reminder on the goals page | Browser |
+| TC-174 | An ended goal's reminder | Browser |
+| TC-175 | Reminder by keyboard at both widths | Browser |
 | none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 
 ## Coverage Gaps
 
 - Every BR-01 to BR-15, FR-01 to FR-23 and NFR-01 to NFR-09 maps to a feature (or a named system responsibility for NFR-07 and NFR-09) and to at least one planned test. No requirement is uncovered.
 - AC exist for every Sprint 1 feature: F-07 to F-10 (Issue #28) and F-01 to F-04, F-06 (draft contracts, Issue #30). The five system checks for NFR-05 to NFR-09 (TC-47, TC-48, TC-50, TC-51, TC-52) have AC-SYS.1 to AC-SYS.5 in `docs/sprints/sprint-1/README.md` (Issue #8). Sprint 2 and 3 rows have none by design.
-- Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Template create and view checks have passed for Issue #36 on `5435e89`, including TC-47/48 on the template list and new form at 375px and 1280px. F-04 tests (TC-12, TC-13 with the edit-versus-goal race, TC-18, TC-71, TC-72, TC-73, and TC-47/48 on the edit form) pass locally for Issue #53 on `3d1ccbb`, and TC-08 now audits `PATCH /api/templates/:id`; teammate review is pending. The Sprint 2 retire refusal (TC-19) remains planned. TC-08 independently discovers implemented API routes from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Issue #36 adds `GET /api/templates` and `POST /api/templates` to that coverage. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
+- Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Template create and view checks have passed for Issue #36 on `5435e89`, including TC-47/48 on the template list and new form at 375px and 1280px. F-04 tests (TC-12, TC-13 with the edit-versus-goal race, TC-18, TC-71, TC-72, TC-73, and TC-47/48 on the edit form) pass locally for Issue #53 on `3d1ccbb`, and TC-08 now audits `PATCH /api/templates/:id`; teammate review is pending. TC-08 independently discovers implemented API routes from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Issue #36 adds `GET /api/templates` and `POST /api/templates` to that coverage. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
 - `GET /api/ready` answering 503 when the database cannot be reached (F-02 section 5, SDS 4.4) has an automated test, `server/test/ready.test.js`, added in Issue #48. It has no TC number because no planned test covers it; no new TC was added in Issue #48 (projectnewy left the choice to the worker, who kept the numbering unchanged); the reviewer may ask for one. The 503 behavior already existed, so that test passed the first time it ran.
-- FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
-- The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
+- FR-08 and the FR-23 retire refusal (F-05, Issue #152): TC-14, TC-15, TC-19, TC-140 to TC-143 pass locally ([evidence](template-retire-implementation-evidence.md)); teammate review is pending.
+- The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have AC and test IDs in the Sprint 2 contracts of Issue #151. Issue #156: TC-37, TC-40, TC-49 (the automated part; phittayanan recorded the markup review in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185), TC-117, TC-123, TC-124, TC-125, TC-126, the List step of TC-110 and TC-47/TC-48 on the List pass locally ([evidence](colours-list-implementation-evidence.md)); phittayanan approved 8cf2ee2 in the PR #185 review. After #154 merged, TC-122 and the calendar colour step of F-13 AC-13.9 (in TC-150) were added in #156 and pass. The template kind (ADR 0064) is built in Issue #168, before #155.
+- Issue #168: TC-118, TC-119, TC-127, TC-128, TC-129 and TC-131 pass locally ([evidence](template-kind-implementation-evidence.md)); teammate review is pending.
+- FR-20 and FR-21 have AC and test IDs in the Sprint 3 contracts of Issue #157; none of those tests is written yet. TC-162 waits for F-13 (#154) and TC-165 for F-11 (#155). F-16 has no code Issue yet.
+- FR-17 (F-13, Issue #154): TC-38 (API and unit), TC-144 to TC-148 (`server/test/entry-edit.test.js`) and TC-149 to TC-151 (`client/test/entry-edit.spec.js`, 375 px and 1280 px) are written and pass; TC-08 audits `PATCH` and `DELETE /api/goals/:id/entries/:entryId`. Results and the tested commit are in the #154 PR. The calendar colour step of AC-13.9 is not run: F-12 (#156) is not merged; TC-122 (F-12) can use these routes once #154 merges. Issue #156 then ran TC-122 and added the calendar colour step to TC-150; both pass.
+- FR-18 (F-14, Issue #153): TC-39 (`server/test/progress-rules.test.js`), TC-152 to TC-155 and TC-157 (`server/test/goal-change.test.js`), TC-156 (`server/test/goal-target-migration.test.js`), TC-158 and TC-159 (`client/test/goal-change.spec.js`, 375 px and 1280 px) are written and pass; results and the tested commit are in the #153 PR. TC-154 (d) (whole minutes on a `TIME` goal) and the "= 7 h" hint (TC-158, `TIME` part) were added after #168 merged, in the same PR (ADR 0093). TC-123 (F-12) can now use the target versions.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.
 
 ## Approved Changes
@@ -183,3 +245,10 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | 2026-11-07 | FR-23 added: a Participant's request to create, edit or retire a template is refused with 403 and changes nothing | FR-23, BR-09 | phittayanan and projectnewy (PR #21 review) |
 | 2026-11-07 | No streak in the Sprint 2 side panel (number box only); the streak comes in Sprint 3 (FR-20, ADR 0021). A-4 decided: a goal's daily target is above 0 and not above the template's maximum | FR-15, F-11, FR-20, F-16, A-4 | phittayanan and projectnewy (PR #23 review, PR #25) |
 | 2026-11-27 | Lab 7: BR-04 changes from one entry per goal per day to several entries with a day total not above the template maximum; BR-07 judges the day total (ADR 0061) | BR-04, BR-07, FR-11, FR-12, F-08, F-09 | projectnewy decided (Issue #139); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | Sprint 2 calendar contracts: template kind Count or Time (Time in whole minutes); phone centre box and kind inputs; month arrows, Monday first; colour edge cases with today live; List grouped by day; one `GET /api/calendar` endpoint (`GET /api/entries?month` dropped). ADR 0063 to ADR 0072. After the PR #167 review: first page `/calendar` with the goals page kept (ADR 0073); nothing saved at +0 by the counter or bar (ADR 0074); Time in hours and minutes on every screen (ADR 0065) | FR-05, FR-07, FR-10, FR-11, FR-15, FR-16, FR-19, BR-15; F-03, F-04, F-07, F-08, F-11, F-12, F-15 | phittayanan (Issue #151); projectnewy agreed to ADR 0064 in the [review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343); the rest pending (PR review) |
+| 2026-11-27 | Sprint 2 rules contracts: permanent retire; value-only entry edit, delete with confirmation, controls on the goals page and day box, day cap on edit and delete; target change for goals not ended, in a new `GoalTarget` table with `daily_target` kept. ADR 0075 to ADR 0084 | FR-08, FR-17, FR-18, BR-04, BR-07, BR-11, BR-12; F-03 to F-09, F-11, F-13, F-14 | projectnewy (Issue #150); phittayanan agreed in the [review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171 |
+| 2026-11-27 | Issue #153: target versions are deleted with their goal (ADR 0092); the `TIME` whole-minutes check of a target change joins the #153 PR after #168 merges (ADR 0093) | FR-18, F-14 | phittayanan chose both; projectnewy agreed in the [review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176 |
+| 2026-11-27 | Sprint 3 contracts: one removable reminder per goal that has not ended, on the goals page; no current streak for an ended goal; current streak on the goals page and today's calendar cards; goal detail page as a short summary. ADR 0086 to ADR 0091 | FR-20, FR-21, BR-13, BR-14; F-16, F-17 | projectnewy (Issue #157); phittayanan agreed in the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219) of PR #174 |
+| 2026-11-27 | Issue #155: F-11 returns `state: null` and shows no day colour, sign or chip; Issue #156 builds them (F-12). TC-117 and the List step of TC-110 run in #156 (ADR 0097) | FR-15, FR-16; F-11, F-12, F-15; AC-11.10, AC-11.11 | phittayanan (Issue #155); projectnewy pending (PR review) |
+| 2026-11-27 | Issue #154: an unsaved entry edit in the day box asks "Discard the edit to …?" only when the value changed (ADR 0101, F-13 OP-13.4) | FR-17; F-13; AC-13.9; TC-150 | phittayanan (Issue #154); projectnewy pending (PR review) |
+| 2026-11-27 | Issue #156: "+ New goal" also above the calendar (ADR 0102); the desktop panel stays with the List (ADR 0103); a List day with no entry shows only "No entries" (ADR 0104); the chosen day is marked by a thick border (ADR 0105) | FR-16, FR-19, FR-10; F-12, F-15; AC-12.4, AC-15.1 to AC-15.3 | projectnewy (Issue #156); phittayanan agreed in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185 |

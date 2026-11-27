@@ -54,7 +54,7 @@ Intervening development, `v1.0` to `v1.4` (`git diff --stat v1.0 origin/staging 
 | Login and roles (F-01, F-02, F-10 rules) | Not applicable: no entry rule is involved |
 | Seed and configuration | Not applicable: the seed creates no entries, and no environment variable changes |
 | Sprint 2 and 3 plans | FR-17 must keep the day total within the maximum; FR-15's one number box per goal must allow several entries; streaks (BR-13) use "day met", which now means the day total |
-| Past evidence | Lab 5 and Lab 6 records and UAT cases describe the old rule as tested at that time. They are not edited. UAT-02 and UAT-03 mention the one-entry rule, so running them again against the new release needs revised expected results |
+| Past evidence | Lab 5 and Lab 6 records and UAT cases describe the old rule as tested at that time. They are not edited. UAT-02 step C9 expects the one-entry message; on the new release the same input (8 then 9, maximum 12) is still refused, with "Only 4 glasses left for today.", so its expected message needs revising. UAT-03 has no step that depends on the one-entry rule (corrected in Issue #142 after projectnewy's review of PR #163) |
 
 ## 4. Behaviour that must not change, and what protects it
 

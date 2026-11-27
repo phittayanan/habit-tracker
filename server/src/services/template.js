@@ -5,7 +5,13 @@ const nameMessage = 'Name must be 1 to 100 characters.';
 const unitMessage = 'Unit must be 1 to 30 characters.';
 const minMessage = 'Minimum must be a number with at most 2 decimal places.';
 const maxMessage = 'Maximum must be a number with at most 2 decimal places.';
-const fieldOrder = ['name', 'unit', 'minValue', 'maxValue'];
+const kindMessage = 'Kind must be Count or Time.';
+const wholeMessage = 'Minimum and maximum must be whole minutes.';
+const fieldOrder = ['name', 'unit', 'minValue', 'maxValue', 'kind'];
+const kind = z.enum(['COUNT', 'TIME'], { error: kindMessage });
+// A Time template is stored in whole minutes (ADR 0065).
+const wholeRange = (minValue, maxValue) => Number.isInteger(minValue) && Number.isInteger(maxValue);
+const notWhole = { ok: false, status: 400, code: 'VALIDATION_ERROR', message: wholeMessage };
 
 export function minimumBelowMaximum(minValue, maxValue) {
   return minValue < maxValue;
@@ -28,14 +34,18 @@ const createBody = z.object({
   unit: text(unitMessage, 30),
   minValue: decimal(minMessage),
   maxValue: decimal(maxMessage),
+  kind: kind.default('COUNT'),
 });
 
 export function parseTemplateCreate(body) {
-  const parsed = createBody.safeParse(body ?? {});
+  // A Time template's unit is always "minutes": whatever unit was sent is replaced (F-03 section 3).
+  const input = body?.kind === 'TIME' ? { ...body, unit: 'minutes' } : body;
+  const parsed = createBody.safeParse(input ?? {});
   if (!parsed.success) {
     const issue = [...parsed.error.issues].sort((left, right) => fieldOrder.indexOf(String(left.path[0])) - fieldOrder.indexOf(String(right.path[0])))[0];
     return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: issue.message };
   }
+  if (parsed.data.kind === 'TIME' && !wholeRange(parsed.data.minValue, parsed.data.maxValue)) return notWhole;
   if (!minimumBelowMaximum(parsed.data.minValue, parsed.data.maxValue)) {
     return { ok: false, status: 400, code: 'MIN_NOT_BELOW_MAX', message: 'Minimum must be below maximum.' };
   }
@@ -47,6 +57,7 @@ const editBody = z.object({
   unit: text(unitMessage, 30).optional(),
   minValue: decimal(minMessage).optional(),
   maxValue: decimal(maxMessage).optional(),
+  kind: kind.optional(),
 });
 const emptyEditMessage = 'Change at least one of name, unit, minimum or maximum.';
 const largestId = 2147483647;
@@ -55,21 +66,40 @@ export function mergedRangeAllowed(stored, sent) {
   return minimumBelowMaximum(sent.minValue ?? stored.minValue, sent.maxValue ?? stored.maxValue);
 }
 
+const invalid = message => ({ ok: false, status: 400, code: 'VALIDATION_ERROR', message });
+
+export function parseTemplateId(idText) {
+  return /^[1-9]\d*$/.test(idText) ? { ok: true, id: Number(idText) } : invalid('Template id must be a positive whole number.');
+}
+
 export function parseTemplateEdit(idText, body) {
-  const fail = message => ({ ok: false, status: 400, code: 'VALIDATION_ERROR', message });
-  if (!/^[1-9]\d*$/.test(idText)) return fail('Template id must be a positive whole number.');
+  const target = parseTemplateId(idText);
+  if (!target.ok) return target;
   const parsed = editBody.safeParse(body ?? {});
   if (!parsed.success) {
     const issue = [...parsed.error.issues].sort((left, right) => fieldOrder.indexOf(String(left.path[0])) - fieldOrder.indexOf(String(right.path[0])))[0];
-    return fail(issue.path.length ? issue.message : emptyEditMessage);
+    return invalid(issue.path.length ? issue.message : emptyEditMessage);
   }
   const data = Object.fromEntries(fieldOrder.filter(field => parsed.data[field] !== undefined).map(field => [field, parsed.data[field]]));
-  if (Object.keys(data).length === 0) return fail(emptyEditMessage);
-  return { ok: true, id: Number(idText), data };
+  if (Object.keys(data).length === 0) return invalid(emptyEditMessage);
+  return { ok: true, id: target.id, data };
 }
 
 const nameExists = { ok: false, status: 409, code: 'TEMPLATE_NAME_EXISTS', message: 'A template with this name already exists.' };
 const notFound = { ok: false, status: 404, code: 'TEMPLATE_NOT_FOUND', message: 'Template not found.' };
+const retired = message => ({ ok: false, status: 409, code: 'TEMPLATE_RETIRED', message });
+
+// F-05: permanent (ADR 0078), for any active template, used or not. The row lock is the one goal
+// creation takes, so a goal is either created first and continues, or is refused.
+export async function retireTemplate(db, id) {
+  if (id > largestId) return notFound;
+  return db.$transaction(async tx => {
+    const [row] = await tx.$queryRaw`SELECT state::text AS state FROM "Template" WHERE id = ${id} FOR UPDATE`;
+    if (!row) return notFound;
+    if (row.state === 'RETIRED') return retired('This template is already retired.');
+    return { ok: true, template: toTemplate(await tx.template.update({ where: { id }, data: { state: 'RETIRED' } })) };
+  });
+}
 
 // F-04 OP-04.4: lock the template row first, as goal creation (F-07) does, so a goal
 // cannot be created between the in-use check and the update.
@@ -77,15 +107,19 @@ export async function editTemplate(db, id, data) {
   if (id > largestId) return notFound;
   try {
     return await db.$transaction(async tx => {
-      const [row] = await tx.$queryRaw`SELECT id, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${id} FOR UPDATE`;
+      const [row] = await tx.$queryRaw`SELECT id, kind::text AS kind, state::text AS state, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${id} FOR UPDATE`;
       if (!row) return notFound;
+      if (row.state === 'RETIRED') return retired('This template is retired and cannot be edited.');
       if (await tx.goal.count({ where: { templateId: id } }) > 0) {
         return { ok: false, status: 409, code: 'TEMPLATE_IN_USE', message: 'This template is used by a goal and cannot be edited.' };
       }
+      const isTime = (data.kind ?? row.kind) === 'TIME';
+      if (isTime && !wholeRange(data.minValue ?? Number(row.minValue), data.maxValue ?? Number(row.maxValue))) return notWhole;
       if (!mergedRangeAllowed({ minValue: Number(row.minValue), maxValue: Number(row.maxValue) }, data)) {
         return { ok: false, status: 400, code: 'MIN_NOT_BELOW_MAX', message: 'Minimum must be below maximum.' };
       }
       const changes = { ...data };
+      if (isTime) changes.unit = 'minutes';
       if (changes.minValue !== undefined) changes.minValue = changes.minValue.toFixed(2);
       if (changes.maxValue !== undefined) changes.maxValue = changes.maxValue.toFixed(2);
       return { ok: true, template: toTemplate(await tx.template.update({ where: { id }, data: changes })) };
@@ -104,6 +138,7 @@ export function toTemplate(row) {
     minValue: Number(row.minValue.toString()),
     maxValue: Number(row.maxValue.toString()),
     state: row.state,
+    kind: row.kind,
   };
 }
 
@@ -118,7 +153,7 @@ export async function listTemplates(db, user) {
 export async function createTemplate(db, user, data) {
   try {
     const row = await db.template.create({ data: {
-      name: data.name, unit: data.unit, createdBy: user.id,
+      name: data.name, unit: data.unit, kind: data.kind, createdBy: user.id,
       minValue: data.minValue.toFixed(2), maxValue: data.maxValue.toFixed(2),
     } });
     return { ok: true, template: toTemplate(row) };

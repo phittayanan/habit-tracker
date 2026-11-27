@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from './api.js';
+import { amountText, minutesHint } from './time-format.js';
+import { DeleteAsk, deleteEntry, editEntry } from './entry-edit.jsx';
 export function bangkokToday(instant = new Date()) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(instant);
 }
@@ -17,13 +19,14 @@ function byDay(entries) {
   return days;
 }
 // Whole hundredths add exactly; values have at most 2 decimal places.
-const dayTotal = entries => String(entries.reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100);
+const dayTotal = entries => entries.reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100;
 function EntryPanel({ goal, onUnauthenticated, onSaved }) {
   const [entries, setEntries] = useState(null);
   const [entryDate, setEntryDate] = useState(() => bangkokToday());
   const [value, setValue] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const valueRef = useRef(null);
   useEffect(() => {
     let active = true;
     api(`/api/goals/${goal.id}/entries`, {}, onUnauthenticated).then(body => { if (active) setEntries(body.entries); }).catch(error => { if (active) setMessage(error.message); });
@@ -43,18 +46,120 @@ function EntryPanel({ goal, onUnauthenticated, onSaved }) {
     } catch (error) { setMessage(error.message); }
     finally { setBusy(false); }
   }
-  return <form className="entry-form" onSubmit={save} noValidate aria-label={`Entries for ${goal.template.name}`}>
-    <label>Date<input name="entryDate" type="date" value={entryDate} onChange={event => setEntryDate(event.target.value)} /></label>
-    <label>Value ({goal.template.unit})<input name="value" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} /></label>
-    <button type="submit" disabled={busy}>Save entry</button>
-    {message && <p role="alert" className="error">{message}</p>}
+  // F-13: the edited entry keeps its place (OP-13.2); a deleted one leaves the list.
+  const replace = entry => setEntries(list => list.map(item => (item.id === entry.id ? entry : item)));
+  const drop = id => setEntries(list => list.filter(item => item.id !== id));
+  return <div className="entry-panel">
+    <form className="entry-form" onSubmit={save} noValidate aria-label={`Entries for ${goal.template.name}`}>
+      <label>Date<input name="entryDate" type="date" value={entryDate} onChange={event => setEntryDate(event.target.value)} /></label>
+      <label>Value ({goal.template.unit})<input ref={valueRef} name="value" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} /></label>
+      {goal.template.kind === 'TIME' ? <p className="time-hint">{minutesHint(value)}</p> : null}
+      <button type="submit" disabled={busy}>Save entry</button>
+      {message && <p role="alert" className="error">{message}</p>}
+    </form>
     {entries === null && !message ? <p role="status">Loading…</p> : null}
     {entries?.length === 0 ? <p>No entries yet</p> : null}
     {entries?.length > 0 ? <ul className="entry-list">{byDay(entries).map(day => <li key={day.date}>
-      <ul>{day.entries.map(entry => <li key={entry.id}>{entry.entryDate}: {entry.value} {goal.template.unit}</li>)}</ul>
-      <p className="day-total">Day total: {dayTotal(day.entries)} {goal.template.unit}</p>
+      <ul>{day.entries.map(entry => <EntryRow key={entry.id} goal={goal} entry={entry} onUnauthenticated={onUnauthenticated}
+        onEdited={entry => { replace(entry); onSaved?.(); }} onDeleted={() => { drop(entry.id); valueRef.current?.focus(); onSaved?.(); }} />)}</ul>
+      <p className="day-total">Day total: {amountText(dayTotal(day.entries), goal.template)}</p>
     </li>)}</ul> : null}
-  </form>;
+  </div>;
+}
+// F-13 section 6 on the goals page: "Edit" opens a number box in place; "Delete" asks first (ADR 0082).
+function EntryRow({ goal, entry, onUnauthenticated, onEdited, onDeleted }) {
+  const [editing, setEditing] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const [value, setValue] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const editRef = useRef(null);
+  const deleteRef = useRef(null);
+  const inputRef = useRef(null);
+  const refocus = useRef(null);
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+  useEffect(() => { if (refocus.current) { refocus.current.current?.focus(); refocus.current = null; } });
+  const what = `${amountText(entry.value, goal.template)} on ${entry.entryDate}`;
+  const inputId = `entry-${entry.id}-value`;
+  function stop(focus = editRef) { setEditing(false); setMessage(''); refocus.current = focus; }
+  async function save(event) {
+    event.preventDefault(); if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      const body = await editEntry(goal.id, entry.id, value.trim() === '' ? undefined : Number(value), onUnauthenticated);
+      stop();
+      onEdited(body.entry);
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  async function remove() {
+    if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      await deleteEntry(goal.id, entry.id, onUnauthenticated);
+      setAsking(false);
+      onDeleted();
+    } catch (error) { setAsking(false); setMessage(error.message); refocus.current = deleteRef; setBusy(false); }
+  }
+  return <li className="entry-row">
+    <span className="entry-text">{entry.entryDate}: {amountText(entry.value, goal.template)}</span>
+    {editing ? <form className="entry-edit" onSubmit={save} noValidate>
+      <label htmlFor={inputId}>New value ({goal.template.unit})</label>
+      <input id={inputId} ref={inputRef} type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)}
+        aria-invalid={message ? true : undefined} aria-describedby={message ? `${inputId}-error` : undefined} />
+      {goal.template.kind === 'TIME' ? <p className="time-hint">{minutesHint(value)}</p> : null}
+      <div className="entry-actions">
+        <button type="submit" disabled={busy}>Save</button>
+        <button type="button" disabled={busy} onClick={() => stop()}>Cancel</button>
+      </div>
+    </form> : <div className="entry-actions">
+      <button type="button" ref={editRef} aria-label={`Edit ${what}`} onClick={() => { setValue(String(entry.value)); setMessage(''); setEditing(true); }}>Edit</button>
+      <button type="button" ref={deleteRef} aria-label={`Delete ${what}`} onClick={() => { setMessage(''); setAsking(true); }}>Delete</button>
+    </div>}
+    {message && <p id={`${inputId}-error`} role="alert" className="error">{message}</p>}
+    {asking ? <DeleteAsk text={what} busy={busy} onDelete={remove} onCancel={() => { setAsking(false); refocus.current = deleteRef; }} /> : null}
+  </li>;
+}
+// F-14 (ADR 0084): change the daily target in place on the goals page, for a goal that has not ended.
+function TargetChange({ goal, onUnauthenticated, onSaved }) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const buttonRef = useRef(null);
+  const inputRef = useRef(null);
+  useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
+  function show() { setValue(String(goal.dailyTarget)); setMessage(''); setOpen(true); }
+  function close() { setOpen(false); setMessage(''); buttonRef.current?.focus(); }
+  async function save(event) {
+    event.preventDefault(); if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      await api(`/api/goals/${goal.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        dailyTarget: value.trim() === '' ? undefined : Number(value),
+      }) }, onUnauthenticated);
+      // Reload the list so the target and "N of M days met" are recomputed by the server.
+      await onSaved?.();
+      close();
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  const notStarted = goal.startDate > bangkokToday();
+  const inputId = `target-${goal.id}`;
+  return <div className="target-change">
+    <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${inputId}-form` : undefined} onClick={() => (open ? close() : show())}>Change target</button>
+    {open ? <form id={`${inputId}-form`} className="target-form" onSubmit={save} noValidate aria-label={`Change target for ${goal.template.name}`}>
+      <label htmlFor={inputId}>New daily target ({goal.template.unit})</label>
+      <input id={inputId} ref={inputRef} name="dailyTarget" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} aria-invalid={message ? true : undefined} aria-describedby={[goal.template.kind === 'TIME' && minutesHint(value) ? `${inputId}-hint` : '', `${inputId}-note`, message ? `${inputId}-error` : ''].filter(Boolean).join(' ')} />
+      {goal.template.kind === 'TIME' ? <p id={`${inputId}-hint`} className="time-hint">{minutesHint(value)}</p> : null}
+      <p id={`${inputId}-note`}>{notStarted ? `Applies from ${goal.startDate}.` : 'Applies from today. Earlier days keep their target.'}</p>
+      <div className="form-actions">
+        <button type="submit" disabled={busy}>Save</button>
+        <button type="button" onClick={close}>Cancel</button>
+      </div>
+      {message && <p id={`${inputId}-error`} role="alert" className="error">{message}</p>}
+    </form> : null}
+  </div>;
 }
 export function GoalList({ navigate, onUnauthenticated }) {
   const [goals, setGoals] = useState(null);
@@ -69,8 +174,9 @@ export function GoalList({ navigate, onUnauthenticated }) {
     {goals === null && !message ? <p role="status">Loading…</p> : null}
     {goals?.length === 0 ? <p>No goals yet</p> : null}
     {goals?.length > 0 ? <ul className="goal-list">{goals.map(goal => <li key={goal.id}>
-      <h2>{goal.template.name}</h2>
-      <p>Daily target: {goal.dailyTarget} {goal.template.unit}</p>
+      <h2 id={`goal-${goal.id}-name`}>{goal.template.name}</h2>
+      <p>Daily target: {amountText(goal.dailyTarget, goal.template)}</p>
+      {goal.state === 'ACTIVE' ? <TargetChange goal={goal} onUnauthenticated={onUnauthenticated} onSaved={load} /> : null}
       <p>{goal.startDate} – {goal.endDate}</p>
       <p>{goal.state === 'ACTIVE' ? 'Active' : 'Ended'}</p>
       <p>{goal.progress.daysMet} of {goal.progress.daysSoFar} days met</p>
@@ -117,6 +223,7 @@ export function GoalForm({ navigate, onUnauthenticated }) {
       </select>
       <label>Daily target<input name="dailyTarget" type="number" step="any" inputMode="decimal" value={dailyTarget} onChange={event => setDailyTarget(event.target.value)} aria-describedby="goal-unit" /></label>
       <p id="goal-unit" className="goal-unit">{selected?.unit || ''}</p>
+      {selected?.kind === 'TIME' ? <p className="time-hint">{minutesHint(dailyTarget)}</p> : null}
       <label>Start date<input name="startDate" type="date" value={startDate} onChange={event => setStartDate(event.target.value)} /></label>
       <label>End date<input name="endDate" type="date" value={endDate} onChange={event => setEndDate(event.target.value)} /></label>
       <div className="form-actions">

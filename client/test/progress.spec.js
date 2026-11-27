@@ -12,7 +12,8 @@ const password = randomBytes(24).toString('base64url');
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const day = n => new Date(Date.parse(`${today()}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 const asDate = text => new Date(`${text}T00:00:00Z`);
-const restartPort = 33140;
+// The main test port plus 8, so one TEST_SERVER_PORT per worktree covers both servers (ADR 0098).
+const restartPort = Number(process.env.TEST_SERVER_PORT || 33132) + 8;
 const restartUrl = `http://127.0.0.1:${restartPort}`;
 const clientDir = fileURLToPath(new URL('..', import.meta.url));
 function startApp() {
@@ -40,7 +41,11 @@ async function login(page, username) {
   await page.getByLabel('Username', { exact: true }).fill(username);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
-  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/goals$/);
+  if (username === 'manager1') { await expect(page).toHaveURL(/\/templates$/); return; }
+  // ADR 0073 point 4: a Participant lands on /calendar and opens the goals page from the menu.
+  await expect(page).toHaveURL(/\/calendar$/);
+  await page.getByRole('link', { name: 'Goals', exact: true }).click();
+  await expect(page).toHaveURL(/\/goals$/);
 }
 const logout = async page => { await page.getByRole('button', { name: 'Log out' }).click(); await expect(page).toHaveURL(/\/login$/); };
 

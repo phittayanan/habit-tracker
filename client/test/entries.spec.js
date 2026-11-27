@@ -22,6 +22,9 @@ async function login(page) {
   await page.getByLabel('Username', { exact: true }).fill('participant1');
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
+  // ADR 0073 point 4: a Participant lands on /calendar and opens the goals page from the menu.
+  await expect(page).toHaveURL(/\/calendar$/);
+  await page.getByRole('link', { name: 'Goals', exact: true }).click();
   await expect(page).toHaveURL(/\/goals$/);
 }
 const save = page => page.getByRole('button', { name: 'Save entry', exact: true });
@@ -66,7 +69,8 @@ test('TC-86: several entries of one day are listed newest saved first with the d
   }
   for (const reload of [false, true]) {
     if (reload) await page.reload();
-    await expect(page.locator('.entry-list li li')).toHaveText([`${today()}: 4.5 hours`, `${today()}: 3 hours`]);
+    // F-13 (#154): the entry text keeps its own element beside Edit and Delete.
+    await expect(page.locator('.entry-list .entry-text')).toHaveText([`${today()}: 4.5 hours`, `${today()}: 3 hours`]);
     await expect(page.getByText('Day total: 7.5 hours', { exact: true })).toBeVisible();
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
