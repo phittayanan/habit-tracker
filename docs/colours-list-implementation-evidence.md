@@ -1,6 +1,6 @@
 # Day colours and Calendar / List implementation evidence (Issue #156)
 
-Contracts: [F-12](sprints/sprint-2/F-12-day-colours.md) and [F-15](sprints/sprint-2/F-15-calendar-list.md), with ADR 0069 to ADR 0072 and ADR 0101 to ADR 0105. Run on Windows 11, Node.js 24.14.0, PostgreSQL 16.14 in a Docker container and a test database used only by this worktree, Playwright's Chromium, `TEST_SERVER_PORT=33170` and its own `PLAYWRIGHT_OUTPUT_DIR` (ADR 0098). Run by Claude Code; not run in CI at the time of writing.
+Contracts: [F-12](sprints/sprint-2/F-12-day-colours.md) and [F-15](sprints/sprint-2/F-15-calendar-list.md), with ADR 0069 to ADR 0072 and ADR 0102 to ADR 0105. Run on Windows 11, Node.js 24.14.0, PostgreSQL 16.14 in a Docker container and a test database used only by this worktree, Playwright's Chromium, `TEST_SERVER_PORT=33170` and its own `PLAYWRIGHT_OUTPUT_DIR` (ADR 0098). Run by Claude Code; not run in CI at the time of writing.
 
 ## Before the change
 
@@ -9,16 +9,22 @@ Contracts: [F-12](sprints/sprint-2/F-12-day-colours.md) and [F-15](sprints/sprin
 - Browser tests committed in 3fb2076, before any code: `day-colours.spec.js` and `calendar.spec.js` gave 19 failed, 23 passed, 6 skipped. The new case "a day with no counted goal shows no sign chip" passed already, because there was no chip at all.
 - ef022dc changes one new test after the first run against the new code: the failed month read was mocked as 500, for which `client/src/api.js` shows its general message, so it is now a 400 with an API message. The app code did not change for this.
 
+## Update from `staging` after #154 merged
+
+#184 (entry edit and delete) merged into `staging` first. The branch merged `staging` (conflicts in `client/src/calendar.jsx` and this Issue's traceability rows, both sides kept). #184 had used ADR 0101, so this Issue's ADRs became 0102 to 0105, and the decision to open this PR before #154 was removed as no longer true (projectnewy). The ADR numbers in the commit messages made before the renumbering are the old ones.
+
+Then TC-122 was added to `calendar.test.js`, and the calendar colour step of F-13 AC-13.9 to TC-150 in `entry-edit.spec.js`, whose day locators now accept the state words. TC-122 and the colour step passed with no new app code, because the state is computed on every read; they have no red run of their own. In the first run the new colour lines had been put in TC-149 by mistake, and TC-149 failed at both widths (118 passed, 2 failed, 6 skipped); they were moved to TC-150.
+
 ## After the change
 
-Tested code commit: 4395185 (later commits change documents only).
+Tested commit: 51d4ca7 (later commits change documents only).
 
 | Command | Result |
 |---|---|
-| `npm test` in `server/` | 143 tests, 143 pass, 0 fail, 0 skipped |
-| `npx playwright test` in `client/` | 114 passed, 6 skipped, 0 failed |
+| `npm test` in `server/` | 151 tests, 151 pass, 0 fail, 0 skipped |
+| `npx playwright test` in `client/` | 120 passed, 6 skipped, 0 failed |
 
-The 6 skipped cases are width-specific: the 5 of #155, and the ADR 0102 case, which runs at 1280 px only.
+The 6 skipped cases are width-specific: the 5 of #155, and the ADR 0103 case, which runs at 1280 px only. Before the update, on 4395185: server 143 of 143; browser 114 passed, 6 skipped.
 
 ## AC results
 
@@ -27,7 +33,7 @@ The 6 skipped cases are width-specific: the 5 of #155, and the ADR 0102 case, wh
 | AC-12.1 | TC-37 (`day-state-rules.test.js`: the 8 cases of F-12 section 4, and 3 more) | pass |
 | AC-12.2 | TC-49 (three cases in `day-colours.spec.js`) | the automated part passes at 375 and 1280 px; **the reviewer's markup review is still to be recorded in the PR review** |
 | AC-12.3, AC-12.6 | TC-117 (`day-colours.spec.js`), TC-124 (`calendar.test.js`) | pass |
-| AC-12.4 | TC-122 | **not run, waits for F-13 (#154)** (ADR 0104) |
+| AC-12.4, and F-13 AC-13.9 (calendar colour) | TC-122 (`calendar.test.js`), TC-150 colour step (`entry-edit.spec.js`) | pass |
 | AC-12.5 | TC-123 unit (`day-state-rules.test.js`) and API (`calendar.test.js`) | pass |
 | AC-15.1, AC-15.4 | TC-40 (`day-colours.spec.js`), TC-110 List step (`calendar.spec.js`) | pass |
 | AC-15.2, AC-15.3 | TC-125 (two cases) | pass |
@@ -35,7 +41,7 @@ The 6 skipped cases are width-specific: the 5 of #155, and the ADR 0102 case, wh
 | AC-15.6 | TC-121 (`calendar.test.js`); TC-125 also gives another Participant an entry that must not show | pass |
 | AC-15.1 to AC-15.4, keyboard and width | TC-47/TC-48 on the List (`day-colours.spec.js`): the switch with Enter and Space, both month arrows, no horizontal scroll | pass at 375 and 1280 px |
 | F-15 section 4 | Failed month read: the API message shows and the switch still works | pass |
-| ADR 0102, ADR 0105 | Panel stays with the List and a save updates it (1280 px); the chosen day keeps its colour with a 3 px border | pass |
+| ADR 0103, ADR 0105 | Panel stays with the List and a save updates it (1280 px); the chosen day keeps its colour with a 3 px border | pass |
 
 ## Changes to earlier tests
 
@@ -59,4 +65,6 @@ Also changed, with no test of its own: today's day button now shows the usual fo
 |---|---|---|---|---|
 | ![](sprints/sprint-2/img/f12-built-1280-calendar.png) | ![](sprints/sprint-2/img/f15-built-1280-list.png) | ![](sprints/sprint-2/img/f12-built-375-calendar.png) | ![](sprints/sprint-2/img/f12-built-375-box.png) | ![](sprints/sprint-2/img/f15-built-375-list.png) |
 
-Not done: TC-122; no deploy; no run in CI; not checked by a person with a screen reader. No separate AI review of the branch was run before this file was written.
+The screenshots were taken before the update from `staging`, so the day box in them has no F-13 Edit and Delete buttons.
+
+Not done: no deploy; no run in CI; not checked by a person with a screen reader. No separate AI review of the branch was run before this file was written.
