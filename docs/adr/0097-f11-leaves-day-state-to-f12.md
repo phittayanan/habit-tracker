@@ -4,7 +4,7 @@ Status: chosen by phittayanan on 2026-11-27 in the session for [Issue #155](http
 
 ## Context
 
-The F-11 contract (Issue #151) puts the F-12 day state in `GET /api/calendar` (`state`), the state chip in the day box and panel, TC-117 (the colour changes after a save) and a List step in TC-110. The state rule, the colours, the signs and the List are F-12 and F-15, built in Issue #156, which projectnewy owns.
+The F-11 contract (Issue #151) puts the F-12 day state in `GET /api/calendar` (`state`), the day's sign in the day box and panel (section 2 step 6), TC-117 (the colour changes after a save) and a List step in TC-110. The state rule, the colours, the signs and the List are F-12 and F-15, built in Issue #156, which projectnewy owns.
 
 ## Decision
 

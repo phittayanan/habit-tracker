@@ -65,7 +65,7 @@ The calendar read is `GET /api/calendar` (section 7). Checks run in this order (
 
 A month after the current month is not an error: every day has `state` `null` and no goals (the UI never asks for it, ADR 0068).
 
-Saving uses F-08's checks and messages unchanged, plus the Time rule (F-08 revision): a fraction of a minute gets `400 VALIDATION_ERROR` "Minutes must be a whole number." A rejected save shows the API `message` in the goal's card and keeps the chosen amount.
+Saving uses F-08's checks and messages unchanged, plus the Time rule (F-08 revision): a fraction of a minute gets `400 VALIDATION_ERROR` "Minutes must be a whole number." A rejected save shows the API `message` in the goal's card and keeps the chosen amount. In the "Exact" row a Minutes value that is not a whole number from 0 to 59 is not sent: the card shows "Minutes must be 0 to 59." and keeps the typed values (phittayanan, Issue #155).
 
 Boundaries: the + button and the bar cannot go past what still fits (`maxValue` minus the stored day total); when nothing fits, Check in is not offered and the card says "{Day} is full ({max} {unit})." (F-08 OP-08.14 wording). The − button cannot go below +0, and at +0 Done and Check in are disabled (ADR 0074). A day equal to a goal's start or end date lists that goal.
 
@@ -199,4 +199,5 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): first page `/calendar` and the Sprint 1 goals page kept (ADR 0073; sections 2, 3, 5, 9, 10, 12; AC-11.13, TC-130); Done and Check in disabled at +0 (ADR 0074; AC-11.6, AC-11.7, TC-113); projectnewy's agreement to ADR 0064 | pending (reviewer projectnewy) |
 | 2026-11-27 | Re-check of PR #167 ([review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): the Sprint 1 test steps that change for `/calendar` (ADR 0073 point 4; section 2, section 3, AC-11.13, TC-130, OP-11.13) | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #150: F-13 controls in the card (OP-11.10) and the F-13 and F-14 controls on the goals page (section 3; ADR 0081, ADR 0084) | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #155, independent check: the Minutes box takes 0 to 59, with the message "Minutes must be 0 to 59." (section 4) | phittayanan; projectnewy in the #155 PR review |
 | 2026-11-27 | Issue #155: the day state, colour, sign and chip are built in #156; `state` is `null` until then; TC-117 and TC-110's List step wait for #156 (ADR 0097; sections 1, 7, 10, 12) | phittayanan; projectnewy in the #155 PR review |
