@@ -1,4 +1,4 @@
--- F-17 (Issue #158, ADR 0086, ADR 0095): one stored reminder per goal in a new table. Additive: no existing table or row changes.
+-- F-17 (Issue #158, ADR 0086, ADR 0099): one stored reminder per goal in a new table. Additive: no existing table or row changes.
 -- A previous app version still runs on this schema: it ignores "GoalReminder".
 CREATE TABLE "GoalReminder" (
   "goal_id" INTEGER NOT NULL,
@@ -10,6 +10,6 @@ CREATE TABLE "GoalReminder" (
   -- At least one weekday, each one of MON to SUN (F-17 section 3).
   CONSTRAINT "GoalReminder_weekdays_present" CHECK (cardinality("weekdays") >= 1),
   CONSTRAINT "GoalReminder_weekdays_known" CHECK ("weekdays" <@ ARRAY['MON','TUE','WED','THU','FRI','SAT','SUN']::TEXT[]),
-  -- ADR 0095: the reminder goes with its goal; Entry keeps ON DELETE RESTRICT.
+  -- ADR 0099: the reminder goes with its goal; Entry keeps ON DELETE RESTRICT.
   CONSTRAINT "GoalReminder_goal_id_fkey" FOREIGN KEY ("goal_id") REFERENCES "Goal"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

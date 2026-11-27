@@ -1,6 +1,6 @@
-# 0096. The calendar step of TC-43 waits for the calendar endpoint
+# 0100. The calendar step of TC-43 waits for the calendar endpoint
 
-Status: chosen by phittayanan on 2026-11-27 in the Claude Code session that started [Issue #158](https://github.com/phittayanan/habit-tracker/issues/158), from the proposal of Claude Code ("Yes, wait for #155"). Pending the reviewer, projectnewy, in the #158 PR.
+Status: chosen by phittayanan on 2026-11-27 in the Claude Code session that started [Issue #158](https://github.com/phittayanan/habit-tracker/issues/158), from the proposal of Claude Code ("Yes, wait for #155"). Pending the reviewer, projectnewy, in the #158 PR. Numbered 0095 and 0096 on the #158 branch at first; renumbered 0099 and 0100 after PR #179 (ADR 0095), PR #180 (ADR 0097) and PR #182 (ADR 0098) merged (ADR 0094 rule 4, ADR 0098).
 
 ## Decision
 

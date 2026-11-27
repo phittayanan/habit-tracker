@@ -85,7 +85,7 @@ model GoalTarget {
   @@unique([goalId, effectiveFrom])
 }
 
-// F-17 stored reminder (ADR 0086, ADR 0095): at most one per goal, deleted with its goal. Nothing is sent (BR-14).
+// F-17 stored reminder (ADR 0086, ADR 0099): at most one per goal, deleted with its goal. Nothing is sent (BR-14).
 model GoalReminder {
   goalId   Int      @id @map("goal_id")
   goal     Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)

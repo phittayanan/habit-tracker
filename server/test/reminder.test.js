@@ -91,7 +91,7 @@ test('TC-43: a stored reminder is returned Monday first, survives a restart, rid
     const changed = await request(base).patch(`/api/goals/${w.id}`).set('Cookie', cookies.a).send({ dailyTarget: 6 });
     assert.equal(changed.status, 200);
     assert.deepEqual(changed.body.goal.reminder, { time: '07:30', weekdays: ['MON', 'FRI'] }, 'the PATCH response carries W\'s reminder');
-    // ADR 0096: GET /api/calendar is built in #155; this step stays red until #155 is merged into this branch.
+    // ADR 0100: GET /api/calendar is built in #155; this step stays red until #155 is merged into this branch.
     const calendar = await request(base).get(`/api/calendar?month=${day(0).slice(0, 7)}`).set('Cookie', cookies.a);
     assert.equal(calendar.status, 200, 'GET /api/calendar (Issue #155) must exist');
     const dayD = calendar.body.days.find(entry => entry.date === day(0));
@@ -204,7 +204,7 @@ test('TC-172: anonymous 401, Manager 403, another Participant and an unknown id 
   }
 });
 
-test('ADR 0095: deleting a goal row deletes its reminder', async () => {
+test('ADR 0099: deleting a goal row deletes its reminder', async () => {
   await db.goalReminder.create({ data: { goalId: e.id, time: '22:00', weekdays: ['SAT'] } });
   await db.goal.delete({ where: { id: e.id } });
   assert.deepEqual(await rows(), []);

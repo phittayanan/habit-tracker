@@ -1,6 +1,6 @@
-# 0095. A goal's reminder is deleted with its goal
+# 0099. A goal's reminder is deleted with its goal
 
-Status: chosen by phittayanan on 2026-11-27 in the Claude Code session that started [Issue #158](https://github.com/phittayanan/habit-tracker/issues/158), from two options Claude Code proposed ("Yes, CASCADE"). Pending the reviewer, projectnewy (F-17 contract author), in the #158 PR.
+Status: chosen by phittayanan on 2026-11-27 in the Claude Code session that started [Issue #158](https://github.com/phittayanan/habit-tracker/issues/158), from two options Claude Code proposed ("Yes, CASCADE"). Pending the reviewer, projectnewy (F-17 contract author), in the #158 PR. Numbered 0095 and 0096 on the #158 branch at first; renumbered 0099 and 0100 after PR #179 (ADR 0095), PR #180 (ADR 0097) and PR #182 (ADR 0098) merged (ADR 0094 rule 4, ADR 0098).
 
 ## Decision
 
