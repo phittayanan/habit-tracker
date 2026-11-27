@@ -29,7 +29,7 @@ Every contract has the same 13 sections: identity and links, behaviour and workf
 | F-04 Template edit | [`F-04-template-edit.md`](F-04-template-edit.md) | FR-07, FR-23; BR-08 (edit part), BR-09 (edit refusal) | AC-04.1 to AC-04.7 (7) | TC-12, TC-13, TC-71, TC-72, TC-73, TC-18 | #30 / PR #31 | #53 / PR #54 |
 | F-06 Participant template view and write refusal | [`F-06-template-view.md`](F-06-template-view.md) | FR-09, FR-23; BR-09 | AC-06.1 to AC-06.3 (3) | TC-16, TC-17 | #30 / PR #31 | #36 / PR #37 |
 | F-07 Goal creation | [`F-07-goal.md`](F-07-goal.md) | FR-10; BR-05, BR-06 | AC-07.1 to AC-07.10 (10) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74 | #28 / PR #29, #38 / PR #39 | #40 / PR #41 |
-| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.18 (18) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89 | #139 (Lab 7 revision); #28 / PR #29, #38 / PR #39 | #42 / PR #43 |
+| F-08 Daily entry recording | [`F-08-entry.md`](F-08-entry.md) | FR-11; BR-01, BR-02, BR-03, BR-04, BR-06 | AC-08.1 to AC-08.19 (19) | TC-23, TC-24, TC-25, TC-26, TC-27, TC-28, TC-29, TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90 | #139 (Lab 7 revision); #28 / PR #29, #38 / PR #39 | #42 / PR #43 |
 | F-09 Progress (days met) | [`F-09-progress.md`](F-09-progress.md) | FR-12; BR-07 | AC-09.1 to AC-09.10 (10) | TC-31, TC-32, TC-59, TC-87, TC-88 | #28 / PR #29 | #44 / PR #51 |
 | F-10 Participant data privacy | [`F-10-privacy.md`](F-10-privacy.md) | FR-13, FR-14; BR-10; NFR-03 | AC-10.1 to AC-10.7 (7) | TC-33, TC-34, TC-35, TC-57 | #28 / PR #29 | #44 / PR #51 |
 
@@ -191,6 +191,7 @@ Every test of the nine contracts in one table (handout D1 §3.5: "Map all Sprint
 | TC-85 | AC-08.16 | The day-total rule is checked after validation, date and range rules | Unit and API |
 | TC-86 | AC-08.17 | The goals page lists several entries of a day with the day total | Browser |
 | TC-89 | AC-08.18 | The migration keeps existing entries and removes the unique index | API and database |
+| TC-90 | AC-08.19 | Negative values: only the upper limit is checked on the day total | API |
 
 #### F-09 Progress (days met)
 
@@ -262,11 +263,13 @@ Collected from section 13 of each contract. The rule: a contract is changed by a
 | 2026-11-07 | F-08 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
 | 2026-11-08 | F-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |
 | 2026-11-09 | F-08 | Issue #42 implementation evidence recorded in section 14 and `docs/entry-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
-| 2026-11-27 | F-08 | Lab 7 (Issue #139): several entries per day with a day-total maximum; AC-08.7 revised, AC-08.13 to AC-08.18; TC-29 and TC-61 revised, TC-82 to TC-86, TC-89 added | projectnewy (author); teammate review pending |
+| 2026-11-27 | F-08 | Lab 7 (Issue #139): several entries per day with a day-total maximum; AC-08.7 revised, AC-08.13 to AC-08.18; TC-29 and TC-61 revised, TC-82 to TC-86, TC-89 added | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | F-08 | Review of PR #143: day-total message wording; AC-08.19 and TC-90 | projectnewy (author); re-check by phittayanan pending |
 | 2026-11-07 | F-09 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-09 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
 | 2026-11-10 | F-09 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
-| 2026-11-27 | F-09 | Lab 7 (Issue #139): a day is met by its day total; AC-09.9, AC-09.10; TC-87, TC-88 | projectnewy (author); teammate review pending |
+| 2026-11-27 | F-09 | Lab 7 (Issue #139): a day is met by its day total; AC-09.9, AC-09.10; TC-87, TC-88 | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | F-09 | Review of PR #143: exactness example changed to 0.7 + 0.1 against 0.8; OP-09.4 | projectnewy (author); re-check by phittayanan pending |
 | 2026-11-07 | F-10 | First draft (Issue #28) | pending |
 | 2026-11-07 | F-10 | Review round 1 (PR #29): error codes added to every expected result, "ignored" changed to "stripped" with OP-10.3, menu wording corrected | pending (partner re-check) |
 | 2026-11-10 | F-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
@@ -319,4 +322,4 @@ The checklist item in Issue #8 ("each Sprint 1 feature gets its own Feature Issu
 |---|---|---|
 | 2026-11-08 | First draft (Issue #8) | pending |
 | 2026-11-08 | Review round 1 (PR #35): the contract index no longer has carriage returns in its titles, so it renders as nine rows of seven cells (checked in GitHub's rendered view); Product Definition of Done item 4 follows the five agreed build groups; TC-47 uses `document.documentElement.scrollWidth` and `window.innerWidth` | pending (partner re-check) |
-| 2026-11-27 | Lab 7 (Issue #139): contract index, error codes, data contracts and test specification updated for ADR 0061. The "Implementation status" section describes Sprint 1 as built; the Lab 7 change is not yet implemented | projectnewy (author); teammate review pending |
+| 2026-11-27 | Lab 7 (Issue #139): contract index, error codes, data contracts and test specification updated for ADR 0061. The "Implementation status" section describes Sprint 1 as built; the Lab 7 change is not yet implemented | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |

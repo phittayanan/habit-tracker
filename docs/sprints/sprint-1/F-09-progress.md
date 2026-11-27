@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 | Depends on | F-08 (entries exist), F-07, F-01, F-02 |
 | Needed by | Sprint 2 features F-11, F-13, F-14 |
 | Author / reviewer | projectnewy / phittayanan |
-| Status | Revised for Lab 7 (Issue #139, ADR 0061): a day is met by its day total. Teammate review pending; not yet implemented |
+| Status | Revised for Lab 7 (Issue #139, ADR 0061): a day is met by its day total. First version agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119); later changes from that review await the re-check. Not yet implemented |
 
 ## 2. Behaviour and workflow
 
@@ -93,7 +93,7 @@ No new table and no migration. Progress is computed from `Goal` and `Entry` (F-0
 | AC-09.6 | After a new entry is saved, the next `GET /api/goals` shows the updated numbers (an entry that brings the day total to the target raises `daysMet`), also after the app restarts |
 | AC-09.7 | The goals page shows "N of M days met" for each goal, with the same numbers as the API |
 | AC-09.8 | An anonymous caller gets 401 `UNAUTHENTICATED` and a Manager gets 403 `FORBIDDEN` on `GET /api/goals` |
-| AC-09.9 | Several entries on one day are added before the comparison: two entries each below the target meet the day when their total reaches it, the day counts once, and the sum is exact (0.1 + 0.2 meets a target of 0.3) |
+| AC-09.9 | Several entries on one day are added before the comparison: two entries each below the target meet the day when their total reaches it, the day counts once, and the sum is exact (0.7 + 0.1 meets a target of 0.8; added as binary floating point it would give 0.7999999999999999 and miss it) |
 | AC-09.10 | On the goals page, saving a first partial entry leaves the day not met; saving a second entry that brings the total to the target makes it met, also after the app restarts |
 
 ## 10. Test specification
@@ -105,7 +105,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | TC-31 | AC-09.1, AC-09.2, AC-09.3, AC-09.4, AC-09.5 | Unit | `today` = 2026-11-10 passed as an argument; template unit minutes, min 0, max 120; target 30; goal 2026-11-01 to 2026-11-30 with entries 11-01 value 30 (met), 11-02 value 29.9 (missed), 11-03 none (empty), 11-04 value 45 (met) | Compute progress; then for a goal starting 2026-11-20; then for goal 2026-11-01 to 2026-11-05 | `daysMet` 2 of `daysSoFar` 10; then 0 of 0; then `daysSoFar` 5 and not 10 |
 | TC-32 | AC-09.7 | Browser | A logged in; goal from `D-9` to `D+20`, target 30, with entries `D-9` value 30, `D-8` value 29.9, `D-6` value 45 (seeded relative to `D`) | Open the goals page | The page shows "2 of 10 days met" for that goal |
 | TC-59 | AC-09.6, AC-09.7, AC-09.8 | Browser and API | Seeded Manager, Participants A and B; no template named "Sleep"; A has no goal | Journey: the Manager logs in and creates the template "Sleep" through the UI; A logs in and creates a goal starting `D` on it; A reads the goals page ("0 of 1 days met"); A records a value that meets the target for `D`; A reads the page again ("1 of 1 days met"); restart the app; read again. Also call `GET /api/goals` as Manager and with no session | The page shows "0 of 1", then "1 of 1", and "1 of 1" after the restart; Manager gets `403 FORBIDDEN`; anonymous gets `401 UNAUTHENTICATED` |
-| TC-87 | AC-09.9 | Unit | `today` = 2026-11-10; goal from 2026-11-01, target 30, entries 11-01: 10 and 20; 11-02: 10 and 19.99; 11-03: 30 and 5. Second goal, target 0.3, entries 11-01: 0.1 and 0.2 | Compute progress | First goal `daysMet` 2 of 10 (11-01 and 11-03); second goal `daysMet` 1 |
+| TC-87 | AC-09.9 | Unit | `today` = 2026-11-10; goal from 2026-11-01, target 30, entries 11-01: 10 and 20; 11-02: 10 and 19.99; 11-03: 30 and 5. Second goal, target 0.8, entries 11-01: 0.7 and 0.1 | Compute progress | First goal `daysMet` 2 of 10 (11-01 and 11-03); second goal `daysMet` 1 |
 | TC-88 | AC-09.10 | Browser and API | A logged in; goal starting `D` with target 30 | Record 10 for `D`, read the page; record 20, read it; restart the app; read again | "0 of 1 days met", then "1 of 1 days met", and "1 of 1" after the restart |
 
 ## 11. Definition of done
@@ -123,6 +123,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | OP-09.1 | SRS A-1: does "days so far" include today while today has no entry yet | Decided on PR #29 (Q5): include today, as A-1 assumes. The streak rule in ADR 0015 is a different matter (Sprint 3) |
 | OP-09.2 | Shape of the percentage: the SRS and ADR 0013 give counts only | Open (proposal): counts only ("N of M days met"), no percentage |
 | OP-09.3 | `daysSoFar` for a goal whose start date is in the future | Open (proposal): 0, shown as "0 of 0 days met" |
+| OP-09.4 | A visible "goal met" signal for a day that becomes met | Not in Lab 7: proposed by phittayanan in PR #143, agreed by projectnewy on 2026-11-27. Lab 7 is one bounded change, and Sprint 1 has no colours; the signal belongs with the calendar colours (FR-15, FR-16) |
 
 ## 13. Revision history
 
@@ -131,7 +132,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | 2026-11-07 | First draft (Issue #28) | pending |
 | 2026-11-07 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
 | 2026-11-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
-| 2026-11-27 | Lab 7, Issue #139: a day is met by its day total (BR-07; AC-09.1, AC-09.2, AC-09.6 revised, AC-09.9 and AC-09.10 added; TC-87, TC-88; ADR 0061). TC-31, TC-32 and TC-59 keep their expected results | projectnewy (author); teammate review pending |
+| 2026-11-27 | Lab 7, Issue #139: a day is met by its day total (BR-07; AC-09.1, AC-09.2, AC-09.6 revised, AC-09.9 and AC-09.10 added; TC-87, TC-88; ADR 0061). TC-31, TC-32 and TC-59 keep their expected results | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | Review of PR #143: the exactness example in AC-09.9 and TC-87 is now 0.7 + 0.1 against 0.8, because the old one could not fail; OP-09.4 | projectnewy (author); re-check by phittayanan pending |
 
 ## 14. Implementation evidence — Issue #44
 

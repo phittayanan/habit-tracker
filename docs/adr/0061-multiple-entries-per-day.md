@@ -1,6 +1,6 @@
 # 0061. Several entries per day, with a day total up to the template maximum
 
-Status: decided by projectnewy, owner of [Issue #139](https://github.com/phittayanan/habit-tracker/issues/139), on 2026-11-27; agreement by phittayanan is pending in the review of the PR for that Issue. Replaces ADR 0008.
+Status: decided by projectnewy, owner of [Issue #139](https://github.com/phittayanan/habit-tracker/issues/139), on 2026-11-27; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119), including OP-08.9 to OP-08.12. Replaces ADR 0008.
 
 ## Decision
 
@@ -12,6 +12,8 @@ Status: decided by projectnewy, owner of [Issue #139](https://github.com/phittay
 6. Entries still cannot be edited or deleted. That is FR-17 (Sprint 2).
 
 Items 3 and 5 were chosen by projectnewy from the options below. The error code, list order, day-total display and negative values (F-08 OP-08.9 to OP-08.12) were drafted by Claude Code and accepted as drafted by projectnewy on 2026-11-27.
+
+After that review, projectnewy accepted two of phittayanan's points on 2026-11-27: the day-total message says what still fits (F-08 section 4, OP-08.14), and Lab 7 adds no separate "goal met" signal (F-09 OP-09.4).
 
 ## Why
 

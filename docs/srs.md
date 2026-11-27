@@ -181,3 +181,10 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 | T-8 | How do we ask for agreement on an alternative Sprint 1 slice or a brief ambiguity, and how long does a reply take? | Open |
 | T-9 | May student IDs be left out of the PDF and given only on LEB2, given the repository is public? | Open |
 | T-10 | Which GCP access method applies: the instructor's announced method or a personal Gmail Free Trial? | Open |
+
+## 7. Revision history
+
+| Date | Change | Approved by |
+|---|---|---|
+| 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
+| 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |

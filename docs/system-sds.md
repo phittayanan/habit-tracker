@@ -389,3 +389,10 @@ Also decided on PR #23 (not S-numbered):
 - **Streak in the Sprint 2 side panel:** none. The streak comes in Sprint 3 with FR-20, BR-13 and ADR 0021 (4.1).
 
 The SRS and `docs/features.md` need a one-line change for each of these two; both are made in separate PRs. The other SRS open points (A-1 to A-11) and the TA questions (T-1 to T-10) still apply to the parts of this design they affect: A-1 to the progress calculation, A-9 to the seed, T-5 and T-10 to 7.4.
+
+## Revision history
+
+| Date | Change | Approved by |
+|---|---|---|
+| 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
+| 2026-11-27 | Lab 7, Issue #139, ADR 0061: `max_value` also caps the day total and the `Entry` index is not unique (3.2); BR-04 and BR-07 enforcement (3.4); status codes and error example (4.3); decision list | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |

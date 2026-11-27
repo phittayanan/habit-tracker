@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 | Depends on | F-07 (a goal exists), F-01, F-02 |
 | Needed by | F-09, F-10 |
 | Author / reviewer | projectnewy / phittayanan |
-| Status | Revised for Lab 7 (Issue #139, ADR 0061): several entries per day with a day-total maximum. Teammate review pending; not yet implemented |
+| Status | Revised for Lab 7 (Issue #139, ADR 0061): several entries per day with a day-total maximum. First version agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119); later changes from that review await the re-check. Not yet implemented |
 
 ## 2. Behaviour and workflow
 
@@ -45,7 +45,7 @@ Checks run in this order (SDS 2.2): session (401), role (403), ownership (404), 
 | 5 | `entryDate` after today (Asia/Bangkok) | 400 | `ENTRY_DATE_IN_FUTURE` |
 | 6 | `entryDate` before the goal's start date or after its end date | 400 | `ENTRY_DATE_OUTSIDE_GOAL` |
 | 7 | `value` below `min_value` or above `max_value` | 400 | `VALUE_OUT_OF_RANGE` |
-| 8 | The day total, including this value, would be above `max_value` | 409 | `DAILY_TOTAL_ABOVE_MAX` (OP-08.9); message "The day total must not be above {max}. Already recorded for this day: {total}." |
+| 8 | The day total, including this value, would be above `max_value` | 409 | `DAILY_TOTAL_ABOVE_MAX` (OP-08.9); message (OP-08.14): "Only {left} {unit} left for {day}." where `left` is `max_value` minus the stored day total; when that is 0, "{Day} is full ({max} {unit})." `{day}` is "today" when the entry date is today, otherwise the date; `{Day}` is the same with a capital first letter |
 
 When a request breaks more than one rule, the first one in this table is returned. Example: with today `D`, a goal ending `D+5` and an entry for `D+10`, the date is both in the future and outside the goal; the answer is `ENTRY_DATE_IN_FUTURE`.
 
@@ -124,6 +124,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 | AC-08.16 | The day-total rule is checked last: a request that also fails an earlier row of section 4 gets that row's answer (for example 25 with `max_value` 24 gets `400 VALUE_OUT_OF_RANGE`, whatever the day already holds) |
 | AC-08.17 | The goals page and `GET /api/goals/:id/entries` show every entry of a day in the order of section 7, and the page shows that day's total with the unit |
 | AC-08.18 | The Lab 7 migration keeps every existing `Entry` row unchanged, removes the unique index and keeps "a goal with entries cannot be deleted" |
+| AC-08.19 | On a template that allows negative values, only the upper limit is checked on the day total: a negative entry inside the template range is accepted and lowers the total, and further entries are checked against the lowered total (OP-08.12) |
 
 ## 10. Test specification
 
@@ -141,13 +142,14 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-30 | AC-08.3, AC-08.11 | Unit and API | Ended goal G4 (`D-15` to `D-5`) | `POST` for `D-4`; then `POST` for `D-10` | `D-4` gets `400 ENTRY_DATE_OUTSIDE_GOAL`; `D-10` (inside the period, in the past) gets 201 |
 | TC-56 | AC-08.8, AC-08.9 | API | A logged in; A's goal G | Send bodies with no date, bad date format, no value, value "abc", value 7.555, value 24.555 (above the max of 24 and with 3 decimal places), value 100000000 (all to G). Send a valid body as Manager and as anonymous. Send a valid body to B's goal and to goal id 99999 | Bad bodies get `400 VALIDATION_ERROR`; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`; B's goal and 99999 get `404 GOAL_NOT_FOUND`; no row stored |
 | TC-58 | AC-08.1 | API and database | A's goal G; entry saved | Restart the app (new process and connection); `GET /api/goals/:id/entries` | The same entry is returned (data survives a restart) |
-| TC-61 | AC-08.10 | Browser | A logged in on the goals page; template max 24 | Type 30 (above max 24) and Save; then 7.5; then 17 for the same day (total 24.5) | The first shows the API message and keeps 30; 7.5 saves; (revised, Lab 7; before: a second entry showed "already exists") 17 shows the day-total message and keeps 17 |
-| TC-82 | AC-08.13 | Unit and API | Template T (min 0, max 24); goals G (T) and H (another template); entry 20 on G for `D` | On G for `D`: `POST` 4.01, then 4, then 0.01, then 0. Then 24 on G for `D-1`, and a value in range on H for `D` | 4.01 gets `409 DAILY_TOTAL_ABOVE_MAX` and no row; 4 gets 201 (total 24); 0.01 gets 409; 0 gets 201 (total stays 24); `D-1` and H are accepted |
+| TC-61 | AC-08.10 | Browser | A logged in on the goals page; template max 24 | Type 30 (above max 24) and Save; then 7.5; then 17 for the same day (total 24.5) | The first shows the API message and keeps 30; 7.5 saves; (revised, Lab 7; before: a second entry showed "already exists") 17 shows "Only 16.5 hours left for today." and keeps 17 |
+| TC-82 | AC-08.13 | Unit and API | Template T (min 0, max 24, unit hours); goals G (T) and H (another template); entry 20 on G for `D` | On G for `D`: `POST` 4.01, then 4, then 0.01, then 0. Then 24 on G for `D-1`, and a value in range on H for `D` | 4.01 gets `409 DAILY_TOTAL_ABOVE_MAX` with "Only 4 hours left for today." and no row; 4 gets 201 (total 24); 0.01 gets 409 with "Today is full (24 hours)."; 0 gets 201 (total stays 24); `D-1` and H are accepted |
 | TC-83 | AC-08.14 | Unit and API | Template with min 0, max 0.3; goal on it | `POST` 0.1, then 0.2, then 0.01 for `D` | 201, 201, then `409 DAILY_TOTAL_ABOVE_MAX`. Adding the values as binary floating point (0.1 + 0.2 > 0.3) fails the second check |
 | TC-84 | AC-08.15 | API and database | G (max 24) with 20 on `D` | (a) Send 3 and 3 at once. (b) With fresh data (20 on `D`), open a transaction that locks the goal row `FOR UPDATE`; start `POST` 3 without waiting; after 500 ms check it has not finished; insert an entry of 2 for `D` in the open transaction and commit | (a) One 201 and one 409; total 23. (b) The request waits, then gets `409 DAILY_TOTAL_ABOVE_MAX`; total 22 |
 | TC-85 | AC-08.16 | Unit and API | G (max 24) with 24 on `D` | `POST` 25 for `D`; 1 for `D+1`; 1.555 for `D`; 1 for `D` | `VALUE_OUT_OF_RANGE`, `ENTRY_DATE_IN_FUTURE`, `VALIDATION_ERROR`, `DAILY_TOTAL_ABOVE_MAX` |
 | TC-86 | AC-08.17 | Browser | A logged in; goal on a template with unit hours, max 24 | Save 3 then 4.5 for today; reload | Both entries show, 4.5 first, and "Day total: 7.5 hours", before and after the reload |
 | TC-89 | AC-08.18 | API and database | A database at the migrations of `v1.4` with entries on several goals and days | Apply the Lab 7 migration; read the rows and the indexes; try to delete a goal that has entries | The rows are identical; no unique index on (`goal_id`, `entry_date`), a non-unique one exists; the delete is refused. The schema test in `server/test/entry.test.js` that expects the unique index is revised to this |
+| TC-90 | AC-08.19 | API | Template with min -5, max 24; goal on it | `POST` 24, then -5, then 5, then 0.01 for `D` | 201, 201, 201 (total 24), then `409 DAILY_TOTAL_ABOVE_MAX` |
 
 ## 11. Definition of done
 
@@ -169,11 +171,12 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | OP-08.6 | An entry dated inside the period of a goal that has already ended | Decided on PR #29 (Q1): allowed (ADR 0012, BR-01); AC-08.11, TC-30 |
 | OP-08.7 | Which code when a request breaks several rules | Open (proposal from review point 10): `ENTRY_DATE_IN_FUTURE`, then `ENTRY_DATE_OUTSIDE_GOAL`, then `VALUE_OUT_OF_RANGE`, then `DAILY_TOTAL_ABOVE_MAX` (Lab 7; before: `ENTRY_ALREADY_EXISTS`) |
 | OP-08.8 | How the Sprint 1 goals page chooses the day | Decided on PR #29 (Q9): a date box next to the value box, defaulting to today in Asia/Bangkok |
-| OP-08.9 | Code and status for a day total above the maximum | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: `409 DAILY_TOTAL_ABOVE_MAX`, because the request conflicts with stored entries (SDS S-16) |
-| OP-08.10 | Order of several entries on one date | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: newest saved first |
-| OP-08.11 | How the goals page shows a day with several entries | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: every entry, plus "Day total: {total} {unit}" for each day |
-| OP-08.12 | Templates may allow negative values (F-03 OP-03.5), so a later entry can lower a day total | Decided by projectnewy on 2026-11-27 (Lab 7); teammate review pending: only the upper limit is checked on the total; each entry stays inside the template range. A day that was met can then become not met |
-| OP-08.13 | Whether a day may exceed the template maximum, and whether the daily target rule changes | Decided by projectnewy on 2026-11-27 (ADR 0061): the day total is not above `max_value`; the target rule (SRS A-4) is unchanged. Teammate review pending |
+| OP-08.9 | Code and status for a day total above the maximum | Decided by projectnewy on 2026-11-27 (Lab 7); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119): `409 DAILY_TOTAL_ABOVE_MAX`, because the request conflicts with stored entries (SDS S-16) |
+| OP-08.10 | Order of several entries on one date | Decided by projectnewy on 2026-11-27 (Lab 7); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119): newest saved first |
+| OP-08.11 | How the goals page shows a day with several entries | Decided by projectnewy on 2026-11-27 (Lab 7); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119): every entry, plus "Day total: {total} {unit}" for each day |
+| OP-08.12 | Templates may allow negative values (F-03 OP-03.5), so a later entry can lower a day total | Decided by projectnewy on 2026-11-27 (Lab 7); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119): only the upper limit is checked on the total; each entry stays inside the template range. A day that was met can then become not met |
+| OP-08.13 | Whether a day may exceed the template maximum, and whether the daily target rule changes | Decided by projectnewy on 2026-11-27 (ADR 0061): the day total is not above `max_value`; the target rule (SRS A-4) is unchanged. Agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| OP-08.14 | Wording of the day-total message | Proposed by phittayanan in [PR #143](https://github.com/phittayanan/habit-tracker/pull/143), accepted by projectnewy on 2026-11-27: the wording of section 4, row 8 |
 
 ## 13. Revision history
 
@@ -184,7 +187,8 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-07 | Wording fix in TC-27: a local-zone implementation fails the second check, not the first (partner's note on PR #29) | pending |
 | 2026-11-08 | Revision for Issue #38 (before the code is built): a `value` with more than 2 decimal places or outside `Decimal(10, 2)` is `400 VALIDATION_ERROR`, and validation wins over `VALUE_OUT_OF_RANGE` (sections 3, 4, 8, AC-08.8, TC-56, OP-08.5) | pending (partner review of the Issue #38 PR) |
 | 2026-11-09 | Issue #42 implementation evidence recorded in section 14 and `docs/entry-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
-| 2026-11-27 | Lab 7, Issue #139: several entries per goal and day with a day-total maximum (BR-04 replaced; sections 2 to 4, 6 to 12; AC-08.7 revised, AC-08.13 to AC-08.18; TC-29 and TC-61 revised, TC-82 to TC-86 and TC-89 added; ADR 0061) | projectnewy (author); teammate review pending |
+| 2026-11-27 | Lab 7, Issue #139: several entries per goal and day with a day-total maximum (BR-04 replaced; sections 2 to 4, 6 to 12; AC-08.7 revised, AC-08.13 to AC-08.18; TC-29 and TC-61 revised, TC-82 to TC-86 and TC-89 added; ADR 0061) | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | Review of PR #143: day-total message wording (section 4, TC-61, TC-82, OP-08.14); AC-08.19 and TC-90 for negative values; agreement recorded | projectnewy (author); re-check by phittayanan pending |
 
 ## 14. Implementation evidence — Issue #42
 

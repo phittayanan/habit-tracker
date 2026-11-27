@@ -13,10 +13,10 @@ Instructor/TA approval is not required, per the instructor's announcement changi
 | New rule | Several entries per goal per day. Each stays inside the template range. The day total is not above the template maximum, otherwise `409 DAILY_TOTAL_ABOVE_MAX`. A day is met when the day total reaches the daily target |
 | Reason | A Participant who records part of a day cannot add the rest, and Sprint 1 has no edit (ADR 0061) |
 | In scope | The entry rule on the backend, one migration, progress, the list and day total on the goals page |
-| Out of scope | Editing or deleting entries (FR-17), the calendar (FR-15, FR-16), goal changes (FR-18), streaks and reminders |
+| Out of scope | Editing or deleting entries (FR-17), the calendar (FR-15, FR-16), goal changes (FR-18), streaks and reminders, and a separate "goal met" signal (F-09 OP-09.4) |
 | Access | Unchanged: own goal only; another Participant or unknown goal 404; Manager 403; anonymous 401 |
 
-Acceptance criteria: AC-08.7 (revised), AC-08.13 to AC-08.18 in [F-08](../../sprints/sprint-1/F-08-entry.md); AC-09.1, AC-09.2, AC-09.6 (revised), AC-09.9, AC-09.10 in [F-09](../../sprints/sprint-1/F-09-progress.md).
+Acceptance criteria: AC-08.7 (revised), AC-08.13 to AC-08.19 in [F-08](../../sprints/sprint-1/F-08-entry.md); AC-09.1, AC-09.2, AC-09.6 (revised), AC-09.9, AC-09.10 in [F-09](../../sprints/sprint-1/F-09-progress.md).
 
 Boundaries and invalid cases (template maximum 24): a total of exactly 24 is accepted; 24.01 is refused; 0.1 + 0.2 fits a maximum of 0.3; a single value above 24 stays `VALUE_OUT_OF_RANGE`; validation and date errors come before the day-total error.
 
@@ -35,8 +35,8 @@ Intervening development, `v1.0` to `v1.4` (`git diff --stat v1.0 origin/staging 
 
 | Requirement | Feature | SRS / SDS sections | AC | Tests | Code to change (Issue #140) |
 |---|---|---|---|---|---|
-| BR-04, FR-11 | F-08 | SRS 1.4, BR-04, FR-11, A-11; SDS 3.2, 3.4, 4.3, decision list; F-08 sections 2 to 4, 6 to 12; Sprint 1 overview | AC-08.7, AC-08.13 to AC-08.17 | TC-29, TC-61 (revised); TC-82 to TC-86 | `server/src/services/entry.js`, `server/src/services/entry-rules.js`, `client/src/goals.jsx` |
-| BR-07, FR-12 | F-09 | SRS 1.4, BR-07; SDS 3.4; F-09 sections 3, 9, 10 | AC-09.1, AC-09.2, AC-09.6, AC-09.9, AC-09.10 | TC-87, TC-88 | `server/src/services/progress-rules.js` |
+| BR-04, FR-11 | F-08 | SRS 1.4, BR-04, FR-11, A-11; SDS 3.2, 3.4, 4.3, decision list; F-08 sections 2 to 4, 6 to 12; Sprint 1 overview | AC-08.7, AC-08.13 to AC-08.17, AC-08.19 | TC-29, TC-61 (revised); TC-82 to TC-86, TC-90 | `server/src/services/entry.js`, `server/src/services/entry-rules.js`, `client/src/goals.jsx` |
+| BR-07, FR-12 | F-09 | SRS 1.4, BR-07; SDS 3.4; F-09 sections 3, 9, 10 | AC-09.1, AC-09.2, AC-09.6, AC-09.9, AC-09.10 | TC-87, TC-88 | `server/src/services/progress-rules.js`, `server/src/services/goal.js` |
 | BR-04 (data) | F-08 | SDS 3.2; F-08 section 8 | AC-08.18 | TC-89 | `server/prisma/schema.prisma`, a new migration |
 
 | Area | Effect |
@@ -44,7 +44,7 @@ Intervening development, `v1.0` to `v1.4` (`git diff --stat v1.0 origin/staging 
 | Callers and dependencies | `computeProgress` is called by `listGoals` in `server/src/services/goal.js`, which already passes every entry of the goal. Today it compares each entry with the target, so without a change two partial entries would not meet the day. `createEntry` and `listEntries` are called by `server/src/routes/entries.js`; paths and response shapes do not change |
 | API | One error code replaces another. The list adds a second sort key (newest saved first within a date). No new endpoint |
 | UI validation | The goals page shows the API message and keeps the typed value, as now. It adds a day total per date |
-| Precision | Values are `Decimal(10, 2)`. The day total must be added as decimals (in the database or in hundredths), not as binary floating point |
+| Precision | Values are `Decimal(10, 2)`. The day total must be added as decimals (in the database or in hundredths), not as binary floating point. `listGoals` in `goal.js` turns each value into a JavaScript number before `computeProgress`, so the sum must not simply add those numbers |
 | Concurrency | The unique index now turns the second of two requests into a 409. Without it, the goal row must be locked while the total is checked and the row inserted |
 | Persistence, migration, history | One migration: drop the unique index, add a non-unique one. No row changes. Each existing day has one in-range entry, so it meets the new rule, and its progress result is unchanged |
 | Rollback | Not safe for the rule: `v1.4` code on the migrated database would accept further same-day entries without a total check. Issue #141 must record this in the release plan. The old unique index cannot be restored once a day holds two entries |
@@ -89,4 +89,16 @@ No test is deleted or disabled. These expect the old rule and are revised, with 
 
 ## 6. Review
 
-Pending. The review is on the PR for Issue #139.
+phittayanan approved commit `6f27fac` on 2026-11-27 (Asia/Bangkok): [review](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119). It records nine checks (made with AI assistance, no test run) and agreement with the two rules and OP-08.9 to OP-08.12.
+
+| Point from the review and follow-up comments on [PR #143](https://github.com/phittayanan/habit-tracker/pull/143) | Result |
+|---|---|
+| Record the agreement instead of "pending" | Done |
+| Revision rows in the SRS and the system SDS | Done |
+| The exactness example in AC-09.9 and TC-87 could not fail | Changed to 0.7 + 0.1 against a target of 0.8; `goal.js` added to the impact table |
+| No test for negative values (OP-08.12) | AC-08.19 and TC-90 added |
+| "Goal met" signal on the goals page? | Not in Lab 7 (F-09 OP-09.4) |
+| Issue #141 does not mention the rollback risk | Line added to #141 |
+| Shorter day-total message that says what still fits | Accepted (F-08 OP-08.14) |
+
+The changes after `6f27fac` await phittayanan's re-check before the merge.
