@@ -90,7 +90,13 @@ Open items:
 
 ## 4. Retrospective
 
-PENDING: answers from phittayanan and projectnewy.
+Each student answered in their own words (phittayanan in Thai, translated by Claude Code and checked by phittayanan).
+
+| Question | phittayanan | projectnewy |
+|---|---|---|
+| What helped? | Running the tests in CI. | PENDING: asked on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215799301) |
+| What hurt? | Our working hours did not match, so sometimes a PR was opened and it was not clear whether a review was needed. | PENDING |
+| What will change? | We set up a team status in Discord, with the agent connected, so we can talk there. | PENDING |
 
 ## 5. Contribution
 
