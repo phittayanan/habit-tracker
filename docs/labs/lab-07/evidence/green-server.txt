@@ -1,0 +1,130 @@
+# Issue #140, GREEN run, tested commit f8736c9, 2026-11-27, macOS, Node 26.8.1, PostgreSQL 16.15, Chrome 158
+# Command: cd server && npm test
+# Local paths replaced by <repo> and <tmp>.
+
+
+> test
+> node --env-file-if-exists=.env --test --test-concurrency=1 test/*.test.js
+
+.env not found. Continuing without it.
+.env not found. Continuing without it.
+✔ TC-01 / TC-46: login persists fixed eight-hour session and flags, then me works (147.704459ms)
+✔ TC-02: unknown username and wrong password both perform cost-10 bcrypt work with identical errors (158.897ms)
+✔ TC-02 regression: a successful dummy comparison still cannot authenticate an unknown username (54.894458ms)
+✔ TC-81: a username with a NUL character is an unknown username, not a server error (156.828334ms)
+✔ TC-03: logout deletes session and clears cookie; replay and anonymous logout fail (109.394584ms)
+✔ TC-04: both roles expose only the contracted identity, never hash or session ID (161.179833ms)
+✔ TC-04 regression: session middleware keeps only public user fields in request identity (123.899875ms)
+✔ TC-05: missing, unknown, deleted and malformed cookies are unauthenticated (113.520583ms)
+✔ TC-06: activity never extends expiry; expired rows are removed on access (108.997291ms)
+✔ TC-62: invalid and non-JSON inputs get the same validation error without side effects (56.57425ms)
+✔ TC-62 regression: JSON parser failures outside login return 400 after session and role checks (162.760583ms)
+✔ TC-64: Origin runs before body/session checks and compares host including port (268.511542ms)
+✔ TC-08: independently audit every implemented API route, then exercise session and role checks (168.573792ms)
+✔ TC-08 regression: an added nested route missing both middleware and registration fails coverage (52.602125ms)
+✔ TC-08 regression: registration alone fails; protecting and registering nested methods passes (230.2935ms)
+✔ TC-08 regression: public allowlist matches exact methods and paths, including path-array mounts (169.908ms)
+✔ TC-66: session then role, before validation/existence; client roles cannot override (109.64475ms)
+✔ OP-01.4 / OP-07.7: login replaces incoming session, trims username and strips extra fields (157.727875ms)
+✔ OP-02.5: unknown API paths return standard 404 regardless of session (108.421583ms)
+✔ TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomically without passwords; tracked files contain no seed values (601.197792ms)
+.env not found. Continuing without it.
+✔ built client serves contracted page addresses from the isolated checkout, without test pages (18.38275ms)
+.env not found. Continuing without it.
+✔ TC-89: the Lab 7 migration keeps every entry row, removes the unique goal+day index and keeps delete-restrict (670.646291ms)
+.env not found. Continuing without it.
+✔ TC-27: today is the Asia/Bangkok date, whatever the process time zone (17.578958ms)
+✔ TC-24 / TC-25 / TC-26: future wins over outside-goal; goal ends are inclusive (0.1935ms)
+✔ TC-28: value limits are inclusive (0.119542ms)
+✔ TC-56: parse accepts only a real date and a number within Decimal(10, 2) (1.424083ms)
+✔ TC-82 (unit): the day total may reach the maximum but not pass it; the message says what is left (0.241792ms)
+✔ TC-83 (unit): the day total is exact to 2 decimal places (0.1 + 0.2 fits a maximum of 0.3) (0.1085ms)
+✔ TC-85 (unit): the day-total rule is checked after the date and range rules (0.117958ms)
+✔ TC-90 (unit): with negative values only the upper limit is checked on the day total (0.110125ms)
+.env not found. Continuing without it.
+✔ TC-23: valid entry returns 201 with the contract shape, owned by the goal, and is listed (47.359375ms)
+✔ TC-24: a date after today is ENTRY_DATE_IN_FUTURE, also when it is outside the goal as well (9.520292ms)
+✔ TC-25 / TC-30: outside the goal period is rejected; inside an ended goal is accepted (9.560458ms)
+✔ TC-26: the start date and today (the end date) are accepted (8.805416ms)
+✔ TC-28: value limits over the API, each accepted value on its own day (13.779958ms)
+✔ TC-29: (revised, Lab 7) a second entry for the same day within the maximum is stored; the first stays unchanged (10.49375ms)
+✔ TC-82: the day total may reach the maximum but not pass it, per goal and per day (17.453333ms)
+✔ TC-83: the day total is exact to 2 decimal places (10.016458ms)
+✔ TC-84 (a): two requests at once that fit one at a time but not together give one 201 and one 409 (6.258583ms)
+✔ TC-84 (b): a request waits for a held goal-row lock and then counts the entry committed meanwhile (510.636625ms)
+✔ TC-85: validation, date and range errors come before the day-total error (19.686875ms)
+✔ TC-90: with negative values only the upper limit is checked on the day total (26.19ms)
+✔ TC-56 / TC-08: validation, roles, ownership and both endpoints (30.054292ms)
+✔ Entry list is newest date first and only for the owner (14.718667ms)
+✔ TC-58: the entry survives an app restart (new process, new connection) (95.798542ms)
+✔ TC-89 (schema): the goal+day index is not unique, and a goal with entries cannot be deleted (16.515458ms)
+.env not found. Continuing without it.
+✔ Goal unit rules: positive exact decimals, real dates and end-date order (1.914ms)
+✔ TC-78 unit: the target must be above the template minimum (Issue #74, ADR 0054) (0.076125ms)
+✔ Goal unit BR-05/BR-06 and target maximum: ended, future, exact boundary (6.438583ms)
+.env not found. Continuing without it.
+✔ TC-20: exact shape, stripped ownership, real process restart, own-only newest list (241.89975ms)
+✔ TC-21: active and future-start duplicates; concurrent same-user creation stores exactly one (12.897459ms)
+✔ TC-22: Bangkok date and goal state boundaries, independent of process timezone (3.870667ms)
+✔ TC-53 / TC-08: validation, auth/role precedence and both endpoint permissions (20.806708ms)
+✔ TC-54: max equality, Decimal boundary and validation/range/duplicate precedence (11.690583ms)
+✔ TC-78: a target not above the template minimum is rejected; just above is accepted; minimum 0 changes nothing (Issue #74, ADR 0054) (12.176291ms)
+✔ TC-55: ended allows new, different template and different owner; one-day/past goals accepted (11.30525ms)
+✔ TC-74: creation waits for real template lock, then validates committed maximum (508.495083ms)
+✔ Goal migration enforces target/date constraints and has no stored state (17.469041ms)
+.env not found. Continuing without it.
+✔ TC-33: Participant B cannot read or change A; A id in a goal body is stripped (60.894583ms)
+✔ TC-34: Manager 403 and anonymous 401 on every goal and entry endpoint, nothing stored (12.44725ms)
+✔ TC-35 (API part): each Participant lists only own goals with own progress (10.063792ms)
+✔ TC-57: another user's goal and an unknown goal give the same status and body (9.793542ms)
+.env not found. Continuing without it.
+✔ TC-31: met, missed and empty days; today counts even without an entry (0.50525ms)
+✔ TC-31: a goal that has not started is 0 of 0; the first day counts on its start date (0.058916ms)
+✔ TC-31: an Ended goal counts start to end and does not grow after that (0.330959ms)
+✔ TC-31: only entries inside the counted days are used; a decimal target is compared exactly (0.092584ms)
+✔ TC-87: several entries on one day are added exactly before the comparison, and the day counts once (0.078625ms)
+.env not found. Continuing without it.
+✔ TC-31 / AC-09.1 to AC-09.3 over the API: progress object from the goal and its entries (40.379667ms)
+✔ AC-09.4 / AC-09.5 over the API: future goal is 0 of 0; an Ended goal does not grow (12.615042ms)
+✔ AC-09.6: a saved entry raises daysMet on the next read, also after an app restart; nothing is stored as progress (122.91625ms)
+✔ TC-59 / AC-09.8: anonymous 401 and Manager 403 on the goal list (6.707917ms)
+✔ A Participant sees progress only for own goals (10.410292ms)
+✔ AC-09.1 to AC-09.3: two active goals of one Participant keep separate progress, even with entries on the same day (15.198458ms)
+✔ The list takes "today" from the Asia/Bangkok date of the instant it is given (5.930208ms)
+.env not found. Continuing without it.
+✔ GET /api/ready returns 503 NOT_READY when the database cannot be reached (10.918667ms)
+✔ GET /api/ready returns 200 ready when the database answers (2.507959ms)
+✔ GET /api/health does not touch the database (0.9325ms)
+.env not found. Continuing without it.
+✔ TC-63: expiry is exclusive and the clock is passed in (0.722791ms)
+✔ TC-46: cookie flags depend only on production (0.277584ms)
+.env not found. Continuing without it.
+✔ TC-12: a manager edits an unused template with two partial edits and the list shows the result (44.0735ms)
+✔ TC-13: a template used by an Active or only an Ended goal is refused first and stays unchanged (23.848417ms)
+✔ TC-13 race (a): an edit waits for a goal transaction holding the template lock, then is refused as in use (62.154125ms)
+✔ TC-13 race (b): an edit and a new goal sent together never leave a goal beside an edited range (44.424375ms)
+✔ TC-71: invalid edits are validation errors, an unknown id is 404, anonymous is 401, and nothing changes (19.07325ms)
+✔ TC-72: the merged range rule refuses a sent minimum at the stored maximum (2.179625ms)
+✔ TC-72: range before duplicate name, own name accepted, rejected edits change nothing (11.709666ms)
+✔ TC-18: a participant edit is forbidden for an existing and an unknown id, and nothing changes (5.04525ms)
+✔ a foreign Origin is refused before the session check and nothing changes (2.744042ms)
+.env not found. Continuing without it.
+✔ the template migration adds the range check and unique name without changing older tables (77.165083ms)
+✔ TC-10: the range rule refuses an equal or higher minimum and accepts one just below (54.101917ms)
+✔ TC-09: a manager create strips unknown state, stores an active template, and lists it after a new app (126.670166ms)
+✔ TC-10: API refuses a minimum that is not below the maximum and stores nothing, then accepts the boundary (113.072792ms)
+✔ TC-68: invalid template bodies are validation errors and anonymous calls stay unauthenticated (117.9555ms)
+✔ TC-69: duplicate names conflict after the range rule, including two creates at once (118.27125ms)
+✔ TC-16 / TC-17: a participant lists active templates only and cannot create one (172.10725ms)
+✔ manager list returns every state, ordered by name (109.620708ms)
+✔ demo seed upserts synthetic templates by name and can run twice (376.593958ms)
+✔ TC-76: demo seed keeps an edited template and still creates a missing one (Issue #79, ADR 0053) (366.600584ms)
+✔ TC-77: demo seed sets the password hashes again on every run (Issue #79, ADR 0053) (669.006958ms)
+ℹ tests 99
+ℹ suites 0
+ℹ pass 99
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9470.406708
