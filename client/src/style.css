@@ -101,7 +101,15 @@ button.day:disabled { cursor: default; background: #fff; color: #999; border-col
 .met { font-weight: 700; }
 .progress { height: 8px; background: #e5e5e5; border-radius: 4px; overflow: hidden; margin: 0 0 8px; }
 .progress span { display: block; height: 100%; background: #333; }
-.entries { color: #444; }
+.entries { color: #444; list-style: none; margin: 0 0 6px; padding: 0; }
+/* F-13 (#154): each entry with Edit and Delete, on the goals page and in the day box. */
+.entry-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-bottom: 4px; }
+.entry-row .entry-text, .entry-row .entry-value { min-width: 0; overflow-wrap: anywhere; }
+.entry-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.entry-edit { display: grid; gap: 6px; width: 100%; }
+.entry-edit input { width: 100%; max-width: 12em; }
+.entry-edit fieldset { display: flex; flex-wrap: wrap; gap: 8px; border: 0; margin: 0; padding: 0; }
+.entry-row .error { width: 100%; margin: 0; }
 .check-in { display: grid; gap: 10px; margin-top: 8px; }
 .counter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .counter > button[aria-label] { min-width: 44px; font-size: 20px; line-height: 1; }

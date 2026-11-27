@@ -3,6 +3,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { api } from './api.js';
 import { formatMinutes } from './time-format.js';
+import { DeleteAsk, deleteEntry, editEntry } from './entry-edit.jsx';
 
 const asDate = text => new Date(`${text}T00:00:00Z`);
 const format = (text, options) => new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', ...options }).format(asDate(text));
@@ -22,6 +23,15 @@ const add = (x, y) => (cents(x) + cents(y)) / 100;
 const amount = (value, goal) => (goal.kind === 'TIME' ? formatMinutes(value) : String(value));
 const withUnit = (value, goal) => (goal.kind === 'TIME' ? formatMinutes(value) : `${value} ${goal.unit}`);
 
+// The value typed in an edit draft; undefined when the boxes are empty.
+function editedValue(draft, goal) {
+  if (goal.kind === 'TIME') {
+    if (draft.hours.trim() === '' && draft.minutes.trim() === '') return undefined;
+    return (Number(draft.hours) || 0) * 60 + (Number(draft.minutes) || 0);
+  }
+  return draft.other.trim() === '' ? undefined : Number(draft.other);
+}
+
 function useDesktop() {
   const query = '(min-width: 600px)';
   const [desktop, setDesktop] = useState(() => matchMedia(query).matches);
@@ -37,6 +47,11 @@ function useDesktop() {
 // What a draft would add, for the ADR 0067 question; null when nothing is unsaved.
 function unsavedText(draft, goal) {
   if (!draft || !goal) return null;
+  // F-13: an edit is unsaved when the typed value differs from the stored one (ADR 0101).
+  if (draft.entryId) {
+    const typed = editedValue(draft, goal);
+    return typed !== undefined && Number.isFinite(typed) && cents(typed) !== cents(draft.original) ? `the edit to ${withUnit(typed, goal)}` : null;
+  }
   if (draft.amount > 0) return `+${withUnit(draft.amount, goal)}`;
   if (goal.kind === 'TIME' && (draft.hours.trim() !== '' || draft.minutes.trim() !== '')) {
     return withUnit((Number(draft.hours) || 0) * 60 + (Number(draft.minutes) || 0), goal);
@@ -196,19 +211,38 @@ function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onS
 function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUnauthenticated }) {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [asking, setAsking] = useState(null);
   const openButton = useRef(null);
   const firstControl = useRef(null);
   const refocus = useRef(false);
+  const entryButtons = useRef(new Map());
+  const focusEntry = useRef(null);
   const fits = (cents(goal.maxValue) - cents(goal.total)) / 100;
   const full = fits <= 0;
   const focusInput = useRef(false);
+  const editing = draft?.entryId ? draft : null;
+  const checking = draft && !draft.entryId ? draft : null;
   // Focus moves to the input once when it opens, and back to "+ Check in" after a save or Cancel.
   useEffect(() => { if (draft && focusInput.current && firstControl.current) { focusInput.current = false; firstControl.current.focus(); } });
   const fullText = useRef(null);
   // When the day is now full there is no "+ Check in", so focus goes to the "is full" text.
   useEffect(() => { if (!draft && refocus.current) { refocus.current = false; (openButton.current || fullText.current)?.focus(); } });
+  // F-13: after an edit, Cancel or a cancelled delete, focus goes back to that entry's button.
+  useEffect(() => {
+    if (!focusEntry.current || editing) return;
+    const element = entryButtons.current.get(focusEntry.current);
+    if (element) { focusEntry.current = null; element.focus(); }
+  });
   function open() {
     whenSaved(() => { setMessage(''); focusInput.current = true; setDraft({ goalId: goal.goalId, amount: 0, other: '', hours: '', minutes: '' }); });
+  }
+  function startEdit(entry) {
+    whenSaved(() => {
+      setMessage(''); focusInput.current = true;
+      const time = goal.kind === 'TIME';
+      setDraft({ goalId: goal.goalId, entryId: entry.id, original: entry.value, amount: 0, other: time ? '' : String(entry.value),
+        hours: time ? String(Math.floor(entry.value / 60)) : '', minutes: time ? String(entry.value % 60) : '' });
+    });
   }
   async function save(value) {
     if (busy) return;
@@ -223,9 +257,33 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
     } catch (error) { setMessage(error.message); }
     finally { setBusy(false); }
   }
+  async function saveEdit(value) {
+    if (busy) return;
+    const entryId = editing.entryId;
+    setBusy(true); setMessage('');
+    try {
+      await editEntry(goal.goalId, entryId, value, onUnauthenticated);
+      setDraft(null);
+      await onSaved();
+      focusEntry.current = `edit ${entryId}`;
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  async function remove() {
+    if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      await deleteEntry(goal.goalId, asking.id, onUnauthenticated);
+      setAsking(null);
+      await onSaved();
+      refocus.current = true;
+    } catch (error) { focusEntry.current = `delete ${asking.id}`; setAsking(null); setMessage(error.message); }
+    finally { setBusy(false); }
+  }
   const total = goal.total;
   const pct = goal.target > 0 ? Math.min(100, (cents(total) / cents(goal.target)) * 100) : 0;
   const when = date === today ? 'Today' : date;
+  const keep = key => element => { if (element) entryButtons.current.set(key, element); else entryButtons.current.delete(key); };
   return <li className="goal-card">
     <h3>{goal.name}</h3>
     <p className="goal-total">{goal.kind === 'TIME' ? `${formatMinutes(total)} / ${formatMinutes(goal.target)}` : `${total} / ${goal.target} ${goal.unit}`}</p>
@@ -234,13 +292,50 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
       aria-valuenow={Math.min(total, goal.target)} aria-valuetext={`${withUnit(total, goal)} of ${withUnit(goal.target, goal)}`}>
       <span style={{ width: `${pct}%` }} />
     </div>
-    {goal.entries.length > 0 ? <p className="entries">{goal.entries.map(entry => amount(entry.value, goal)).join(' · ')}</p> : null}
+    {goal.entries.length > 0 ? <ul className="entries" aria-label={`${goal.name} entries`}>{goal.entries.map(entry => {
+      const what = `${withUnit(entry.value, goal)} on ${date}`;
+      return <li key={entry.id} className="entry-row">
+        <span className="entry-value">{amount(entry.value, goal)}</span>
+        {editing?.entryId === entry.id ? <EditEntry goal={goal} draft={editing} setDraft={setDraft} busy={busy} save={saveEdit} fail={setMessage}
+          firstControl={firstControl} cancel={() => { setMessage(''); focusEntry.current = `edit ${entry.id}`; setDraft(null); }} />
+          : <div className="entry-actions">
+            <button type="button" ref={keep(`edit ${entry.id}`)} aria-label={`Edit ${what}`} onClick={() => startEdit(entry)}>Edit</button>
+            <button type="button" ref={keep(`delete ${entry.id}`)} aria-label={`Delete ${what}`} onClick={() => { setMessage(''); setAsking({ id: entry.id, what }); }}>Delete</button>
+          </div>}
+      </li>;
+    })}</ul> : null}
     {full && !draft ? <p ref={fullText} tabIndex={-1}>{when} is full ({goal.maxValue} {goal.unit}).</p> : null}
     {!full && !draft ? <button type="button" ref={openButton} onClick={open}>+ Check in {goal.name}</button> : null}
-    {draft ? <CheckIn goal={goal} draft={draft} setDraft={setDraft} fits={fits} busy={busy} save={save} fail={setMessage} firstControl={firstControl}
+    {checking ? <CheckIn goal={goal} draft={checking} setDraft={setDraft} fits={fits} busy={busy} save={save} fail={setMessage} firstControl={firstControl}
       cancel={() => { setMessage(''); refocus.current = true; setDraft(null); }} /> : null}
     {message && <p role="alert" className="error">{message}</p>}
+    {asking ? <DeleteAsk text={asking.what} busy={busy} onDelete={remove}
+      onCancel={() => { focusEntry.current = `delete ${asking.id}`; setAsking(null); }} /> : null}
   </li>;
+}
+
+// F-13 section 6 in the day box: a number box, or hour and minute boxes for Time, filled with the stored value.
+function EditEntry({ goal, draft, setDraft, busy, save, fail, firstControl, cancel }) {
+  const set = change => setDraft({ ...draft, ...change });
+  function submit(event) {
+    event.preventDefault();
+    if (goal.kind === 'TIME') {
+      const minutes = draft.minutes.trim();
+      if (minutes !== '' && !(Number.isInteger(Number(minutes)) && Number(minutes) >= 0 && Number(minutes) <= 59)) { fail('Minutes must be 0 to 59.'); return; }
+    }
+    save(editedValue(draft, goal));
+  }
+  return <form className="entry-edit" noValidate onSubmit={submit}>
+    {goal.kind === 'TIME' ? <fieldset><legend>New value</legend>
+      <label>Hours<input ref={firstControl} type="number" min="0" step="1" inputMode="numeric" value={draft.hours} onChange={event => set({ hours: event.target.value })} /></label>
+      <label>Minutes<input type="number" min="0" max="59" step="1" inputMode="numeric" value={draft.minutes} onChange={event => set({ minutes: event.target.value })} /></label>
+    </fieldset>
+      : <label>New value ({goal.unit})<input ref={firstControl} type="number" step="any" inputMode="decimal" value={draft.other} onChange={event => set({ other: event.target.value })} /></label>}
+    <div className="entry-actions">
+      <button type="submit" disabled={busy}>Save</button>
+      <button type="button" onClick={cancel}>Cancel</button>
+    </div>
+  </form>;
 }
 
 function CheckIn({ goal, draft, setDraft, fits, busy, save, fail, firstControl, cancel }) {
