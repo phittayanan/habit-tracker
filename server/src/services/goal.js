@@ -6,7 +6,7 @@ export function toGoal(row, today) {
   return {
     id: row.id, templateId: row.templateId, dailyTarget: Number(row.dailyTarget),
     startDate: dateText(row.startDate), endDate: dateText(row.endDate), state: goalState(dateText(row.endDate), today),
-    template: { id: row.template.id, name: row.template.name, unit: row.template.unit,
+    template: { id: row.template.id, name: row.template.name, unit: row.template.unit, kind: row.template.kind,
       minValue: Number(row.template.minValue), maxValue: Number(row.template.maxValue) },
   };
 }
@@ -24,8 +24,10 @@ export async function createGoal(db, user, data) {
   return db.$transaction(async tx => {
     // This lock serializes both same-user creates and future F-04 template edits.
     // Read the current range only after acquiring the lock, in the same transaction.
-    const [template] = await tx.$queryRaw`SELECT id, name, unit, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${data.templateId} FOR UPDATE`;
+    const [template] = await tx.$queryRaw`SELECT id, name, unit, kind::text AS kind, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${data.templateId} FOR UPDATE`;
     if (!template) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Choose an existing template.' };
+    // A validation row, so it comes before the target rules (F-07 section 4, ADR 0065).
+    if (template.kind === 'TIME' && !Number.isInteger(data.dailyTarget)) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Target must be whole minutes.' };
     if (!targetWithinMaximum(data.dailyTarget, Number(template.maxValue))) return { ok: false, status: 400, code: 'TARGET_ABOVE_TEMPLATE_MAX', message: 'Daily target must not exceed the template maximum.' };
     if (!targetAboveMinimum(data.dailyTarget, Number(template.minValue))) return { ok: false, status: 400, code: 'TARGET_NOT_ABOVE_TEMPLATE_MIN', message: 'Daily target must be above the template minimum.' };
     // Compute today after waiting for the lock, so a Bangkok midnight during a wait
