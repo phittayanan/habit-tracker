@@ -55,6 +55,8 @@ export async function changeTarget(db, user, goalId, body) {
     if (!parsed.ok) return parsed;
     const target = parsed.data.dailyTarget;
     const row = await tx.goal.findUniqueOrThrow({ where: { id: goalId }, include: { template: true } });
+    // Section 4 order 4, a validation row before the ended check (ADR 0065, ADR 0093). A used template cannot change kind.
+    if (row.template.kind === 'TIME' && !Number.isInteger(target)) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Target must be whole minutes.' };
     // Today is read after the lock, as goal creation does, so a wait across Bangkok midnight uses the new day.
     const today = bangkokToday();
     const startDate = dateText(row.startDate);
