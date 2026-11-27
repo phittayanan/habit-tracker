@@ -193,8 +193,8 @@ One layout for everyone: a top bar with the user's name, the role's menu items a
 | Month calendar at `/calendar`, the Participant's first page (Monday first, month arrows) with the chosen day (today at start) in a side panel on desktop and a centre box on phone: every goal active that day with a Check in input by template kind (− / + or a 15-minute bar) and a typed row. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). Contract: `docs/sprints/sprint-2/F-11-month-calendar.md` | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021, ADR 0063 to ADR 0069 |
 | Calendar colours: green all met, yellow some met, red none met, grey nothing recorded, each with a sign; today live | Participant | 2 | FR-16, ADR 0040, ADR 0045, ADR 0046, ADR 0070 |
 | Calendar and List switch (list is grouped by day, newest first, for the same month) | Participant | 2 | FR-19, ADR 0041, ADR 0048, ADR 0071 |
-| Goal detail page with the best streak | Participant | 3 | FR-20, ADR 0042 |
-| Reminder settings on a goal | Participant | 3 | FR-21 |
+| Goal detail page at `/goals/:id`: a short summary with the best streak (ADR 0091; F-16) | Participant | 3 | FR-20, ADR 0042 |
+| Reminder on each goal of the goals page: show, set, change, remove (ADR 0086 to ADR 0088; F-17) | Participant | 3 | FR-21 |
 
 Sprint 1 does not build the calendar; the calendar becomes the Participant's first screen in Sprint 2 (SRS A-3), on its own page `/calendar`, and the goals page stays (ADR 0073). The look is plain, with colour only on the calendar (ADR 0044). Desktop is designed first, and the screens also work at 375 px wide (ADR 0038, NFR-05).
 
@@ -239,7 +239,7 @@ Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature 
 | `PATCH /api/goals/:id` | Change the daily target from today on | 2 | FR-18 |
 | `GET /api/calendar?month=YYYY-MM` | The caller's month: per day the state (colour) and, per goal active that day, the target, total, met and entries. Serves the calendar, the day box and the List; `GET /api/entries?month` was dropped (ADR 0072) | 2 | FR-15, FR-16, FR-19 |
 | `GET /api/goals/:id` | One goal with its current and best streak (detail page) | 3 | FR-20 |
-| `PUT /api/goals/:id/reminder` | Store a reminder time and weekdays on a goal | 3 | FR-21 |
+| `PUT /api/goals/:id/reminder` | Store a reminder time and weekdays on a goal; `DELETE` on the same path removes it (ADR 0086) | 3 | FR-21 |
 
 ## 5. Roles and Permissions
 
@@ -361,6 +361,8 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 | Target versions with `daily_target` kept; which goals change | 0075 to 0077, 0084 |
 | Permanent retire and its screens | 0078, 0079 |
 | Entry edit and delete | 0080 to 0083 |
+| One removable reminder per goal, on the goals page | 0086 to 0088 |
+| Streak display and the goal detail page | 0089 to 0091 |
 | No sharing; a Manager sees templates only | 0019 |
 | Sprint 1 is the handout slice; later split | 0020, 0021 |
 | GCP reference stack; no approval step; one CI job | 0030, 0032, 0033 |
@@ -403,3 +405,4 @@ The SRS and `docs/features.md` need a one-line change for each of these two; bot
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: `max_value` also caps the day total and the `Entry` index is not unique (3.2); BR-04 and BR-07 enforcement (3.4); status codes and error example (4.3); decision list | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072; after the PR #167 review, `/calendar` and the kept goals page (4.1, ADR 0073) | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #150: goal versions in `GoalTarget` with `daily_target` kept (3.5); decision list (8.1). ADR 0075 to ADR 0084 | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #157: detail page and reminder screens (4.1), reminder removal (4.4), decision list (8.1). ADR 0086 to ADR 0091 | pending (reviewer phittayanan) |
