@@ -75,7 +75,7 @@ Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026) is the handout
 | BR-12 | A goal change applies from today on. Earlier days keep the old target, so each goal version is stored. | ADR 0011 | 2 | Unit: past days judged against the old target |
 | BR-13 | A streak is consecutive days met. One missed day resets it to zero. Today does not break the streak until the day is over. | ADR 0015 | 3 | Unit: runs, a miss, today without an entry |
 | BR-14 | A reminder (time and weekdays, per goal) is stored and shown. Nothing is sent. | ADR 0016 | 3 | API: store and read; no outbound call |
-| BR-15 | A day on the calendar is green when every goal was met, yellow when some were met, red when none were met, grey when nothing was recorded. | ADR 0045, ADR 0046, ADR 0040 | 2 (see A-3) | Unit: colour per combination |
+| BR-15 | A day on the calendar is green when every goal active that day was met, yellow when some were met, red when none were met, grey when nothing was recorded. A day with no active goal, or after today, has no colour. | ADR 0045, ADR 0046, ADR 0040, ADR 0070 | 2 (see A-3) | Unit: colour per combination |
 
 ## 4. Functional Requirements (FR)
 
@@ -87,7 +87,7 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-02 | A logged-in user logs out. The session row is deleted and the cookie no longer gives access. | ADR 0027 | 1 |
 | FR-03 | A logged-in user can retrieve who they are (name and role). A request with no valid session to a protected path is refused with 401. | ADR 0027; GWS §5.2 | 1 |
 | FR-04 | A session ends 8 hours after login. After that, protected requests are refused with 401. | ADR 0028 | 1 |
-| FR-05 | A Manager creates a template with a name, a free-text unit, and a minimum and maximum per entry. A minimum not below the maximum is rejected. | ADR 0007, ADR 0043 | 1 |
+| FR-05 | A Manager creates a template with a name, a free-text unit, and a minimum and maximum per entry. A minimum not below the maximum is rejected. From Sprint 2 a template also has a kind, Count or Time; a Time template is in whole minutes. | ADR 0007, ADR 0043, ADR 0064, ADR 0065 | 1; kind in 2 |
 | FR-06 | A Manager sees a table of templates (name, unit, min-max, active or retired) with New and Edit actions. The Retire action appears with FR-08 in Sprint 2 and is hidden in Sprint 1. | ADR 0043 | 1 (see A-2) |
 | FR-07 | A Manager edits a template's name, unit or range while no goal uses it, and is refused once a goal uses it. | ADR 0017 | 1 (see A-2) |
 | FR-08 | A Manager retires a template. It no longer appears for new goals; goals already using it keep working. | ADR 0017 | 2 (see A-2) |
@@ -97,11 +97,11 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-12 | A Participant sees computed progress for a goal: days met out of days so far. | ADR 0013 | 1 |
 | FR-13 | A Participant sees only their own goals, entries and progress. Requests for another Participant's data are refused. | ADR 0019 | 1 |
 | FR-14 | A Manager's request for any Participant's goals or entries is refused. | ADR 0019 | 1 |
-| FR-15 | After login a Participant sees this month's calendar first. On desktop the calendar is on the left and a side panel on the right shows the chosen day (today at start): every goal with a number box. The streak is not shown here; it comes in Sprint 3 with FR-20 (decided on PR #23). | ADR 0037, ADR 0047, ADR 0045 | 2 (see A-3) |
+| FR-15 | After login a Participant sees this month's calendar first (its own page; the Sprint 1 goals page stays, ADR 0073). On desktop the calendar is on the left and a side panel on the right shows the chosen day (today at start); on a phone the day opens in a centre box. The day shows every goal active that day with an input for its kind and a typed number. The streak is not shown here; it comes in Sprint 3 with FR-20 (decided on PR #23). | ADR 0037, ADR 0047, ADR 0045, ADR 0063 to ADR 0069, ADR 0073, ADR 0074 | 2 (see A-3) |
 | FR-16 | The calendar colours each day green, yellow, red or grey per BR-15. | ADR 0040, ADR 0045, ADR 0046 | 2 (see A-3) |
 | FR-17 | A Participant edits or deletes an entry on any day inside the goal period. | ADR 0009 | 2 |
 | FR-18 | A Participant changes a goal's target from today on. Earlier days keep the old target. | ADR 0011 | 2 |
-| FR-19 | A Participant switches between Calendar and List above the calendar. The list shows records by date, newest first, for the same month. | ADR 0014, ADR 0041, ADR 0048 | 2 |
+| FR-19 | A Participant switches between Calendar and List above the calendar. The list shows records by date, newest first, for the same month, grouped by day. | ADR 0014, ADR 0041, ADR 0048, ADR 0071 | 2 |
 | FR-20 | A Participant sees the current streak next to each goal and the best streak on the goal's detail page. | ADR 0015, ADR 0042 | 3 |
 | FR-21 | A Participant stores a reminder time and weekdays per goal. The app shows them and sends nothing. | ADR 0016 | 3 |
 | FR-22 | The layout is the same for everyone. Menu items change with the role; the backend still checks every request. | ADR 0026 | 1 |
@@ -188,3 +188,4 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 |---|---|---|
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases; after the PR #167 review, FR-15 names the kept goals page (ADR 0073) | pending (reviewer projectnewy) |

@@ -16,7 +16,7 @@ Part B of Deliverable 1 (Issue #5). Each feature groups SRS requirements (`docs/
 | F-08 | Daily entry recording | A Participant records a day's value. A day may hold several entries. Date, value-range and day-total rules are enforced on the backend with clear messages (ADR 0061). | FR-11, BR-01, BR-02, BR-03, BR-04, BR-06 | F-07 | 1 |
 | F-09 | Progress (days met) | A Participant sees days met out of days so far for a goal. | FR-12, BR-07 | F-08 | 1 |
 | F-10 | Participant data privacy | A Participant sees only their own goals, entries and progress. Another Participant and any Manager are refused. | FR-13, FR-14, BR-10, NFR-03 | F-01, F-07, F-08 | 1 |
-| F-11 | Month calendar and side panel | After login a Participant sees this month's calendar, and a side panel for the chosen day with each goal's number box (no streak until Sprint 3, F-16; decided on PR #23). | FR-15 | F-08, F-09 | 2 |
+| F-11 | Month calendar and side panel | After login a Participant sees this month's calendar, and a side panel (desktop) or centre box (phone) for the chosen day with each goal's input by template kind and a typed number (no streak until Sprint 3, F-16; decided on PR #23). Needs the template kind, Count or Time (ADR 0064; F-03 revision). | FR-15 | F-08, F-09 | 2 |
 | F-12 | Calendar day colours | Each calendar day is green, yellow, red or grey. | FR-16, BR-15 | F-11 | 2 |
 | F-13 | Entry edit and delete | A Participant edits or deletes an entry on any day inside the goal period; progress is recomputed. | FR-17, BR-11 | F-08, F-09 | 2 |
 | F-14 | Goal change | A Participant changes a goal's target from today on; earlier days keep the old target. | FR-18, BR-12 | F-07, F-09 | 2 |
