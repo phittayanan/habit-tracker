@@ -106,7 +106,7 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 
 | Test | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
-| TC-07 | AC-02.1 | Browser | App on the test database; Manager and A exist | Log in as the Manager and read the top bar; log out; log in as A and read it | Both bars show the display name and "Log out"; the Manager's menu is exactly "Templates", A's is exactly "Goals", "Templates" |
+| TC-07 | AC-02.1 | Browser | App on the test database; Manager and A exist | Log in as the Manager and read the top bar; log out; log in as A and read it | Both bars show the display name and "Log out"; the Manager's menu is exactly "Templates", A's is exactly "Goals", "Templates". From Sprint 2, A's is exactly "Calendar", "Goals", "Templates" (ADR 0073 point 4) |
 | TC-08 | AC-02.2 | API | F-02: auth routes and the test-only Manager route; later: fixtures required by each implemented feature route | Table-driven over the implemented protected routes in section 5 plus the test-only route: call each with no cookie, then as the wrong role where restricted, with a valid body | Every no-session call gets `401 UNAUTHENTICATED`; every wrong-role call gets `403 FORBIDDEN`; no protected handler runs and no data changes. Start with F-01 routes and the test-only route; each feature PR adds its routes until every protected row in section 5 is covered |
 | TC-66 | AC-02.3, AC-02.4 | API | Test-only Manager route registered as above; id 1 exists, 99999 does not; validator, existence check and handler are spies | Anonymous `POST /api/test/manager/1`; as A: POST id 1 with `{}`; POST id 99999; POST id 1 with a valid body plus `"role": "MANAGER"`; the same with header `X-Role: MANAGER` | Anonymous gets `401 UNAUTHENTICATED`; each of A's four calls gets `403 FORBIDDEN`; validator, existence check and handler never run; no data changes |
 | TC-67 | AC-02.5 | Browser | App on the test database; A exists; test-only protected page registered as above | Open `/test/protected` with no session; log in as A and open that page; delete A's session row in the test database; reload the page | The first visit shows the login screen; after the reload `GET /api/auth/me` answers `401 UNAUTHENTICATED` and the login screen is shown |
@@ -136,6 +136,7 @@ Fixtures: one Manager and Participants A and B created by each test with test-on
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): test-only protected route and page for TC-66/67; TC-08 grows with implemented endpoints; record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): Sprint 2 menu, first page `/calendar` and page address (OP-02.1, OP-02.3; ADR 0073) | pending (reviewer projectnewy) |
+| 2026-11-27 | Re-check of PR #167 ([review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): TC-07's Participant menu from Sprint 2 (ADR 0073 point 4) | pending (reviewer projectnewy) |
 
 ## 14. Implementation evidence
 

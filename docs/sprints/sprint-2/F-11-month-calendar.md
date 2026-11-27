@@ -17,7 +17,7 @@ Sprint 2 contract (Deliverable 2 Part B, [Issue #151](https://github.com/phittay
 
 ## 2. Behaviour and workflow
 
-1. After login a Participant's first screen is the calendar of the current month in Asia/Bangkok, on the page `/calendar` (ADR 0037, ADR 0073, BR-02). The week starts on Monday (ADR 0068). The Participant's menu is "Calendar", "Goals", "Templates"; "Goals" opens the Sprint 1 goals page at `/goals`, which stays unchanged: days-met progress (F-09), the entry list with day totals and the record form with a date box (F-08) (ADR 0073).
+1. After login a Participant's first screen is the calendar of the current month in Asia/Bangkok, on the page `/calendar` (ADR 0037, ADR 0073, BR-02). The week starts on Monday (ADR 0068). The Participant's menu is "Calendar", "Goals", "Templates"; "Goals" opens the Sprint 1 goals page at `/goals`, which stays unchanged except the display and input of Time values (ADR 0065): days-met progress (F-09), the entry list with day totals and the record form with a date box (F-08) (ADR 0073).
 2. Arrows ‹ and › beside the month title move to earlier months and forward up to the current month, not past it (ADR 0068).
 3. A future day is shown but cannot be opened. Today and past days open (ADR 0069).
 4. **Desktop** (600 px wide and more, the current stylesheet breakpoint): the calendar is on the left and the panel on the right shows the chosen day, today at start. Choosing another day changes the panel; there is no pop-up (ADR 0047, ADR 0063).
@@ -42,7 +42,7 @@ Prototype screenshots (sample data, not saved; ADR 0063). The prototype week sta
 | Rule | Statement | Source |
 |---|---|---|
 | First screen | The Participant's first screen after login is this month's calendar at `/calendar` | SRS FR-15; ADR 0037, ADR 0073 |
-| Goals page kept | The Sprint 1 goals page at `/goals` stays unchanged and is reached from the menu item "Goals" | ADR 0073 |
+| Goals page kept | The Sprint 1 goals page at `/goals` stays unchanged except the display and input of Time values, and is reached from the menu item "Goals" | ADR 0065, ADR 0073 |
 | Months | ‹ goes back without limit; › stops at the current month (Asia/Bangkok) | ADR 0068 |
 | Days that open | Today and past days; never a future day | ADR 0069; SRS BR-01 |
 | Goals listed | Only goals whose start and end dates include the day | ADR 0069; SRS BR-01 |
@@ -142,7 +142,7 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | AC-11.10 | After a save, the card's total and entries, the day sign and the calendar colour update without a reload |
 | AC-11.11 | `GET /api/calendar` returns the shape in section 7 with only the caller's goals; a bad `month` gets `400 VALIDATION_ERROR`; anonymous gets 401; a Manager gets 403 |
 | AC-11.12 | The calendar screen has no horizontal scroll and works at 375 px and 1280 px, and every action on it works with the keyboard alone |
-| AC-11.13 | The Participant's menu shows "Calendar", "Goals", "Templates"; "Goals" opens the Sprint 1 goals page with its progress, entry list, day totals and record form unchanged; a Manager on `/calendar` sees "This page is not available for your role." |
+| AC-11.13 | After login a Participant is on `/calendar`; the menu shows "Calendar", "Goals", "Templates"; "Goals" opens the Sprint 1 goals page, where every Sprint 1 check of its progress, entry list, day totals and record form still holds; a Manager on `/calendar` sees "This page is not available for your role." |
 
 ## 10. Test specification
 
@@ -161,7 +161,7 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | TC-117 | AC-11.10 | Browser (cross-feature with F-12) | A; on `D`, W met (8) and S empty | Check in 420 on S; watch the card and calendar | Without a reload the S card shows "7 h / 7 h ✓ met", the box sign and the day turn from "½ some goals met" to "✓ all goals met" |
 | TC-120 | AC-11.11 | API | A with W and S and entries on `D` and `D-1`; X ended `D-3` | `GET /api/calendar`; `?month=` previous month; `?month=2026-13`; `?month=abc` | Shape as in section 7; one item per day, oldest first; entries newest first; X only on its days; the bad months get `400 VALIDATION_ERROR` |
 | TC-121 | AC-11.11 | API | A, B, Manager, as above | `GET /api/calendar` as B, as the Manager, and anonymous | B sees none of A's goals; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`. TC-08 lists the route as protected |
-| TC-130 | AC-11.13 | Browser | A with goal W and an entry on `D`; the Manager | As A: read the menu; choose "Goals". Run the Sprint 1 goals-page tests TC-32, TC-61 and TC-86 and the journey TC-59 unchanged. As the Manager: open `/calendar` | Menu "Calendar", "Goals", "Templates"; "Goals" opens `/goals` with "x of y days met", the entry list with "Day total" and the record form; the four Sprint 1 tests pass unchanged; the Manager sees "This page is not available for your role." |
+| TC-130 | AC-11.13 | Browser | A with goal W and an entry on `D`; the Manager | As A: log in; read the address and the menu; choose "Goals". Run TC-07, TC-32, TC-59, TC-61, TC-65, TC-86 and the auth, goals and entries TC-47/TC-48 with only the steps of ADR 0073 point 4 changed. As the Manager: open `/calendar` | A is on `/calendar`; menu "Calendar", "Goals", "Templates"; "Goals" opens `/goals` with "x of y days met", the entry list with "Day total" and the record form; those Sprint 1 tests pass, with their goals-page checks as in Sprint 1; the Manager sees "This page is not available for your role." |
 | TC-47, TC-48 | AC-11.12 | Browser | A logged in | Run the NFR-05 and NFR-06 checks on the calendar screen, the phone box and the desktop panel | No horizontal scroll at 375 and 1280 px; every step of TC-113 to TC-116 can be done with the keyboard alone |
 
 ## 11. Definition of done
@@ -186,6 +186,7 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | OP-11.8 | The API shape and dropping `GET /api/entries?month` | Drafted by Claude Code, accepted as drafted by phittayanan (Q11): ADR 0072 |
 | OP-11.9 | Counter start (+0), the "Other amount" and "Exact" labels, the "No goals on this day." text, the dialog and slider markup, and "choosing another day on desktop" counting as closing for ADR 0067 | Drafted by Claude Code; accepted as drafted by phittayanan on 2026-11-27 (Q13) |
 | OP-11.11 | What happens to the Sprint 1 goals page | Decided by phittayanan (R1, answering projectnewy's blocking finding 1): kept unchanged at `/goals`; the calendar is the new first page `/calendar` (ADR 0073) |
+| OP-11.13 | Which Sprint 1 test steps may change for the new first page | Decided by phittayanan (R4, answering projectnewy's blocking finding 1 in the [review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): only the steps that lead to the goals page (address after login, opening "Goals", the menu list, the tab order); the goals-page checks stay (ADR 0073 point 4) |
 | OP-11.12 | What Done does at +0 | Decided by phittayanan (R2, answering projectnewy's finding 2): disabled, and the same for Check in (ADR 0074) |
 | OP-11.10 | Editing and deleting an entry from the card (F-13) | Not in this contract; F-13's contract (Issue #150) says where its controls go |
 
@@ -195,3 +196,4 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 |---|---|---|
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): first page `/calendar` and the Sprint 1 goals page kept (ADR 0073; sections 2, 3, 5, 9, 10, 12; AC-11.13, TC-130); Done and Check in disabled at +0 (ADR 0074; AC-11.6, AC-11.7, TC-113); projectnewy's agreement to ADR 0064 | pending (reviewer projectnewy) |
+| 2026-11-27 | Re-check of PR #167 ([review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): the Sprint 1 test steps that change for `/calendar` (ADR 0073 point 4; section 2, section 3, AC-11.13, TC-130, OP-11.13) | pending (reviewer projectnewy) |

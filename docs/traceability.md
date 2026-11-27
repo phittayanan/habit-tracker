@@ -181,7 +181,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-127 | A Time entry must be whole minutes | API |
 | TC-128 | A Time goal target must be whole minutes | API |
 | TC-129 | Template kind change: allowed while unused, whole numbers for Time, refused when used | API |
-| TC-130 | First page `/calendar`; menu Calendar, Goals, Templates; the Sprint 1 goals page and its tests unchanged; Manager refused on `/calendar` | Browser |
+| TC-130 | First page `/calendar`; menu Calendar, Goals, Templates; TC-07, TC-32, TC-59, TC-61, TC-65, TC-86 and TC-47/TC-48 pass with only their steps into the goals page changed (ADR 0073 point 4); Manager refused on `/calendar` | Browser |
 | TC-131 | Time values outside the calendar: typed in minutes with an hours-and-minutes hint, shown in hours and minutes | Browser |
 | none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 

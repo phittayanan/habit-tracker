@@ -187,7 +187,7 @@ One layout for everyone: a top bar with the user's name, the role's menu items a
 | Template list: a table (name, unit, min-max, active or retired) with New and Edit. Retire appears in Sprint 2 | Manager | 1 | FR-06, ADR 0043 |
 | Template form (create and edit) | Manager | 1 | FR-05, FR-07 |
 | Templates: active templates, read-only | Participant | 1 | FR-09, ADR 0018 |
-| Goals page: the Participant's goals with computed progress. A plain page in Sprint 1; kept unchanged at `/goals` in Sprint 2, menu "Goals" (ADR 0073) | Participant | 1 | FR-10, FR-12; SRS A-3 |
+| Goals page: the Participant's goals with computed progress. A plain page in Sprint 1; kept at `/goals` in Sprint 2, unchanged except the display and input of Time values (ADR 0065), menu "Goals" (ADR 0073) | Participant | 1 | FR-10, FR-12; SRS A-3 |
 | New goal form: template dropdown, daily target, start and end dates | Participant | 1 | FR-10, ADR 0049 |
 | Record a day: a number box with the unit shown, per goal | Participant | 1 | FR-11, ADR 0039 |
 | Month calendar at `/calendar`, the Participant's first page (Monday first, month arrows) with the chosen day (today at start) in a side panel on desktop and a centre box on phone: every goal active that day with a Check in input by template kind (− / + or a 15-minute bar) and a typed row. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). Contract: `docs/sprints/sprint-2/F-11-month-calendar.md` | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021, ADR 0063 to ADR 0069 |
