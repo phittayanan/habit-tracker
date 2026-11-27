@@ -137,7 +137,7 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await expect(box).toHaveValue('5');
   await box.fill('20');
   await water.getByRole('button', { name: 'Save', exact: true }).click();
-  const row = water.locator('.entry-row').filter({ has: box });
+  const row = water.locator('.entry-row').filter({ has: page.getByLabel('New value (glasses)', { exact: true }) });
   await expect(row.getByRole('alert')).toHaveText('The value must be between 1 and 12.');
   await expect(box).toHaveAttribute('aria-invalid', 'true');
   await expect(box).toHaveAccessibleDescription('The value must be between 1 and 12.');

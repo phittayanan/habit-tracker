@@ -212,6 +212,9 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(null);
+  // The entry a message belongs to (F-13: shown by that entry), or null for the card's check-in.
+  const [messageAt, setMessageAt] = useState(null);
+  const say = (text, at = null) => { setMessage(text); setMessageAt(at); };
   const openButton = useRef(null);
   const firstControl = useRef(null);
   const refocus = useRef(false);
@@ -234,11 +237,11 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
     if (element) { focusEntry.current = null; element.focus(); }
   });
   function open() {
-    whenSaved(() => { setMessage(''); focusInput.current = true; setDraft({ goalId: goal.goalId, amount: 0, other: '', hours: '', minutes: '' }); });
+    whenSaved(() => { say(''); focusInput.current = true; setDraft({ goalId: goal.goalId, amount: 0, other: '', hours: '', minutes: '' }); });
   }
   function startEdit(entry) {
     whenSaved(() => {
-      setMessage(''); focusInput.current = true;
+      say(''); focusInput.current = true;
       const time = goal.kind === 'TIME';
       setDraft({ goalId: goal.goalId, entryId: entry.id, original: entry.value, amount: 0, other: time ? '' : String(entry.value),
         hours: time ? String(Math.floor(entry.value / 60)) : '', minutes: time ? String(entry.value % 60) : '' });
@@ -246,7 +249,7 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
   }
   async function save(value) {
     if (busy) return;
-    setBusy(true); setMessage('');
+    setBusy(true); say('');
     try {
       await api(`/api/goals/${goal.goalId}/entries`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entryDate: date, value }) }, onUnauthenticated);
@@ -260,24 +263,24 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
   async function saveEdit(value) {
     if (busy) return;
     const entryId = editing.entryId;
-    setBusy(true); setMessage('');
+    setBusy(true); say('');
     try {
       await editEntry(goal.goalId, entryId, value, onUnauthenticated);
       setDraft(null);
       await onSaved();
       focusEntry.current = `edit ${entryId}`;
-    } catch (error) { setMessage(error.message); }
+    } catch (error) { say(error.message, entryId); }
     finally { setBusy(false); }
   }
   async function remove() {
     if (busy) return;
-    setBusy(true); setMessage('');
+    setBusy(true); say('');
     try {
       await deleteEntry(goal.goalId, asking.id, onUnauthenticated);
       setAsking(null);
       await onSaved();
       refocus.current = true;
-    } catch (error) { focusEntry.current = `delete ${asking.id}`; setAsking(null); setMessage(error.message); }
+    } catch (error) { focusEntry.current = `delete ${asking.id}`; setAsking(null); say(error.message, asking.id); }
     finally { setBusy(false); }
   }
   const total = goal.total;
@@ -296,26 +299,29 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
       const what = `${withUnit(entry.value, goal)} on ${date}`;
       return <li key={entry.id} className="entry-row">
         <span className="entry-value">{amount(entry.value, goal)}</span>
-        {editing?.entryId === entry.id ? <EditEntry goal={goal} draft={editing} setDraft={setDraft} busy={busy} save={saveEdit} fail={setMessage}
-          firstControl={firstControl} cancel={() => { setMessage(''); focusEntry.current = `edit ${entry.id}`; setDraft(null); }} />
+        {editing?.entryId === entry.id ? <EditEntry goal={goal} draft={editing} setDraft={setDraft} busy={busy} save={saveEdit} fail={text => say(text, entry.id)}
+          errorId={messageAt === entry.id && message ? `entry-${entry.id}-error` : undefined}
+          firstControl={firstControl} cancel={() => { say(''); focusEntry.current = `edit ${entry.id}`; setDraft(null); }} />
           : <div className="entry-actions">
             <button type="button" ref={keep(`edit ${entry.id}`)} aria-label={`Edit ${what}`} onClick={() => startEdit(entry)}>Edit</button>
-            <button type="button" ref={keep(`delete ${entry.id}`)} aria-label={`Delete ${what}`} onClick={() => { setMessage(''); setAsking({ id: entry.id, what }); }}>Delete</button>
+            <button type="button" ref={keep(`delete ${entry.id}`)} aria-label={`Delete ${what}`} onClick={() => { say(''); setAsking({ id: entry.id, what }); }}>Delete</button>
           </div>}
+        {messageAt === entry.id && message ? <p id={`entry-${entry.id}-error`} role="alert" className="error">{message}</p> : null}
       </li>;
     })}</ul> : null}
     {full && !draft ? <p ref={fullText} tabIndex={-1}>{when} is full ({goal.maxValue} {goal.unit}).</p> : null}
     {!full && !draft ? <button type="button" ref={openButton} onClick={open}>+ Check in {goal.name}</button> : null}
-    {checking ? <CheckIn goal={goal} draft={checking} setDraft={setDraft} fits={fits} busy={busy} save={save} fail={setMessage} firstControl={firstControl}
-      cancel={() => { setMessage(''); refocus.current = true; setDraft(null); }} /> : null}
-    {message && <p role="alert" className="error">{message}</p>}
+    {checking ? <CheckIn goal={goal} draft={checking} setDraft={setDraft} fits={fits} busy={busy} save={save} fail={text => say(text)} firstControl={firstControl}
+      cancel={() => { say(''); refocus.current = true; setDraft(null); }} /> : null}
+    {message && messageAt === null ? <p role="alert" className="error">{message}</p> : null}
     {asking ? <DeleteAsk text={asking.what} busy={busy} onDelete={remove}
       onCancel={() => { focusEntry.current = `delete ${asking.id}`; setAsking(null); }} /> : null}
   </li>;
 }
 
 // F-13 section 6 in the day box: a number box, or hour and minute boxes for Time, filled with the stored value.
-function EditEntry({ goal, draft, setDraft, busy, save, fail, firstControl, cancel }) {
+function EditEntry({ goal, draft, setDraft, busy, save, fail, errorId, firstControl, cancel }) {
+  const invalid = { 'aria-invalid': errorId ? true : undefined, 'aria-describedby': errorId };
   const set = change => setDraft({ ...draft, ...change });
   function submit(event) {
     event.preventDefault();
@@ -327,10 +333,10 @@ function EditEntry({ goal, draft, setDraft, busy, save, fail, firstControl, canc
   }
   return <form className="entry-edit" noValidate onSubmit={submit}>
     {goal.kind === 'TIME' ? <fieldset><legend>New value</legend>
-      <label>Hours<input ref={firstControl} type="number" min="0" step="1" inputMode="numeric" value={draft.hours} onChange={event => set({ hours: event.target.value })} /></label>
-      <label>Minutes<input type="number" min="0" max="59" step="1" inputMode="numeric" value={draft.minutes} onChange={event => set({ minutes: event.target.value })} /></label>
+      <label>Hours<input ref={firstControl} {...invalid} type="number" min="0" step="1" inputMode="numeric" value={draft.hours} onChange={event => set({ hours: event.target.value })} /></label>
+      <label>Minutes<input {...invalid} type="number" min="0" max="59" step="1" inputMode="numeric" value={draft.minutes} onChange={event => set({ minutes: event.target.value })} /></label>
     </fieldset>
-      : <label>New value ({goal.unit})<input ref={firstControl} type="number" step="any" inputMode="decimal" value={draft.other} onChange={event => set({ other: event.target.value })} /></label>}
+      : <label>New value ({goal.unit})<input ref={firstControl} {...invalid} type="number" step="any" inputMode="decimal" value={draft.other} onChange={event => set({ other: event.target.value })} /></label>}
     <div className="entry-actions">
       <button type="submit" disabled={busy}>Save</button>
       <button type="button" onClick={cancel}>Cancel</button>
