@@ -1,5 +1,5 @@
 // F-11 month calendar and day box (Issue #155): TC-36, TC-110 to TC-116, TC-130, and TC-47/TC-48 on the calendar,
-// at 375 px and 1280 px (playwright.config.js projects). The day state, colour and sign come in #156 (ADR 0097).
+// at 375 px and 1280 px (playwright.config.js projects). The day state, colour and sign are tested in day-colours.spec.js (#156).
 import { test, expect } from '@playwright/test';
 import { PrismaClient } from '../../server/node_modules/@prisma/client/default.js';
 import bcrypt from '../../server/node_modules/bcryptjs/index.js';
@@ -55,7 +55,8 @@ async function goToMonth(page, date) {
   }
   await expect(title(page)).toHaveText(monthTitle(date));
 }
-const dayButton = (page, date) => page.getByRole('button', { name: label(date), exact: true });
+// A day button is named by its date and, from #156, the F-12 state words.
+const dayButton = (page, date) => page.getByRole('button', { name: new RegExp(`^${label(date)}(, (all goals met|some goals met|no goal met|nothing recorded))?$`) });
 const box = (page, date) => page.getByRole(phone() ? 'dialog' : 'region', { name: heading(date), exact: true });
 async function openDay(page, date) {
   await goToMonth(page, date);
@@ -80,7 +81,8 @@ test('TC-36: calendar first after login, Monday first, panel for today; a day li
   await expect(panel.getByText('Today', { exact: true })).toBeVisible();
   await expect(goalNames(panel)).toHaveText(['Water', 'Sleep']);
   await expect(card(panel, 'Water').getByText('5 / 8 glasses', { exact: true })).toBeVisible();
-  await expect(card(panel, 'Water').getByText('2 · 3', { exact: true })).toBeVisible();
+  // F-13 (#154): the entries are a list with Edit and Delete; same values, same order.
+  await expect(card(panel, 'Water').locator('.entry-value')).toHaveText(['2', '3']);
   await expect(card(panel, 'Sleep').getByText('0 min / 7 h', { exact: true })).toBeVisible();
   await expect(card(panel, 'Water').getByText('✓ met', { exact: true })).toHaveCount(0);
   await expect(dayButton(page, day(0))).toHaveAttribute('aria-current', 'date');
@@ -106,7 +108,11 @@ test('TC-110: ‹ shows earlier months; › stops at the current month', async (
   await next.click(); await expect(title(page)).toHaveText(monthTitle(one));
   await next.click(); await expect(title(page)).toHaveText(monthTitle(today()));
   await expect(next).toBeDisabled();
-  // The List step of TC-110 runs in #156 (ADR 0097).
+  // The List step (run in #156, ADR 0097): the List follows the shown month.
+  await back.click(); await expect(title(page)).toHaveText(monthTitle(one));
+  await page.getByRole('button', { name: 'List', exact: true }).click();
+  await expect(page.locator('.day-list')).toHaveAttribute('data-month', one.slice(0, 7));
+  await expect(title(page)).toHaveText(monthTitle(one));
 });
 
 test('TC-111: a future day cannot be opened; today and yesterday open the box', async ({ page }) => {
@@ -160,7 +166,7 @@ test('TC-113: count − / + stops at +0 and at what fits; Done saves one entry',
   await done.click();
   await expect(water.getByText('12 / 8 glasses', { exact: true })).toBeVisible();
   await expect(water.getByText('✓ met', { exact: true })).toBeVisible();
-  await expect(water.getByText('2 · 10', { exact: true })).toBeVisible();
+  await expect(water.locator('.entry-value')).toHaveText(['2', '10']);
   expect(await values(w, day(0))).toEqual([10, 2]);
   // Nothing fits any more: no Check in, and the card says so.
   await expect(water.getByRole('button', { name: '+ Check in Water', exact: true })).toHaveCount(0);

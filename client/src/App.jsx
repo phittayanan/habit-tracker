@@ -96,7 +96,7 @@ export function App({ extraPage }) {
   else if (path === '/templates') page = <TemplateList user={user} navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/templates/new') page = <TemplateForm navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (/^\/templates\/\d+\/edit$/.test(path)) page = <TemplateForm key={path} id={path.split('/')[2]} navigate={navigate} onUnauthenticated={unauthenticated} />;
-  else if (path === '/calendar') page = <CalendarPage onUnauthenticated={unauthenticated} />;
+  else if (path === '/calendar') page = <CalendarPage navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/goals') page = <GoalList navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/goals/new') page = <GoalForm navigate={navigate} onUnauthenticated={unauthenticated} />;
   return <>
