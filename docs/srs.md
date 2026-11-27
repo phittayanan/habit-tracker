@@ -90,7 +90,7 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-05 | A Manager creates a template with a name, a free-text unit, and a minimum and maximum per entry. A minimum not below the maximum is rejected. From Sprint 2 a template also has a kind, Count or Time; a Time template is in whole minutes. | ADR 0007, ADR 0043, ADR 0064, ADR 0065 | 1; kind in 2 |
 | FR-06 | A Manager sees a table of templates (name, unit, min-max, active or retired) with New and Edit actions. The Retire action appears with FR-08 in Sprint 2 and is hidden in Sprint 1. | ADR 0043 | 1 (see A-2) |
 | FR-07 | A Manager edits a template's name, unit or range while no goal uses it, and is refused once a goal uses it. | ADR 0017 | 1 (see A-2) |
-| FR-08 | A Manager retires a template. It no longer appears for new goals; goals already using it keep working. | ADR 0017 | 2 (see A-2) |
+| FR-08 | A Manager retires a template. It no longer appears for new goals; goals already using it keep working. Retiring is permanent. | ADR 0017, ADR 0078, ADR 0079 | 2 (see A-2) |
 | FR-09 | A Participant sees all active templates, read-only. | ADR 0018 | 1 |
 | FR-10 | A Participant creates a goal from a "+ New goal" form: template dropdown, daily target, start and end dates. A second active goal on the same template is rejected. | ADR 0049, ADR 0010 | 1 |
 | FR-11 | A Participant records a day's value by typing a number. The unit is shown and the template's range is checked. Rejections follow BR-01, BR-03 and BR-04, each with a clear message. | ADR 0039, ADR 0061 | 1 |
@@ -158,7 +158,7 @@ No ADR settles these. Each is left open and needs a decision before the requirem
 | A-2 | Which sprint builds template edit and retire. The handout's Sprint 1 example only requires defining a template. Template edit (FR-07) stays in Sprint 1 because the handout's "Participant cannot edit a template" test needs it. Retire (FR-08, and the retire part of BR-08) moves to Sprint 2, as the partner's review listed. | BR-08, FR-06 to FR-08 |
 | A-3 | Which sprint builds the coloured calendar and the side panel. ADR 0037 puts the calendar first for the Participant, but no ADR says which of ADR 0040 to 0049 land in Sprint 1. Sprint 1 is the handout's slice, so Sprint 1 has only a plain page for goals and progress (FR-10 to FR-12). The month calendar and side panel (FR-15) and the colours (FR-16, BR-15) move to Sprint 2, as the partner's review listed. | BR-15, FR-15, FR-16 |
 | A-4 | Decided on PR #23: a goal's daily target is greater than 0 and not above the template's maximum (`max_value`), so every target can be met. Revised by Issue #74 (ADR 0054, 2026-11-14): the target must also be greater than the template's minimum (`min_value`), so a day can be missed and "day met" (BR-07) means something. | FR-10 |
-| A-5 | Whether Participants can see template names after retirement on their existing goals, and what the Manager's table shows for them. | FR-08, FR-09 |
+| A-5 | Decided (ADR 0079): existing goals show the name and unit as before; the Manager's row shows "Retired" with no Edit or Retire button. The question was: whether Participants can see template names after retirement on their existing goals, and what the Manager's table shows for them. | FR-08, FR-09 |
 | A-6 | Whether native or mobile apps are out of scope. ADR 0038 says the design covers phone and desktop screens, which this SRS reads as a browser app only. | 1.3 |
 | A-7 | Whether email verification is excluded for the whole project. Only self-registration and password recovery are (ADR 0004). | 1.3 |
 | A-8 | NFR numbers: the width and keyboard targets are proposed here, not agreed. | NFR-05, NFR-06 |
@@ -189,3 +189,4 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases; after the PR #167 review, FR-15 names the kept goals page (ADR 0073) | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #150: FR-08 permanent retire; A-5 decided | pending (reviewer phittayanan) |
