@@ -236,8 +236,8 @@ test('F-15 section 4: when the month read fails, the List shows the API message 
   await twoGoals(c, day(-2));
   await login(page);
   await switchButton(page, 'List').click();
-  await page.route('**/api/calendar?month=*', route => route.fulfill({ status: 500, contentType: 'application/json',
-    body: JSON.stringify({ error: { code: 'INTERNAL_ERROR', message: 'Synthetic read failure.' } }) }));
+  await page.route('**/api/calendar?month=*', route => route.fulfill({ status: 400, contentType: 'application/json',
+    body: JSON.stringify({ error: { code: 'VALIDATION_ERROR', message: 'Synthetic read failure.' } }) }));
   await page.getByRole('button', { name: 'Previous month', exact: true }).click();
   await expect(page.getByRole('alert')).toHaveText('Synthetic read failure.');
   await switchButton(page, 'Calendar').click();
