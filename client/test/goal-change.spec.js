@@ -52,6 +52,9 @@ test('TC-158: change W to 13 (refused, value kept), then 6; no button on an ende
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByRole('alert')).toHaveText('Daily target must not exceed the template maximum.');
   await expect(box).toHaveValue('13');
+  await expect(box).toHaveAttribute('aria-invalid', 'true');
+  await expect(box).toHaveAccessibleDescription(/Daily target must not exceed the template maximum\./);
+  await expect(water.getByRole('button', { name: 'Change target', exact: true })).toHaveAccessibleDescription('Water');
   await expect(water.getByText('Daily target: 8 glasses', { exact: true })).toBeVisible();
   // Save is disabled while the request is in flight.
   let release;
