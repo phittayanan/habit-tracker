@@ -89,6 +89,9 @@ test('TC-158 (TIME, ADR 0093): a Time target is typed in minutes with the "= 7 h
   await expect(sleep.getByText('= 8 h', { exact: true })).toBeVisible();
   await box.fill('420');
   await expect(sleep.getByText('= 7 h', { exact: true })).toBeVisible();
+  await expect(box).toHaveAccessibleDescription(/= 7 h/);
+  const gap = await box.evaluate(input => input.parentElement.querySelector('.time-hint').getBoundingClientRect().top - input.getBoundingClientRect().bottom);
+  expect(gap).toBeGreaterThanOrEqual(0);
   await box.fill('420.5');
   await sleep.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(sleep.getByRole('alert')).toHaveText('Target must be whole minutes.');
