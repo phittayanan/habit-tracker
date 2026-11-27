@@ -88,7 +88,7 @@ No new table or column: `Template.state` already exists (F-03). No migration.
 | AC-05.5 | A second retire and an edit get `409 TEMPLATE_RETIRED`; an unknown id gets 404; a bad id gets 400; nothing changes |
 | AC-05.6 | Anonymous gets 401 and a Participant 403, and the template stays active |
 | AC-05.7 | The browser asks before retiring; "Cancel" changes nothing; after "Retire" the row shows "Retired" with no Edit or Retire button |
-| AC-05.8 | A retire and a goal creation on the same template never both ignore each other (section 4 boundaries) |
+| AC-05.8 | When a retire and a goal creation on one template arrive together, either the goal is created and the template is then retired, or the goal gets `409 TEMPLATE_RETIRED`. When two retire requests arrive together, one gets 200 and the other `409 TEMPLATE_RETIRED` |
 
 ## 10. Test specification
 
@@ -101,7 +101,7 @@ Fixtures: one Manager and Participant A (test-only passwords); templates "Sleep"
 | TC-19 | AC-05.6 | API | Fixtures; no template 99999 | Retire "Sleep" and 99999 as A; retire "Sleep" with no session | 403, 403, 401; "Sleep" stays `ACTIVE` |
 | TC-140 | AC-05.5 | API | "Steps" retired | Retire it again; `PATCH` it; retire `99999` and `abc` | 409, 409 (`TEMPLATE_RETIRED`), 404, 400; "Steps" unchanged |
 | TC-141 | AC-05.7 | Browser | Manager on the template list | Press Retire on "Sleep", Cancel; press it again, Retire; then log in as A and open "+ New goal" | After Cancel still "Active"; then "Retired" with no Edit or Retire on that row; "Sleep" is not in A's list; A's goal still shows "Sleep" |
-| TC-142 | AC-05.8 | API and database | Unused "Water" | Hold a lock on "Water" in a test transaction; start retire and see it wait; commit. Then send retire and A's goal creation at the same time | The retire waits. At the same time: the goal is 201 then retire 200, or retire 200 then the goal `409 TEMPLATE_RETIRED` |
+| TC-142 | AC-05.8 | API and database | Unused "Water" and "Tea" | Hold a lock on "Water" in a test transaction; start retire and see it wait; commit. Then, on a fresh active "Water", send retire and A's goal creation at the same time. Send two retire requests for "Tea" at the same time | The retire waits for the lock. Retire against goal: the goal is 201 then retire 200, or retire 200 then the goal `409 TEMPLATE_RETIRED`. Two retires: one 200 and one `409 TEMPLATE_RETIRED`; "Tea" is `RETIRED` |
 | TC-143 | AC-05.7 | Browser | Manager, 375 px and 1280 px | Retire by keyboard only, once cancelling with Escape | No horizontal scroll; focus moves into the dialog and back |
 | TC-08 | AC-05.6 | API | Route audit | Run it | `POST /api/templates/:id/retire` is listed as protected |
 
@@ -115,12 +115,13 @@ Fixtures: one Manager and Participant A (test-only passwords); templates "Sleep"
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-05.1 | Undo and confirmation; screens after retire (SRS A-5, F-04 OP-04.8, F-06 OP-06.2) | Decided by projectnewy (ADR 0078, ADR 0079); phittayanan's agreement pending |
-| OP-05.2 | An unused template can also be retired | Drafted by Claude Code from FR-08 ("A Manager retires a template"); accepted by projectnewy on 2026-11-27; phittayanan's review pending |
-| OP-05.3 | Error code `TEMPLATE_RETIRED`, check order, message and dialog texts | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan's review pending |
+| OP-05.1 | Undo and confirmation; screens after retire (SRS A-5, F-04 OP-04.8, F-06 OP-06.2) | Decided by projectnewy (ADR 0078, ADR 0079); phittayanan agreed in the review of 507ba1c (PR #171) |
+| OP-05.2 | An unused template can also be retired | Drafted by Claude Code from FR-08 ("A Manager retires a template"); accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
+| OP-05.3 | Error code `TEMPLATE_RETIRED`, check order, message and dialog texts | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
 
 ## 13. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #150) | pending (reviewer phittayanan) |
+| 2026-11-27 | [Review of PR #171](https://github.com/phittayanan/habit-tracker/pull/171): two retires at once added to AC-05.8 and TC-142; AC-05.8 reworded. phittayanan agreed to ADR 0078, ADR 0079 and the drafted points | pending (reviewer phittayanan) |

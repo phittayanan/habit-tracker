@@ -133,9 +133,9 @@ TC-123 (F-12) runs once this feature is merged.
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-14.1 | The `daily_target` column (Issue #150: both students decide) | projectnewy chose keep and update (ADR 0075); phittayanan's agreement pending |
-| OP-14.2 | Which goals, same-day changes, the control | Decided by projectnewy (ADR 0076, ADR 0077, ADR 0084); agreement pending |
-| OP-14.3 | The current value writes nothing; `GOAL_ENDED`; check order; screen texts; table and column names; the baseline row for a goal without versions; no list of earlier targets | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan's review pending |
+| OP-14.1 | The `daily_target` column (Issue #150: both students decide) | projectnewy chose keep and update (ADR 0075); phittayanan agreed in the review of 507ba1c (PR #171) |
+| OP-14.2 | Which goals, same-day changes, the control | Decided by projectnewy (ADR 0076, ADR 0077, ADR 0084); phittayanan agreed in the review of 507ba1c (PR #171) |
+| OP-14.3 | The current value writes nothing; `GOAL_ENDED`; check order; screen texts; table and column names; the baseline row for a goal without versions; no list of earlier targets | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
 
 ## 13. Revision history
 

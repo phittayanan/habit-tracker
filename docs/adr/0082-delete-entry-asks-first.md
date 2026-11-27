@@ -1,6 +1,6 @@
 # 0082. Deleting an entry asks first
 
-Status: chosen by projectnewy on 2026-11-27 in [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150) (Q8). To be agreed by phittayanan in the review of the #150 PR.
+Status: chosen by projectnewy on 2026-11-27 in [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150) (Q8). Agreed by phittayanan in the [review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171) of PR #171.
 
 ## Decision
 

@@ -1,6 +1,6 @@
 # 0076. A target can change while the goal has not ended
 
-Status: chosen by projectnewy on 2026-11-27 in [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150) (Q2). To be agreed by phittayanan in the review of the #150 PR.
+Status: chosen by projectnewy on 2026-11-27 in [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150) (Q2). Agreed by phittayanan in the [review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171) of PR #171.
 
 ## Decision
 

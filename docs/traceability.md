@@ -14,8 +14,8 @@
 | BR-08 | FR-06, FR-07, FR-08 |
 | BR-09 | FR-09, FR-23 |
 | BR-10 | FR-13, FR-14 |
-| BR-11 | FR-17 | F-13 | AC-13.1 to AC-13.10 | TC-38, TC-144 to TC-151 | 2 | #150 ([contract](sprints/sprint-2/F-13-entry-edit-delete.md)), #154 |
-| BR-12 | FR-18 | F-14 | AC-14.1 to AC-14.9 | TC-39, TC-152 to TC-159 | 2 | #150 ([contract](sprints/sprint-2/F-14-goal-change.md)), #153 |
+| BR-11 | FR-17 |
+| BR-12 | FR-18 |
 | BR-13 | FR-20 |
 | BR-14 | FR-21 |
 | BR-15 | FR-16 |
@@ -44,8 +44,8 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | none | FR-15 | F-11 | AC-11.1 to AC-11.13 | TC-36, TC-110 to TC-117, TC-120, TC-121, TC-130, TC-47, TC-48 | 2 | #151 ([contract](sprints/sprint-2/F-11-month-calendar.md)), #155 |
 | BR-15 | FR-16 | F-12 | AC-12.1 to AC-12.6 | TC-37, TC-49, TC-117, TC-122, TC-123, TC-124 | 2 | #151 ([contract](sprints/sprint-2/F-12-day-colours.md)), #156 |
-| BR-11 | FR-17 | F-13 | later | TC-38 | 2 | none yet |
-| BR-12 | FR-18 | F-14 | later | TC-39 | 2 | none yet |
+| BR-11 | FR-17 | F-13 | AC-13.1 to AC-13.10 | TC-38, TC-144 to TC-151 | 2 | #150 ([contract](sprints/sprint-2/F-13-entry-edit-delete.md)), #154 |
+| BR-12 | FR-18 | F-14 | AC-14.1 to AC-14.9 | TC-39, TC-152 to TC-159 | 2 | #150 ([contract](sprints/sprint-2/F-14-goal-change.md)), #153 |
 | none | FR-19 | F-15 | AC-15.1 to AC-15.6 | TC-40, TC-121, TC-125, TC-126, TC-47, TC-48 | 2 | #151 ([contract](sprints/sprint-2/F-15-calendar-list.md)), #156 |
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
@@ -185,7 +185,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-131 | Time values outside the calendar: typed in minutes with an hours-and-minutes hint, shown in hours and minutes | Browser |
 | TC-140 | Retire again, edit after retire and bad ids refused | API |
 | TC-141 | Retire in the browser with confirmation; the row and the Participant lists after it | Browser |
-| TC-142 | Retire and goal creation on one template at once | API and database |
+| TC-142 | Retire against goal creation, and two retires, on one template at once | API and database |
 | TC-143 | Retire by keyboard at both widths | Browser |
 | TC-144 | Edit on an ended goal and a retired template | API |
 | TC-145 | Invalid edit values refused | API |
@@ -227,4 +227,4 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | 2026-11-07 | No streak in the Sprint 2 side panel (number box only); the streak comes in Sprint 3 (FR-20, ADR 0021). A-4 decided: a goal's daily target is above 0 and not above the template's maximum | FR-15, F-11, FR-20, F-16, A-4 | phittayanan and projectnewy (PR #23 review, PR #25) |
 | 2026-11-27 | Lab 7: BR-04 changes from one entry per goal per day to several entries with a day total not above the template maximum; BR-07 judges the day total (ADR 0061) | BR-04, BR-07, FR-11, FR-12, F-08, F-09 | projectnewy decided (Issue #139); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Sprint 2 calendar contracts: template kind Count or Time (Time in whole minutes); phone centre box and kind inputs; month arrows, Monday first; colour edge cases with today live; List grouped by day; one `GET /api/calendar` endpoint (`GET /api/entries?month` dropped). ADR 0063 to ADR 0072. After the PR #167 review: first page `/calendar` with the goals page kept (ADR 0073); nothing saved at +0 by the counter or bar (ADR 0074); Time in hours and minutes on every screen (ADR 0065) | FR-05, FR-07, FR-10, FR-11, FR-15, FR-16, FR-19, BR-15; F-03, F-04, F-07, F-08, F-11, F-12, F-15 | phittayanan (Issue #151); projectnewy agreed to ADR 0064 in the [review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343); the rest pending (PR review) |
-| 2026-11-27 | Sprint 2 rules contracts: permanent retire; value-only entry edit, delete with confirmation, controls on the goals page and day box, day cap on edit and delete; target change for goals not ended, in a new `GoalTarget` table with `daily_target` kept. ADR 0075 to ADR 0084 | FR-08, FR-17, FR-18, BR-04, BR-07, BR-11, BR-12; F-03 to F-09, F-11, F-13, F-14 | projectnewy (Issue #150); phittayanan pending (PR review) |
+| 2026-11-27 | Sprint 2 rules contracts: permanent retire; value-only entry edit, delete with confirmation, controls on the goals page and day box, day cap on edit and delete; target change for goals not ended, in a new `GoalTarget` table with `daily_target` kept. ADR 0075 to ADR 0084 | FR-08, FR-17, FR-18, BR-04, BR-07, BR-11, BR-12; F-03 to F-09, F-11, F-13, F-14 | projectnewy (Issue #150); phittayanan agreed in the review of 507ba1c (PR #171) |
