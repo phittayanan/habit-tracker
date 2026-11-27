@@ -13,7 +13,7 @@ Sprint 3 contract (Deliverable 2 Part C, [Issue #157](https://github.com/phittay
 | Depends on | F-07 |
 | Needed by | none |
 | Author / reviewer | projectnewy / phittayanan. Code owner: phittayanan (#158) |
-| Status | In progress in #158 (started 2026-11-27). It merges after the `v2.0` release and after #155 (ADR 0100) |
+| Status | Built and tested in #158 (2026-11-27); #155 is merged (PR #180), so TC-43 runs whole. It merges after the `v2.0` release |
 
 ## 2. Behaviour and workflow
 
@@ -133,7 +133,7 @@ Errors use the ADR 0025 body.
 | OP-17.3 | Check order, codes and messages; remove without a question; 204 when there is none; screen texts; table and column names; how "no outbound call" is tested | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
 | OP-17.4 | Whether the goals inside `GET /api/calendar` carry `reminder` (question 3 of the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219)) | Decided by projectnewy on 2026-11-27: no; only the goal objects of the goal endpoints do (section 7); phittayanan agreed in the [approval of 33f4fbc](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089420416) of PR #174 |
 | OP-17.5 | What happens to a reminder when its goal row is deleted (section 8) | Decided by phittayanan on 2026-11-27 (#158): deleted with the goal, `ON DELETE CASCADE` (ADR 0099); pending projectnewy in the #158 PR |
-| OP-17.6 | `GET /api/calendar` (TC-43) is built in #155, not yet on `staging` when #158 starts | Decided by phittayanan on 2026-11-27 (#158): #158 is blocked by #155; the calendar step is committed failing and passes after #155 merges (ADR 0100); pending projectnewy in the #158 PR |
+| OP-17.6 | `GET /api/calendar` (TC-43) is built in #155, not yet on `staging` when #158 starts | Decided by phittayanan on 2026-11-27 (#158): #158 is blocked by #155; the calendar step is committed failing and passes after #155 merges (ADR 0100). #155 merged as PR #180 and TC-43 passes on the #158 branch; pending projectnewy in the #158 PR |
 | OP-17.7 | Screen details section 6 leaves open: the time box is a text box labelled "Reminder time" with the hint `HH:MM` (a time picker shows AM/PM in some browser languages); the checkbox group is named "Weekdays"; order in a card: the reminder line, "Set reminder" or "Change reminder", the open box, then "Remove reminder"; after a save or removal focus returns to the set or change button | Drafted by Claude Code in #158; decided by phittayanan on 2026-11-27 ("Yes, keep a) to d)", after a sketch of the goal card drawn from the description, not a screenshot of the build); pending projectnewy in the #158 PR |
 
 ## 13. Revision history

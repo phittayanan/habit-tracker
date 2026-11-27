@@ -18,3 +18,7 @@ AC-17.1 and TC-43 check that `GET /api/calendar` has no `reminder` field. That e
 ## Why
 
 AC-17.1 stays whole in one PR, and the check runs against the real endpoint rather than a guess of its shape. Same pattern as ADR 0093.
+
+## Outcome
+
+#155 merged as PR #180 on 2026-11-27. The #158 branch was updated from `staging` once, and TC-43 passes with its calendar step.
