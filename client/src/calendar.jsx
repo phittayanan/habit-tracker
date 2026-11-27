@@ -85,7 +85,8 @@ export function CalendarPage({ onUnauthenticated }) {
   // Run `then` now, or after the ADR 0067 question when an amount is unsaved.
   function whenSaved(then) {
     const text = unsavedText(draft, goalOfDraft);
-    if (text) setAsking({ text, then });
+    // Keep editing puts focus back where it was (keyboard use, NFR-06).
+    if (text) setAsking({ text, then, back: document.activeElement });
     else { setDraft(null); then(); }
   }
   function chooseDay(item) {
@@ -142,7 +143,7 @@ export function CalendarPage({ onUnauthenticated }) {
       </table>
     </section>
     {box}
-    {asking ? <Discard text={asking.text} onKeep={() => setAsking(null)}
+    {asking ? <Discard text={asking.text} onKeep={() => { const back = asking.back; setAsking(null); setFocusAfter(() => () => back?.focus()); }}
       onDiscard={() => { const then = asking.then; setAsking(null); setDraft(null); then(); }} /> : null}
   </div>;
 }
@@ -177,7 +178,15 @@ function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onS
   if (desktop) return <section className="day-panel" aria-labelledby={id}>{content}</section>;
   return <div className="backdrop" onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
     <div role="dialog" aria-modal="true" aria-labelledby={id} className="day-box"
-      onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); onClose(); } }}>
+      onKeyDown={event => {
+        if (event.key === 'Escape') { event.preventDefault(); onClose(); return; }
+        // Focus stays inside the modal box: Tab wraps from the last control to the first and back.
+        if (event.key !== 'Tab') return;
+        const items = [...event.currentTarget.querySelectorAll('button:not(:disabled), input, [tabindex="0"]')];
+        const first = items[0]; const last = items.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }}>
       <button type="button" className="close" ref={close} aria-label="Close" onClick={onClose}>✕</button>
       {content}
     </div>
@@ -195,7 +204,9 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
   const focusInput = useRef(false);
   // Focus moves to the input once when it opens, and back to "+ Check in" after a save or Cancel.
   useEffect(() => { if (draft && focusInput.current && firstControl.current) { focusInput.current = false; firstControl.current.focus(); } });
-  useEffect(() => { if (!draft && refocus.current) { refocus.current = false; openButton.current?.focus(); } });
+  const fullText = useRef(null);
+  // When the day is now full there is no "+ Check in", so focus goes to the "is full" text.
+  useEffect(() => { if (!draft && refocus.current) { refocus.current = false; (openButton.current || fullText.current)?.focus(); } });
   function open() {
     whenSaved(() => { setMessage(''); focusInput.current = true; setDraft({ goalId: goal.goalId, amount: 0, other: '', hours: '', minutes: '' }); });
   }
@@ -205,9 +216,10 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
     try {
       await api(`/api/goals/${goal.goalId}/entries`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entryDate: date, value }) }, onUnauthenticated);
-      refocus.current = true;
       setDraft(null);
       await onSaved();
+      // Set after the re-read, so focus goes to what the updated card shows.
+      refocus.current = true;
     } catch (error) { setMessage(error.message); }
     finally { setBusy(false); }
   }
@@ -223,20 +235,23 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
       <span style={{ width: `${pct}%` }} />
     </div>
     {goal.entries.length > 0 ? <p className="entries">{goal.entries.map(entry => amount(entry.value, goal)).join(' · ')}</p> : null}
-    {full && !draft ? <p>{when} is full ({goal.maxValue} {goal.unit}).</p> : null}
+    {full && !draft ? <p ref={fullText} tabIndex={-1}>{when} is full ({goal.maxValue} {goal.unit}).</p> : null}
     {!full && !draft ? <button type="button" ref={openButton} onClick={open}>+ Check in {goal.name}</button> : null}
-    {draft ? <CheckIn goal={goal} draft={draft} setDraft={setDraft} fits={fits} busy={busy} save={save} firstControl={firstControl}
+    {draft ? <CheckIn goal={goal} draft={draft} setDraft={setDraft} fits={fits} busy={busy} save={save} fail={setMessage} firstControl={firstControl}
       cancel={() => { setMessage(''); refocus.current = true; setDraft(null); }} /> : null}
     {message && <p role="alert" className="error">{message}</p>}
   </li>;
 }
 
-function CheckIn({ goal, draft, setDraft, fits, busy, save, firstControl, cancel }) {
+function CheckIn({ goal, draft, setDraft, fits, busy, save, fail, firstControl, cancel }) {
   const set = change => setDraft({ ...draft, ...change });
   const typed = goal.kind === 'TIME'
     ? <form className="typed" noValidate onSubmit={event => {
       event.preventDefault();
       const empty = draft.hours.trim() === '' && draft.minutes.trim() === '';
+      const minutes = draft.minutes.trim();
+      // Section 4: minutes are a whole number from 0 to 59; anything else is not sent.
+      if (minutes !== '' && !(Number.isInteger(Number(minutes)) && Number(minutes) >= 0 && Number(minutes) <= 59)) { fail('Minutes must be 0 to 59.'); return; }
       save(empty ? undefined : (Number(draft.hours) || 0) * 60 + (Number(draft.minutes) || 0));
     }}>
       <fieldset><legend>Exact</legend>
