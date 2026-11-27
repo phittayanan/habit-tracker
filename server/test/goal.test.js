@@ -37,7 +37,7 @@ test('TC-20: exact shape, stripped ownership, real process restart, own-only new
   assert.equal(created.status, 201);
   const goal = created.body.goal;
   assert.deepEqual(goal, { id: goal.id, templateId: template.id, dailyTarget: 20, startDate: day(0), endDate: day(30), state: 'ACTIVE',
-    template: { id: template.id, name: 'Sleep', unit: 'hours', minValue: 0, maxValue: 24 } });
+    template: { id: template.id, name: 'Sleep', unit: 'hours', kind: 'COUNT', minValue: 0, maxValue: 24 } });
   assert.equal((await db.goal.findUniqueOrThrow({ where: { id: goal.id } })).participantId, a.id);
   await post(body(), cookies.b).expect(201);
   const ended = await post(body({ startDate: day(-5), endDate: day(-1) }));

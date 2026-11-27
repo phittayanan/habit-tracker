@@ -53,7 +53,7 @@ const templateShape = (body, expected) => {
   assert.equal(body.maxValue, expected.maxValue);
   assert.equal(typeof body.maxValue, 'number');
   assert.equal(body.state, expected.state);
-  assert.deepEqual(Object.keys(body).sort(), ['id', 'maxValue', 'minValue', 'name', 'state', 'unit']);
+  assert.deepEqual(Object.keys(body).sort(), ['id', 'kind', 'maxValue', 'minValue', 'name', 'state', 'unit']);
 };
 
 test('the template migration adds the range check and unique name without changing older tables', async () => {
