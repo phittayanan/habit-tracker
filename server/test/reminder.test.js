@@ -3,6 +3,8 @@ import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import https from 'node:https';
+import net from 'node:net';
+import tls from 'node:tls';
 import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -54,22 +56,28 @@ beforeEach(async () => {
 });
 after(async () => db.$disconnect());
 
-// Replaces fetch, http.request and https.request with recorders. Calls to the app's own test server are not counted.
+// Replaces fetch, http.request/get, https.request/get, net.connect/createConnection and tls.connect with recorders
+// (mail and push libraries reach the network through these). Calls to the app's own test server are not counted.
 function recordOutbound(ownPort) {
   const calls = [];
-  const saved = { fetch: globalThis.fetch, http: http.request, https: https.request };
+  const targets = [[globalThis, 'fetch'], [http, 'request'], [http, 'get'], [https, 'request'], [https, 'get'], [net, 'connect'], [net, 'createConnection'], [tls, 'connect']];
+  const saved = targets.map(([owner, name]) => owner[name]);
   const own = args => {
     const [first, second] = args;
-    const target = typeof first === 'string' || first instanceof URL ? new URL(first) : null;
-    const options = target ? (typeof second === 'object' ? second : {}) : (first || {});
-    const host = target ? target.hostname : (options.hostname || options.host);
-    const port = Number(target ? target.port : options.port);
+    let host, port;
+    if (typeof first === 'number' || (typeof first === 'string' && /^\d+$/.test(first))) { port = Number(first); host = typeof second === 'string' ? second : 'localhost'; }
+    else if (typeof first === 'string' || first instanceof URL) { const url = new URL(first); host = url.hostname; port = Number(url.port); }
+    else { host = first?.hostname || first?.host || 'localhost'; port = Number(first?.port); }
     return ['127.0.0.1', 'localhost'].includes(host) && port === ownPort;
   };
-  globalThis.fetch = (...args) => { calls.push(['fetch', String(args[0])]); return Promise.reject(new Error('outbound fetch blocked in TC-43')); };
-  http.request = function (...args) { if (!own(args)) calls.push(['http', args[0]]); return saved.http.apply(this, args); };
-  https.request = function (...args) { calls.push(['https', args[0]]); return saved.https.apply(this, args); };
-  return { calls, restore() { globalThis.fetch = saved.fetch; http.request = saved.http; https.request = saved.https; } };
+  targets.forEach(([owner, name], i) => {
+    owner[name] = function (...args) {
+      if (name === 'fetch' || !own(args)) calls.push([`${owner === globalThis ? '' : `${owner === http ? 'http' : owner === https ? 'https' : owner === net ? 'net' : 'tls'}.`}${name}`, String(args[0]?.href || args[0]?.host || args[0])]);
+      if (name === 'fetch') return Promise.reject(new Error('outbound fetch blocked in TC-43'));
+      return saved[i].apply(this, args);
+    };
+  });
+  return { calls, restore() { targets.forEach(([owner, name], i) => { owner[name] = saved[i]; }); } };
 }
 
 test('TC-43: a stored reminder is returned Monday first, survives a restart, rides on POST and PATCH, is not in the calendar, and nothing is sent', async () => {
@@ -110,6 +118,11 @@ test('TC-43: a stored reminder is returned Monday first, survives a restart, rid
 });
 
 test('TC-168: saving again replaces the reminder, and two saves at once leave one row', async () => {
+  // Two first saves at once on a goal with no reminder: both 200, one row (the goal-row lock, not a unique-key error).
+  const firsts = await Promise.all([put(w.id, { time: '05:00', weekdays: ['MON'] }), put(w.id, { time: '05:05', weekdays: ['TUE'] })]);
+  assert.deepEqual(firsts.map(res => res.status), [200, 200]);
+  assert.equal((await rows()).length, 1);
+  await db.goalReminder.deleteMany();
   assert.equal((await put(w.id, { time: '07:30', weekdays: ['MON'] })).status, 200);
   const replaced = await put(w.id, { time: '21:15', weekdays: ['SUN', 'TUE'] });
   assert.equal(replaced.status, 200);
@@ -174,14 +187,21 @@ test('TC-171: setting on an ended goal gets 409 GOAL_ENDED; a goal ending today 
   assert.deepEqual((await listed(e.id)).reminder, { time: '22:00', weekdays: ['SAT'] }, 'an ended goal still shows its reminder');
   const ok = await put(endsToday.id, { time: '07:30', weekdays: ['MON'] });
   assert.equal(ok.status, 200);
+  assert.deepEqual((await rows()).find(row => row.goalId === endsToday.id), { goalId: endsToday.id, time: '07:30', weekdays: ['MON'] });
+  // F-17 section 3 (ADR 0017): a goal on a retired template keeps working, reminder included.
+  await db.template.update({ where: { id: water.id }, data: { state: 'RETIRED' } });
+  assert.equal((await put(w.id, { time: '08:15', weekdays: ['WED'] })).status, 200);
+  assert.deepEqual((await listed(w.id)).reminder, { time: '08:15', weekdays: ['WED'] });
+  assert.equal((await remove(w.id)).status, 204);
 });
 
 test('TC-172: anonymous 401, Manager 403, another Participant and an unknown id 404; nothing changes; TC-08 lists both routes', async () => {
   assert.equal((await put(w.id, { time: '07:30', weekdays: ['MON'] })).status, 200);
   const before = await rows();
+  const messages = { UNAUTHENTICATED: 'Please log in.', FORBIDDEN: 'You do not have permission to do this.', GOAL_NOT_FOUND: 'Goal not found.' };
   const expectError = (res, status, code) => {
     assert.equal(res.status, status);
-    assert.equal(res.body.error.code, code);
+    assert.deepEqual(res.body, { error: { code, message: messages[code] } });
   };
   const body = { time: '09:00', weekdays: ['TUE'] };
   expectError(await put(w.id, body, null), 401, 'UNAUTHENTICATED');
@@ -193,6 +213,12 @@ test('TC-172: anonymous 401, Manager 403, another Participant and an unknown id 
     expectError(refusedPut, 404, 'GOAL_NOT_FOUND');
     assert.equal(refusedPut.body.error.message, 'Goal not found.');
     expectError(await remove(id, cookie), 404, 'GOAL_NOT_FOUND');
+  }
+  // Order 0: a foreign Origin is refused before anything else (F-01).
+  for (const call of [put(w.id, body).set('Origin', 'https://evil.example'), remove(w.id).set('Origin', 'https://evil.example')]) {
+    const foreign = await call;
+    assert.equal(foreign.status, 403);
+    assert.equal(foreign.body.error.code, 'ORIGIN_NOT_ALLOWED');
   }
   // Order 3 before order 4: a bad body on another Participant's goal is 404, not 400.
   expectError(await put(w.id, { time: 'x' }, cookies.b), 404, 'GOAL_NOT_FOUND');

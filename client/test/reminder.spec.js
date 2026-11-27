@@ -61,6 +61,8 @@ test('TC-173: set 07:30 Mon and Fri, reload, refused save keeps the values, chan
   await page.route(`**/api/goals/${w.id}/reminder`, async route => { await new Promise(resolve => { release = resolve; }); await route.continue(); });
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  // Cancel cannot close the box while the save runs, so a refusal still finds the typed values.
+  await expect(water.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
   release();
   await expect(water.getByText('Reminder: 07:30 on Mon, Fri', { exact: true })).toBeVisible();
   await expect(water.getByLabel('Reminder time', { exact: true })).toHaveCount(0);
@@ -80,6 +82,9 @@ test('TC-173: set 07:30 Mon and Fri, reload, refused save keeps the values, chan
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByRole('alert')).toHaveText('Choose at least one weekday, each only once.');
   await expect(time).toHaveValue('21:05');
+  // The weekday message describes the Weekdays group, not the time box.
+  await expect(days).toHaveAccessibleDescription(/Choose at least one weekday, each only once\./);
+  await expect(time).not.toHaveAttribute('aria-invalid', 'true');
   await expect(days.getByRole('checkbox', { checked: true })).toHaveCount(0);
   await expect(water.getByText('Reminder: 07:30 on Mon, Fri', { exact: true })).toBeVisible();
   expect(await stored(w.id)).toEqual({ time: '07:30', weekdays: ['MON', 'FRI'] });
@@ -87,8 +92,12 @@ test('TC-173: set 07:30 Mon and Fri, reload, refused save keeps the values, chan
   await days.getByRole('checkbox', { name: 'Wed', exact: true }).check();
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByText('Reminder: 21:05 on Wed, Sun', { exact: true })).toBeVisible();
-  // Remove happens at once, with no question.
+  // Remove happens at once, with no question; its button is disabled while the request runs.
+  let releaseRemove;
+  await page.route(`**/api/goals/${w.id}/reminder`, async route => { await new Promise(resolve => { releaseRemove = resolve; }); await route.continue(); });
   await water.getByRole('button', { name: 'Remove reminder', exact: true }).click();
+  await expect(water.getByRole('button', { name: 'Remove reminder', exact: true })).toBeDisabled();
+  releaseRemove();
   await expect(water.getByText('No reminder', { exact: true })).toBeVisible();
   await expect(water.getByRole('button', { name: 'Set reminder', exact: true })).toBeVisible();
   expect(await stored(w.id)).toBeNull();
