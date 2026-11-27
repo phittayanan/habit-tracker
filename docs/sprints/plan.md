@@ -83,9 +83,11 @@ The rows run in build order, taken from the Depends-on column. F-04 follows F-07
 
 All dependencies are Sprint 1 features or earlier Sprint 2 features, so Sprint 2 can start once Sprint 1 is released. F-12 and F-15 follow F-11. The side panel shows no streak until Sprint 3 (F-16; decided on PR #23).
 
-**Data change.** Goal versions: each change of the daily target becomes a new row with an effective-from date, and the Sprint 1 `daily_target` column moves to the version rows (SDS 3.5, ADR 0011).
+**Added work (Issue #151).** The day box needs a template kind, Count or Time, with Time in whole minutes (ADR 0064, ADR 0065). It revises F-03, F-04, F-07 and F-08 and is built in Issue #168, which F-11 (#155) waits for. The calendar is a new first page, `/calendar`; the Sprint 1 goals page stays at `/goals` (ADR 0073).
 
-**Tests planned.** TC-14, TC-15, TC-19 (F-05), TC-36 (F-11), TC-37 (F-12), TC-38 (F-13), TC-39 (F-14), TC-40 (F-15), TC-49 (non-colour signal on the calendar). NFR-05 and NFR-06 are checked on the new screens, and NFR-02 and NFR-03 are rechecked on each new endpoint (SRS 5.1). Feature contracts with AC and test IDs are written before each feature is built (`docs/assignment.md` 3.5).
+**Data change.** The template kind column (ADR 0064, #168). Goal versions: each change of the daily target becomes a new row with an effective-from date, and the Sprint 1 `daily_target` column moves to the version rows (SDS 3.5, ADR 0011).
+
+**Tests planned.** TC-14, TC-15, TC-19 (F-05), TC-36 (F-11), TC-37 (F-12), TC-38 (F-13), TC-39 (F-14), TC-40 (F-15), TC-49 (non-colour signal on the calendar); the calendar contracts add TC-110 to TC-131 (Issue #151). NFR-05 and NFR-06 are checked on the new screens, and NFR-02 and NFR-03 are rechecked on each new endpoint (SRS 5.1). Feature contracts with AC and test IDs are written before each feature is built (`docs/assignment.md` 3.5).
 
 **Completion outcome.** All six Sprint 2 features are implemented, reviewed, integrated and verified against their contracts, with Sprint 1 behavior, login, backend permissions and record ownership still working (`docs/assignment.md` 5.2). The Participant's first screen is the month calendar. The Sprint 2 release is on `main`. By the same date the Sprint 3 contracts, working progress on at least one Sprint 3 workflow or rule, and a remaining-work list are due (`docs/assignment.md` 5.2).
 

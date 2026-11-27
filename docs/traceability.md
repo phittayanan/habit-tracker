@@ -32,21 +32,21 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | none | FR-02 | F-01 | AC-01.4 | TC-03 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | none | FR-03 | F-01 | AC-01.5, AC-01.6 | TC-04, TC-05 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
 | none | FR-04 | F-01 | AC-01.7 | TC-06, TC-63 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
-| BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7 | TC-09, TC-10, TC-68, TC-69, TC-70 | 1 | #30, #36, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
+| BR-03 | FR-05 | F-03 | AC-03.1 to AC-03.5, AC-03.7; AC-03.8, AC-03.9 (kind, Sprint 2) | TC-09, TC-10, TC-68, TC-69, TC-70; TC-118, TC-119 | 1; kind 2 | #30, #36, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/37); #151 (kind contract) |
 | BR-08 | FR-06 | F-03 | AC-03.6 | TC-11 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6 | TC-12, TC-13, TC-71, TC-72, TC-73 | 1 | #30, #53, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/54) |
+| BR-08 | FR-07 | F-04 | AC-04.1 to AC-04.6; AC-04.8 (kind, Sprint 2) | TC-12, TC-13, TC-71, TC-72, TC-73; TC-129 | 1; kind 2 | #30, #53, #9, #131 (partner finding #127), [implementation](https://github.com/phittayanan/habit-tracker/pull/54) |
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
-| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78 | 1 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
-| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19 | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90 | 1 | #28, #38, #42, #9, #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
+| BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11; AC-07.12, AC-07.13 (Time target, Sprint 2) | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78; TC-128, TC-131 | 1; Time target 2 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
+| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19; AC-08.20, AC-08.21 (Time value, Sprint 2) | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90; TC-127, TC-131 | 1; Time value 2 | #28, #38, #42, #9, #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
 | BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.10 | TC-31, TC-32, TC-59, TC-87, TC-88 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51), #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
 | BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
-| none | FR-15 | F-11 | later | TC-36 | 2 | none yet |
-| BR-15 | FR-16 | F-12 | later | TC-37 | 2 | none yet |
+| none | FR-15 | F-11 | AC-11.1 to AC-11.13 | TC-36, TC-110 to TC-117, TC-120, TC-121, TC-130, TC-47, TC-48 | 2 | #151 ([contract](sprints/sprint-2/F-11-month-calendar.md)), #155 |
+| BR-15 | FR-16 | F-12 | AC-12.1 to AC-12.6 | TC-37, TC-49, TC-117, TC-122, TC-123, TC-124 | 2 | #151 ([contract](sprints/sprint-2/F-12-day-colours.md)), #156 |
 | BR-11 | FR-17 | F-13 | later | TC-38 | 2 | none yet |
 | BR-12 | FR-18 | F-14 | later | TC-39 | 2 | none yet |
-| none | FR-19 | F-15 | later | TC-40 | 2 | none yet |
+| none | FR-19 | F-15 | AC-15.1 to AC-15.6 | TC-40, TC-121, TC-125, TC-126, TC-47, TC-48 | 2 | #151 ([contract](sprints/sprint-2/F-15-calendar-list.md)), #156 |
 | BR-13 | FR-20 | F-16 | later | TC-41, TC-42 | 3 | none yet |
 | BR-14 | FR-21 | F-17 | later | TC-43 | 3 | none yet |
 | none | FR-22 | F-02 | AC-02.1 to AC-02.5 | TC-07, TC-08, TC-66, TC-67 | 1 | #30, #32, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/34) |
@@ -109,7 +109,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-33 | Participant B's read and write of Participant A's goals and entries refused | API |
 | TC-34 | Manager read and write of goals and entries refused | API |
 | TC-35 | Participant sees only own goals, entries and progress | API and browser |
-| TC-36 | Calendar is first after login; side panel shows chosen day | Browser |
+| TC-36 | Calendar is first after login (Monday first); the panel shows the chosen day's active goals | Browser |
 | TC-37 | Colour per combination of goals met | Unit |
 | TC-38 | Edit and delete an entry, then recompute | API and unit |
 | TC-39 | Past days judged against the old target | Unit |
@@ -161,6 +161,28 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-88 | A day becomes met with a second entry, also after a restart | Browser and API |
 | TC-89 | The Lab 7 migration keeps existing entries | API and database |
 | TC-90 | Negative values: only the upper limit is checked on the day total | API |
+| TC-110 | Month arrows: back to earlier months, not past the current month; the List follows | Browser |
+| TC-111 | A future day cannot be opened; today and past days open | Browser |
+| TC-112 | A day with no active goal says "No goals on this day." | Browser |
+| TC-113 | Count input: − / + by 1, not below +0 or past what fits; Done saves one entry | Browser |
+| TC-114 | Time input: 15-minute bar by pointer and arrow keys; Check in saves whole minutes | Browser |
+| TC-115 | Typed row saves exact amounts; a rejected save shows the API message | Browser and API |
+| TC-116 | Closing with an unsaved amount asks before discarding | Browser |
+| TC-117 | A save updates the card, the sign and the calendar colour without a reload | Browser |
+| TC-118 | Template kind on create: default Count; Time stores unit minutes and whole numbers; bad kind refused | API and database |
+| TC-119 | Template form Kind choice and the Kind column | Browser |
+| TC-120 | `GET /api/calendar` shape, month default and bad month | API |
+| TC-121 | `GET /api/calendar` privacy: own goals only; Manager 403; anonymous 401 | API |
+| TC-122 | Editing or deleting an entry changes the day state (after F-13) | API |
+| TC-123 | Day state uses the target valid that day (after F-14) | Unit and API |
+| TC-124 | Today's state is live | API |
+| TC-125 | List grouped by day, newest first, with "No entries" days | Browser |
+| TC-126 | Time shown as hours and minutes | Unit |
+| TC-127 | A Time entry must be whole minutes | API |
+| TC-128 | A Time goal target must be whole minutes | API |
+| TC-129 | Template kind change: allowed while unused, whole numbers for Time, refused when used | API |
+| TC-130 | First page `/calendar`; menu Calendar, Goals, Templates; TC-07, TC-32, TC-59, TC-61, TC-65, TC-86 and TC-47/TC-48 pass with only their steps into the goals page changed (ADR 0073 point 4); Manager refused on `/calendar` | Browser |
+| TC-131 | Time values outside the calendar: typed in minutes with an hours-and-minutes hint, shown in hours and minutes | Browser |
 | none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 
 ## Coverage Gaps
@@ -170,7 +192,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 - Auth API/unit/browser checks have passed for Issue #32, including TC-47/48 on the login and shared role layout. Template create and view checks have passed for Issue #36 on `5435e89`, including TC-47/48 on the template list and new form at 375px and 1280px. F-04 tests (TC-12, TC-13 with the edit-versus-goal race, TC-18, TC-71, TC-72, TC-73, and TC-47/48 on the edit form) pass locally for Issue #53 on `3d1ccbb`, and TC-08 now audits `PATCH /api/templates/:id`; teammate review is pending. The Sprint 2 retire refusal (TC-19) remains planned. TC-08 independently discovers implemented API routes from the Express router tree, including mounted routers and methods; only exact login/health/ready methods are public. Issue #36 adds `GET /api/templates` and `POST /api/templates` to that coverage. Missing coverage registration and missing protection are regression-tested; each later feature must extend the protected coverage entries. Implementation re-review and merge remain pending.
 - `GET /api/ready` answering 503 when the database cannot be reached (F-02 section 5, SDS 4.4) has an automated test, `server/test/ready.test.js`, added in Issue #48. It has no TC number because no planned test covers it; no new TC was added in Issue #48 (projectnewy left the choice to the worker, who kept the numbering unchanged); the reviewer may ask for one. The 503 behavior already existed, so that test passed the first time it ran.
 - FR-23 retire refusal (TC-19) cannot run until FR-08 exists in Sprint 2.
-- The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have only a Sprint 2 test name.
+- The calendar rows (FR-15, FR-16, FR-19) and NFR-06's non-colour check (TC-49) have AC and test IDs in the Sprint 2 contracts of Issue #151; no test is written yet. TC-122 and TC-123 wait for F-13 (#154) and F-14 (#153). The template kind (ADR 0064) is built in Issue #168, before #155.
 - Open points that change a row if answered differently: SRS A-1 (FR-12), A-2 (FR-06 to FR-08), A-3 (FR-15, FR-16), A-11 (FR-11); and O-1 to O-8 in `docs/features.md`.
 
 ## Approved Changes
@@ -183,3 +205,4 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | 2026-11-07 | FR-23 added: a Participant's request to create, edit or retire a template is refused with 403 and changes nothing | FR-23, BR-09 | phittayanan and projectnewy (PR #21 review) |
 | 2026-11-07 | No streak in the Sprint 2 side panel (number box only); the streak comes in Sprint 3 (FR-20, ADR 0021). A-4 decided: a goal's daily target is above 0 and not above the template's maximum | FR-15, F-11, FR-20, F-16, A-4 | phittayanan and projectnewy (PR #23 review, PR #25) |
 | 2026-11-27 | Lab 7: BR-04 changes from one entry per goal per day to several entries with a day total not above the template maximum; BR-07 judges the day total (ADR 0061) | BR-04, BR-07, FR-11, FR-12, F-08, F-09 | projectnewy decided (Issue #139); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | Sprint 2 calendar contracts: template kind Count or Time (Time in whole minutes); phone centre box and kind inputs; month arrows, Monday first; colour edge cases with today live; List grouped by day; one `GET /api/calendar` endpoint (`GET /api/entries?month` dropped). ADR 0063 to ADR 0072. After the PR #167 review: first page `/calendar` with the goals page kept (ADR 0073); nothing saved at +0 by the counter or bar (ADR 0074); Time in hours and minutes on every screen (ADR 0065) | FR-05, FR-07, FR-10, FR-11, FR-15, FR-16, FR-19, BR-15; F-03, F-04, F-07, F-08, F-11, F-12, F-15 | phittayanan (Issue #151); projectnewy agreed to ADR 0064 in the [review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343); the rest pending (PR review) |

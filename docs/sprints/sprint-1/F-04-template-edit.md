@@ -51,6 +51,8 @@ Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403
 
 When a request breaks more than one rule, the first one in this table is returned. Example: an edit of a used template that also sets the minimum above the maximum gets `409 TEMPLATE_IN_USE`.
 
+Sprint 2 (Issue #151; ADR 0064, ADR 0065): `kind` is an editable field like the other four, so a body with only `kind` is not empty. Changing it on a used template gets `409 TEMPLATE_IN_USE` (row 5). After merging, a `TIME` template has unit `minutes` and whole-number minimum and maximum; a fraction gets `400 VALIDATION_ERROR` at row 6's step, before the range rule.
+
 Unknown body fields are stripped and do not cause an error (decided on PR #29, OP-07.7).
 
 Boundaries: sending the template's own current name is accepted (not a duplicate); a template whose only goal is Ended is still used. The check "no goal uses it" and the update run in one transaction that first locks the template row (`SELECT ... FOR UPDATE`); goal creation takes the same lock (F-07 AC-07.10), so the two cannot interleave (OP-04.4).
@@ -106,6 +108,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4.
 | AC-04.5 | An edit of a used template that also breaks the range rule gets `409 TEMPLATE_IN_USE` |
 | AC-04.6 | In the browser, Edit opens the filled form, a valid change shows in the table, and a refused change shows the API message and keeps the typed values |
 | AC-04.7 | A Participant's `PATCH /api/templates/:id` gets `403 FORBIDDEN`, for an existing and for an unknown id, and the template is unchanged |
+| AC-04.8 | (Sprint 2) An unused template can change kind: to `TIME` its unit becomes `minutes` and a merged minimum or maximum with a fraction gets `400 VALIDATION_ERROR`; to `COUNT` the unit stays until edited. A kind change on a used template gets `409 TEMPLATE_IN_USE` |
 
 ## 10. Test specification
 
@@ -119,6 +122,7 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-72 | AC-04.3 | Unit and API | Unused templates "Walk" (0 to 100) and "Swim" (0 to 50) | Unit: the merged range for stored (0, 100) with sent `minValue` 100. API: `PATCH` "Walk" `{ "minValue": 100 }`; `PATCH` "Walk" `{ "name": "Swim" }`; `PATCH` "Walk" `{ "name": "Walk", "unit": "steps" }` | Unit: refused. API: `400 MIN_NOT_BELOW_MAX`; `409 TEMPLATE_NAME_EXISTS`; 200 with unit "steps". "Walk" keeps min 0 and max 100 after the first two |
 | TC-73 | AC-04.6 | Browser | Manager; unused template "Reading" (0 to 500); template "Sleep" with A's Active goal (created through the API before the test) | Edit "Reading": maximum 300, Save. Edit "Sleep": maximum 12, Save | "Reading" shows 0–300 in the table. "Sleep": the message "This template is used by a goal and cannot be edited." and the typed 12 stays |
 | TC-18 | AC-04.7 | API | A logged in; template "Sleep" (hours, 0 to 24); no template with id 99999 | As A: `PATCH` "Sleep" `{ "maxValue": 12 }`; `PATCH /api/templates/99999` `{ "unit": "x" }` | Both get `403 FORBIDDEN`; "Sleep" still has max 24 |
+| TC-129 | AC-04.8 | API | Unused "Nap" (`COUNT`, hours, 0 to 1.5); unused "Rest" (`COUNT`, hours, 0 to 2); "Sleep" with A's goal | `PATCH` "Rest" `{ "kind": "TIME", "maxValue": 120 }`; `PATCH` "Nap" `{ "kind": "TIME" }`; `PATCH` "Sleep" `{ "kind": "TIME" }` | "Rest" 200, `TIME`, unit `minutes`, 0 to 120; "Nap" `400 VALIDATION_ERROR` (1.5 is not whole) and unchanged; "Sleep" `409 TEMPLATE_IN_USE` and unchanged |
 
 ## 11. Definition of done
 
@@ -149,3 +153,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): own Participant edit refusal as AC-04.7 / TC-18; remove circular dependency; record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-10 | Implementation Issue #53, before the code: the edit locks the template row (sections 4 and 8, as OP-04.4 decided); TC-13 adds the edit-versus-goal race that F-07 OP-07.11 deferred to F-04; OP-04.9 lists the edit-page details as a proposal | pending (partner review of the Issue #53 PR) |
 | 2026-11-26 | Issue #131, from the partner UAT finding #127: AC-04.4 lists a name or unit that contains a NUL character; TC-71 adds both cases | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-04.8; TC-129 | pending (reviewer projectnewy) |
