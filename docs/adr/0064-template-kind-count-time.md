@@ -1,6 +1,6 @@
 # 0064. Template kind: Count or Time
 
-Status: chosen by phittayanan on 2026-11-27 in [Issue #151](https://github.com/phittayanan/habit-tracker/issues/151) (Q1, Q9, Q10). The Issue says both students decide this: to be agreed by projectnewy in the review of the #151 PR.
+Status: chosen by phittayanan on 2026-11-27 in [Issue #151](https://github.com/phittayanan/habit-tracker/issues/151) (Q1, Q9, Q10). The Issue says both students decide this: agreed by projectnewy in the [review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343) of PR #167.
 
 ## Decision
 
@@ -9,7 +9,7 @@ Status: chosen by phittayanan on 2026-11-27 in [Issue #151](https://github.com/p
 3. A `TIME` template stores whole minutes (ADR 0065).
 4. The kind can be changed only while no goal uses the template, like the other template fields (BR-08).
 5. A count goal's − / + steps by 1. A time goal's bar runs from 0 to the template's maximum, one segment = 15 minutes. Neither goes past what still fits in the day (BR-04).
-6. The code (database column, template API, Manager form) is a new Issue, blocked by #151 and blocking #155.
+6. The code (database column, template API, Manager form) is Issue #168, blocked by #151 and blocking #155.
 
 ## Options considered
 
