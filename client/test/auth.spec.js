@@ -53,6 +53,7 @@ test('TC-07: shared bar shows database identity and exact role menus on test-onl
     await expect(page.getByRole('navigation').getByRole('link')).toHaveText(menu);
     await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
     await page.getByRole('button', { name: 'Log out' }).click();
+    await expect(page).toHaveURL(/\/login$/);
   }
 });
 
