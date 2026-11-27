@@ -7,18 +7,20 @@ Contract: [F-11](sprints/sprint-2/F-11-month-calendar.md), with ADR 0063 to ADR 
 - Server suite on `staging` (650cde2): 113 tests, 113 pass.
 - New and changed server tests (`server/test/calendar.test.js`: TC-120, TC-121; `server/test/client.test.js` with `/calendar`) against the unchanged code: 6 tests, 0 pass, 6 fail.
 - Browser suite with the new `client/test/calendar.spec.js` and the changed Sprint 1 login steps, against the unchanged code: 70 failed, 12 passed, 4 skipped.
+- 3455050, still before the code, fixed two test steps: the month helper now waits for each month change, and the goals TC-47/TC-48 needs one more Tab for "Calendar". It has no red run of its own.
+- After the independent check, new tests in 8ba370c (keyboard Discard, focus inside the phone box, focus after a day becomes full, Minutes 0 to 59, the time bar by keyboard) ran red against the code of ffc88f0: `calendar.spec.js` 18 passed, 5 failed, 5 skipped. 8c2cd29 then made TC-115 answer the Discard question before it opens Sleep.
 
 ## After the change
 
-Tested code commit: ffc88f0 (later commits change documents only).
+Tested code commit: 3d31bb1 (later commits change documents only).
 
 | Command | Result |
 |---|---|
 | `npm test` in `server/` | 118 tests, 118 pass, 0 fail, 0 skipped |
-| `npx playwright test` in `client/` (Chrome, port 33155) | 80 passed, 4 skipped, 2 failed: TC-73 at both widths, `connect ECONNREFUSED 127.0.0.1:33132`, because its request context is hard-coded to 33132 |
+| `npx playwright test` in `client/` (Chrome, port 33155) | 83 passed, 5 skipped, 2 failed: TC-73 at both widths, `connect ECONNREFUSED 127.0.0.1:33132`, because its request context is hard-coded to 33132 |
 | `npx playwright test test/templates.spec.js -g TC-73` (standard config, port 33132) | 2 passed |
 
-The 4 skipped cases are width-specific: TC-36 and the desktop TC-116 case run at 1280 px only; TC-111 and the phone TC-116 case at 375 px only.
+The 5 skipped cases are width-specific: TC-36 and the desktop TC-116 case run at 1280 px only; TC-111, the phone TC-116 case and the keyboard Discard case at 375 px only.
 
 ## AC results
 
@@ -35,7 +37,7 @@ The 4 skipped cases are width-specific: TC-36 and the desktop TC-116 case run at
 | AC-11.9 | TC-116 (phone and desktop) | pass |
 | AC-11.10 | TC-113, TC-115 (card total and entries) | pass; sign and colour are TC-117, which runs in #156 (ADR 0097) |
 | AC-11.11 | TC-120, TC-121 (`calendar.test.js`) | pass; `state` is `null` on every day until #156 |
-| AC-11.12 | TC-47/TC-48 (`calendar.spec.js`) | pass at 375 and 1280 px |
+| AC-11.12 | Three TC-47/TC-48 tests (`calendar.spec.js`): counter and Other amount; time bar, Check in and Exact; Keep editing and Discard with focus kept in the phone box | pass at 375 and 1280 px (the Discard test at 375 px) |
 | AC-11.13 | TC-130, and the Sprint 1 tests with only the ADR 0073 point 4 steps changed | pass |
 
 ## Sprint 1 tests that changed (ADR 0073 point 4)
@@ -56,8 +58,20 @@ The checks on the goals page itself did not change.
 6. Cancel on the time bar drops the amount without the ADR 0067 question (the question is for closing the box or choosing another day).
 7. A full past day says "2026-11-26 is full (12 glasses)." with the F-08 wording.
 8. On desktop the panel keeps its chosen day while other months are shown.
+9. A tap on a bar segment fills up to the end of that segment (with 6 h 40 min logged, a tap on the 7 h segment adds +20 min); the arrow keys add 15 minutes each.
+10. One card's input is open at a time; opening another card's input with an unsaved amount asks the ADR 0067 question.
+11. `GET /api/calendar` answers `400 VALIDATION_ERROR` "Month must be YYYY-MM.", also for an empty or repeated `month`.
+12. A Minutes value outside 0 to 59 shows "Minutes must be 0 to 59." and is not sent (written into contract section 4).
 
-Also drafted by Claude Code and not yet accepted: `GET /api/calendar` answers `400 VALIDATION_ERROR` with the message "Month must be YYYY-MM.", also for an empty or repeated `month` (the contract names the code, not the message).
+Items 1 to 8 were accepted after phittayanan looked at the screenshots; items 9 to 12 were accepted one by one in the same session.
+
+## Independent check before review
+
+Two read-only subagents checked the branch at ffb3112: Claude Sonnet checked the claims in the changed documents against their sources, and Claude Opus checked the branch against Issue #155, the F-11 contract and ADR 0073 and ADR 0097. Claude Code verified each finding against the code before changing anything.
+
+- Fixed: focus was lost after "Keep editing" and after a save that fills the day, and Tab could leave the phone box (now kept inside); the Minutes box took values above 59; the keyboard tests did not cover the time bar, the Exact row or the Discard question; ADR 0097 said "chip" where the contract says "sign"; this file did not mention 3455050; a stray test comment.
+- Recorded here, not changed: the pointer behaviour of the bar (item 9), the red run for 3455050, the busy files shared with PR #179.
+- Not fixed: if the read after a 201 fails, the card shows the read error although the entry was saved; the next read shows it.
 
 ## Screenshots (for the D2 PDF)
 
