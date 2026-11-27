@@ -26,10 +26,12 @@ export async function createGoal(db, user, data) {
   return db.$transaction(async tx => {
     // This lock serializes both same-user creates and future F-04 template edits.
     // Read the current range only after acquiring the lock, in the same transaction.
-    const [template] = await tx.$queryRaw`SELECT id, name, unit, kind::text AS kind, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${data.templateId} FOR UPDATE`;
+    const [template] = await tx.$queryRaw`SELECT id, name, unit, kind::text AS kind, state::text AS state, min_value AS "minValue", max_value AS "maxValue" FROM "Template" WHERE id = ${data.templateId} FOR UPDATE`;
     if (!template) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Choose an existing template.' };
     // A validation row, so it comes before the target rules (F-07 section 4, ADR 0065).
     if (template.kind === 'TIME' && !Number.isInteger(data.dailyTarget)) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Target must be whole minutes.' };
+    // F-05: after all validation rows and before the other rule rows. The state is read under the lock.
+    if (template.state === 'RETIRED') return { ok: false, status: 409, code: 'TEMPLATE_RETIRED', message: 'This template is retired and cannot be used for a new goal.' };
     if (!targetWithinMaximum(data.dailyTarget, Number(template.maxValue))) return { ok: false, status: 400, code: 'TARGET_ABOVE_TEMPLATE_MAX', message: 'Daily target must not exceed the template maximum.' };
     if (!targetAboveMinimum(data.dailyTarget, Number(template.minValue))) return { ok: false, status: 400, code: 'TARGET_NOT_ABOVE_TEMPLATE_MIN', message: 'Daily target must be above the template minimum.' };
     // Compute today after waiting for the lock, so a Bangkok midnight during a wait

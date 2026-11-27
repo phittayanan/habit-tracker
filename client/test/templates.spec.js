@@ -31,7 +31,7 @@ function range(min, max) {
   return `${min}\u2013${max}`;
 }
 
-test('TC-11: manager template page shows every state, New and Edit, and no Retire control', async ({ page }) => {
+test('TC-11: manager template page shows every state, New, and Edit and Retire on active rows only', async ({ page }) => {
   await logIn(page, 'manager1');
   await expect(page.getByRole('heading', { name: 'Templates' })).toBeVisible();
   await expect(page.getByText('No templates yet')).toBeVisible();
@@ -55,9 +55,11 @@ test('TC-11: manager template page shows every state, New and Edit, and no Retir
   await expect(rows.nth(1)).toContainText('Active');
   await expect(rows.nth(2)).toContainText('Steps');
   await expect(rows.nth(2)).toContainText('Retired');
-  await expect(page.getByRole('button', { name: 'Edit', exact: true })).toHaveCount(2);
+  // Sprint 2 (F-05, ADR 0079): the active row has Edit and Retire; the retired row has neither.
+  await expect(rows.nth(1).getByRole('button', { name: 'Edit', exact: true })).toBeVisible();
+  await expect(rows.nth(1).getByRole('button', { name: 'Retire', exact: true })).toBeVisible();
+  await expect(rows.nth(2).getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'New', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Retire' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Retire' })).toHaveCount(0);
   await expect(page.getByText('Retired')).toBeVisible();
 });

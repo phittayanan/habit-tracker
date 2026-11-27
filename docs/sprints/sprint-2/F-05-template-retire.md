@@ -62,7 +62,7 @@ Boundaries: retire and goal creation lock the same template row (`SELECT ... FOR
 ## 6. UI behaviour
 
 - Each active row of the Manager's table has "Edit" and "Retire". A retired row has neither (ADR 0079).
-- "Retire" asks: `Retire "Sleep"? New goals cannot use it. This cannot be undone.` with "Cancel" and "Retire". The question is a dialog; focus moves into it, Escape cancels, and focus returns to the row's button.
+- "Retire" asks: `Retire "Sleep"? New goals cannot use it. This cannot be undone.` with "Cancel" and "Retire". The question is a dialog; focus moves into it, Escape cancels, and focus returns to the row's button. After a successful retire that button is gone, so focus moves to the row's "Retired" cell (ADR 0095).
 - While the request runs the confirm button is disabled. On 200 the row shows "Retired". A rejected request shows the API `message`.
 - The "+ New goal" list and the Participant's templates page do not show the template. A form opened earlier that submits it shows the API message and keeps the typed values.
 - 375 px and 1280 px with no horizontal scroll; keyboard only (NFR-05, NFR-06).
@@ -102,7 +102,7 @@ Fixtures: one Manager and Participant A (test-only passwords); templates "Sleep"
 | TC-140 | AC-05.5 | API | "Steps" retired | Retire it again; `PATCH` it; retire `99999` and `abc` | 409, 409 (`TEMPLATE_RETIRED`), 404, 400; "Steps" unchanged |
 | TC-141 | AC-05.7 | Browser | Manager on the template list | Press Retire on "Sleep", Cancel; press it again, Retire; then log in as A and open "+ New goal" | After Cancel still "Active"; then "Retired" with no Edit or Retire on that row; "Sleep" is not in A's list; A's goal still shows "Sleep" |
 | TC-142 | AC-05.8 | API and database | Besides the fixtures, three unused active templates: "Water", "Juice" and "Tea" | (a) Hold a lock on "Water" in a test transaction; start the retire of "Water" and see it wait; commit. (b) Send the retire of "Juice" and A's goal creation on "Juice" at the same time. (c) Send two retire requests for "Tea" at the same time | (a) The retire waits for the lock, then returns 200. (b) Either the goal is 201 and the retire 200, or the retire is 200 and the goal `409 TEMPLATE_RETIRED`. (c) One 200 and one `409 TEMPLATE_RETIRED`; "Tea" is `RETIRED` |
-| TC-143 | AC-05.7 | Browser | Manager, 375 px and 1280 px | Retire by keyboard only, once cancelling with Escape | No horizontal scroll; focus moves into the dialog and back |
+| TC-143 | AC-05.7 | Browser | Manager, 375 px and 1280 px | Retire by keyboard only, once cancelling with Escape | No horizontal scroll; focus moves into the dialog and back; after the retire it is on the row's "Retired" cell |
 | TC-08 | AC-05.6 | API | Route audit | Run it | `POST /api/templates/:id/retire` is listed as protected |
 
 ## 11. Definition of done
@@ -126,3 +126,4 @@ Fixtures: one Manager and Participant A (test-only passwords); templates "Sleep"
 | 2026-11-27 | First draft (Issue #150) | pending (reviewer phittayanan) |
 | 2026-11-27 | [Review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171: two retires at once added to AC-05.8 and TC-142; AC-05.8 reworded. phittayanan agreed to ADR 0078, ADR 0079 and the drafted points | pending (reviewer phittayanan) |
 | 2026-11-27 | [Review of 3048963](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6088156899) of PR #171: TC-142 names its own unused templates and gives the status of step (a); review links corrected | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #152, review of PR #179: focus after a successful retire (section 6, TC-143; ADR 0095) | chosen by projectnewy; pending (reviewer phittayanan) |

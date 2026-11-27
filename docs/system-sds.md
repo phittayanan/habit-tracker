@@ -360,7 +360,7 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 | Template edit only while unused; retire | 0017 |
 | Target versions with `daily_target` kept; which goals change | 0075 to 0077, 0084 |
 | Versions deleted with their goal; the `TIME` check of a change after #168 | 0092, 0093 |
-| Permanent retire and its screens | 0078, 0079 |
+| Permanent retire and its screens | 0078, 0079, 0095 |
 | Entry edit and delete | 0080 to 0083 |
 | One removable reminder per goal, on the goals page | 0086 to 0088 |
 | Streak display and the goal detail page | 0089 to 0091 |
