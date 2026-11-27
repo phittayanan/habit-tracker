@@ -46,6 +46,8 @@ The 5 skipped cases are width-specific: TC-36 and the desktop TC-116 case run at
 - TC-07: the Participant's menu is "Calendar", "Goals", "Templates". The auth and templates TC-47/TC-48: Tab reaches "Calendar" before "Goals". The goals TC-47/TC-48: one more Tab to reach "+ New goal".
 - `server/test/client.test.js`: the built client also serves `/calendar`.
 
+- After `staging` brought in PR #179, `client/test/template-retire.spec.js` (TC-141) got the same login step: a Participant lands on `/calendar` and opens "Goals" from the menu.
+
 The checks on the goals page itself did not change.
 
 ## Choices the contract does not spell out (drafted by Claude Code, accepted by phittayanan on 2026-11-27)
