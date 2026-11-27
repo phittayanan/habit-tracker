@@ -13,7 +13,7 @@ Sprint 2 contract (Deliverable 2 Part B, [Issue #151](https://github.com/phittay
 | Depends on | F-08, F-09; the template kind (ADR 0064, built in Issue #168, blocked by #151); F-14's goal versions for "the target that day" once #153 is merged |
 | Needed by | F-12, F-15, F-13 (the day box is where entries are listed) |
 | Author / reviewer | phittayanan / projectnewy |
-| Status | Draft for review |
+| Status | Agreed (PR #167); built in Issue #155. The day state, colour and sign are built in Issue #156 (ADR 0097) |
 
 ## 2. Behaviour and workflow
 
@@ -112,7 +112,7 @@ Response 200:
 ```
 
 - `days` has one item per day of the month, oldest first.
-- `state` is `ALL_MET`, `SOME_MET`, `NONE_MET`, `NOTHING` or `null` by the F-12 rule.
+- `state` is `ALL_MET`, `SOME_MET`, `NONE_MET`, `NOTHING` or `null` by the F-12 rule. Issue #155 returns `null` on every day; Issue #156 fills it (ADR 0097).
 - `goals` lists the caller's goals active that day; it is empty for a future day. `name` is the template's name. `entries` are newest saved first (F-08 OP-08.10). `total` is the sum of the entries; `met` is `total >= target`.
 - Errors: 400, 401, 403 as in section 4.
 
@@ -151,14 +151,14 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | Test | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
 | TC-36 | AC-11.1, AC-11.4 | Browser | A; entries 3 and 2 on W for `D`; one goal X of A ending `D-3` | Log in at 1280 px; read the address, the calendar and the panel; open `D-5` and `D-1` | The address is `/calendar`; current month title, Monday first column; panel shows today with W "5 / 8 glasses" and entries "2 · 3" and S "0 min / 7 h"; `D-5` lists X, W and S; `D-1` lists W and S only |
-| TC-110 | AC-11.2 | Browser | A logged in | Press ‹ twice, then › twice; switch to List after the first ‹ | Titles show the two earlier months, then the current one; › is not available on the current month; the List shows the previous month |
+| TC-110 | AC-11.2 | Browser | A logged in | Press ‹ twice, then › twice; switch to List after the first ‹ (this step runs in #156, ADR 0097) | Titles show the two earlier months, then the current one; › is not available on the current month; the List shows the previous month |
 | TC-111 | AC-11.3 | Browser | A logged in, phone width | Try to open `D+1` (if in this month) by pointer and keyboard; open `D` and `D-1` | `D+1` is a disabled button named "… future" and nothing opens; `D` and `D-1` open the box |
 | TC-112 | AC-11.4 | Browser | A whose only goal starts `D-2` | Go to the previous month; open its first day | "No goals on this day." |
 | TC-113 | AC-11.6 | Browser | A; W has 10 on `D` (2 still fit) | Open `D`, "+ Check in water"; try Done and − at +0; press + three times, Done | At +0 Done and − are disabled; + stops at +2 ("total 12 / 8"); Done stores one entry of 2; the card shows 12 / 8 ✓ met |
 | TC-114 | AC-11.7 | Browser | A; S has 400 on `D` | Open `D`, "+ Check in sleep"; focus the bar; press → three times; Check in | The bar reads "+45 min", total "7 h 25 min"; one entry of 45 is stored; the bar cannot add more than 5 h 20 min (720 − 400 minutes) |
 | TC-115 | AC-11.8 | Browser and API | A; W and S with no entries on `D-1` | Count "Other amount" 2.5 → Save; Time "Exact" 7 h 10 min → Save; Count "Other amount" 20 → Save | 2.5 and 430 are stored; 20 shows the API's `VALUE_OUT_OF_RANGE` message and keeps 20 |
 | TC-116 | AC-11.9 | Browser | A, phone width | Choose +3 on W, press Escape, choose "Keep editing", tap outside, choose "Discard"; then open again and close with nothing chosen | First the question "Discard +3 glasses?"; after "Keep editing" the box and +3 stay; after "Discard" the box closes and no entry is stored; the last close happens at once |
-| TC-117 | AC-11.10 | Browser (cross-feature with F-12) | A; on `D`, W met (8) and S empty | Check in 420 on S; watch the card and calendar | Without a reload the S card shows "7 h / 7 h ✓ met", the box sign and the day turn from "½ some goals met" to "✓ all goals met" |
+| TC-117 | AC-11.10 | Browser (cross-feature with F-12; runs in #156, ADR 0097) | A; on `D`, W met (8) and S empty | Check in 420 on S; watch the card and calendar | Without a reload the S card shows "7 h / 7 h ✓ met", the box sign and the day turn from "½ some goals met" to "✓ all goals met" |
 | TC-120 | AC-11.11 | API | A with W and S and entries on `D` and `D-1`; X ended `D-3` | `GET /api/calendar`; `?month=` previous month; `?month=2026-13`; `?month=abc` | Shape as in section 7; one item per day, oldest first; entries newest first; X only on its days; the bad months get `400 VALIDATION_ERROR` |
 | TC-121 | AC-11.11 | API | A, B, Manager, as above | `GET /api/calendar` as B, as the Manager, and anonymous | B sees none of A's goals; Manager `403 FORBIDDEN`; anonymous `401 UNAUTHENTICATED`. TC-08 lists the route as protected |
 | TC-130 | AC-11.13 | Browser | A with goal W and an entry on `D`; the Manager | As A: log in; read the address and the menu; choose "Goals". Run TC-07, TC-32, TC-59, TC-61, TC-65, TC-86 and the auth, goals and entries TC-47/TC-48 with only the steps of ADR 0073 point 4 changed. As the Manager: open `/calendar` | A is on `/calendar`; menu "Calendar", "Goals", "Templates"; "Goals" opens `/goals` with "x of y days met", the entry list with "Day total" and the record form; those Sprint 1 tests pass, with their goals-page checks as in Sprint 1; the Manager sees "This page is not available for your role." |
@@ -188,6 +188,7 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | OP-11.11 | What happens to the Sprint 1 goals page | Decided by phittayanan (R1, answering projectnewy's blocking finding 1): kept unchanged at `/goals`; the calendar is the new first page `/calendar` (ADR 0073) |
 | OP-11.13 | Which Sprint 1 test steps may change for the new first page | Decided by phittayanan (R4, answering projectnewy's blocking finding 1 in the [review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): only the steps that lead to the goals page (address after login, opening "Goals", the menu list, the tab order); the goals-page checks stay (ADR 0073 point 4) |
 | OP-11.12 | What Done does at +0 | Decided by phittayanan (R2, answering projectnewy's finding 2): disabled, and the same for Check in (ADR 0074) |
+| OP-11.14 | Who builds the day state, colour and sign | Decided by phittayanan in Issue #155 (ADR 0097): Issue #156 (F-12). #155 returns `state: null`, shows no sign, colour or chip, and names a day button by its date ("… future" for a future day). TC-117 and the List step of TC-110 wait for #156 |
 | OP-11.10 | Editing and deleting an entry from the card (F-13) | In the day box or panel and on the goals page (ADR 0081; F-13 section 6). A card lists each entry with Edit and Delete once F-13 is built |
 
 ## 13. Revision history
@@ -198,3 +199,4 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): first page `/calendar` and the Sprint 1 goals page kept (ADR 0073; sections 2, 3, 5, 9, 10, 12; AC-11.13, TC-130); Done and Check in disabled at +0 (ADR 0074; AC-11.6, AC-11.7, TC-113); projectnewy's agreement to ADR 0064 | pending (reviewer projectnewy) |
 | 2026-11-27 | Re-check of PR #167 ([review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): the Sprint 1 test steps that change for `/calendar` (ADR 0073 point 4; section 2, section 3, AC-11.13, TC-130, OP-11.13) | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #150: F-13 controls in the card (OP-11.10) and the F-13 and F-14 controls on the goals page (section 3; ADR 0081, ADR 0084) | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #155: the day state, colour, sign and chip are built in #156; `state` is `null` until then; TC-117 and TC-110's List step wait for #156 (ADR 0097; sections 1, 7, 10, 12) | phittayanan; projectnewy in the #155 PR review |
