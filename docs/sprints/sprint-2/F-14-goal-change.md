@@ -1,6 +1,6 @@
 # F-14 Goal change
 
-Sprint 2 contract (Deliverable 2 Part B, [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150)). Written before any code. Built from the merged SRS, SDS, features, traceability, the Sprint 1 contracts, ADR 0011, ADR 0054 and ADR 0065, plus ADR 0075 to ADR 0077 and ADR 0084. Points drafted by Claude Code are marked in section 12.
+Sprint 2 contract (Deliverable 2 Part B, [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150)). Written before any code. Built from the merged SRS, SDS, features, traceability, the Sprint 1 contracts, ADR 0011, ADR 0054 and ADR 0065, plus ADR 0075 to ADR 0077, ADR 0084, ADR 0086 and ADR 0087. Points drafted by Claude Code are marked in section 12.
 
 ## 1. Identity
 
@@ -86,6 +86,7 @@ Errors use the ADR 0025 body.
 | Migration | One additive migration: create the table and insert, for every goal, (`goal_id`, `start_date`, `daily_target`) |
 | Goal creation (F-07) | Also inserts the first row, in the same transaction |
 | A change | In one transaction with the goal row locked: if no row is effective on the start date (a goal created while the app was rolled back), first insert (start date, old `daily_target`); then insert or replace the row of the effective date; then update `daily_target` |
+| Delete | `goal_id` is `ON DELETE CASCADE`: versions go with their goal (ADR 0086) |
 | Human step | A person reads the migration before it runs on Cloud SQL (#153) |
 
 **Rollback (ADR 0075).** The previous app version still runs on the new schema. It ignores `GoalTarget` and judges all days against `daily_target`, so days before a change are shown wrongly until the roll forward. Goals it creates have no version row and use `daily_target`.
@@ -136,6 +137,7 @@ TC-123 (F-12) runs once this feature is merged.
 | OP-14.1 | The `daily_target` column (Issue #150: both students decide) | projectnewy chose keep and update (ADR 0075); phittayanan agreed in the review of 507ba1c (PR #171) |
 | OP-14.2 | Which goals, same-day changes, the control | Decided by projectnewy (ADR 0076, ADR 0077, ADR 0084); phittayanan agreed in the review of 507ba1c (PR #171) |
 | OP-14.3 | The current value writes nothing; `GOAL_ENDED`; check order; screen texts; table and column names; the baseline row for a goal without versions; no list of earlier targets | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
+| OP-14.4 | What deleting a goal does to its versions; when the `TIME` whole-minutes check and "= 7 h" hint are built, since `Template.kind` comes with #168 | phittayanan chose CASCADE (ADR 0086) and the same #153 PR, merged after #168 (ADR 0087), on 2026-11-27 |
 
 ## 13. Revision history
 
@@ -143,3 +145,4 @@ TC-123 (F-12) runs once this feature is merged.
 |---|---|---|
 | 2026-11-27 | First draft (Issue #150) | pending (reviewer phittayanan) |
 | 2026-11-27 | [Review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171: phittayanan agreed to the decisions and drafted points (section 12) | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #153: ADR 0086 (versions deleted with their goal) and ADR 0087 (`TIME` check after #168) | phittayanan; projectnewy reviews the #153 PR |
