@@ -38,8 +38,8 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
 | BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78 | 1 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
-| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.12 | TC-23 to TC-30, TC-56, TC-58, TC-61 | 1 | #28, #38, #42, #9 |
-| BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.8 | TC-31, TC-32, TC-59 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
+| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19 | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90 | 1 | #28, #38, #42, #9, #139 (Lab 7, not yet implemented) |
+| BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.10 | TC-31, TC-32, TC-59, TC-87, TC-88 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51), #139 (Lab 7, not yet implemented) |
 | BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | none | FR-15 | F-11 | later | TC-36 | 2 | none yet |
@@ -102,7 +102,7 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-26 | Entry on today and on boundary days accepted | Unit and API |
 | TC-27 | "Today" is the Bangkok date at 23:59:59 and 00:00:00 (process run with `TZ=UTC`), for the future-date check and the UI's default date | Unit |
 | TC-28 | Value below, at and above each limit | Unit and API |
-| TC-29 | Second entry for the same day returns 409 | API |
+| TC-29 | A second entry for the same day within the day maximum is stored (revised in Lab 7; before: 409) | API |
 | TC-30 | Ended goal: an entry dated after its end is rejected; an entry dated inside its period is accepted | Unit and API |
 | TC-31 | Days met counts for met, missed and empty days | Unit |
 | TC-32 | Progress shown on the goals page | Browser |
@@ -152,6 +152,15 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | TC-76 | Demo seed keeps an edited template: after a Manager edits a demo template, running the seed again leaves the unit, minimum and maximum as edited and still creates a missing demo template (Issue #79, ADR 0053; no feature ID) | API and database |
 | TC-77 | Seed sets the password hash again on every run: a second run with other `SEED_*_PASSWORD` values replaces the hashes, so the new passwords match and the old ones no longer do (Issue #79, ADR 0053 decision 2; no feature ID) | API and database |
 | TC-78 | A daily target not above the template minimum is rejected with `TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; a target just above it is accepted; on a template with minimum 0 a target of 0 still gets `VALIDATION_ERROR` (Issue #74, ADR 0054, AC-07.11) | API and unit |
+| TC-82 | Day total below, at and above the template maximum | Unit and API |
+| TC-83 | Day total is exact to 2 decimal places | Unit and API |
+| TC-84 | Concurrent entries cannot take the day total above the maximum | API and database |
+| TC-85 | The day-total rule is checked last | Unit and API |
+| TC-86 | Several entries of a day and the day total on the goals page | Browser |
+| TC-87 | A day is met by the sum of its entries and counts once | Unit |
+| TC-88 | A day becomes met with a second entry, also after a restart | Browser and API |
+| TC-89 | The Lab 7 migration keeps existing entries | API and database |
+| TC-90 | Negative values: only the upper limit is checked on the day total | API |
 | none | Lab 5 technical checks (Issue #80, no feature ID): `deploy/tests/test_release_stub.sh`, `deploy/tests/test_smoke.py`, `deploy/tests/test_deploy_workflow.py` (release script, smoke test and `deploy.yml` structure, offline) | Offline script and unit |
 
 ## Coverage Gaps
@@ -173,3 +182,4 @@ Names from the "Tested by" and "Verification" columns of the SRS. Auth implement
 | 2026-11-07 | FR-15 (calendar and side panel) and FR-16 with BR-15 move from Sprint 1 to Sprint 2 | FR-15, FR-16, BR-15 | phittayanan and projectnewy (PR #21 review) |
 | 2026-11-07 | FR-23 added: a Participant's request to create, edit or retire a template is refused with 403 and changes nothing | FR-23, BR-09 | phittayanan and projectnewy (PR #21 review) |
 | 2026-11-07 | No streak in the Sprint 2 side panel (number box only); the streak comes in Sprint 3 (FR-20, ADR 0021). A-4 decided: a goal's daily target is above 0 and not above the template's maximum | FR-15, F-11, FR-20, F-16, A-4 | phittayanan and projectnewy (PR #23 review, PR #25) |
+| 2026-11-27 | Lab 7: BR-04 changes from one entry per goal per day to several entries with a day total not above the template maximum; BR-07 judges the day total (ADR 0061) | BR-04, BR-07, FR-11, FR-12, F-08, F-09 | projectnewy decided (Issue #139); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |

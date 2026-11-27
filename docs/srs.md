@@ -34,9 +34,9 @@ Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026) is the handout
 ### 1.4 Definitions
 - **Template**: a Manager-defined activity with a name, a free-text unit and a per-entry minimum and maximum. Active or retired.
 - **Goal**: a Participant's daily target on one template, with a start and an end date. At most one active goal per template per Participant (ADR 0010).
-- **Entry**: one value a Participant records for one goal on one day.
+- **Entry**: one value a Participant records for one goal on one day. A day may hold several entries; their sum is the **day total** (ADR 0061).
 - **Day**: a calendar date in the fixed time zone Asia/Bangkok (ADR 0006).
-- **Day met**: a day whose value reached the goal's daily target (ADR 0013).
+- **Day met**: a day whose total reached the goal's daily target (ADR 0013, ADR 0061).
 - **Goal states**: Active until its end date passes, then Ended; derived from dates, never set by hand (ADR 0012).
 - **Streak**: consecutive days met; one missed day resets it to zero; today does not break it until the day is over (ADR 0015).
 - Domain terms are kept in `GLOSSARY.md`.
@@ -64,10 +64,10 @@ Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026) is the handout
 | BR-01 | An entry's date must be today or earlier, and inside its goal's start and end dates. Anything else is rejected. | ADR 0005 | 1 | Unit and API: future date, before start, after end, today, boundary days |
 | BR-02 | A day is a date in Asia/Bangkok, for every user. | ADR 0006 | 1 | Unit: entries either side of midnight Bangkok |
 | BR-03 | An entry's value must lie within its template's minimum and maximum (inclusive). A template's minimum must be below its maximum. | ADR 0007 | 1 | Unit and API: below, at, above each limit; min not below max |
-| BR-04 | A Participant has at most one entry per goal per day. A second entry for the same day is rejected; the Participant edits the existing one instead. Known Sprint 1 limit: editing is FR-17 (Sprint 2), so in Sprint 1 a wrong same-day entry cannot be fixed. | ADR 0008 | 1 | API: second entry returns 409 |
+| BR-04 | A Participant may record several entries for one goal on one day. The sum of a goal's values on one day (the day total) is not above the template's `max_value` (equal is allowed); an entry that would take it above is rejected and stores nothing. Entries cannot be edited or deleted until FR-17 (Sprint 2), so a wrong entry cannot be fixed. Revised in Lab 7; before, a second entry for the same day was rejected. | ADR 0061 (replaces ADR 0008) | 1, revised in Lab 7 | Unit and API: below, at and above the day maximum; two requests at once |
 | BR-05 | A Participant has at most one active goal per template. | ADR 0010 | 1 | API: second active goal rejected |
 | BR-06 | A goal is Active until its end date passes, then Ended. The state is computed from dates. An entry to an ended goal is rejected by BR-01. | ADR 0012 | 1 | Unit: state on start, end, day after end |
-| BR-07 | Progress is days met: the count of days whose value reached the daily target, out of the days so far. | ADR 0013 | 1 | Unit: counts for met, missed and empty days |
+| BR-07 | Progress is days met: the count of days whose total (the sum of that day's entries) reached the daily target, out of the days so far. | ADR 0013, ADR 0061 | 1, revised in Lab 7 | Unit: counts for met, missed and empty days; days with several entries |
 | BR-08 | A Manager may edit a template only while no goal uses it. A used template can only be retired. A retired template cannot start new goals; existing goals continue. | ADR 0017 | 1 for edit; 2 for retire (see A-2) | API: edit used template refused; new goal on retired template refused; existing goal still takes entries |
 | BR-09 | A Participant cannot create, edit or retire a template. | ADR 0018; GWS §6.8 | 1 | API: Participant request returns 403 |
 | BR-10 | A Participant's goals and entries are private. A Manager and any other Participant are refused access (no sharing). | ADR 0019; GWS §6.8 | 1 | API: cross-Participant and Manager reads and writes return 403 or 404 |
@@ -93,7 +93,7 @@ Observable behaviour. "Sprint 1" items are the handout's example.
 | FR-08 | A Manager retires a template. It no longer appears for new goals; goals already using it keep working. | ADR 0017 | 2 (see A-2) |
 | FR-09 | A Participant sees all active templates, read-only. | ADR 0018 | 1 |
 | FR-10 | A Participant creates a goal from a "+ New goal" form: template dropdown, daily target, start and end dates. A second active goal on the same template is rejected. | ADR 0049, ADR 0010 | 1 |
-| FR-11 | A Participant records a day's value by typing a number. The unit is shown and the template's range is checked. Rejections follow BR-01, BR-03 and BR-04, each with a clear message. | ADR 0039, ADR 0008 | 1 |
+| FR-11 | A Participant records a day's value by typing a number. The unit is shown and the template's range is checked. Rejections follow BR-01, BR-03 and BR-04, each with a clear message. | ADR 0039, ADR 0061 | 1 |
 | FR-12 | A Participant sees computed progress for a goal: days met out of days so far. | ADR 0013 | 1 |
 | FR-13 | A Participant sees only their own goals, entries and progress. Requests for another Participant's data are refused. | ADR 0019 | 1 |
 | FR-14 | A Manager's request for any Participant's goals or entries is refused. | ADR 0019 | 1 |
@@ -164,7 +164,7 @@ No ADR settles these. Each is left open and needs a decision before the requirem
 | A-8 | NFR numbers: the width and keyboard targets are proposed here, not agreed. | NFR-05, NFR-06 |
 | A-9 | Seeded account names and the way their passwords are shared privately (not in the repository). | FR-01 |
 | A-10 | What a goal's detail page shows besides the best streak (ADR 0042 names the page, not its content). | FR-20 |
-| A-11 | Sprint 1 limit: a wrong same-day entry cannot be fixed until editing (FR-17) arrives in Sprint 2. Chosen over adding an edit to Sprint 1; the students may revisit. | BR-04, FR-11, FR-17 |
+| A-11 | Sprint 1 limit: a wrong entry cannot be fixed until editing (FR-17) arrives in Sprint 2. Since ADR 0061 a later entry on the same day adds to the day total; it does not replace the wrong one. | BR-04, FR-11, FR-17 |
 
 ### 6.4 Questions for the TA (open)
 The team cannot settle these. They are open points in the handouts (`docs/design-questions.md`, "Ask the TA"). Record each reply here or in an ADR.
@@ -181,3 +181,10 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 | T-8 | How do we ask for agreement on an alternative Sprint 1 slice or a brief ambiguity, and how long does a reply take? | Open |
 | T-9 | May student IDs be left out of the PDF and given only on LEB2, given the repository is public? | Open |
 | T-10 | Which GCP access method applies: the instructor's announced method or a personal Gmail Free Trial? | Open |
+
+## 7. Revision history
+
+| Date | Change | Approved by |
+|---|---|---|
+| 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
+| 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
