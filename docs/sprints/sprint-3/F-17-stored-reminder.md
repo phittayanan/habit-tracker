@@ -90,7 +90,7 @@ Errors use the ADR 0025 body.
 
 | AC | Observable outcome |
 |---|---|
-| AC-17.1 | The owner stores a reminder; it is returned by `GET /api/goals` Monday first and is still there after a restart |
+| AC-17.1 | The owner stores a reminder; it is returned by `GET /api/goals` Monday first and is still there after a restart; the `POST /api/goals` and `PATCH /api/goals/:id` responses carry `reminder` (`null` when there is none); `GET /api/calendar` has no `reminder` field |
 | AC-17.2 | Saving again replaces it; the goal never has two |
 | AC-17.3 | The owner removes it (204), also on an ended goal; removing when there is none is 204 |
 | AC-17.4 | Bad times and weekday lists get `400 VALIDATION_ERROR` with the section 4 messages and change nothing |
@@ -106,7 +106,7 @@ Errors use the ADR 0025 body.
 
 | Test | AC | Level | Precondition / input | Action | Expected result |
 |---|---|---|---|---|---|
-| TC-43 | AC-17.1, AC-17.7 | API | Fixtures; `fetch`, `http.request` and `https.request` replaced by recorders after login | `PUT` W `07:30` with `["FRI","MON"]`; read goals; restart; read | 200; `["MON","FRI"]` both times; the recorders saw no call. The test client's own request to the app is not counted |
+| TC-43 | AC-17.1, AC-17.7 | API | Fixtures; `fetch`, `http.request` and `https.request` replaced by recorders after login | `PUT` W `07:30` with `["FRI","MON"]`; read goals; restart; read. Then `POST /api/goals` on a template A has no goal on; `PATCH` W to another valid daily target; `GET /api/calendar` for day `D` | 200; `["MON","FRI"]` both times; the `POST` response has `reminder` `null`; the `PATCH` response has W's reminder; no goal in day `D` of the calendar has a `reminder` field; the recorders saw no call. The test client's own request to the app is not counted |
 | TC-167 | AC-17.7 | Review | The PR diff and `server/package.json` | Search for mail, push, notification and scheduler libraries or jobs | None added; the reviewer records the check |
 | TC-168 | AC-17.2 | API and database | W with a reminder | `PUT` another; then two `PUT` at the same time | The latest replaces the first; both 200; one row |
 | TC-169 | AC-17.3 | API | W and E with reminders (E's inserted directly) | `DELETE` each twice | 204 every time; no rows |
@@ -139,3 +139,4 @@ Errors use the ADR 0025 body.
 |---|---|---|
 | 2026-11-27 | First draft (Issue #157) | pending (reviewer phittayanan) |
 | 2026-11-27 | [Review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219) of PR #174: phittayanan agreed to the decisions and drafted points; section 7 says which responses carry `reminder` (OP-17.4) | pending (reviewer phittayanan) |
+| 2026-11-27 | [Approval of 33f4fbc](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089420416) of PR #174, finding 1: AC-17.1 and TC-43 now check `reminder` in the `POST` and `PATCH` responses and its absence from `GET /api/calendar` (section 7, OP-17.4) | pending (reviewer phittayanan) |
