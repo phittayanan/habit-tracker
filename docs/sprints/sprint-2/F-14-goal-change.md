@@ -138,6 +138,7 @@ TC-123 (F-12) runs once this feature is merged.
 | OP-14.2 | Which goals, same-day changes, the control | Decided by projectnewy (ADR 0076, ADR 0077, ADR 0084); phittayanan agreed in the review of 507ba1c (PR #171) |
 | OP-14.3 | The current value writes nothing; `GOAL_ENDED`; check order; screen texts; table and column names; the baseline row for a goal without versions; no list of earlier targets | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
 | OP-14.4 | What deleting a goal does to its versions; when the `TIME` whole-minutes check and "= 7 h" hint are built, since `Template.kind` comes with #168 | phittayanan chose CASCADE (ADR 0086) and the same #153 PR, merged after #168 (ADR 0087), on 2026-11-27 |
+| OP-14.5 | The box label "New daily target ({unit})"; the `VALIDATION_ERROR` message reuses F-07's target wording ("Daily target must be above 0, at most 99,999,999.99, with at most 2 decimal places."); the `GOAL_NOT_FOUND` message "Goal not found." as F-08 | Drafted by Claude Code in #153; open for projectnewy in the PR review |
 
 ## 13. Revision history
 
