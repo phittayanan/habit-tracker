@@ -119,6 +119,10 @@ test('TC-143: keyboard alone retires with no horizontal scroll; focus moves into
   await expect(confirm).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(dialog).toHaveCount(0);
-  await expect(sleepRow(page).getByRole('cell', { name: 'Retired', exact: true })).toBeVisible();
+  // ADR 0095: the row's button is gone, so focus goes to the row's "Retired" cell.
+  const retiredCell = sleepRow(page).getByRole('cell', { name: 'Retired', exact: true });
+  await expect(retiredCell).toBeFocused();
+  expect(await retiredCell.evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
+  await expect(retiredCell).toHaveAttribute('tabindex', '-1');
   await noSideScroll(page);
 });
