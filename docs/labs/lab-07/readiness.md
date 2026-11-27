@@ -63,7 +63,7 @@ The change went from contract to production in under 14 hours (M1), the tests fa
 | Deployed version | `v1.5`, `b8d5acb`, revision `habit-tracker-00008-jgf`; the page shows `build b8d5acb` | [release.md](release.md) sections 1 and 3 |
 | Defects | Critical 0, major 0, minor 2. Both minor ones (#126, #127, Lab 6) are fixed in `v1.4`, retested PASS by the partner team, and closed. None is open. | [Lab 6 resolution](../lab-06/resolution.md) section 2 |
 | Automated tests | Server 99 passed, 0 failed, 0 skipped; browser 50 passed, 0 failed, 0 skipped (release CI on `b8d5acb`) | S2 |
-| User tests | Lab 6 UAT-01 to UAT-04 and EXP-1 PASS on `v1.3`, retests 4 of 4 PASS on `v1.4`. They were not run again on `v1.5`. On `v1.5`, UAT-02 step C9 (8 then 9 glasses, maximum 12) is still refused, but with "Only 4 glasses left for today." instead of the expected "An entry already exists for this day." | [Lab 6 resolution](../lab-06/resolution.md); [change-request.md](change-request.md) section 3 |
+| User tests | Lab 6 UAT-01 to UAT-04 and EXP-1 PASS on `v1.3`, retests 4 of 4 PASS on `v1.4`. They were not run again on `v1.5`. On `v1.5`, UAT-02 step C9 (8 then 9 glasses, maximum 12) is still refused, but with "Only 4 glasses left for today." instead of the expected "An entry already exists for this day." (C9 revised to the new message in Issue #165) | [Lab 6 resolution](../lab-06/resolution.md); [change-request.md](change-request.md) section 3 |
 | Post-deployment checks | 13 passed, 0 failed (changed behaviour, privacy and roles) | [release.md](release.md) section 4 |
 | Configuration and secrets | No environment variable changed. Secrets stay in Secret Manager; none are in Git. | [change-request.md](change-request.md) section 3; [Lab 5 deployment](../lab-05/deployment.md) |
 | Documentation | Contract, ADR 0061, implementation, release and this file are on `staging`. `README.md` describes several entries per day with the day total, and points to the Lab 5 deployment and the Lab 7 records (updated in PR #163). | PR #143, #146, #162, #163 |
@@ -78,7 +78,7 @@ Open items:
 | Item | Risk | Owner | Action |
 |---|---|---|---|
 | Rollback to `v1.4` is not safe after the migration | `v1.4` code would accept same-day entries without the day-total check | projectnewy | Fix forward with a new release; do not roll back the app alone |
-| UAT-02 step C9 expects the old message "An entry already exists for this day." | A re-run on `v1.5` fails on the message, although the entry is still refused | phittayanan | Change the expected message of C9 to "Only 4 glasses left for today." before the Final delivery UAT re-run |
+| UAT-02 step C9 expects the old message "An entry already exists for this day." | A re-run on `v1.5` fails on the message, although the entry is still refused | phittayanan | Done in Issue #165 (2026-11-27): C9 now expects "Only 4 glasses left for today.", with a revision note; run on the deployed `v1.5` (`build b8d5acb`) showed that message |
 
 ## 3. Technical debt
 
