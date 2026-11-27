@@ -1,2 +1,4 @@
 # Shell scripts run inside Linux containers: keep LF on every machine.
 *.sh text eol=lf
+# AI use log: rows that two branches append are both kept (ADR 0098). Check its diff after every merge.
+docs/ai-use.md merge=union
