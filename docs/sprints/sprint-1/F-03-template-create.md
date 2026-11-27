@@ -33,6 +33,7 @@ Sprint 1 contract (Part E, Issue #30). Written before any code. Built only from 
 | Decimal scale | `min_value` and `max_value` have 2 decimal places, sent as JSON numbers | Decided on PR #29 (OP-07.8) |
 | New state | A new template is `ACTIVE`; the state column exists from the start, retire comes in Sprint 2 | SDS 3.2 |
 | Creator | `created_by` is the session user, never read from the request | SDS 2.2, 3.2 |
+| Kind (Sprint 2) | A template is `COUNT` or `TIME`; the default is `COUNT`. A `TIME` template's unit is `minutes` (a sent unit is replaced) and its minimum and maximum are whole numbers | ADR 0064, ADR 0065 |
 
 ## 4. Validation and failure cases
 
@@ -47,6 +48,8 @@ Checks run in this order (SDS 2.2): Origin (403, F-01), session (401), role (403
 | 5 | A template with the same name already exists (OP-03.1) | 409 | `TEMPLATE_NAME_EXISTS` | "A template with this name already exists." |
 
 When a request breaks more than one rule, the first one in this table is returned. Example: a new template named like an existing one with minimum 5 and maximum 5 gets `400 MIN_NOT_BELOW_MAX`.
+
+Sprint 2 (Issue #151; ADR 0064, ADR 0065): row 3 also covers a `kind` other than `COUNT` or `TIME` ("Kind must be Count or Time."), and, for `TIME`, a minimum or maximum with a fraction ("Minimum and maximum must be whole minutes."). Both get `400 VALIDATION_ERROR`.
 
 Unknown body fields (for example `state`, `createdBy` or `id`) are stripped and do not cause an error (decided on PR #29, OP-07.7). Names and units are stored trimmed.
 
@@ -65,6 +68,7 @@ Boundaries: a minimum just below the maximum (0 and 0.01) is accepted; negative 
 - **Template list** (Manager's first page; ADR 0043, OP-02.1): a table with the columns Name, Unit, Range (`min–max`), State (`Active` or `Retired`), a "New" button above it, and an "Edit" button on each row. No Retire button in Sprint 1 (features O-4). The state is shown as a word, not by colour (NFR-06).
 - **Empty state**: "No templates yet", with "New" visible (SDS 4.2).
 - **Template form** (`/templates/new`, OP-02.3): Name, Unit, Minimum, Maximum (number boxes), Save, Cancel. The form may check "minimum below maximum" first for a faster message; the API decides.
+- **Kind** (Sprint 2, ADR 0064): the form has a Kind choice, Count or Time, default Count. Choosing Time fills Unit with "minutes" and makes it read-only, and shows each of Minimum and Maximum also as hours and minutes ("= 24 h"). The template table has a Kind column in words. (Drafted by Claude Code in Issue #151; accepted as drafted by phittayanan on 2026-11-27.)
 - A rejected request shows the API `message` next to the form and keeps the typed values. While the request runs Save is disabled. On 201 the table is shown with the new row.
 - The table and the form fit 375 px and 1280 px wide with no horizontal scroll, and work with the keyboard alone (NFR-05, NFR-06; TC-47, TC-48 run on these screens).
 
@@ -84,6 +88,8 @@ Response 201:
 ```
 Errors: 400, 401, 403, 409 as in section 4.
 
+Sprint 2 (ADR 0064): the request may carry `"kind": "COUNT"` or `"kind": "TIME"` (default `COUNT`), and every template object in a response carries `kind`. For `TIME` the stored and returned `unit` is `"minutes"`.
+
 **`GET /api/templates`** (Manager or Participant): returns `{ "templates": [ ... ] }` in the shape above, ordered by name A to Z (OP-03.7). A Manager gets every template; a Participant gets active templates only (F-06). Errors: 401.
 
 ## 8. Data
@@ -94,6 +100,7 @@ Errors: 400, 401, 403, 409 as in section 4.
 | Constraints | check `min_value < max_value` (BR-03, SDS 3.4); unique `name` (S-4) |
 | Decimal scale | `min_value` and `max_value` use 2 decimal places (OP-07.8), precision 10 (OP-03.4). Prisma returns `Decimal` as a string by default, so the service converts it to a JSON number |
 | Migration | One additive Prisma migration that creates `Template` and its enum. It changes no existing table. F-07's migration relies on this one for the template scale (F-07 section 8) |
+| Kind (Sprint 2) | Column `kind`, enum `COUNT` or `TIME`, not null, default `COUNT`, in one additive migration; existing rows become `COUNT` (ADR 0064). Built in the template-kind Issue that #151 blocks |
 | Seed | When `SEED_DEMO_DATA` is true, the seed also upserts a few synthetic templates by name, safe to run twice (SDS 3.6, 7.1) |
 
 ## 9. Acceptance criteria
@@ -107,6 +114,8 @@ Errors: 400, 401, 403, 409 as in section 4.
 | AC-03.5 | An anonymous `POST /api/templates` or `GET /api/templates` gets `401 UNAUTHENTICATED` and nothing is stored |
 | AC-03.6 | The Manager's template page lists every template, active and retired, with name, unit, range and state in words, a "New" button and an "Edit" button per row, and no Retire control; with no templates it shows "No templates yet" and "New" |
 | AC-03.7 | The New template form creates the template through the API; a rejected request shows the API message and keeps the typed values |
+| AC-03.8 | (Sprint 2) A template created without `kind` is `COUNT`; with `"kind": "TIME"` it is stored with unit `minutes` whatever unit was sent; a `TIME` minimum or maximum with a fraction, and a `kind` other than `COUNT` or `TIME`, get `400 VALIDATION_ERROR` and nothing is stored; every template in `GET /api/templates` has `kind` |
+| AC-03.9 | (Sprint 2) The form's Kind choice: Time fills Unit with "minutes", makes it read-only and shows the range in hours and minutes; the table shows the kind in words |
 
 ## 10. Test specification
 
@@ -120,6 +129,8 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | TC-69 | AC-03.4 | API | Template "Walk" (min 0, max 100) exists | `POST` "Walk" with min 0 max 50; `POST` "Walk" with min 5 max 5; two `POST` "Swim" at the same time | First: `409 TEMPLATE_NAME_EXISTS`. Second: `400 MIN_NOT_BELOW_MAX`. "Swim": one 201 and one `409 TEMPLATE_NAME_EXISTS`. One "Walk" and one "Swim" row |
 | TC-11 | AC-03.6 | Browser | Manager; no templates at first. Then templates "Sleep" (active) and "Steps" (set to `RETIRED` directly in the test database, since retire is Sprint 2) | Open the template page before and after the templates exist | Before: "No templates yet" and "New". After: two rows with name, unit, range and the words "Active" and "Retired"; "New" above, "Edit" on each row; no "Retire" anywhere |
 | TC-70 | AC-03.7 | Browser | Manager logged in; no templates | Open "New"; enter "Stretching", "minutes", 10, 5 and Save; change the minimum to 0 and Save | First Save: the message "Minimum must be below maximum." and the typed values stay. Second: the table shows "Stretching" |
+| TC-118 | AC-03.8 | API and database | Manager logged in; one template made before the kind migration | Read the old template; `POST` "Reading" (pages, 0 to 500) with no kind; `POST` "Sleep" with `"kind": "TIME"`, `"unit": "hours"`, 0 to 720; `POST` "Nap" `TIME` 0 to 90.5; `POST` "Run" with `"kind": "DISTANCE"` | Old template `COUNT`; "Reading" 201 `COUNT`; "Sleep" 201 `TIME` with unit `minutes`; "Nap" and "Run" `400 VALIDATION_ERROR` with nothing stored |
+| TC-119 | AC-03.9 | Browser | Manager logged in | Open "New"; choose Time; type maximum 720; Save as "Sleep" | Unit shows "minutes" and cannot be typed; "= 12 h" shows by the maximum; the table row shows "Time" |
 
 ## 11. Definition of done
 
@@ -153,3 +164,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-08 | Issue #36 implementation evidence recorded in `docs/template-implementation-evidence.md`. No decided point was reopened. | pending review |
 | 2026-11-26 | Issue #131, from the partner UAT finding #127: AC-03.3 lists a name or unit that contains a NUL character; TC-68 adds both cases | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; sections 3, 4, 6, 7, 8; AC-03.8, AC-03.9; TC-118, TC-119 | pending (reviewer projectnewy) |

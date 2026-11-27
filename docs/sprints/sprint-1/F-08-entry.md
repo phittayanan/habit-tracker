@@ -51,6 +51,8 @@ When a request breaks more than one rule, the first one in this table is returne
 
 Because row 4 comes before row 7, a value with more than 2 decimal places gets `VALIDATION_ERROR` even when it is also out of range. Example: 24.555 for a template with maximum 24 gets `400 VALIDATION_ERROR`, not `VALUE_OUT_OF_RANGE`.
 
+Sprint 2 (Issue #151, ADR 0065): row 4 also covers, on a goal whose template is `TIME`, a `value` with a fraction: `400 VALIDATION_ERROR` with "Minutes must be a whole number."
+
 Unknown body fields are stripped and do not cause an error (decided, OP-07.7).
 
 Boundaries: a value equal to `min_value` or `max_value` is accepted; `entryDate` equal to today, to the start date or to the end date is accepted; an entry dated after the end date is rejected. A value that makes the day total equal to `max_value` is accepted; 0.01 more is refused. Requests for the same goal at the same time are checked one after another (the goal row lock, section 8), so the stored day total is never above `max_value`.
@@ -125,6 +127,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 | AC-08.17 | The goals page and `GET /api/goals/:id/entries` show every entry of a day in the order of section 7, and the page shows that day's total with the unit |
 | AC-08.18 | The Lab 7 migration keeps every existing `Entry` row unchanged, removes the unique index and keeps "a goal with entries cannot be deleted" |
 | AC-08.19 | On a template that allows negative values, only the upper limit is checked on the day total: a negative entry inside the template range is accepted and lowers the total, and further entries are checked against the lowered total (OP-08.12) |
+| AC-08.20 | (Sprint 2) On a goal whose template is `TIME`, a value with a fraction gets `400 VALIDATION_ERROR` "Minutes must be a whole number." and nothing is stored; a whole number of minutes is accepted under the other rules |
 
 ## 10. Test specification
 
@@ -150,6 +153,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-86 | AC-08.17 | Browser | A logged in; goal on a template with unit hours, max 24 | Save 3 then 4.5 for today; reload | Both entries show, 4.5 first, and "Day total: 7.5 hours", before and after the reload |
 | TC-89 | AC-08.18 | API and database | A database at the migrations of `v1.4` with entries on several goals and days | Apply the Lab 7 migration; read the rows and the indexes; try to delete a goal that has entries | The rows are identical; no unique index on (`goal_id`, `entry_date`), a non-unique one exists; the delete is refused. The schema test in `server/test/entry.test.js` that expects the unique index is revised to this |
 | TC-90 | AC-08.19 | API | Template with min -5, max 24; goal on it | `POST` 24, then -5, then 5, then 0.01 for `D` | 201, 201, 201 (total 24), then `409 DAILY_TOTAL_ABOVE_MAX` |
+| TC-127 | AC-08.20 | API | A's goal on `TIME` template "Sleep" (0 to 720) | `POST` 45.5 for `D`; then 45 | 45.5 gets `400 VALIDATION_ERROR` with that message and no row; 45 gets 201 |
 
 ## 11. Definition of done
 
@@ -190,6 +194,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-27 | Lab 7, Issue #139: several entries per goal and day with a day-total maximum (BR-04 replaced; sections 2 to 4, 6 to 12; AC-08.7 revised, AC-08.13 to AC-08.18; TC-29 and TC-61 revised, TC-82 to TC-86 and TC-89 added; ADR 0061) | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Review of PR #143: day-total message wording (section 4, TC-61, TC-82, OP-08.14); AC-08.19 and TC-90 for negative values; agreement recorded | projectnewy (author); re-checked by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777) |
 | 2026-11-27 | Issue #140: TC-61 names the template unit (hours) in its Given, as asked in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777); the expected result is unchanged | phittayanan (author); review in the Issue #140 PR |
+| 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-08.20; TC-127 | pending (reviewer projectnewy) |
 
 ## 14. Implementation evidence — Issue #42
 
