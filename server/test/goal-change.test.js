@@ -126,7 +126,25 @@ test('TC-154: ended goals, bad values and out-of-range targets are refused in co
   assert.deepEqual([row.templateId, row.participantId, row.startDate.toISOString().slice(0, 10), row.endDate.toISOString().slice(0, 10), Number(row.dailyTarget)], [water.id, a.id, day(-10), day(10), 9]);
 });
 
-test.todo('TC-154 (d): a fraction on a TIME goal gets 400 VALIDATION_ERROR (added once Template.kind from #168 is in staging, ADR 0093)');
+test('TC-154 (d): a fraction on a TIME goal gets 400 VALIDATION_ERROR before the ended check, and changes nothing (ADR 0093)', async () => {
+  const sleep = await db.template.create({ data: { name: 'Sleep time', unit: 'minutes', kind: 'TIME', minValue: 0, maxValue: 720, createdBy: manager.id } });
+  const read = await db.template.create({ data: { name: 'Reading time', unit: 'minutes', kind: 'TIME', minValue: 0, maxValue: 600, createdBy: manager.id } });
+  const time = await makeGoal({ template: sleep, target: 480, start: day(-5), end: day(5) });
+  const endedTime = await makeGoal({ template: read, target: 60, start: day(-9), end: day(-1) });
+  const before = await snapshot();
+  for (const [id, target] of [[time.id, 420.5], [time.id, 420.25], [endedTime.id, 30.5]]) {
+    const res = await patch(id, { dailyTarget: target });
+    assert.equal(res.status, 400, `${target} on ${id}`);
+    assert.deepEqual(res.body.error, { code: 'VALIDATION_ERROR', message: 'Target must be whole minutes.' });
+  }
+  assert.deepEqual(await snapshot(), before, 'nothing changes');
+  const whole = await patch(time.id, { dailyTarget: 420 });
+  assert.equal(whole.status, 200);
+  assert.equal(whole.body.goal.dailyTarget, 420);
+  assert.equal(whole.body.goal.template.kind, 'TIME');
+  // A COUNT goal still takes 2 decimal places.
+  assert.equal((await patch(w.id, { dailyTarget: 7.5 })).status, 200);
+});
 
 test('TC-155: anonymous 401, Manager 403, another Participant and an unknown id 404; nothing changes; the route is audited', async () => {
   const before = await snapshot();

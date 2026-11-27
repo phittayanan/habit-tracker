@@ -11,8 +11,8 @@ const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok',
 const day = n => new Date(Date.parse(`${today()}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 const asDate = text => new Date(`${text}T00:00:00Z`);
 let a, manager, w, ended, future;
-async function makeGoal(name, unit, max, target, start, end) {
-  const template = await db.template.create({ data: { name, unit, minValue: 1, maxValue: max, createdBy: manager.id } });
+async function makeGoal(name, unit, max, target, start, end, kind = 'COUNT') {
+  const template = await db.template.create({ data: { name, unit, kind, minValue: 1, maxValue: max, createdBy: manager.id } });
   const goal = await db.goal.create({ data: { participantId: a.id, templateId: template.id, dailyTarget: target, startDate: asDate(start), endDate: asDate(end) } });
   await db.goalTarget.create({ data: { goalId: goal.id, effectiveFrom: asDate(start), dailyTarget: target } });
   return goal;
@@ -76,6 +76,29 @@ test('TC-158: change W to 13 (refused, value kept), then 6; no button on an ende
   await expect(reading.getByText('Daily target: 20 pages', { exact: true })).toBeVisible();
   expect(await fits(page)).toBe(true);
   expect(Number((await db.goal.findUniqueOrThrow({ where: { id: w.id } })).dailyTarget)).toBe(6);
+});
+
+test('TC-158 (TIME, ADR 0093): a Time target is typed in minutes with the "= 7 h" hint; a fraction shows the API message', async ({ page }) => {
+  const time = await makeGoal('Sleep time', 'minutes', 720, 480, day(-5), day(5), 'TIME');
+  await login(page);
+  const sleep = card(page, 'Sleep time');
+  await expect(sleep.getByText('Daily target: 8 h', { exact: true })).toBeVisible();
+  await sleep.getByRole('button', { name: 'Change target', exact: true }).click();
+  const box = sleep.getByLabel('New daily target (minutes)', { exact: true });
+  await expect(box).toHaveValue('480');
+  await expect(sleep.getByText('= 8 h', { exact: true })).toBeVisible();
+  await box.fill('420');
+  await expect(sleep.getByText('= 7 h', { exact: true })).toBeVisible();
+  await box.fill('420.5');
+  await sleep.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(sleep.getByRole('alert')).toHaveText('Target must be whole minutes.');
+  await expect(box).toHaveValue('420.5');
+  await box.fill('430');
+  await expect(sleep.getByText('= 7 h 10 min', { exact: true })).toBeVisible();
+  await sleep.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(sleep.getByText('Daily target: 7 h 10 min', { exact: true })).toBeVisible();
+  expect(await fits(page)).toBe(true);
+  expect(Number((await db.goal.findUniqueOrThrow({ where: { id: time.id } })).dailyTarget)).toBe(430);
 });
 
 test('TC-159: keyboard alone opens, cancels, opens again and saves a change, with no horizontal scroll', async ({ page }) => {
