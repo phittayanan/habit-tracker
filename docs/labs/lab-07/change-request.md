@@ -101,4 +101,4 @@ phittayanan approved commit `6f27fac` on 2026-11-27 (Asia/Bangkok): [review](htt
 | Issue #141 does not mention the rollback risk | Line added to #141 |
 | Shorter day-total message that says what still fits | Accepted (F-08 OP-08.14) |
 
-The changes after `6f27fac` await phittayanan's re-check before the merge.
+phittayanan re-checked and approved the changes after `6f27fac` in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777) on 2026-11-27. That review asked for "unit hours" in the Given of TC-61; it was added in Issue #140.

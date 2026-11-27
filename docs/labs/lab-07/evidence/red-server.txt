@@ -1,0 +1,432 @@
+# Issue #140, RED run, tested commit 761d87e, 2026-11-27, macOS, Node 26.8.1, PostgreSQL 16.15, Chrome 158
+# Command: cd server && npm test
+# Local paths replaced by <repo> and <tmp>.
+
+
+> test
+> node --env-file-if-exists=.env --test --test-concurrency=1 test/*.test.js
+
+.env not found. Continuing without it.
+.env not found. Continuing without it.
+✔ TC-01 / TC-46: login persists fixed eight-hour session and flags, then me works (139.785834ms)
+✔ TC-02: unknown username and wrong password both perform cost-10 bcrypt work with identical errors (158.385125ms)
+✔ TC-02 regression: a successful dummy comparison still cannot authenticate an unknown username (55.221333ms)
+✔ TC-81: a username with a NUL character is an unknown username, not a server error (160.45725ms)
+✔ TC-03: logout deletes session and clears cookie; replay and anonymous logout fail (111.65675ms)
+✔ TC-04: both roles expose only the contracted identity, never hash or session ID (162.277209ms)
+✔ TC-04 regression: session middleware keeps only public user fields in request identity (113.520834ms)
+✔ TC-05: missing, unknown, deleted and malformed cookies are unauthenticated (115.572417ms)
+✔ TC-06: activity never extends expiry; expired rows are removed on access (114.292791ms)
+✔ TC-62: invalid and non-JSON inputs get the same validation error without side effects (57.720666ms)
+✔ TC-62 regression: JSON parser failures outside login return 400 after session and role checks (162.741083ms)
+✔ TC-64: Origin runs before body/session checks and compares host including port (268.618417ms)
+✔ TC-08: independently audit every implemented API route, then exercise session and role checks (171.906625ms)
+✔ TC-08 regression: an added nested route missing both middleware and registration fails coverage (54.82925ms)
+✔ TC-08 regression: registration alone fails; protecting and registering nested methods passes (237.392125ms)
+✔ TC-08 regression: public allowlist matches exact methods and paths, including path-array mounts (173.547333ms)
+✔ TC-66: session then role, before validation/existence; client roles cannot override (111.252708ms)
+✔ OP-01.4 / OP-07.7: login replaces incoming session, trims username and strips extra fields (160.160333ms)
+✔ OP-02.5: unknown API paths return standard 404 regardless of session (110.4495ms)
+✔ TC-44 / TC-45: seed is idempotent, uses current env hashes, fails atomically without passwords; tracked files contain no seed values (608.943125ms)
+.env not found. Continuing without it.
+✔ built client serves contracted page addresses from the isolated checkout, without test pages (23.481667ms)
+.env not found. Continuing without it.
+✖ TC-89: the Lab 7 migration keeps every entry row, removes the unique goal+day index and keeps delete-restrict (803.345792ms)
+.env not found. Continuing without it.
+✔ TC-27: today is the Asia/Bangkok date, whatever the process time zone (7.380916ms)
+✔ TC-24 / TC-25 / TC-26: future wins over outside-goal; goal ends are inclusive (0.315583ms)
+✔ TC-28: value limits are inclusive (0.1375ms)
+✔ TC-56: parse accepts only a real date and a number within Decimal(10, 2) (1.379708ms)
+✖ TC-82 (unit): the day total may reach the maximum but not pass it; the message says what is left (0.606625ms)
+✖ TC-83 (unit): the day total is exact to 2 decimal places (0.1 + 0.2 fits a maximum of 0.3) (0.165ms)
+✖ TC-85 (unit): the day-total rule is checked after the date and range rules (0.1355ms)
+✖ TC-90 (unit): with negative values only the upper limit is checked on the day total (0.120792ms)
+.env not found. Continuing without it.
+✔ TC-23: valid entry returns 201 with the contract shape, owned by the goal, and is listed (55.67325ms)
+✔ TC-24: a date after today is ENTRY_DATE_IN_FUTURE, also when it is outside the goal as well (14.503709ms)
+✔ TC-25 / TC-30: outside the goal period is rejected; inside an ended goal is accepted (10.694042ms)
+✔ TC-26: the start date and today (the end date) are accepted (8.961208ms)
+✔ TC-28: value limits over the API, each accepted value on its own day (15.171084ms)
+✖ TC-29: (revised, Lab 7) a second entry for the same day within the maximum is stored; the first stays unchanged (9.834375ms)
+✖ TC-82: the day total may reach the maximum but not pass it, per goal and per day (7.795083ms)
+✖ TC-83: the day total is exact to 2 decimal places (9.599792ms)
+✖ TC-84 (a): two requests at once that fit one at a time but not together give one 201 and one 409 (6.365292ms)
+✖ TC-84 (b): a request waits for a held goal-row lock and then counts the entry committed meanwhile (508.031125ms)
+✖ TC-85: validation, date and range errors come before the day-total error (17.66925ms)
+✖ TC-90: with negative values only the upper limit is checked on the day total (13.352958ms)
+✔ TC-56 / TC-08: validation, roles, ownership and both endpoints (34.046625ms)
+✖ Entry list is newest date first and only for the owner (14.932792ms)
+✔ TC-58: the entry survives an app restart (new process, new connection) (118.511209ms)
+✖ TC-89 (schema): the goal+day index is not unique, and a goal with entries cannot be deleted (17.576209ms)
+.env not found. Continuing without it.
+✔ Goal unit rules: positive exact decimals, real dates and end-date order (1.930416ms)
+✔ TC-78 unit: the target must be above the template minimum (Issue #74, ADR 0054) (0.051042ms)
+✔ Goal unit BR-05/BR-06 and target maximum: ended, future, exact boundary (6.9055ms)
+.env not found. Continuing without it.
+✔ TC-20: exact shape, stripped ownership, real process restart, own-only newest list (254.834667ms)
+✔ TC-21: active and future-start duplicates; concurrent same-user creation stores exactly one (16.518666ms)
+✔ TC-22: Bangkok date and goal state boundaries, independent of process timezone (4.502708ms)
+✔ TC-53 / TC-08: validation, auth/role precedence and both endpoint permissions (24.581833ms)
+✔ TC-54: max equality, Decimal boundary and validation/range/duplicate precedence (15.443667ms)
+✔ TC-78: a target not above the template minimum is rejected; just above is accepted; minimum 0 changes nothing (Issue #74, ADR 0054) (16.77925ms)
+✔ TC-55: ended allows new, different template and different owner; one-day/past goals accepted (13.67925ms)
+✔ TC-74: creation waits for real template lock, then validates committed maximum (507.94225ms)
+✔ Goal migration enforces target/date constraints and has no stored state (20.995834ms)
+.env not found. Continuing without it.
+✔ TC-33: Participant B cannot read or change A; A id in a goal body is stripped (64.597ms)
+✔ TC-34: Manager 403 and anonymous 401 on every goal and entry endpoint, nothing stored (13.260291ms)
+✔ TC-35 (API part): each Participant lists only own goals with own progress (13.81725ms)
+✔ TC-57: another user's goal and an unknown goal give the same status and body (14.671292ms)
+.env not found. Continuing without it.
+✔ TC-31: met, missed and empty days; today counts even without an entry (0.584875ms)
+✔ TC-31: a goal that has not started is 0 of 0; the first day counts on its start date (0.06175ms)
+✔ TC-31: an Ended goal counts start to end and does not grow after that (0.059166ms)
+✔ TC-31: only entries inside the counted days are used; a decimal target is compared exactly (0.090875ms)
+✖ TC-87: several entries on one day are added exactly before the comparison, and the day counts once (0.521541ms)
+.env not found. Continuing without it.
+✔ TC-31 / AC-09.1 to AC-09.3 over the API: progress object from the goal and its entries (45.43975ms)
+✔ AC-09.4 / AC-09.5 over the API: future goal is 0 of 0; an Ended goal does not grow (9.193542ms)
+✔ AC-09.6: a saved entry raises daysMet on the next read, also after an app restart; nothing is stored as progress (127.500834ms)
+✔ TC-59 / AC-09.8: anonymous 401 and Manager 403 on the goal list (6.107458ms)
+✔ A Participant sees progress only for own goals (8.891ms)
+✔ AC-09.1 to AC-09.3: two active goals of one Participant keep separate progress, even with entries on the same day (17.364584ms)
+✔ The list takes "today" from the Asia/Bangkok date of the instant it is given (6.06975ms)
+.env not found. Continuing without it.
+✔ GET /api/ready returns 503 NOT_READY when the database cannot be reached (10.726083ms)
+✔ GET /api/ready returns 200 ready when the database answers (2.551417ms)
+✔ GET /api/health does not touch the database (1.039375ms)
+.env not found. Continuing without it.
+✔ TC-63: expiry is exclusive and the clock is passed in (0.73825ms)
+✔ TC-46: cookie flags depend only on production (0.276ms)
+.env not found. Continuing without it.
+✔ TC-12: a manager edits an unused template with two partial edits and the list shows the result (47.434334ms)
+✔ TC-13: a template used by an Active or only an Ended goal is refused first and stays unchanged (27.287959ms)
+✔ TC-13 race (a): an edit waits for a goal transaction holding the template lock, then is refused as in use (61.329875ms)
+✔ TC-13 race (b): an edit and a new goal sent together never leave a goal beside an edited range (41.256542ms)
+✔ TC-71: invalid edits are validation errors, an unknown id is 404, anonymous is 401, and nothing changes (19.147375ms)
+✔ TC-72: the merged range rule refuses a sent minimum at the stored maximum (2.774334ms)
+✔ TC-72: range before duplicate name, own name accepted, rejected edits change nothing (12.841292ms)
+✔ TC-18: a participant edit is forbidden for an existing and an unknown id, and nothing changes (4.759666ms)
+✔ a foreign Origin is refused before the session check and nothing changes (3.482292ms)
+.env not found. Continuing without it.
+✔ the template migration adds the range check and unique name without changing older tables (85.226417ms)
+✔ TC-10: the range rule refuses an equal or higher minimum and accepts one just below (54.270958ms)
+✔ TC-09: a manager create strips unknown state, stores an active template, and lists it after a new app (125.982375ms)
+✔ TC-10: API refuses a minimum that is not below the maximum and stores nothing, then accepts the boundary (110.611708ms)
+✔ TC-68: invalid template bodies are validation errors and anonymous calls stay unauthenticated (121.074167ms)
+✔ TC-69: duplicate names conflict after the range rule, including two creates at once (122.508667ms)
+✔ TC-16 / TC-17: a participant lists active templates only and cannot create one (172.466917ms)
+✔ manager list returns every state, ordered by name (108.836625ms)
+✔ demo seed upserts synthetic templates by name and can run twice (369.321542ms)
+✔ TC-76: demo seed keeps an edited template and still creates a missing one (Issue #79, ADR 0053) (366.035916ms)
+✔ TC-77: demo seed sets the password hashes again on every run (Issue #79, ADR 0053) (668.112083ms)
+ℹ tests 99
+ℹ suites 0
+ℹ pass 84
+ℹ fail 15
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9736.298916
+
+✖ failing tests:
+
+test at test/entry-migration.test.js:19:1
+✖ TC-89: the Lab 7 migration keeps every entry row, removes the unique goal+day index and keeps delete-restrict (803.345792ms)
+  AssertionError [ERR_ASSERTION]: no unique goal+day index: CREATE UNIQUE INDEX "Entry_goal_id_entry_date_key" ON tc89_42fc9eb7."Entry" USING btree (goal_id, entry_date)
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry-migration.test.js:46:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry-rules.test.js:61:1
+✖ TC-82 (unit): the day total may reach the maximum but not pass it; the message says what is left (0.606625ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + null
+  - {
+  -   code: 'DAILY_TOTAL_ABOVE_MAX',
+  -   message: 'Only 4 hours left for today.',
+  -   status: 409
+  - }
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry-rules.test.js:62:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: { status: 409, code: 'DAILY_TOTAL_ABOVE_MAX', message: 'Only 4 hours left for today.' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry-rules.test.js:71:1
+✖ TC-83 (unit): the day total is exact to 2 decimal places (0.1 + 0.2 fits a maximum of 0.3) (0.165ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + null
+  - {
+  -   code: 'DAILY_TOTAL_ABOVE_MAX',
+  -   message: 'Today is full (0.3 litres).',
+  -   status: 409
+  - }
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry-rules.test.js:75:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: { status: 409, code: 'DAILY_TOTAL_ABOVE_MAX', message: 'Today is full (0.3 litres).' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry-rules.test.js:79:1
+✖ TC-85 (unit): the day-total rule is checked after the date and range rules (0.1355ms)
+  TypeError: Cannot read properties of null (reading 'code')
+      at TestContext.<anonymous> (file://<repo>/server/test/entry-rules.test.js:83:45)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test/entry-rules.test.js:86:1
+✖ TC-90 (unit): with negative values only the upper limit is checked on the day total (0.120792ms)
+  TypeError: Cannot read properties of null (reading 'code')
+      at TestContext.<anonymous> (file://<repo>/server/test/entry-rules.test.js:91:56)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test/entry.test.js:84:1
+✖ TC-29: (revised, Lab 7) a second entry for the same day within the maximum is stored; the first stays unchanged (9.834375ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  409 !== 201
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:88:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 409,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry.test.js:96:1
+✖ TC-82: the day total may reach the maximum but not pass it, per goal and per day (7.795083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+      error: {
+  +     code: 'ENTRY_ALREADY_EXISTS',
+  +     message: 'An entry already exists for this day.'
+  -     code: 'DAILY_TOTAL_ABOVE_MAX',
+  -     message: 'Only 4 hours left for today.'
+      }
+    }
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:102:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { error: { code: 'ENTRY_ALREADY_EXISTS', message: 'An entry already exists for this day.' } },
+    expected: { error: { code: 'DAILY_TOTAL_ABOVE_MAX', message: 'Only 4 hours left for today.' } },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry.test.js:116:1
+✖ TC-83: the day total is exact to 2 decimal places (9.599792ms)
+  Error: expected 201 "Created", got 409 "Conflict"
+      at TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:120:55)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ----
+      at Test._assertStatus (<repo>/server/node_modules/supertest/lib/test.js:404:14)
+      at <repo>/server/node_modules/supertest/lib/test.js:460:13
+      at Test._assertFunction (<repo>/server/node_modules/supertest/lib/test.js:437:13)
+      at Test.assert (<repo>/server/node_modules/supertest/lib/test.js:302:23)
+      at localAssert (<repo>/server/node_modules/supertest/lib/test.js:220:38)
+      at Server.<anonymous> (<repo>/server/node_modules/supertest/lib/test.js:227:13)
+      at Server.wrapper (node:events:639:12)
+      at Server.emit (node:events:514:20)
+      at emitCloseNT (node:net:2879:8)
+      at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+
+test at test/entry.test.js:126:1
+✖ TC-84 (a): two requests at once that fit one at a time but not together give one 201 and one 409 (6.365292ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  -   201,
+      409,
+  +   409
+    ]
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:130:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 409, 409 ],
+    expected: [ 201, 409 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry.test.js:135:1
+✖ TC-84 (b): a request waits for a held goal-row lock and then counts the entry committed meanwhile (508.031125ms)
+  AssertionError [ERR_ASSERTION]: the request must wait for the goal-row lock
+  
+  true !== false
+  
+      at db.$transaction.timeout (file://<repo>/server/test/entry.test.js:144:12)
+      at async Proxy._transactionWithCallback (<repo>/server/node_modules/@prisma/client/runtime/library.js:130:8120)
+      at async TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:139:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry.test.js:152:1
+✖ TC-85: validation, date and range errors come before the day-total error (17.66925ms)
+  AssertionError [ERR_ASSERTION]: {"entryDate":"2026-11-27","value":1}
+  + actual - expected
+  
+  + 'ENTRY_ALREADY_EXISTS'
+  - 'DAILY_TOTAL_ABOVE_MAX'
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:158:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'ENTRY_ALREADY_EXISTS',
+    expected: 'DAILY_TOTAL_ABOVE_MAX',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry.test.js:163:1
+✖ TC-90: with negative values only the upper limit is checked on the day total (13.352958ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+      201,
+  -   201,
+  -   201,
+      409,
+  +   409,
+  +   409
+    ]
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:168:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 201, 409, 409, 409 ],
+    expected: [ 201, 201, 201, 409 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/entry.test.js:203:1
+✖ Entry list is newest date first and only for the owner (14.932792ms)
+  PrismaClientKnownRequestError: 
+  Invalid `prisma.entry.create()` invocation:
+  
+  
+  Unique constraint failed on the fields: (`goal_id`,`entry_date`)
+      at ei.handleRequestError (<repo>/server/node_modules/@prisma/client/runtime/library.js:121:7268)
+      at ei.handleAndLogRequestError (<repo>/server/node_modules/@prisma/client/runtime/library.js:121:6593)
+      at ei.request (<repo>/server/node_modules/@prisma/client/runtime/library.js:121:6300)
+      at async a (<repo>/server/node_modules/@prisma/client/runtime/library.js:130:9551)
+      at async TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:210:34)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test/entry.test.js:227:1
+✖ TC-89 (schema): the goal+day index is not unique, and a goal with entries cannot be deleted (17.576209ms)
+  PrismaClientKnownRequestError: 
+  Invalid `prisma.entry.create()` invocation:
+  
+  
+  Unique constraint failed on the fields: (`goal_id`,`entry_date`)
+      at ei.handleRequestError (<repo>/server/node_modules/@prisma/client/runtime/library.js:121:7268)
+      at ei.handleAndLogRequestError (<repo>/server/node_modules/@prisma/client/runtime/library.js:121:6593)
+      at ei.request (<repo>/server/node_modules/@prisma/client/runtime/library.js:121:6300)
+      at async a (<repo>/server/node_modules/@prisma/client/runtime/library.js:130:9551)
+      at async TestContext.<anonymous> (file://<repo>/server/test/entry.test.js:232:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at test/progress-rules.test.js:36:1
+✖ TC-87: several entries on one day are added exactly before the comparison, and the day counts once (0.521541ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   daysMet: 1,
+  -   daysMet: 2,
+      daysSoFar: 10
+    }
+  
+      at TestContext.<anonymous> (file://<repo>/server/test/progress-rules.test.js:43:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { daysMet: 1, daysSoFar: 10 },
+    expected: { daysMet: 2, daysSoFar: 10 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

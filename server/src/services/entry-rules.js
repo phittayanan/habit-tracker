@@ -23,10 +23,25 @@ export function parseEntryCreate(body) {
   return { ok: true, data: parsed.data };
 }
 
-// Rule order is the contract order: future, outside the goal, out of range (the unique day is the database's job).
-export function checkEntryRules({ entryDate, value }, goal, template, now = new Date()) {
-  if (entryDate > bangkokToday(now)) return { status: 400, code: 'ENTRY_DATE_IN_FUTURE', message: 'The date cannot be after today.' };
+// Values have at most 2 decimal places, so whole hundredths add exactly (0.1 + 0.2 is 30 hundredths, not 0.30000000000000004).
+const hundredths = number => Math.round(number * 100);
+const shown = count => String(count / 100);
+
+// Rule order is the contract order (F-08 section 4): future, outside the goal, out of range, then the day total.
+// `dayTotal` is the stored total of this goal on this date, read under the goal-row lock.
+export function checkEntryRules({ entryDate, value }, goal, template, now = new Date(), dayTotal = 0) {
+  const today = bangkokToday(now);
+  if (entryDate > today) return { status: 400, code: 'ENTRY_DATE_IN_FUTURE', message: 'The date cannot be after today.' };
   if (entryDate < goal.startDate || entryDate > goal.endDate) return { status: 400, code: 'ENTRY_DATE_OUTSIDE_GOAL', message: 'The date must be inside the goal start and end dates.' };
   if (value < template.minValue || value > template.maxValue) return { status: 400, code: 'VALUE_OUT_OF_RANGE', message: `The value must be between ${template.minValue} and ${template.maxValue}.` };
+  const max = hundredths(template.maxValue);
+  const stored = hundredths(dayTotal);
+  if (stored + hundredths(value) > max) {
+    const left = max - stored;
+    const when = entryDate === today ? 'today' : entryDate;
+    const message = left > 0 ? `Only ${shown(left)} ${template.unit} left for ${when}.`
+      : `${when[0].toUpperCase()}${when.slice(1)} is full (${shown(max)} ${template.unit}).`;
+    return { status: 409, code: 'DAILY_TOTAL_ABOVE_MAX', message };
+  }
   return null;
 }
