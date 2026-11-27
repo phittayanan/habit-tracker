@@ -62,13 +62,13 @@ Water: unit glasses, range 1 to 12, daily target 8, goal 2026-11-23 to 2026-12-2
 | ID | Time | Action | Expected | Actual | Result |
 |---|---|---|---|---|---|
 | [E-PD-00](evidence/img/E-PD-00-before-water.png) [2](evidence/img/E-PD-00-templates-range.png) | 16:42 to 16:43 | Read the goal and the template before any save | Old entries shown; no entry for 11-27 | 2 of 5 days met; one entry each on 11-23, 24, 25 with a day total; range 1 to 12 | Recorded |
-| [E-PD-01](evidence/img/E-PD-01-first-entry-5.png) | 16:44 | Save 5 for 11-27 | Saved; total 5; still 2 of 5 | As expected | Pass |
-| [E-PD-02](evidence/img/E-PD-02-second-entry-3-day-met.png) | 16:44 | Save 3 for the same day | Saved; order 3, 5; total 8; 3 of 5 | As expected | Pass |
-| [E-PD-03](evidence/img/E-PD-03-over-maximum-refused.png) | 16:45 | Save 5 (total would be 13) | "Only 4 glasses left for today."; value kept; nothing added | As expected | Pass |
-| [E-PD-04](evidence/img/E-PD-04-exact-maximum-accepted.png) | 16:45 | Save 4 (total exactly 12) | Saved; order 4, 3, 5; total 12; still 3 of 5 | As expected | Pass |
-| [E-PD-05](evidence/img/E-PD-05-day-full-refused.png) | 16:45 | Save 1 on the full day | "Today is full (12 glasses)."; value kept; nothing added | As expected | Pass |
-| [E-PD-06](evidence/img/E-PD-06-after-reload-water.png) [2](evidence/img/E-PD-06-after-reload-header.png) | 16:46 | Reload the page | Entries 4, 3, 5 only; total 12; 3 of 5 | As expected | Pass |
-| [E-PD-07](evidence/img/E-PD-07-goal-id.png) [2](evidence/img/E-PD-07-owner-reads-entries.png) | 16:47 to 16:50 | Owner reads `/api/goals` and `/api/goals/2/entries` | Goal id 2, progress 3 of 5; entries listed newest first | As expected (the entries screenshot has no address bar) | Pass |
+| [E-PD-01](evidence/img/E-PD-01-first-entry-5.png) | 16:44 | Save 5 for 11-27 | Saved; total 5; still 2 of 5 | Saved; list shows 5 for 11-27; day total 5; 2 of 5 days met | Pass |
+| [E-PD-02](evidence/img/E-PD-02-second-entry-3-day-met.png) | 16:44 | Save 3 for the same day | Saved; order 3, 5; total 8; 3 of 5 | Saved; order 3, 5; day total 8; 3 of 5 days met | Pass |
+| [E-PD-03](evidence/img/E-PD-03-over-maximum-refused.png) | 16:45 | Save 5 (total would be 13) | "Only 4 glasses left for today."; value kept; nothing added | "Only 4 glasses left for today."; the box still shows 5; list still 3, 5 | Pass |
+| [E-PD-04](evidence/img/E-PD-04-exact-maximum-accepted.png) | 16:45 | Save 4 (total exactly 12) | Saved; order 4, 3, 5; total 12; still 3 of 5 | Saved; order 4, 3, 5; day total 12; 3 of 5 days met | Pass |
+| [E-PD-05](evidence/img/E-PD-05-day-full-refused.png) | 16:45 | Save 1 on the full day | "Today is full (12 glasses)."; value kept; nothing added | "Today is full (12 glasses)."; the box still shows 1; list still 4, 3, 5 | Pass |
+| [E-PD-06](evidence/img/E-PD-06-after-reload-water.png) [2](evidence/img/E-PD-06-after-reload-header.png) | 16:46 | Reload the page | Entries 4, 3, 5 only; total 12; 3 of 5 | Entries 4, 3, 5 only; day total 12; 3 of 5 days met | Pass |
+| [E-PD-07](evidence/img/E-PD-07-goal-id.png) [2](evidence/img/E-PD-07-owner-reads-entries.png) | 16:47 to 16:50 | Owner reads `/api/goals` and `/api/goals/2/entries` | Goal id 2, progress 3 of 5; entries listed newest first | Goal `id` 2, `daysMet` 3, `daysSoFar` 5; entries 4, 3, 5 (ids 19, 18, 17), then 10, 6, 8 (the entries screenshot has no address bar) | Pass |
 
 ### B. Preserved behaviour: privacy and roles
 
@@ -76,10 +76,10 @@ Water: unit glasses, range 1 to 12, daily target 8, goal 2026-11-23 to 2026-12-2
 |---|---|---|---|---|---|
 | (earlier) | 16:35 | Anonymous GET `/api/goals`, run by Claude Code | 401 | 401 `UNAUTHENTICATED` | Pass |
 | [E-PD-08](evidence/img/E-PD-08-participant2-goals-top.png) [2](evidence/img/E-PD-08-participant2-goals-middle.png) [3](evidence/img/E-PD-08-participant2-goals-bottom.png) | 16:50 to 16:51 | Participant Two reads the goals page | None of Participant One's goals or entries | Own goals seen (Walking, Reading, Water, UAT-02 Squats); the Water goal has other dates and entries; no 4, 3, 5 | Pass |
-| [E-PD-09](evidence/img/E-PD-09-participant2-goal-not-found.png) | 16:53 | Participant Two opens `/api/goals/2/entries` | `GOAL_NOT_FOUND` | As expected, address bar visible. The account is not shown in this screenshot; it follows E-PD-08 in the same session as reported by the tester | Pass |
-| [E-PD-10](evidence/img/E-PD-10-manager-home.png) | 16:53 | Manager signs in | Templates only, no Goals menu | As expected | Pass |
-| [E-PD-11](evidence/img/E-PD-11-manager-goals-forbidden.png) | 16:53 | Manager opens `/api/goals` | `FORBIDDEN` | As expected | Pass |
-| [E-PD-12](evidence/img/E-PD-12-manager-entries-forbidden.png) | 16:53 | Manager opens `/api/goals/2/entries` | `FORBIDDEN` | As expected | Pass |
+| [E-PD-09](evidence/img/E-PD-09-participant2-goal-not-found.png) | 16:53 | Participant Two opens `/api/goals/2/entries` | `GOAL_NOT_FOUND` | `GOAL_NOT_FOUND`, "Goal not found."; address bar visible. The account is not shown in this screenshot; it follows E-PD-08 in the same session as reported by the tester | Pass |
+| [E-PD-10](evidence/img/E-PD-10-manager-home.png) | 16:53 | Manager signs in | Templates only, no Goals menu | "Manager One"; menu shows Templates only; `build b8d5acb` | Pass |
+| [E-PD-11](evidence/img/E-PD-11-manager-goals-forbidden.png) | 16:53 | Manager opens `/api/goals` | `FORBIDDEN` | `FORBIDDEN`, "You do not have permission to do this." | Pass |
+| [E-PD-12](evidence/img/E-PD-12-manager-entries-forbidden.png) | 16:53 | Manager opens `/api/goals/2/entries` | `FORBIDDEN` | `FORBIDDEN`, "You do not have permission to do this." | Pass |
 
 ### Existing data after the migration
 

@@ -38,17 +38,17 @@ The change measured here is the Lab 7 change: several entries per day with a day
 
 **S4. CI runs.** `gh run list`, workflow "CI & Docker Build", on the change's branches:
 
-| Created (+07:00) | Branch | Commit | Result |
-|---|---|---|---|
-| 02:12 | `docs/139-lab7-multiple-entries-contract` | `ff6867b` | cancelled (a new push followed 1 minute later) |
-| 02:13 | `docs/139-lab7-multiple-entries-contract` | `6f27fac` | success |
-| 12:06 | `docs/139-lab7-multiple-entries-contract` | `eda4c6b` | success |
-| 13:08 | `feat/140-multiple-entries-per-day` | `a3ea23a` | success |
-| 13:35 | `feat/140-multiple-entries-per-day` | `d30cf8c` | success |
-| 13:54 | `staging` (PR #147) | `83ab8a2` | success |
-| 13:56 | `chore/148-sync-main` | `4f3a1c4` | success |
-| 14:02 | `staging` (PR #147) | `c482474` | success |
-| 16:47 | `docs/141-lab7-release-evidence` | `dd163ad` | success |
+| Created (+07:00) | Run ID | Branch | Commit | Result |
+|---|---|---|---|---|
+| 02:12 | 45881885203 | `docs/139-lab7-multiple-entries-contract` | `ff6867b` | cancelled (a new push followed 1 minute later) |
+| 02:13 | 45882026268 | `docs/139-lab7-multiple-entries-contract` | `6f27fac` | success |
+| 12:06 | 45943837419 | `docs/139-lab7-multiple-entries-contract` | `eda4c6b` | success |
+| 13:08 | 45949904654 | `feat/140-multiple-entries-per-day` | `a3ea23a` | success |
+| 13:35 | 45952829418 | `feat/140-multiple-entries-per-day` | `d30cf8c` | success |
+| 13:54 | 45954873028 | `staging` (PR #147) | `83ab8a2` | success |
+| 13:56 | 45955070917 | `chore/148-sync-main` | `4f3a1c4` | success |
+| 14:02 | 45955696058 | `staging` (PR #147) | `c482474` | success |
+| 16:47 | 45976631016 | `docs/141-lab7-release-evidence` | `dd163ad` | success |
 
 **S5. Change failure.** One production deploy of the change: run 45969767744 on `b8d5acb`, `ROLLBACK: false`, revision `habit-tracker-00008-jgf`. No later deploy, rollback or `fix/*` branch up to the read time. The post-deployment checks in [release.md](release.md) section 4 passed (13 checks passed; E-PD-00 is the reading taken before the change).
 
@@ -66,7 +66,7 @@ The change went from contract to production in under 14 hours (M1), the tests fa
 | User tests | Lab 6 UAT-01 to UAT-04 and EXP-1 PASS on `v1.3`, retests 4 of 4 PASS on `v1.4`. They were not run again on `v1.5`. On `v1.5`, UAT-02 step C9 (8 then 9 glasses, maximum 12) is still refused, but with "Only 4 glasses left for today." instead of the expected "An entry already exists for this day." | [Lab 6 resolution](../lab-06/resolution.md); [change-request.md](change-request.md) section 3 |
 | Post-deployment checks | 13 passed, 0 failed (changed behaviour, privacy and roles) | [release.md](release.md) section 4 |
 | Configuration and secrets | No environment variable changed. Secrets stay in Secret Manager; none are in Git. | [change-request.md](change-request.md) section 3; [Lab 5 deployment](../lab-05/deployment.md) |
-| Documentation | Contract, ADR 0061, implementation, release and this file are on `staging`. `README.md` describes several entries per day with the day total, and points to the Lab 5 deployment and the Lab 7 records (updated in this PR). | PR #143, #146, #162; this PR |
+| Documentation | Contract, ADR 0061, implementation, release and this file are on `staging`. `README.md` describes several entries per day with the day total, and points to the Lab 5 deployment and the Lab 7 records (updated in PR #163). | PR #143, #146, #162, #163 |
 | Deployment and smoke test | Deploy run success; migration job completed; smoke test passed (`/api/health`, `/api/ready`, build label) | [release.md](release.md) section 3 |
 
 **Decision: READY** for the maintained Sprint 1 scope (decided by phittayanan, 2026-11-27).
@@ -90,13 +90,13 @@ Open items:
 
 ## 4. Retrospective
 
-Each student answered in their own words: phittayanan in Thai, translated by Claude Code and checked by phittayanan; projectnewy in English on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215873068), drafted with Claude Code and reviewed by projectnewy (their note). Answers are copied as written.
+Each student answered in their own words: phittayanan in Thai, translated by Claude Code and checked by phittayanan; projectnewy in English on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215873068), drafted with Claude Code and reviewed by projectnewy (their note). projectnewy's answers are copied as written. phittayanan revised their "What helped?" and "What will change?" answers on 2026-11-27 after PR #163 was merged (commit `fb23e1d`, reviewed in PR #169).
 
 | Question | phittayanan | projectnewy |
 |---|---|---|
-| What helped? | Running the tests in CI. | Reviewing the contract and the code before merging caught real problems: a decimal example in the contract that could not fail, and TC-89 passing CI but failing on Windows. |
+| What helped? | Writing the failing tests before the code: the 21 failures on the old code showed each new rule was really tested, and CI ran both test suites on every PR before merge. | Reviewing the contract and the code before merging caught real problems: a decimal example in the contract that could not fail, and TC-89 passing CI but failing on Windows. |
 | What hurt? | Our working hours did not match, so sometimes a PR was opened and it was not clear whether a review was needed. | Work waited in a chain of reviews, and extra rounds came from docs/ai-use.md merge conflicts and from the sync PR that the release needed before it could be merged. |
-| What will change? | We set up a team status in Discord, with the agent connected, so we can talk there. Next time I check the teammate's status there before asking for a review. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
+| What will change? | Four of my PRs on 2026-11-27 needed changes for claims that did not match their sources or for missed sheet items. Before I ask for a review, a second AI agent that has not seen the work will check each factual claim against its file or log and the PR against the sheet or Issue checklist. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
 
 ## 5. Contribution
 
@@ -105,7 +105,7 @@ Each student answered in their own words: phittayanan in Thai, translated by Cla
 | A. Change request and contract | #139 / PR #143 | projectnewy | phittayanan |
 | B. Tests and implementation | #140 / PR #146 | phittayanan | projectnewy (changes requested, then approved) |
 | B. Release, deploy and post-deployment checks | #141, #148 / PR #149, #147, #162 | projectnewy | phittayanan |
-| C and D. Metrics, readiness, retrospective | #142 / this PR | phittayanan | projectnewy |
+| C and D. Metrics, readiness, retrospective | #142 / PR #163 | phittayanan | projectnewy |
 
 ## 6. AI use
 
