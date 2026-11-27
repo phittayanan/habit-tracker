@@ -24,14 +24,14 @@ async function logIn(page, username) {
   await page.getByLabel('Username', { exact: true }).fill(username);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
-  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/goals$/);
+  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/calendar$/);
 }
 
 function range(min, max) {
   return `${min}\u2013${max}`;
 }
 
-test('TC-11: manager template page shows every state, New and Edit, and no Retire control', async ({ page }) => {
+test('TC-11: manager template page shows every state, New, and Edit and Retire on active rows only', async ({ page }) => {
   await logIn(page, 'manager1');
   await expect(page.getByRole('heading', { name: 'Templates' })).toBeVisible();
   await expect(page.getByText('No templates yet')).toBeVisible();
@@ -55,9 +55,11 @@ test('TC-11: manager template page shows every state, New and Edit, and no Retir
   await expect(rows.nth(1)).toContainText('Active');
   await expect(rows.nth(2)).toContainText('Steps');
   await expect(rows.nth(2)).toContainText('Retired');
-  await expect(page.getByRole('button', { name: 'Edit', exact: true })).toHaveCount(2);
+  // Sprint 2 (F-05, ADR 0079): the active row has Edit and Retire; the retired row has neither.
+  await expect(rows.nth(1).getByRole('button', { name: 'Edit', exact: true })).toBeVisible();
+  await expect(rows.nth(1).getByRole('button', { name: 'Retire', exact: true })).toBeVisible();
+  await expect(rows.nth(2).getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'New', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Retire' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Retire' })).toHaveCount(0);
   await expect(page.getByText('Retired')).toBeVisible();
 });
@@ -171,6 +173,8 @@ test('TC-47 / TC-48: template screens fit both widths and the keyboard completes
   await expect(page.getByRole('table')).toContainText('Keyboard');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Calendar', exact: true })).toBeFocused();
+  await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Goals', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Templates', exact: true })).toBeFocused();
@@ -185,11 +189,11 @@ async function editRow(page, name) {
   await page.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) }).getByRole('button', { name: 'Edit', exact: true }).click();
 }
 
-test('TC-73: Edit opens the filled form, a valid change shows in the table, a used template shows the API message', async ({ page, playwright }) => {
+test('TC-73: Edit opens the filled form, a valid change shows in the table, a used template shows the API message', async ({ page, playwright, baseURL }) => {
   const manager = await db.user.findUniqueOrThrow({ where: { username: 'manager1' } });
   const reading = await db.template.create({ data: { name: 'Reading', unit: 'pages', minValue: 0, maxValue: 500, createdBy: manager.id } });
   const sleep = await db.template.create({ data: { name: 'Sleep', unit: 'hours', minValue: 0, maxValue: 24, createdBy: manager.id } });
-  const participant = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:33132' });
+  const participant = await playwright.request.newContext({ baseURL });
   try {
     expect((await participant.post('/api/auth/login', { data: { username: 'participant1', password } })).status()).toBe(200);
     expect((await participant.post('/api/goals', { data: { templateId: sleep.id, dailyTarget: 8, startDate: today(), endDate: addDays(30) } })).status()).toBe(201);

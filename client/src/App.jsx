@@ -3,9 +3,10 @@ import { api } from './api.js';
 import { TemplateForm, TemplateList } from './templates.jsx';
 
 import { GoalForm, GoalList } from './goals.jsx';
+import { CalendarPage } from './calendar.jsx';
 
 const build = import.meta.env.VITE_BUILD_SHA;
-const firstPage = user => user.role === 'MANAGER' ? '/templates' : '/goals';
+const firstPage = user => user.role === 'MANAGER' ? '/templates' : '/calendar';
 
 export function App({ extraPage }) {
   const [path, setPath] = useState(location.pathname);
@@ -87,14 +88,15 @@ export function App({ extraPage }) {
     </form>
   </main>;
 
-  const menu = user.role === 'MANAGER' ? ['Templates'] : ['Goals', 'Templates'];
+  const menu = user.role === 'MANAGER' ? ['Templates'] : ['Calendar', 'Goals', 'Templates'];
   const wrongRole = (user.role === 'PARTICIPANT' && /^\/templates\/(new|[^/]+\/edit)\/?$/.test(path)) ||
-    (user.role === 'MANAGER' && /^\/goals(?:\/|$)/.test(path));
+    (user.role === 'MANAGER' && /^\/(?:goals(?:\/|$)|calendar\/?$)/.test(path));
   let page = extraPage?.(path);
   if (wrongRole) page = <p>This page is not available for your role.</p>;
   else if (path === '/templates') page = <TemplateList user={user} navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/templates/new') page = <TemplateForm navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (/^\/templates\/\d+\/edit$/.test(path)) page = <TemplateForm key={path} id={path.split('/')[2]} navigate={navigate} onUnauthenticated={unauthenticated} />;
+  else if (path === '/calendar') page = <CalendarPage onUnauthenticated={unauthenticated} />;
   else if (path === '/goals') page = <GoalList navigate={navigate} onUnauthenticated={unauthenticated} />;
   else if (path === '/goals/new') page = <GoalForm navigate={navigate} onUnauthenticated={unauthenticated} />;
   return <>

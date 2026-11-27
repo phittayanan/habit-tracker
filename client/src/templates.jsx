@@ -15,6 +15,35 @@ function numberOrText(value) {
   return Number.isFinite(numeric) ? numeric : text;
 }
 
+// F-05 (ADR 0078): retiring is permanent, so it asks first in a modal dialog.
+function RetireDialog({ template, onClose, onRetired, onUnauthenticated }) {
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const dialogRef = useRef(null);
+  useEffect(() => { dialogRef.current.showModal(); }, []);
+  // The open dialog closes first, so the page can take focus again.
+  function close() { dialogRef.current.close(); onClose(); }
+  // While the request runs, nothing may look like a cancel.
+  function escape(event) { event.preventDefault(); if (!busy) close(); }
+  async function confirm() {
+    if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      const body = await api(`/api/templates/${template.id}/retire`, { method: 'POST' }, onUnauthenticated);
+      dialogRef.current.close();
+      onRetired(body.template);
+    } catch (error) { setMessage(error.message); setBusy(false); }
+  }
+  return <dialog ref={dialogRef} className="retire-dialog" aria-labelledby="retire-question" onCancel={escape}>
+    <p id="retire-question">Retire "{template.name}"? New goals cannot use it. This cannot be undone.</p>
+    {message && <p role="alert" className="error">{message}</p>}
+    <div className="form-actions">
+      <button type="button" onClick={close} disabled={busy}>Cancel</button>
+      <button type="button" onClick={confirm} disabled={busy}>Retire</button>
+    </div>
+  </dialog>;
+}
+
 export function TemplateList({ user, navigate, onUnauthenticated }) {
   const [templates, setTemplates] = useState(null);
   const [message, setMessage] = useState('');
@@ -33,6 +62,20 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
     navigate('/templates/new');
   }
   const openEdit = template => navigate(`/templates/${template.id}/edit`);
+  const [asking, setAsking] = useState(null);
+  const opener = useRef(null);
+  function askRetire(event, template) { opener.current = event.currentTarget; setAsking(template); }
+  function closeDialog() { setAsking(null); opener.current?.focus(); }
+  // ADR 0095: after a retire the row's button is gone, so focus goes to the row's "Retired" cell.
+  // It waits for the render, so the cell already says "Retired" when it takes focus.
+  const [retiredId, setRetiredId] = useState(null);
+  const stateCells = useRef(new Map());
+  useEffect(() => { if (retiredId !== null) stateCells.current.get(retiredId)?.focus(); }, [retiredId]);
+  function retired(changed) {
+    setTemplates(rows => rows.map(row => (row.id === changed.id ? changed : row)));
+    setAsking(null);
+    setRetiredId(changed.id);
+  }
 
   return <>
     <h1>Templates</h1>
@@ -52,12 +95,16 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
           <td>{template.unit}</td>
           <td>{rangeText(template)}</td>
           {manager ? <>
-            <td>{stateWord[template.state]}</td>
-            <td><button type="button" onClick={() => openEdit(template)}>Edit</button></td>
+            <td tabIndex={-1} ref={cell => { stateCells.current.set(template.id, cell); }}>{stateWord[template.state]}</td>
+            <td>{template.state === 'ACTIVE' ? <div className="row-actions">
+              <button type="button" onClick={() => openEdit(template)}>Edit</button>
+              <button type="button" onClick={event => askRetire(event, template)}>Retire</button>
+            </div> : null}</td>
           </> : null}
         </tr>)}
       </tbody>
     </table> : null}
+    {asking ? <RetireDialog template={asking} onClose={closeDialog} onRetired={retired} onUnauthenticated={onUnauthenticated} /> : null}
   </>;
 }
 
