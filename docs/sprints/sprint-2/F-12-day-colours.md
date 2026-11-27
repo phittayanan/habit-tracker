@@ -64,6 +64,7 @@ As F-11 section 5: a Participant's states come only from their own goals and ent
 - Signs inside the day cell: ✓ (all met), ½ (some), ✗ (none met), – (nothing recorded). A legend under the calendar repeats them in words: "✓ all met, ½ some, ✗ none, – nothing".
 - Each day button's accessible name has the state in words: "all goals met", "some goals met", "no goal met", "nothing recorded"; a `null` past day has only the date; a future day "… future" (F-11).
 - Today has an outline as well as its colour.
+- The chosen day keeps its colour and sign and has a 3 px dark border (ADR 0105).
 - The same words and signs appear on the F-11 chip and the F-15 day headings.
 
 ## 7. API
@@ -118,4 +119,4 @@ Fixtures as F-11 section 10 (goals W, count target 8; S, time target 420).
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
-| 2026-11-27 | Issue #156: its PR opens before #154, with TC-122 "not run, waits for #154" (ADR 0104; sections 10, 11) | projectnewy; phittayanan in the #156 PR review |
+| 2026-11-27 | Issue #156: its PR opens before #154, with TC-122 "not run, waits for #154" (ADR 0104; sections 10, 11); the chosen day has a border (ADR 0105; section 6) | projectnewy; phittayanan in the #156 PR review |
