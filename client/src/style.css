@@ -71,7 +71,7 @@ table.manager th:last-child, table.manager td:last-child { width: 5.5rem; }
 .build { color: #555; font-size: 0.8125rem; margin: 8px 0 0; }
 .topbar .build { margin: 0; }
 
-/* F-11 month calendar and day box (Issue #155). Day colours and signs come in #156 (ADR 0097). */
+/* F-11 month calendar and day box (Issue #155). */
 .calendar-layout { display: grid; gap: 24px; min-width: 0; }
 @media (min-width: 600px) { .calendar-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
 .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
@@ -79,9 +79,12 @@ table.manager th:last-child, table.manager td:last-child { width: 5.5rem; }
 .month-bar button { min-width: 44px; font-size: 20px; line-height: 1; }
 table.month th { text-align: center; font-size: 14px; padding: 4px 0; }
 table.month td { padding: 2px; }
-button.day { width: 100%; padding: 0; text-align: center; }
+button.day { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 56px; padding: 2px 0; line-height: 1.25; }
 button.day[aria-current=date] { outline: 2px solid #222; outline-offset: -4px; font-weight: 700; }
-button.day.chosen { background: #333; color: #fff; }
+/* The chosen day keeps its colour and gets a thick border (ADR 0105); the outline of today stays inside it. */
+button.day.chosen { border: 3px solid #222; }
+button.day.chosen[aria-current=date] { outline-offset: -6px; }
+button.day[aria-current=date]:focus-visible { outline: 3px solid #222; outline-offset: 3px; }
 button.day:disabled { cursor: default; background: #fff; color: #999; border-color: #ccc; }
 .day-panel, .day-box { min-width: 0; overflow-wrap: anywhere; }
 .day-panel h2, .day-box h2 { font-size: 20px; margin: 0; }
@@ -117,3 +120,21 @@ button.day:disabled { cursor: default; background: #fff; color: #999; border-col
 .typed input { width: 100%; min-width: 0; }
 .typed fieldset { border: 1px solid #aaa; border-radius: 3px; display: grid; gap: 8px; margin: 0; padding: 8px 12px 12px; }
 .typed button { justify-self: start; }
+
+/* F-12 day colours (prototype shades, ADR 0063) and the F-15 Calendar / List switch (Issue #156). */
+button.day.state-ALL_MET, .state-chip.state-ALL_MET { background: #cfe8d4; }
+button.day.state-SOME_MET, .state-chip.state-SOME_MET { background: #f6e7a8; }
+button.day.state-NONE_MET, .state-chip.state-NONE_MET { background: #f3c4c4; }
+button.day.state-NOTHING, .state-chip.state-NOTHING { background: #e6e6e6; }
+.state-chip { display: inline-block; border: 1px solid #777; border-radius: 999px; padding: 2px 10px; }
+.legend { font-size: 14px; margin: 8px 0 0; }
+.calendar-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.view-switch { display: flex; }
+.view-switch button { border-radius: 0; }
+.view-switch button + button { border-left: 0; }
+.view-switch button[aria-pressed=true] { background: #e5e5e5; font-weight: 700; }
+.day-list { overflow-wrap: anywhere; }
+.day-list section { border-top: 1px solid #aaa; padding: 8px 0; }
+.day-list h3 { font-size: 16px; margin: 0 0 4px; }
+.day-list ul { list-style: none; margin: 0; padding: 0; }
+.day-list p { margin: 0; }

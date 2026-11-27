@@ -1,8 +1,10 @@
 // F-11 month calendar and day box (Issue #155; contract docs/sprints/sprint-2/F-11-month-calendar.md).
-// The day state, colour and sign are added by Issue #156 (ADR 0097).
+// The day colour, sign and legend (F-12) and the Calendar / List switch (F-15) are from Issue #156.
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { api } from './api.js';
 import { formatMinutes } from './time-format.js';
+import { DAY_STATES, LEGEND, chipText } from './day-states.js';
+import { DayList } from './calendar-list.jsx';
 
 const asDate = text => new Date(`${text}T00:00:00Z`);
 const format = (text, options) => new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', ...options }).format(asDate(text));
@@ -45,8 +47,10 @@ function unsavedText(draft, goal) {
   return null;
 }
 
-export function CalendarPage({ onUnauthenticated }) {
+export function CalendarPage({ navigate, onUnauthenticated }) {
   const desktop = useDesktop();
+  // Calendar is selected after login (F-15, ADR 0048).
+  const [view, setView] = useState('calendar');
   const [shown, setShown] = useState(null);
   const [chosen, setChosen] = useState(null);
   const [boxOpen, setBoxOpen] = useState(false);
@@ -102,7 +106,7 @@ export function CalendarPage({ onUnauthenticated }) {
       setFocusAfter(() => () => dayButtons.current.get(date)?.focus());
     });
   }
-  // After a save, read the chosen day's month again so the card, and in #156 the sign and colour, update.
+  // After a save, read the chosen day's month again so the card, sign, colour and List update.
   async function reloadChosen() {
     const month = chosen.date.slice(0, 7);
     const body = await read(month);
@@ -122,25 +126,42 @@ export function CalendarPage({ onUnauthenticated }) {
 
   const box = showBox ? <DayBox item={chosen} today={shown.today} desktop={desktop} draft={draft} setDraft={setDraft}
     whenSaved={whenSaved} onClose={closeBox} onSaved={reloadChosen} onUnauthenticated={onUnauthenticated} /> : null;
+  function newGoal(event) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigate('/goals/new');
+  }
   return <div className="calendar-layout">
     <section className="calendar" aria-labelledby="month-title">
+      <div className="calendar-toolbar">
+        <a className="button" href="/goals/new" onClick={newGoal}>+ New goal</a>
+        <div className="view-switch" role="group" aria-label="View">
+          <button type="button" aria-pressed={view === 'calendar'} onClick={() => setView('calendar')}>Calendar</button>
+          <button type="button" aria-pressed={view === 'list'} onClick={() => setView('list')}>List</button>
+        </div>
+      </div>
       <div className="month-bar">
         <button type="button" aria-label="Previous month" onClick={() => showMonth(shiftMonth(shown.month, -1))}>‹</button>
         <h1 id="month-title" className="month-title">{monthTitle(shown.month)}</h1>
         <button type="button" aria-label="Next month" disabled={shown.month >= current} onClick={() => showMonth(shiftMonth(shown.month, 1))}>›</button>
       </div>
       {message && <p role="alert" className="error">{message}</p>}
+      {view === 'list' ? <DayList month={shown.month} today={shown.today} days={shown.days} /> : <>
       <table className="month">
         <thead><tr>{WEEKDAYS.map(name => <th key={name} scope="col">{name}</th>)}</tr></thead>
         <tbody>{weeks.map((week, i) => <tr key={i}>{week.map((item, j) => <td key={j}>{item ? (() => {
           const future = item.date > shown.today;
-          return <button type="button" className={`day${chosen?.date === item.date && showBox ? ' chosen' : ''}`}
+          const state = DAY_STATES[item.state];
+          return <button type="button" className={`day${state ? ` state-${item.state}` : ''}${chosen?.date === item.date && showBox ? ' chosen' : ''}`}
             ref={element => { if (element) dayButtons.current.set(item.date, element); else dayButtons.current.delete(item.date); }}
-            aria-label={future ? `${dayLabel(item.date)}, future` : dayLabel(item.date)}
+            aria-label={future ? `${dayLabel(item.date)}, future` : state ? `${dayLabel(item.date)}, ${state.words}` : dayLabel(item.date)}
             aria-current={item.date === shown.today ? 'date' : undefined}
-            disabled={future} onClick={() => chooseDay(item)}>{Number(item.date.slice(8))}</button>;
+            disabled={future} onClick={() => chooseDay(item)}><span>{Number(item.date.slice(8))}</span>
+            {state ? <span className="day-sign">{state.sign}</span> : null}</button>;
         })() : null}</td>)}</tr>)}</tbody>
       </table>
+      <p className="legend">{LEGEND}</p>
+      </>}
     </section>
     {box}
     {asking ? <Discard text={asking.text} onKeep={() => { const back = asking.back; setAsking(null); setFocusAfter(() => () => back?.focus()); }}
@@ -171,6 +192,7 @@ function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onS
   const content = <>
     <h2 id={id}>{dayHeading(item.date)}</h2>
     {item.date === today ? <p className="today-note">Today</p> : null}
+    {DAY_STATES[item.state] ? <p className={`state-chip state-${item.state}`}>{chipText(item.state)}</p> : null}
     {item.goals.length === 0 ? <p>No goals on this day.</p> : <ul className="goal-cards">{item.goals.map(goal =>
       <GoalCard key={goal.goalId} goal={goal} date={item.date} today={today} draft={draft?.goalId === goal.goalId ? draft : null}
         setDraft={setDraft} whenSaved={whenSaved} onSaved={onSaved} onUnauthenticated={onUnauthenticated} />)}</ul>}
