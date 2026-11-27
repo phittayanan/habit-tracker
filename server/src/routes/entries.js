@@ -1,6 +1,6 @@
 import express from 'express';
 import { requireRole, requireSession, sendError } from '../middleware/auth.js';
-import { createEntry, deleteEntry, editEntry, listEntries } from '../services/entry.js';
+import { createEntry, deleteEntry, editEntry, findOwnEntry, listEntries } from '../services/entry.js';
 
 export const entryRoutes = [
   ...['get', 'post'].map(method => ({ method, path: '/api/goals/:id/entries', roles: ['PARTICIPANT'], requestPath: '/api/goals/1/entries' })),
@@ -24,7 +24,16 @@ export function registerEntries(app, db) {
       res.status(201).json({ entry: result.entry });
     } catch (error) { next(error); }
   });
-  app.patch('/api/goals/:id/entries/:entryId', requireSession(db), requireRole('PARTICIPANT'), express.json(), async (req, res, next) => {
+  // F-13 section 4: the goal and the entry are checked before the body is parsed (as F-14's ownGoal, #176).
+  // The service checks the entry again under the goal-row lock.
+  const ownEntry = async (req, res, next) => {
+    try {
+      const found = await findOwnEntry(db, req.user, req.params.id, req.params.entryId);
+      if (!found.ok) return sendError(res, found.status, found.code, found.message);
+      next();
+    } catch (error) { next(error); }
+  };
+  app.patch('/api/goals/:id/entries/:entryId', requireSession(db), requireRole('PARTICIPANT'), ownEntry, express.json(), async (req, res, next) => {
     try {
       const result = await editEntry(db, req.user, req.params.id, req.params.entryId, req.body);
       if (!result.ok) return sendError(res, result.status, result.code, result.message);

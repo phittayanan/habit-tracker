@@ -110,7 +110,7 @@ function EntryRow({ goal, entry, onUnauthenticated, onEdited, onDeleted }) {
       {goal.template.kind === 'TIME' ? <p className="time-hint">{minutesHint(value)}</p> : null}
       <div className="entry-actions">
         <button type="submit" disabled={busy}>Save</button>
-        <button type="button" onClick={() => stop()}>Cancel</button>
+        <button type="button" disabled={busy} onClick={() => stop()}>Cancel</button>
       </div>
     </form> : <div className="entry-actions">
       <button type="button" ref={editRef} aria-label={`Edit ${what}`} onClick={() => { setValue(String(entry.value)); setMessage(''); setEditing(true); }}>Edit</button>

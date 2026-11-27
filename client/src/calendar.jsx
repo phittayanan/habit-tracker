@@ -339,7 +339,7 @@ function EditEntry({ goal, draft, setDraft, busy, save, fail, errorId, firstCont
       : <label>New value ({goal.unit})<input ref={firstControl} {...invalid} type="number" step="any" inputMode="decimal" value={draft.other} onChange={event => set({ other: event.target.value })} /></label>}
     <div className="entry-actions">
       <button type="submit" disabled={busy}>Save</button>
-      <button type="button" onClick={cancel}>Cancel</button>
+      <button type="button" disabled={busy} onClick={cancel}>Cancel</button>
     </div>
   </form>;
 }

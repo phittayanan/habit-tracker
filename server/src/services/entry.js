@@ -47,12 +47,21 @@ export async function createEntry(db, user, goalId, body, now = new Date()) {
 
 // F-13 (Issue #154): edit the value of, or delete, one entry of an own goal. Check order is F-13 section 4.
 // `value` is undefined for a delete.
-async function changeEntry(db, user, goalId, entryId, body, deleting, now) {
+// Section 4 orders 3 and 4: the caller's goal, then the entry on it. The route runs this before the body
+// parser, so a malformed body on a goal or entry that is not the caller's still gets 404.
+export async function findOwnEntry(db, user, goalId, entryId) {
   const goal = await ownGoal(db, user, goalId);
   if (!goal) return notFound;
   if (!validId(entryId)) return entryNotFound;
   const id = Number(entryId);
   if (!await db.entry.findFirst({ where: { id, goalId: goal.id }, select: { id: true } })) return entryNotFound;
+  return { ok: true, goal, id };
+}
+
+async function changeEntry(db, user, goalId, entryId, body, deleting, now) {
+  const found = await findOwnEntry(db, user, goalId, entryId);
+  if (!found.ok) return found;
+  const { goal, id } = found;
   let value;
   if (!deleting) {
     const parsed = parseEntryValue(body);
