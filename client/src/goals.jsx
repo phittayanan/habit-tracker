@@ -88,8 +88,8 @@ function TargetChange({ goal, onUnauthenticated, onSaved }) {
     <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${inputId}-form` : undefined} onClick={() => (open ? close() : show())}>Change target</button>
     {open ? <form id={`${inputId}-form`} className="target-form" onSubmit={save} noValidate aria-label={`Change target for ${goal.template.name}`}>
       <label htmlFor={inputId}>New daily target ({goal.template.unit})</label>
-      <input id={inputId} ref={inputRef} name="dailyTarget" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} aria-invalid={message ? true : undefined} aria-describedby={message ? `${inputId}-note ${inputId}-error` : `${inputId}-note`} />
-      {goal.template.kind === 'TIME' ? <p className="time-hint">{minutesHint(value)}</p> : null}
+      <input id={inputId} ref={inputRef} name="dailyTarget" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} aria-invalid={message ? true : undefined} aria-describedby={[goal.template.kind === 'TIME' && minutesHint(value) ? `${inputId}-hint` : '', `${inputId}-note`, message ? `${inputId}-error` : ''].filter(Boolean).join(' ')} />
+      {goal.template.kind === 'TIME' ? <p id={`${inputId}-hint`} className="time-hint">{minutesHint(value)}</p> : null}
       <p id={`${inputId}-note`}>{notStarted ? `Applies from ${goal.startDate}.` : 'Applies from today. Earlier days keep their target.'}</p>
       <div className="form-actions">
         <button type="submit" disabled={busy}>Save</button>

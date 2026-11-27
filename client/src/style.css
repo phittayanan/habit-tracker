@@ -48,6 +48,7 @@ table.manager th:last-child, table.manager td:last-child { width: 5.5rem; }
 .goal-unit:empty { display: none; }
 .time-hint { margin: -12px 0 0; }
 .entry-form .time-hint { margin: -8px 0 0; }
+.target-form .time-hint { margin: -4px 0 0; }
 .time-hint:empty { display: none; }
 .goal-list { list-style: none; margin: 0; padding: 0; }
 .goal-list li { margin-bottom: 24px; overflow-wrap: anywhere; }
