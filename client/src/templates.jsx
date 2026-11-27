@@ -30,8 +30,8 @@ function RetireDialog({ template, onClose, onRetired, onUnauthenticated }) {
     setBusy(true); setMessage('');
     try {
       const body = await api(`/api/templates/${template.id}/retire`, { method: 'POST' }, onUnauthenticated);
+      dialogRef.current.close();
       onRetired(body.template);
-      close();
     } catch (error) { setMessage(error.message); setBusy(false); }
   }
   return <dialog ref={dialogRef} className="retire-dialog" aria-labelledby="retire-question" onCancel={escape}>
@@ -66,7 +66,16 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
   const opener = useRef(null);
   function askRetire(event, template) { opener.current = event.currentTarget; setAsking(template); }
   function closeDialog() { setAsking(null); opener.current?.focus(); }
-  const replace = changed => setTemplates(rows => rows.map(row => (row.id === changed.id ? changed : row)));
+  // ADR 0095: after a retire the row's button is gone, so focus goes to the row's "Retired" cell.
+  // It waits for the render, so the cell already says "Retired" when it takes focus.
+  const [retiredId, setRetiredId] = useState(null);
+  const stateCells = useRef(new Map());
+  useEffect(() => { if (retiredId !== null) stateCells.current.get(retiredId)?.focus(); }, [retiredId]);
+  function retired(changed) {
+    setTemplates(rows => rows.map(row => (row.id === changed.id ? changed : row)));
+    setAsking(null);
+    setRetiredId(changed.id);
+  }
 
   return <>
     <h1>Templates</h1>
@@ -86,7 +95,7 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
           <td>{template.unit}</td>
           <td>{rangeText(template)}</td>
           {manager ? <>
-            <td>{stateWord[template.state]}</td>
+            <td tabIndex={-1} ref={cell => { stateCells.current.set(template.id, cell); }}>{stateWord[template.state]}</td>
             <td>{template.state === 'ACTIVE' ? <div className="row-actions">
               <button type="button" onClick={() => openEdit(template)}>Edit</button>
               <button type="button" onClick={event => askRetire(event, template)}>Retire</button>
@@ -95,7 +104,7 @@ export function TemplateList({ user, navigate, onUnauthenticated }) {
         </tr>)}
       </tbody>
     </table> : null}
-    {asking ? <RetireDialog template={asking} onClose={closeDialog} onRetired={replace} onUnauthenticated={onUnauthenticated} /> : null}
+    {asking ? <RetireDialog template={asking} onClose={closeDialog} onRetired={retired} onUnauthenticated={onUnauthenticated} /> : null}
   </>;
 }
 
