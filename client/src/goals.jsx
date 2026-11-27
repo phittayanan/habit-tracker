@@ -112,10 +112,12 @@ function Reminder({ goal, onUnauthenticated, onChange }) {
   const [busy, setBusy] = useState(false);
   const buttonRef = useRef(null);
   const timeRef = useRef(null);
+  const lineRef = useRef(null);
   const focusButton = useRef(false);
   useEffect(() => { if (open) timeRef.current?.focus(); }, [open]);
   // After a save or a removal the button is re-rendered with a new name; focus goes back to it.
-  useEffect(() => { if (focusButton.current) { focusButton.current = false; buttonRef.current?.focus(); } });
+  // An ended goal has no such button, so focus goes to the reminder line instead (OP-17.7).
+  useEffect(() => { if (focusButton.current) { focusButton.current = false; (buttonRef.current || lineRef.current)?.focus(); } });
   const canSet = goal.state === 'ACTIVE';
   function show() { setTime(goal.reminder?.time || ''); setWeekdays(goal.reminder?.weekdays || []); setMessage(''); setOpen(true); }
   function close() { setOpen(false); setMessage(''); buttonRef.current?.focus(); }
@@ -145,7 +147,7 @@ function Reminder({ goal, onUnauthenticated, onChange }) {
   const dayError = message === 'Choose at least one weekday, each only once.';
   const timeError = Boolean(message) && !dayError;
   return <div className="reminder">
-    <p>{reminderText(goal.reminder)}</p>
+    <p ref={lineRef} tabIndex={-1}>{reminderText(goal.reminder)}</p>
     {canSet ? <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${id}-form` : undefined} onClick={() => (open ? close() : show())}>{goal.reminder ? 'Change reminder' : 'Set reminder'}</button> : null}
     {open ? <form id={`${id}-form`} className="reminder-form" onSubmit={save} noValidate aria-label={`Reminder for ${goal.template.name}`}>
       <label htmlFor={`${id}-time`}>Reminder time</label>
