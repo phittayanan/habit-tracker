@@ -83,16 +83,16 @@ function TargetChange({ goal, onUnauthenticated, onSaved }) {
   const notStarted = goal.startDate > bangkokToday();
   const inputId = `target-${goal.id}`;
   return <div className="target-change">
-    <button type="button" ref={buttonRef} aria-expanded={open} aria-controls={open ? `${inputId}-form` : undefined} onClick={() => (open ? close() : show())}>Change target</button>
+    <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${inputId}-form` : undefined} onClick={() => (open ? close() : show())}>Change target</button>
     {open ? <form id={`${inputId}-form`} className="target-form" onSubmit={save} noValidate aria-label={`Change target for ${goal.template.name}`}>
       <label htmlFor={inputId}>New daily target ({goal.template.unit})</label>
-      <input id={inputId} ref={inputRef} name="dailyTarget" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} aria-describedby={`${inputId}-note`} />
+      <input id={inputId} ref={inputRef} name="dailyTarget" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} aria-invalid={message ? true : undefined} aria-describedby={message ? `${inputId}-note ${inputId}-error` : `${inputId}-note`} />
       <p id={`${inputId}-note`}>{notStarted ? `Applies from ${goal.startDate}.` : 'Applies from today. Earlier days keep their target.'}</p>
       <div className="form-actions">
         <button type="submit" disabled={busy}>Save</button>
         <button type="button" onClick={close}>Cancel</button>
       </div>
-      {message && <p role="alert" className="error">{message}</p>}
+      {message && <p id={`${inputId}-error`} role="alert" className="error">{message}</p>}
     </form> : null}
   </div>;
 }
@@ -109,7 +109,7 @@ export function GoalList({ navigate, onUnauthenticated }) {
     {goals === null && !message ? <p role="status">Loading…</p> : null}
     {goals?.length === 0 ? <p>No goals yet</p> : null}
     {goals?.length > 0 ? <ul className="goal-list">{goals.map(goal => <li key={goal.id}>
-      <h2>{goal.template.name}</h2>
+      <h2 id={`goal-${goal.id}-name`}>{goal.template.name}</h2>
       <p>Daily target: {goal.dailyTarget} {goal.template.unit}</p>
       {goal.state === 'ACTIVE' ? <TargetChange goal={goal} onUnauthenticated={onUnauthenticated} onSaved={load} /> : null}
       <p>{goal.startDate} – {goal.endDate}</p>

@@ -57,7 +57,7 @@ export async function changeTarget(db, user, goalId, body) {
     const today = bangkokToday();
     const startDate = dateText(row.startDate);
     if (goalState(dateText(row.endDate), today) === 'ENDED') return { ok: false, status: 409, code: 'GOAL_ENDED', message: 'This goal has ended and cannot be changed.' };
-    // A retired template keeps its range (ADR 0017), and BR-08 keeps a used template's range fixed.
+    // A goal on a retired template can still change its target (ADR 0017); BR-08 keeps a used template's range fixed.
     if (!targetWithinMaximum(target, Number(row.template.maxValue))) return { ok: false, status: 400, code: 'TARGET_ABOVE_TEMPLATE_MAX', message: 'Daily target must not exceed the template maximum.' };
     if (!targetAboveMinimum(target, Number(row.template.minValue))) return { ok: false, status: 400, code: 'TARGET_NOT_ABOVE_TEMPLATE_MIN', message: 'Daily target must be above the template minimum.' };
     // Sending the current target writes nothing (OP-14.3).
