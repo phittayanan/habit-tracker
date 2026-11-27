@@ -1,6 +1,6 @@
 # 0088. The reminder is set and shown on the goals page
 
-Status: chosen by projectnewy on 2026-11-27 in [Issue #157](https://github.com/phittayanan/habit-tracker/issues/157) (Q3). To be agreed by phittayanan in the review of the #157 PR.
+Status: chosen by projectnewy on 2026-11-27 in [Issue #157](https://github.com/phittayanan/habit-tracker/issues/157) (Q3). Agreed by phittayanan in the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219) of PR #174.
 
 ## Decision
 

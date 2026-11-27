@@ -119,12 +119,13 @@ No new table, column or migration.
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-16.1 | Ended goals; where the current streak shows; detail page content (SRS A-10) | Decided by projectnewy (ADR 0089 to ADR 0091); phittayanan's agreement pending |
-| OP-16.2 | 0 for a goal not started; best streak counted up to today or the end date; a day total equal to the target counts | Drafted by Claude Code from BR-07 and BR-13; accepted by projectnewy on 2026-11-27; phittayanan's review pending |
-| OP-16.3 | API fields and shapes, the address `/goals/:id`, the "Details" link, screen texts | Drafted by Claude Code (the endpoint is in SDS 4.4); accepted by projectnewy on 2026-11-27; phittayanan's review pending |
+| OP-16.1 | Ended goals; where the current streak shows; detail page content (SRS A-10) | Decided by projectnewy (ADR 0089 to ADR 0091); phittayanan agreed in the review of 95c47f8 (PR #174) |
+| OP-16.2 | 0 for a goal not started; best streak counted up to today or the end date; a day total equal to the target counts | Drafted by Claude Code from BR-07 and BR-13; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
+| OP-16.3 | API fields and shapes, the address `/goals/:id`, the "Details" link, screen texts | Drafted by Claude Code (the endpoint is in SDS 4.4); accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
 
 ## 13. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #157) | pending (reviewer phittayanan) |
+| 2026-11-27 | [Review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219) of PR #174: phittayanan agreed to the decisions and drafted points | pending (reviewer phittayanan) |

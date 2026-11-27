@@ -75,7 +75,7 @@ Errors use the ADR 0025 body.
 
 - **`PUT /api/goals/:id/reminder`** (Participant): request `{ "time": "07:30", "weekdays": ["MON", "WED", "FRI"] }`; response 200 `{ "reminder": { "time": "07:30", "weekdays": ["MON", "WED", "FRI"] } }`.
 - **`DELETE /api/goals/:id/reminder`** (Participant): no body; response 204.
-- **`GET /api/goals`** and every goal in a response: also `"reminder"`, the object above or `null`. Exact-shape checks of Sprint 1 tests gain this field.
+- **Goal objects of the goal endpoints** (`GET /api/goals`, the response of `POST /api/goals` and of `PATCH /api/goals/:id`, and `GET /api/goals/:id` once F-16 builds it): also `"reminder"`, the object above or `null`. `GET /api/calendar` has no `reminder` field: the calendar does not show reminders (ADR 0088). Exact-shape checks of Sprint 1 tests of a goal object gain this field.
 
 ## 8. Data
 
@@ -128,12 +128,14 @@ Errors use the ADR 0025 body.
 
 | ID | Point | Status and answer |
 |---|---|---|
-| OP-17.1 | One reminder, removable; which goals; where it is set | Decided by projectnewy (ADR 0086 to ADR 0088); phittayanan's agreement pending |
-| OP-17.2 | `HH:MM` 24-hour in Asia/Bangkok; weekday codes and Monday-first order | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan's review pending |
-| OP-17.3 | Check order, codes and messages; remove without a question; 204 when there is none; screen texts; table and column names; how "no outbound call" is tested | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan's review pending |
+| OP-17.1 | One reminder, removable; which goals; where it is set | Decided by projectnewy (ADR 0086 to ADR 0088); phittayanan agreed in the review of 95c47f8 (PR #174) |
+| OP-17.2 | `HH:MM` 24-hour in Asia/Bangkok; weekday codes and Monday-first order | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
+| OP-17.3 | Check order, codes and messages; remove without a question; 204 when there is none; screen texts; table and column names; how "no outbound call" is tested | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
+| OP-17.4 | Whether the goals inside `GET /api/calendar` carry `reminder` (question 3 of the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219)) | Decided by projectnewy on 2026-11-27: no; only the goal objects of the goal endpoints do (section 7); phittayanan's review pending |
 
 ## 13. Revision history
 
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #157) | pending (reviewer phittayanan) |
+| 2026-11-27 | [Review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219) of PR #174: phittayanan agreed to the decisions and drafted points; section 7 says which responses carry `reminder` (OP-17.4) | pending (reviewer phittayanan) |

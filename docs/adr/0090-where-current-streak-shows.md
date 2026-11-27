@@ -1,6 +1,6 @@
 # 0090. The current streak shows on the goals page and on today's calendar cards
 
-Status: chosen by projectnewy on 2026-11-27 in [Issue #157](https://github.com/phittayanan/habit-tracker/issues/157) (Q5). To be agreed by phittayanan in the review of the #157 PR.
+Status: chosen by projectnewy on 2026-11-27 in [Issue #157](https://github.com/phittayanan/habit-tracker/issues/157) (Q5). Agreed by phittayanan in the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219) of PR #174.
 
 ## Decision
 
