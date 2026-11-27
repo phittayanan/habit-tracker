@@ -21,7 +21,7 @@
 | Deployed URL | <https://habit-tracker-rfi4eg2u4q-as.a.run.app> |
 | Sprint 1 baseline where the old rule was first delivered | tag `v1.0`, commit `64831f7` |
 | Accepted Sprint 1 release (Lab 6) | tag `v1.4`, commit `056ee5c`, Cloud Run revision `habit-tracker-00007-7pd` |
-| Pre-change implementation | `staging` at `c4ba749` (the merged revised contract); its `server` and `client` code is the same as `v1.4` |
+| Pre-change implementation | `staging` at `c4ba749`, the merged revised contract, which the new tests were run against. The change request (A.1, section 2) names `a43070f`, the `staging` head when it was written; `a43070f` to `c4ba749` changes only `docs/`, and both have the same `server` and `client` code as `v1.4` |
 | Tests seen failing on the old code | `761d87e` |
 | Implementation | `bbf12a2`; reviewed head `d30cf8c` |
 | Submitted main release | tag `v1.5`, commit `b8d5acb` |
@@ -31,7 +31,7 @@ The full version table, with the merge commits and the unrelated changes in the 
 
 ## Approval of the change
 
-The sheet asks for instructor/TA approval before implementation. Our change request records: "Instructor/TA approval is not required, per the instructor's announcement changing the Lab 7 spec sheet (as relayed by projectnewy on 2026-11-27)" (Issue #139, Appendix CR-139). The team's own approval is the teammate review of the change request and contract in PR #143 before any test or code (Part A, A.4).
+The sheet asks for instructor/TA approval before implementation. Issue #139 records: "Instructor/TA approval is not required, per the instructor's announcement changing the Lab 7 spec sheet" (Appendix CR-139); the change request adds "as relayed by projectnewy on 2026-11-27" (A.1). The team's own approval is the teammate review of the change request and contract in PR #143 before any test or code (Part A, A.4).
 
 ## Contents
 

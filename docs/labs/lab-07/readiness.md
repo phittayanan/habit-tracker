@@ -38,17 +38,17 @@ The change measured here is the Lab 7 change: several entries per day with a day
 
 **S4. CI runs.** `gh run list`, workflow "CI & Docker Build", on the change's branches:
 
-| Created (+07:00) | Branch | Commit | Result |
-|---|---|---|---|
-| 02:12 | `docs/139-lab7-multiple-entries-contract` | `ff6867b` | cancelled (a new push followed 1 minute later) |
-| 02:13 | `docs/139-lab7-multiple-entries-contract` | `6f27fac` | success |
-| 12:06 | `docs/139-lab7-multiple-entries-contract` | `eda4c6b` | success |
-| 13:08 | `feat/140-multiple-entries-per-day` | `a3ea23a` | success |
-| 13:35 | `feat/140-multiple-entries-per-day` | `d30cf8c` | success |
-| 13:54 | `staging` (PR #147) | `83ab8a2` | success |
-| 13:56 | `chore/148-sync-main` | `4f3a1c4` | success |
-| 14:02 | `staging` (PR #147) | `c482474` | success |
-| 16:47 | `docs/141-lab7-release-evidence` | `dd163ad` | success |
+| Created (+07:00) | Run ID | Branch | Commit | Result |
+|---|---|---|---|---|
+| 02:12 | 45881885203 | `docs/139-lab7-multiple-entries-contract` | `ff6867b` | cancelled (a new push followed 1 minute later) |
+| 02:13 | 45882026268 | `docs/139-lab7-multiple-entries-contract` | `6f27fac` | success |
+| 12:06 | 45943837419 | `docs/139-lab7-multiple-entries-contract` | `eda4c6b` | success |
+| 13:08 | 45949904654 | `feat/140-multiple-entries-per-day` | `a3ea23a` | success |
+| 13:35 | 45952829418 | `feat/140-multiple-entries-per-day` | `d30cf8c` | success |
+| 13:54 | 45954873028 | `staging` (PR #147) | `83ab8a2` | success |
+| 13:56 | 45955070917 | `chore/148-sync-main` | `4f3a1c4` | success |
+| 14:02 | 45955696058 | `staging` (PR #147) | `c482474` | success |
+| 16:47 | 45976631016 | `docs/141-lab7-release-evidence` | `dd163ad` | success |
 
 **S5. Change failure.** One production deploy of the change: run 45969767744 on `b8d5acb`, `ROLLBACK: false`, revision `habit-tracker-00008-jgf`. No later deploy, rollback or `fix/*` branch up to the read time. The post-deployment checks in [release.md](release.md) section 4 passed (13 checks passed; E-PD-00 is the reading taken before the change).
 
@@ -90,7 +90,7 @@ Open items:
 
 ## 4. Retrospective
 
-Each student answered in their own words: phittayanan in Thai, translated by Claude Code and checked by phittayanan; projectnewy in English on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215873068), drafted with Claude Code and reviewed by projectnewy (their note). Answers are copied as written.
+Each student answered in their own words: phittayanan in Thai, translated by Claude Code and checked by phittayanan; projectnewy in English on [Issue #142](https://github.com/phittayanan/habit-tracker/issues/142#issuecomment-7215873068), drafted with Claude Code and reviewed by projectnewy (their note). projectnewy's answers are copied as written. phittayanan revised their "What will change?" answer on 2026-11-27 after PR #163 was merged (commit `fb23e1d`, reviewed in PR #169).
 
 | Question | phittayanan | projectnewy |
 |---|---|---|

@@ -1,10 +1,14 @@
 # Part D: Release readiness and retrospective
 
-The texts were reviewed by projectnewy in PR #163 (records R-163 in the Appendix): changes requested on `daefb86`, then approved on `7452f46`.
+The texts were reviewed by projectnewy in PR #163 (records R-163 in the Appendix): changes requested on `daefb86`, then approved on `7452f46`. One later change is reviewed in PR #169 instead: phittayanan's revised "What will change?" answer in D.3 (`fb23e1d`).
 
 ## D.1 Release readiness
 
 {{include:../readiness.md|## 2.}}
+
+The defect list behind the "Defects" row, as recorded in the Lab 6 resolution (section 2, 2026-11-26):
+
+{{include:../../lab-06/resolution.md|## 2.}}
 
 ## D.2 Technical debt
 
@@ -24,9 +28,11 @@ The texts were reviewed by projectnewy in PR #163 (records R-163 in the Appendix
 | C and D. Metrics, readiness, retrospective | #142 / PR #163 | phittayanan | projectnewy |
 | This PDF | #166 / PR #169 | phittayanan | projectnewy |
 
+No part was pair work: each part had one author, and the other student reviewed and merged it.
+
 ## D.5 AI-use declaration for Lab 7
 
-Both students used Claude Code (an AI coding agent) for every part of Lab 7. The agent drafted documents, tests, code, reviews and this PDF, and ran commands; the students made every decision listed below, approved each review before it was posted, and merged every PR. Each review in the Appendix says in its first line that it was drafted with Claude Code. The full log is `docs/ai-use.md` (rows for #139 to #142, #148 and #164 to #166).
+Both students used Claude Code (an AI coding agent) for every part of Lab 7. The agent drafted documents, tests, code, reviews and this PDF, and ran commands; the students made every decision listed below, approved each review before it was posted, and merged every PR. Eight of the nine reviews in the Appendix say in their first line that they were drafted with Claude Code; the ninth, R-162, marks each check `[AI-assisted]` instead. The full log is `docs/ai-use.md` (rows for #139 to #142, #148 and #164 to #166).
 
 | Part | Issue | What Claude Code did | What the students decided and checked |
 |---|---|---|---|

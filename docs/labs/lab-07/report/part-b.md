@@ -40,11 +40,23 @@ As merged (`docs/labs/lab-07/release.md`). The screenshots it lists follow in B.
 
 {{include:../release.md}}
 
+Release CI and deployment, excerpt of the log of deploy run 45969767744 (job `test / test-and-docker`, then `deploy`), times UTC:
+
+````text
+2026-11-27T08:58:39Z ℹ tests 99
+2026-11-27T08:58:39Z ℹ pass 99
+2026-11-27T08:58:39Z ℹ fail 0
+2026-11-27T08:58:39Z ℹ skipped 0
+2026-11-27T08:59:33Z   50 passed (54.1s)
+2026-11-27T09:01:45Z Execution [habit-tracker-migrate-5p6mb] has successfully completed.
+2026-11-27T09:02:01Z Service [habit-tracker] revision [habit-tracker-00008-jgf] has been deployed and is serving 100 percent of traffic.
+````
+
 ## B.5 Screenshots
 
 Manual checks in Chrome by projectnewy on the deployed revision `habit-tracker-00008-jgf` (`build b8d5acb`), 2026-11-27. Times are when Claude Code received each screenshot, by projectnewy's computer clock, which runs about 10 minutes ahead of GitHub (B.4, section 4). The browser's extension and profile area is masked. The copies in this PDF are cropped to the page content at build time (the files in `evidence/img/` are unchanged). Each caption gives the evidence ID, time and result; the action, expected and actual results are in the tables of B.4, section 4.
 
-![E-pre-release, 15:27: Cloud SQL backup `before-lab7-release`, successful, before the merge at 15:57 (B.4, section 3).](../evidence/img/E-pre-release-backup-2026-11-27.png)
+![E-pre-release, 15:27 (creation time shown by the Console, not a receipt time): Cloud SQL backup `before-lab7-release`, successful, before the merge at 15:57 (B.4, section 3).](../evidence/img/E-pre-release-backup-2026-11-27.png)
 
 ![E-PD-00 (1 of 2), 16:42: Water before any save. Recorded (B.4, table A).](../evidence/img/E-PD-00-before-water.png)
 
