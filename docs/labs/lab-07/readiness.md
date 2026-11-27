@@ -54,7 +54,7 @@ The change measured here is the Lab 7 change: several entries per day with a day
 
 ### Interpretation
 
-The change went from contract to production in under 14 hours (M1), and the tests failed first, then passed (M2). CI passed every completed run (M4), yet review still found a Windows-only test failure (M3), so CI does not cover every place the tests run (debt item 1). No deploy failed (M5), but the change altered a business rule that the Lab 6 UAT cases still describe the old way. **Action:** phittayanan revises the expected results of UAT-02 and UAT-03 for the day-total rule before the Final delivery UAT re-run.
+The change went from contract to production in under 14 hours (M1), the tests failed first and then passed (M2), and no deploy failed (M5). The problem the metrics show: CI passed every completed run (M4), yet the one review that requested changes (M3) found a test that failed only on Windows. CI runs on Linux only, so a team member's platform is not tested before merge (debt item 1). **Action:** phittayanan adds a Windows job that runs the server tests to the CI workflow, before the Sprint 2 release (`v2.0`, Issue #160).
 
 ## 2. Release readiness (Part D)
 
@@ -63,10 +63,10 @@ The change went from contract to production in under 14 hours (M1), and the test
 | Deployed version | `v1.5`, `b8d5acb`, revision `habit-tracker-00008-jgf`; the page shows `build b8d5acb` | [release.md](release.md) sections 1 and 3 |
 | Defects | Critical 0, major 0, minor 2. Both minor ones (#126, #127, Lab 6) are fixed in `v1.4`, retested PASS by the partner team, and closed. None is open. | [Lab 6 resolution](../lab-06/resolution.md) section 2 |
 | Automated tests | Server 99 passed, 0 failed, 0 skipped; browser 50 passed, 0 failed, 0 skipped (release CI on `b8d5acb`) | S2 |
-| User tests | Lab 6 UAT-01 to UAT-04 and EXP-1 PASS on `v1.3`, retests 4 of 4 PASS on `v1.4`. They were not run again on `v1.5`. UAT-02 step C9 still expects the old one-entry rule. | [Lab 6 resolution](../lab-06/resolution.md); [change-request.md](change-request.md) section 3 |
+| User tests | Lab 6 UAT-01 to UAT-04 and EXP-1 PASS on `v1.3`, retests 4 of 4 PASS on `v1.4`. They were not run again on `v1.5`. On `v1.5`, UAT-02 step C9 (8 then 9 glasses, maximum 12) is still refused, but with "Only 4 glasses left for today." instead of the expected "An entry already exists for this day." | [Lab 6 resolution](../lab-06/resolution.md); [change-request.md](change-request.md) section 3 |
 | Post-deployment checks | 13 passed, 0 failed (changed behaviour, privacy and roles) | [release.md](release.md) section 4 |
 | Configuration and secrets | No environment variable changed. Secrets stay in Secret Manager; none are in Git. | [change-request.md](change-request.md) section 3; [Lab 5 deployment](../lab-05/deployment.md) |
-| Documentation | Contract, ADR 0061, implementation, release and this file are on `staging` | PR #143, #146, #162 |
+| Documentation | Contract, ADR 0061, implementation, release and this file are on `staging`. `README.md` describes several entries per day with the day total, and points to the Lab 5 deployment and the Lab 7 records (updated in this PR). | PR #143, #146, #162; this PR |
 | Deployment and smoke test | Deploy run success; migration job completed; smoke test passed (`/api/health`, `/api/ready`, build label) | [release.md](release.md) section 3 |
 
 **Decision: READY** for the maintained Sprint 1 scope (decided by phittayanan, 2026-11-27).
@@ -78,7 +78,7 @@ Open items:
 | Item | Risk | Owner | Action |
 |---|---|---|---|
 | Rollback to `v1.4` is not safe after the migration | `v1.4` code would accept same-day entries without the day-total check | projectnewy | Fix forward with a new release; do not roll back the app alone |
-| UAT-02 (step C9) and UAT-03 expect the old one-entry rule | A re-run on `v1.5` reports a false failure | phittayanan | Revise the expected results before the Final delivery UAT re-run |
+| UAT-02 step C9 expects the old message "An entry already exists for this day." | A re-run on `v1.5` fails on the message, although the entry is still refused | phittayanan | Change the expected message of C9 to "Only 4 glasses left for today." before the Final delivery UAT re-run |
 
 ## 3. Technical debt
 
@@ -96,7 +96,7 @@ Each student answered in their own words: phittayanan in Thai, translated by Cla
 |---|---|---|
 | What helped? | Running the tests in CI. | Reviewing the contract and the code before merging caught real problems: a decimal example in the contract that could not fail, and TC-89 passing CI but failing on Windows. |
 | What hurt? | Our working hours did not match, so sometimes a PR was opened and it was not clear whether a review was needed. | Work waited in a chain of reviews, and extra rounds came from docs/ai-use.md merge conflicts and from the sync PR that the release needed before it could be merged. |
-| What will change? | We set up a team status in Discord, with the agent connected, so we can talk there. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
+| What will change? | We set up a team status in Discord, with the agent connected, so we can talk there. Next time I check the teammate's status there before asking for a review. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
 
 ## 5. Contribution
 
@@ -109,12 +109,13 @@ Each student answered in their own words: phittayanan in Thai, translated by Cla
 
 ## 6. AI use
 
-Claude Code read the GitHub data and the repository, computed the metric values, drafted this file and explained each choice in Thai. phittayanan chose the five metrics, the READY decision, the debt items with their priority and action, the interpretation action and the owners of the open items. The full record is in [`docs/ai-use.md`](../../ai-use.md).
+Claude Code read the GitHub data and the repository, computed the metric values, drafted this file and explained each choice in Thai. phittayanan chose the five metrics, the READY decision, the debt items with their priority and action, the interpretation action and its owner, the owners of the open items, and the fixes after projectnewy's review. The full record is in [`docs/ai-use.md`](../../ai-use.md).
 
 ## 7. Known limitations
 
 - The window is one day; the values describe one change, not a trend.
 - M1 starts when the contract PR was opened. Work done before that (the decision to make this change) is not counted.
+- M3 counts only "changes requested" review states. PR #143 and PR #147 were approved, but their reviews also had findings that led to changes.
 - M4 counts workflow runs, not tests. A cancelled run is counted as not a success.
 - M5 was read about 1 hour after the deploy.
 - UAT was not run again on `v1.5`.

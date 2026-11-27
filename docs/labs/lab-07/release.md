@@ -51,7 +51,7 @@ Lab 7 Part B, [Issue #141](https://github.com/phittayanan/habit-tracker/issues/1
 
 - **URL:** https://habit-tracker-rfi4eg2u4q-as.a.run.app
 - **Method:** manual test in Chrome by projectnewy, who typed all passwords. Claude Code gave the steps and checked the screenshots projectnewy sent; it did not operate or see the browser.
-- **Times:** when Claude Code received each screenshot, by this computer's clock (+07:00). They are not capture times.
+- **Times:** when Claude Code received each screenshot, by this computer's clock (+07:00). They are not capture times. projectnewy measured this computer's clock on 2026-11-27 as about 10 minutes ahead of GitHub (10 min 23 s); the same applies to "read by Claude Code at 16:35" in section 3. Times from GitHub and the Google Cloud Console are not affected.
 - **Data:** synthetic. Three entries (5, 3, 4) were added to Participant One's Water goal (goal id 2) for 2026-11-27. They cannot be deleted in the app.
 - Screenshots are in [`evidence/img/`](evidence/img/); in those with a browser bar, the extension and profile area is masked. Most do not show the address bar; the build label `b8d5acb` is visible in E-PD-00-templates-range, E-PD-06-after-reload-header, E-PD-08-participant2-goals-top and E-PD-10-manager-home. E-PD-09, E-PD-11 and E-PD-12 show the URL but not the account; the account follows from the order of the tests.
 
