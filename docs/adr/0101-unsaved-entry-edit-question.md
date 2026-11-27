@@ -1,6 +1,6 @@
 # 0101. Ask before discarding an unsaved entry edit
 
-Status: proposed by Claude Code in [Issue #154](https://github.com/phittayanan/habit-tracker/issues/154); waiting for phittayanan's answer. To be agreed by projectnewy in the review of the #154 PR. Fills the wording that F-13 section 6 leaves to ADR 0067.
+Status: chosen by phittayanan on 2026-11-27 in [Issue #154](https://github.com/phittayanan/habit-tracker/issues/154) (proposed by Claude Code; answered yes in the Claude Code chat). To be agreed by projectnewy in the review of the #154 PR. Fills the wording that F-13 section 6 leaves to ADR 0067.
 
 ## Decision
 
