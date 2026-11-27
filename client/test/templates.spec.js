@@ -189,11 +189,11 @@ async function editRow(page, name) {
   await page.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) }).getByRole('button', { name: 'Edit', exact: true }).click();
 }
 
-test('TC-73: Edit opens the filled form, a valid change shows in the table, a used template shows the API message', async ({ page, playwright }) => {
+test('TC-73: Edit opens the filled form, a valid change shows in the table, a used template shows the API message', async ({ page, playwright, baseURL }) => {
   const manager = await db.user.findUniqueOrThrow({ where: { username: 'manager1' } });
   const reading = await db.template.create({ data: { name: 'Reading', unit: 'pages', minValue: 0, maxValue: 500, createdBy: manager.id } });
   const sleep = await db.template.create({ data: { name: 'Sleep', unit: 'hours', minValue: 0, maxValue: 24, createdBy: manager.id } });
-  const participant = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:33132' });
+  const participant = await playwright.request.newContext({ baseURL });
   try {
     expect((await participant.post('/api/auth/login', { data: { username: 'participant1', password } })).status()).toBe(200);
     expect((await participant.post('/api/goals', { data: { templateId: sleep.id, dailyTarget: 8, startDate: today(), endDate: addDays(30) } })).status()).toBe(201);

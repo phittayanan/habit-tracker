@@ -16,7 +16,7 @@ ADR 0057 lets each student work on more than one Issue at a time. One folder can
 ## Decision
 
 1. **Busy files** are the ones `CLAUDE.md` lists plus every file an open PR also changes, shared docs (`docs/traceability.md`, `docs/system-sds.md`, `docs/srs.md`) included. When starting an Issue, name each overlap with its PR number.
-2. **ADR numbers:** before naming a new ADR, take the next number that is free on `staging` and in every open PR. Recheck before asking for review.
+2. **ADR numbers:** before naming a new ADR, take the next number that is free on `staging` and in every open PR. Recheck before asking for review. Extended by [ADR 0098](0098-adr-branches-test-port-ai-use-union.md): fetch first and check every pushed branch too.
 3. **Blocked by:** when an Issue waits for another Issue, add the "blocked by" link, also when an ADR lets its PR open before the other merges.
 4. **When to update from `staging`:** when an open PR that changes the same files is approved or will merge first, wait for it to merge, then update once. The PR that merges second fixes the conflicts, including renumbering a clashing ADR. If that PR is still not merged and our work is waiting on it, the two of us may agree a new order in the thread.
 5. **One worktree per Issue** (for parallel work with no open blocker):
