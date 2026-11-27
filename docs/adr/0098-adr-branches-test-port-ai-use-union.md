@@ -30,6 +30,8 @@ The rest of ADR 0094. `docs/traceability.md` is written and merged as before: it
 
 GitHub's own merge may not apply `.gitattributes` merge drivers, so a PR page may still report a conflict on `docs/ai-use.md`. This has not been verified. The expected gain is local: `git merge staging` on a branch keeps both rows by itself.
 
+Checked with local throwaway branches on Windows on 2026-11-27: a branch whose own files do not have the `.gitattributes` line yet still conflicts on `docs/ai-use.md`, also when the branch it merges brings the line. So a branch made before this change can conflict once more, on the update that brings the line in.
+
 ## Source
 
 Issue #181: phittayanan's proposal of 2026-11-27 (change 3 added the same day) and projectnewy's answer of 2026-11-27. The "main port plus 8" part of change 2 was chosen by projectnewy in the Claude Code chat while the Issue was being built; phittayanan reviews it in the PR.
