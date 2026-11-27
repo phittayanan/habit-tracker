@@ -45,3 +45,29 @@ test('TC-87: several entries on one day are added exactly before the comparison,
   assert.equal(0.7 + 0.1 >= 0.8, false, 'a binary floating point sum would miss the target');
   assert.deepEqual(computeProgress(second, [{ entryDate: '2026-11-01', value: 0.7 }, { entryDate: '2026-11-01', value: 0.1 }], '2026-11-10'), { daysMet: 1, daysSoFar: 10 });
 });
+
+// F-14 (Issue #153, ADR 0075): each day is judged against the target version valid that day.
+test('TC-39: days before a change keep the old target; the change day and later use the new one', async () => {
+  const { targetOn } = await import('../src/services/progress-rules.js');
+  // D = 2026-11-20; W: target 8 from D-10, changed to 6 on D; 7 entered on D-2 and on D.
+  const goal = { startDate: '2026-11-10', endDate: '2026-11-30', dailyTarget: 6,
+    targets: [{ effectiveFrom: '2026-11-20', dailyTarget: 6 }, { effectiveFrom: '2026-11-10', dailyTarget: 8 }] };
+  const rows = [{ entryDate: '2026-11-18', value: 7 }, { entryDate: '2026-11-20', value: 7 }];
+  assert.equal(targetOn(goal, '2026-11-18'), 8);
+  assert.equal(targetOn(goal, '2026-11-19'), 8);
+  assert.equal(targetOn(goal, '2026-11-20'), 6);
+  assert.equal(targetOn(goal, '2026-11-25'), 6);
+  assert.deepEqual(computeProgress(goal, rows, '2026-11-20'), { daysMet: 1, daysSoFar: 11 }, 'D-2 not met, D met');
+  // Without the versions every day would use the latest target (6) and both days would be met.
+  assert.deepEqual(computeProgress({ ...goal, targets: undefined }, rows, '2026-11-20'), { daysMet: 2, daysSoFar: 11 });
+});
+
+test('TC-39: with no version on or before a day, the day uses dailyTarget (ADR 0075 point 4)', async () => {
+  const { targetOn } = await import('../src/services/progress-rules.js');
+  const goal = { startDate: '2026-11-10', endDate: '2026-11-30', dailyTarget: 6, targets: [{ effectiveFrom: '2026-11-20', dailyTarget: 6 }] };
+  assert.equal(targetOn(goal, '2026-11-12'), 6);
+  assert.equal(targetOn({ ...goal, targets: [] }, '2026-11-12'), 6);
+  // Decimal versions compare exactly, as the single target does.
+  const decimal = { startDate: '2026-11-01', endDate: '2026-11-30', dailyTarget: 7.5, targets: [{ effectiveFrom: '2026-11-01', dailyTarget: 0.8 }, { effectiveFrom: '2026-11-03', dailyTarget: 7.5 }] };
+  assert.deepEqual(computeProgress(decimal, [{ entryDate: '2026-11-02', value: 0.7 }, { entryDate: '2026-11-02', value: 0.1 }, { entryDate: '2026-11-03', value: 7.49 }], '2026-11-03'), { daysMet: 1, daysSoFar: 3 });
+});
