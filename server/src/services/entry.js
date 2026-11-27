@@ -24,6 +24,8 @@ export async function createEntry(db, user, goalId, body, now = new Date()) {
   const parsed = parseEntryCreate(body);
   if (!parsed.ok) return parsed;
   const data = parsed.data;
+  // Part of the validation row, before the date rules (F-08 section 4). A used template cannot change kind.
+  if (goal.template.kind === 'TIME' && !Number.isInteger(data.value)) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Minutes must be a whole number.' };
   const period = { startDate: dateText(goal.startDate), endDate: dateText(goal.endDate) };
   // The template cannot change while a goal uses it (BR-08), so its range is safe to read before the lock.
   const template = { minValue: Number(goal.template.minValue), maxValue: Number(goal.template.maxValue), unit: goal.template.unit };
