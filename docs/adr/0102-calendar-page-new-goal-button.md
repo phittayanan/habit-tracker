@@ -1,6 +1,6 @@
 # 0102. "+ New goal" also sits above the calendar
 
-Status: chosen by projectnewy on 2026-11-27 in the session for [Issue #156](https://github.com/phittayanan/habit-tracker/issues/156), before any F-15 screen code. To be agreed by phittayanan in the review of the #156 PR.
+Status: chosen by projectnewy on 2026-11-27 in the session for [Issue #156](https://github.com/phittayanan/habit-tracker/issues/156), before any F-15 screen code. Agreed by phittayanan in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185.
 
 ## Context
 

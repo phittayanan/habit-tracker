@@ -97,4 +97,4 @@ Fixtures as F-11 section 10.
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
-| 2026-11-27 | Issue #156: "+ New goal" on the calendar page (ADR 0102), the desktop panel stays with the List (ADR 0103), a day with no entry has no goal rows (ADR 0104); section 2 | projectnewy; phittayanan in the #156 PR review |
+| 2026-11-27 | Issue #156: "+ New goal" on the calendar page (ADR 0102), the desktop panel stays with the List (ADR 0103), a day with no entry has no goal rows (ADR 0104); section 2 | projectnewy; phittayanan agreed in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185 |

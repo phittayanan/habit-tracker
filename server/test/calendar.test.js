@@ -173,8 +173,7 @@ test('TC-122: editing or deleting an entry changes the day state (after F-13)', 
   await request(app).patch(url).set('Cookie', cookies.a).send({ value: 5 }).expect(200);
   assert.equal(await stateOf(day(-1)), 'SOME_MET');
   assert.equal((await waterOf()).total, 5);
-  const removed = await request(app).delete(url).set('Cookie', cookies.a);
-  assert.ok(removed.status === 200 || removed.status === 204, String(removed.status));
+  await request(app).delete(url).set('Cookie', cookies.a).expect(204);
   assert.equal(await stateOf(day(-1)), 'SOME_MET');
   assert.deepEqual((await waterOf()).entries, []);
 });

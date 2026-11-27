@@ -31,7 +31,7 @@ The 6 skipped cases are width-specific: the 5 of #155, and the ADR 0103 case, wh
 | AC | Test (file) | Result |
 |---|---|---|
 | AC-12.1 | TC-37 (`day-state-rules.test.js`: the 8 cases of F-12 section 4, and 3 more) | pass |
-| AC-12.2 | TC-49 (three cases in `day-colours.spec.js`) | the automated part passes at 375 and 1280 px; **the reviewer's markup review is still to be recorded in the PR review** |
+| AC-12.2 | TC-49 (three cases in `day-colours.spec.js`) | the automated part passes at 375 and 1280 px; phittayanan recorded the markup review in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185 |
 | AC-12.3, AC-12.6 | TC-117 (`day-colours.spec.js`), TC-124 (`calendar.test.js`) | pass |
 | AC-12.4, and F-13 AC-13.9 (calendar colour) | TC-122 (`calendar.test.js`), TC-150 colour step (`entry-edit.spec.js`) | pass |
 | AC-12.5 | TC-123 unit (`day-state-rules.test.js`) and API (`calendar.test.js`) | pass |
@@ -48,7 +48,7 @@ The 6 skipped cases are width-specific: the 5 of #155, and the ADR 0103 case, wh
 - `client/test/calendar.spec.js`: a day button's name now includes the F-12 words, so its day locator accepts them; TC-110 gains its List step (ADR 0097).
 - `server/test/calendar.test.js`: TC-120 expects the day states in place of `state: null`.
 
-## Choices the contracts do not spell out (drafted by Claude Code, not yet accepted by either student)
+## Choices the contracts do not spell out (drafted by Claude Code, accepted by phittayanan in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185)
 
 1. A List heading uses the short words of F-15 ("all met", "some met", "none met", "nothing"); the chip and the day button names use the long words of F-12 section 6, which says "the same words" appear on both. The F-15 text and TC-125 give the short ones for headings.
 2. The chip reads "✓ All goals met", "½ Some goals met", "✗ No goal met" or "– Nothing recorded", and sits under the date and "Today".

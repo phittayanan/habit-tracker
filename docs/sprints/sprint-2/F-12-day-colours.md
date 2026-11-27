@@ -65,7 +65,7 @@ As F-11 section 5: a Participant's states come only from their own goals and ent
 - Each day button's accessible name has the state in words: "all goals met", "some goals met", "no goal met", "nothing recorded"; a `null` past day has only the date; a future day "… future" (F-11).
 - Today has an outline as well as its colour.
 - The chosen day keeps its colour and sign and has a 3 px dark border (ADR 0105).
-- The same words and signs appear on the F-11 chip and the F-15 day headings.
+- The F-11 chip and the F-15 day headings use the same signs. The chip uses the long words above ("½ Some goals met"); a List heading uses the short words of F-15 ("½ some met").
 
 ## 7. API
 
@@ -119,4 +119,5 @@ Fixtures as F-11 section 10 (goals W, count target 8; S, time target 420).
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
-| 2026-11-27 | Issue #156: the chosen day has a border (ADR 0105; section 6) | projectnewy; phittayanan in the #156 PR review |
+| 2026-11-27 | Issue #156: the chosen day has a border (ADR 0105; section 6) | projectnewy; phittayanan agreed in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185 |
+| 2026-11-28 | Review of PR #185: the chip uses the long words and a List heading the short words (section 6) | phittayanan asked for it in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185 |
