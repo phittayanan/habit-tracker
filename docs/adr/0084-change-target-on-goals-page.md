@@ -1,6 +1,6 @@
 # 0084. The target is changed on the goals page
 
-Status: chosen by projectnewy on 2026-11-27 in [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150) (Q10). Agreed by phittayanan in the [review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171) of PR #171. Amends ADR 0073 point 2: the goals page also gains this control.
+Status: chosen by projectnewy on 2026-11-27 in [Issue #150](https://github.com/phittayanan/habit-tracker/issues/150) (Q10). Agreed by phittayanan in the [review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171. Amends ADR 0073 point 2: the goals page also gains this control.
 
 ## Decision
 

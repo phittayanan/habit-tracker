@@ -101,7 +101,7 @@ Fixtures: one Manager and Participant A (test-only passwords); templates "Sleep"
 | TC-19 | AC-05.6 | API | Fixtures; no template 99999 | Retire "Sleep" and 99999 as A; retire "Sleep" with no session | 403, 403, 401; "Sleep" stays `ACTIVE` |
 | TC-140 | AC-05.5 | API | "Steps" retired | Retire it again; `PATCH` it; retire `99999` and `abc` | 409, 409 (`TEMPLATE_RETIRED`), 404, 400; "Steps" unchanged |
 | TC-141 | AC-05.7 | Browser | Manager on the template list | Press Retire on "Sleep", Cancel; press it again, Retire; then log in as A and open "+ New goal" | After Cancel still "Active"; then "Retired" with no Edit or Retire on that row; "Sleep" is not in A's list; A's goal still shows "Sleep" |
-| TC-142 | AC-05.8 | API and database | Unused "Water" and "Tea" | Hold a lock on "Water" in a test transaction; start retire and see it wait; commit. Then, on a fresh active "Water", send retire and A's goal creation at the same time. Send two retire requests for "Tea" at the same time | The retire waits for the lock. Retire against goal: the goal is 201 then retire 200, or retire 200 then the goal `409 TEMPLATE_RETIRED`. Two retires: one 200 and one `409 TEMPLATE_RETIRED`; "Tea" is `RETIRED` |
+| TC-142 | AC-05.8 | API and database | Besides the fixtures, three unused active templates: "Water", "Juice" and "Tea" | (a) Hold a lock on "Water" in a test transaction; start the retire of "Water" and see it wait; commit. (b) Send the retire of "Juice" and A's goal creation on "Juice" at the same time. (c) Send two retire requests for "Tea" at the same time | (a) The retire waits for the lock, then returns 200. (b) Either the goal is 201 and the retire 200, or the retire is 200 and the goal `409 TEMPLATE_RETIRED`. (c) One 200 and one `409 TEMPLATE_RETIRED`; "Tea" is `RETIRED` |
 | TC-143 | AC-05.7 | Browser | Manager, 375 px and 1280 px | Retire by keyboard only, once cancelling with Escape | No horizontal scroll; focus moves into the dialog and back |
 | TC-08 | AC-05.6 | API | Route audit | Run it | `POST /api/templates/:id/retire` is listed as protected |
 
@@ -124,4 +124,5 @@ Fixtures: one Manager and Participant A (test-only passwords); templates "Sleep"
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #150) | pending (reviewer phittayanan) |
-| 2026-11-27 | [Review of PR #171](https://github.com/phittayanan/habit-tracker/pull/171): two retires at once added to AC-05.8 and TC-142; AC-05.8 reworded. phittayanan agreed to ADR 0078, ADR 0079 and the drafted points | pending (reviewer phittayanan) |
+| 2026-11-27 | [Review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171: two retires at once added to AC-05.8 and TC-142; AC-05.8 reworded. phittayanan agreed to ADR 0078, ADR 0079 and the drafted points | pending (reviewer phittayanan) |
+| 2026-11-27 | [Review of 3048963](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6088156899) of PR #171: TC-142 names its own unused templates and gives the status of step (a); review links corrected | pending (reviewer phittayanan) |

@@ -142,3 +142,4 @@ TC-123 (F-12) runs once this feature is merged.
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #150) | pending (reviewer phittayanan) |
+| 2026-11-27 | [Review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171: phittayanan agreed to the decisions and drafted points (section 12) | pending (reviewer phittayanan) |
