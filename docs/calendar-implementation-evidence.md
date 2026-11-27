@@ -10,13 +10,13 @@ Contract: [F-11](sprints/sprint-2/F-11-month-calendar.md), with ADR 0063 to ADR 
 
 ## After the change
 
-Commit and results are in the table below (filled from the final run).
+Tested code commit: ffc88f0 (later commits change documents only).
 
 | Command | Result |
 |---|---|
-| `npm test` in `server/` | RESULT_SERVER |
-| `npx playwright test` in `client/` (Chrome, port 33155) | RESULT_BROWSER |
-| `npx playwright test test/templates.spec.js -g TC-73` (port 33132) | 2 passed |
+| `npm test` in `server/` | 118 tests, 118 pass, 0 fail, 0 skipped |
+| `npx playwright test` in `client/` (Chrome, port 33155) | 80 passed, 4 skipped, 2 failed: TC-73 at both widths, `connect ECONNREFUSED 127.0.0.1:33132`, because its request context is hard-coded to 33132 |
+| `npx playwright test test/templates.spec.js -g TC-73` (standard config, port 33132) | 2 passed |
 
 The 4 skipped cases are width-specific: TC-36 and the desktop TC-116 case run at 1280 px only; TC-111 and the phone TC-116 case at 375 px only.
 
