@@ -1,5 +1,5 @@
 // F-11 GET /api/calendar (Issue #155): TC-120, TC-121 and the TC-08 route listing.
-// Issue #156 fills the day state by the F-12 rule; TC-123 (API) and TC-124 are at the end.
+// Issue #156 fills the day state by the F-12 rule; TC-122, TC-123 (API) and TC-124 are at the end.
 import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
@@ -161,4 +161,20 @@ test('TC-124: today is live, from NOTHING to SOME_MET to ALL_MET as entries are 
   assert.equal(await stateOf(day(0)), 'SOME_MET');
   await save(w, day(0), 8);
   assert.equal(await stateOf(day(0)), 'ALL_MET');
+});
+
+test('TC-122: editing or deleting an entry changes the day state (after F-13)', async () => {
+  await db.entry.deleteMany();
+  const kept = await entry(w, day(-1), 8, new Date());
+  await entry(s, day(-1), 420, new Date());
+  const url = `/api/goals/${w.id}/entries/${kept.id}`;
+  const waterOf = async () => dayOf((await get(`?month=${monthOf(day(-1))}`).expect(200)).body, day(-1)).goals.find(g => g.goalId === w.id);
+  assert.equal(await stateOf(day(-1)), 'ALL_MET');
+  await request(app).patch(url).set('Cookie', cookies.a).send({ value: 5 }).expect(200);
+  assert.equal(await stateOf(day(-1)), 'SOME_MET');
+  assert.equal((await waterOf()).total, 5);
+  const removed = await request(app).delete(url).set('Cookie', cookies.a);
+  assert.ok(removed.status === 200 || removed.status === 204, String(removed.status));
+  assert.equal(await stateOf(day(-1)), 'SOME_MET');
+  assert.deepEqual((await waterOf()).entries, []);
 });
