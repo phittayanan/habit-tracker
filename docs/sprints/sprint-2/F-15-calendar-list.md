@@ -17,11 +17,11 @@ Sprint 2 contract (Deliverable 2 Part B, [Issue #151](https://github.com/phittay
 
 ## 2. Behaviour and workflow
 
-1. Two buttons, "Calendar" and "List", sit above the calendar, next to "+ New goal" (ADR 0048). Calendar is selected after login.
-2. List replaces the calendar with the records of the same month; Calendar brings the calendar back. The month arrows work in both views, and switching keeps the month (ADR 0068).
+1. Two buttons, "Calendar" and "List", sit above the calendar, next to "+ New goal" (ADR 0048). "+ New goal" opens the form at `/goals/new` (ADR 0102). Calendar is selected after login.
+2. List replaces the calendar with the records of the same month; Calendar brings the calendar back. The month arrows work in both views, and switching keeps the month (ADR 0068). On desktop the day panel stays beside the List, and a save there updates the List (ADR 0103).
 3. The List shows the days of the month that are today or earlier and have at least one goal active, newest day first (FR-19, ADR 0071). Each day has a heading with the date and the F-12 sign and words ("Thu 27 Nov · ½ some met").
-4. Under each heading, one row per goal active that day: the goal name, total / target with the unit, ✓ when met, and the day's entries in brackets, newest saved first ("Water 5 / 8 glasses (3 · 2)"). Time values show as hours and minutes (ADR 0065).
-5. A day with active goals but no entries shows "No entries" under its heading.
+4. Under each heading of a day with at least one entry, one row per goal active that day: the goal name, total / target with the unit, ✓ when met, and the day's entries in brackets, newest saved first ("Water 5 / 8 glasses (3 · 2)"). Time values show as hours and minutes (ADR 0065).
+5. A day with active goals but no entries shows only "No entries" under its heading, with no goal rows (ADR 0104).
 6. A month with no goal active on any day so far shows "No goals in this month."
 
 ## 3. Business rules
@@ -97,3 +97,4 @@ Fixtures as F-11 section 10.
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #156: "+ New goal" on the calendar page (ADR 0102), the desktop panel stays with the List (ADR 0103), a day with no entry has no goal rows (ADR 0104); section 2 | projectnewy; phittayanan agreed in the [review of 8cf2ee2](https://github.com/phittayanan/habit-tracker/pull/185#pullrequestreview-6091551110) of PR #185 |

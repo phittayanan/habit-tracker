@@ -1,5 +1,5 @@
 // F-11 month calendar and day box (Issue #155): TC-36, TC-110 to TC-116, TC-130, and TC-47/TC-48 on the calendar,
-// at 375 px and 1280 px (playwright.config.js projects). The day state, colour and sign come in #156 (ADR 0097).
+// at 375 px and 1280 px (playwright.config.js projects). The day state, colour and sign are tested in day-colours.spec.js (#156).
 import { test, expect } from '@playwright/test';
 import { PrismaClient } from '../../server/node_modules/@prisma/client/default.js';
 import bcrypt from '../../server/node_modules/bcryptjs/index.js';
@@ -55,7 +55,8 @@ async function goToMonth(page, date) {
   }
   await expect(title(page)).toHaveText(monthTitle(date));
 }
-const dayButton = (page, date) => page.getByRole('button', { name: label(date), exact: true });
+// A day button is named by its date and, from #156, the F-12 state words.
+const dayButton = (page, date) => page.getByRole('button', { name: new RegExp(`^${label(date)}(, (all goals met|some goals met|no goal met|nothing recorded))?$`) });
 const box = (page, date) => page.getByRole(phone() ? 'dialog' : 'region', { name: heading(date), exact: true });
 async function openDay(page, date) {
   await goToMonth(page, date);
@@ -107,7 +108,11 @@ test('TC-110: ‹ shows earlier months; › stops at the current month', async (
   await next.click(); await expect(title(page)).toHaveText(monthTitle(one));
   await next.click(); await expect(title(page)).toHaveText(monthTitle(today()));
   await expect(next).toBeDisabled();
-  // The List step of TC-110 runs in #156 (ADR 0097).
+  // The List step (run in #156, ADR 0097): the List follows the shown month.
+  await back.click(); await expect(title(page)).toHaveText(monthTitle(one));
+  await page.getByRole('button', { name: 'List', exact: true }).click();
+  await expect(page.locator('.day-list')).toHaveAttribute('data-month', one.slice(0, 7));
+  await expect(title(page)).toHaveText(monthTitle(one));
 });
 
 test('TC-111: a future day cannot be opened; today and yesterday open the box', async ({ page }) => {

@@ -1,7 +1,8 @@
 // F-11 GET /api/calendar (ADR 0072). One read per month; nothing is stored.
-// The day state is null on every day until Issue #156 adds the F-12 rule (ADR 0097).
+// `state` is the F-12 day state (day-state-rules.js).
 import { bangkokToday } from './goal-rules.js';
 import { targetOn } from './progress-rules.js';
+import { dayState } from './day-state-rules.js';
 
 const dateText = value => value.toISOString().slice(0, 10);
 const dateValue = text => new Date(`${text}T00:00:00Z`);
@@ -34,7 +35,7 @@ export function buildCalendar(month, today, goals, entries) {
   const days = daysOfMonth(month).map(date => {
     if (date > today) return { date, state: null, goals: [] };
     const active = goals.filter(goal => goal.startDate <= date && date <= goal.endDate);
-    return { date, state: null, goals: active.map(goal => {
+    const cards = active.map(goal => {
       // Newest saved first (F-08 OP-08.10).
       const own = [...(byGoalDay.get(`${goal.id} ${date}`) || [])].sort((x, y) => y.createdAt - x.createdAt || y.id - x.id);
       const total = own.reduce((sum, entry) => sum + hundredths(entry.value), 0);
@@ -45,7 +46,9 @@ export function buildCalendar(month, today, goals, entries) {
         minValue: goal.template.minValue, maxValue: goal.template.maxValue,
         entries: own.map(entry => ({ id: entry.id, value: entry.value })),
       };
-    }) };
+    });
+    const state = dayState(cards.map(card => ({ target: card.target, values: card.entries.map(entry => entry.value) })), false);
+    return { date, state, goals: cards };
   });
   return { month, today, days };
 }

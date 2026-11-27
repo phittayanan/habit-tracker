@@ -1,5 +1,5 @@
 // F-11 GET /api/calendar (Issue #155): TC-120, TC-121 and the TC-08 route listing.
-// The day state is null until Issue #156 (ADR 0097).
+// Issue #156 fills the day state by the F-12 rule; TC-122, TC-123 (API) and TC-124 are at the end.
 import { before, beforeEach, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
@@ -65,8 +65,11 @@ test('TC-120: the current month has the section 7 shape, one item per day, entri
   assert.equal(res.body.days.length, daysIn(monthOf(day(0))));
   assert.deepEqual(res.body.days.map(item => item.date), [...res.body.days.map(item => item.date)].sort());
   assert.equal(res.body.days[0].date, `${monthOf(day(0))}-01`);
-  for (const item of res.body.days) assert.equal(item.state, null, 'state is filled by #156 (ADR 0097)');
-  assert.deepEqual(dayOf(res.body, day(0)), { date: day(0), state: null, goals: [
+  for (const item of res.body.days) {
+    if (item.goals.length === 0) assert.equal(item.state, null, item.date);
+    else assert.ok(['ALL_MET', 'SOME_MET', 'NONE_MET', 'NOTHING'].includes(item.state), item.date);
+  }
+  assert.deepEqual(dayOf(res.body, day(0)), { date: day(0), state: 'SOME_MET', goals: [
     { goalId: w.id, name: 'Water', unit: 'glasses', kind: 'COUNT', target: 8, total: 5, met: false, minValue: 1, maxValue: 12,
       entries: [{ id: res.body.days.find(i => i.date === day(0)).goals[0].entries[0].id, value: 2 }, { id: res.body.days.find(i => i.date === day(0)).goals[0].entries[1].id, value: 3 }] },
     { goalId: s.id, name: 'Sleep', unit: 'minutes', kind: 'TIME', target: 420, total: 430, met: true, minValue: 0, maxValue: 720,
@@ -133,4 +136,44 @@ test('TC-121: B sees only own goals; Manager 403; anonymous 401; TC-08 lists the
   assert.equal((await request(app).get('/api/calendar?month=abc')).status, 401);
   assert.equal((await get('?month=abc', cookies.manager)).status, 403);
   assert.deepEqual(protectedRoutes.find(route => route.path === '/api/calendar'), { method: 'get', path: '/api/calendar', roles: ['PARTICIPANT'] });
+});
+
+// F-12 section 10: on these days the Participant has only W and S.
+const stateOf = async date => dayOf((await get(`?month=${monthOf(date)}`).expect(200)).body, date).state;
+const save = (goal, date, value) => request(app).post(`/api/goals/${goal.id}/entries`).set('Cookie', cookies.a).send({ entryDate: date, value }).expect(201);
+
+test('TC-123 (API): a past day is judged against the target valid on that day', async () => {
+  await db.entry.deleteMany();
+  await db.goalTarget.create({ data: { goalId: w.id, effectiveFrom: asDate(day(0)), dailyTarget: 6 } });
+  await db.goal.update({ where: { id: w.id }, data: { dailyTarget: 6 } });
+  for (const date of [day(-2), day(0)]) {
+    await entry(w, date, 7, new Date());
+    await entry(s, date, 420, new Date());
+  }
+  assert.equal(await stateOf(day(-2)), 'SOME_MET');
+  assert.equal(await stateOf(day(0)), 'ALL_MET');
+});
+
+test('TC-124: today is live, from NOTHING to SOME_MET to ALL_MET as entries are saved', async () => {
+  await db.entry.deleteMany();
+  assert.equal(await stateOf(day(0)), 'NOTHING');
+  await save(s, day(0), 420);
+  assert.equal(await stateOf(day(0)), 'SOME_MET');
+  await save(w, day(0), 8);
+  assert.equal(await stateOf(day(0)), 'ALL_MET');
+});
+
+test('TC-122: editing or deleting an entry changes the day state (after F-13)', async () => {
+  await db.entry.deleteMany();
+  const kept = await entry(w, day(-1), 8, new Date());
+  await entry(s, day(-1), 420, new Date());
+  const url = `/api/goals/${w.id}/entries/${kept.id}`;
+  const waterOf = async () => dayOf((await get(`?month=${monthOf(day(-1))}`).expect(200)).body, day(-1)).goals.find(g => g.goalId === w.id);
+  assert.equal(await stateOf(day(-1)), 'ALL_MET');
+  await request(app).patch(url).set('Cookie', cookies.a).send({ value: 5 }).expect(200);
+  assert.equal(await stateOf(day(-1)), 'SOME_MET');
+  assert.equal((await waterOf()).total, 5);
+  await request(app).delete(url).set('Cookie', cookies.a).expect(204);
+  assert.equal(await stateOf(day(-1)), 'SOME_MET');
+  assert.deepEqual((await waterOf()).entries, []);
 });
