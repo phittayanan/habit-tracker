@@ -163,6 +163,14 @@ test('TC-147 / TC-08: roles, ownership and wrong entry ids for both routes; a se
       assert.deepEqual(r.body, { error: { code: 'ENTRY_NOT_FOUND', message: 'Entry not found.' } });
     }
   }
+  // Review of af245ef: ownership and the entry come before the body parser, so malformed JSON is 404 on
+  // a goal or entry that is not the caller's, and 400 only on the caller's own entry (section 4, orders 3 to 5).
+  const malformed = (goalId, entryId, cookie) => request(app).patch(url(goalId, entryId)).set('Cookie', cookie).set('Content-Type', 'application/json').send('{');
+  for (const [goalId, entryId, cookie, status, code] of [[w.id, e5.id, cookies.b, 404, 'GOAL_NOT_FOUND'], [99999, e5.id, cookies.b, 404, 'GOAL_NOT_FOUND'],
+    [w.id, bEntry.id, cookies.a, 404, 'ENTRY_NOT_FOUND'], [w.id, 'abc', cookies.a, 404, 'ENTRY_NOT_FOUND'], [w.id, e5.id, cookies.a, 400, 'VALIDATION_ERROR']]) {
+    const r = await malformed(goalId, entryId, cookie);
+    assert.equal(r.status, status, `${goalId}/${entryId}`); assert.equal(r.body.error.code, code, `${goalId}/${entryId}`);
+  }
   assert.equal(await snapshot(), before, 'nothing changes');
   await remove(w.id, e3.id).expect(204);
   const twice = await remove(w.id, e3.id);

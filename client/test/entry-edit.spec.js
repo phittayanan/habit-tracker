@@ -82,6 +82,8 @@ test('TC-149: the goals page edits in place, keeps a rejected value, and asks be
   await box.fill('4');
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  // Review of af245ef: Cancel waits too, so the box cannot close as if cancelled while the value is saved.
+  await expect(water.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
   release();
   await expect(water.locator('.entry-text')).toHaveText([`${day(-1)}: 4 glasses`, `${day(-1)}: 3 glasses`]);
   await expect(water.getByText('Day total: 7 glasses', { exact: true })).toBeVisible();
@@ -148,6 +150,7 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await page.route('**/api/goals/*/entries/*', async route => { await held; await route.continue(); });
   await water.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  await expect(water.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
   release();
   await expect(water.getByText('7 / 8 glasses', { exact: true })).toBeVisible();
   await page.unroute('**/api/goals/*/entries/*');
