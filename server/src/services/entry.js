@@ -1,13 +1,15 @@
-import { checkEntryRules, parseEntryCreate } from './entry-rules.js';
+import { checkChangedDayTotal, checkEntryRules, parseEntryCreate, parseEntryValue } from './entry-rules.js';
 
 const dateText = value => value.toISOString().slice(0, 10);
 const notFound = { ok: false, status: 404, code: 'GOAL_NOT_FOUND', message: 'Goal not found.' };
+const entryNotFound = { ok: false, status: 404, code: 'ENTRY_NOT_FOUND', message: 'Entry not found.' };
+const validId = id => /^\d{1,10}$/.test(id) && Number(id) <= 2147483647;
 
 export const toEntry = row => ({ id: row.id, goalId: row.goalId, entryDate: dateText(row.entryDate), value: Number(row.value) });
 
 // The same answer for an unknown goal and another Participant's goal (SDS S-7).
 async function ownGoal(db, user, goalId) {
-  if (!/^\d{1,10}$/.test(goalId) || Number(goalId) > 2147483647) return null;
+  if (!validId(goalId)) return null;
   return db.goal.findFirst({ where: { id: Number(goalId), participantId: user.id }, include: { template: true } });
 }
 
@@ -42,3 +44,39 @@ export async function createEntry(db, user, goalId, body, now = new Date()) {
     return { ok: true, entry: toEntry(row) };
   });
 }
+
+// F-13 (Issue #154): edit the value of, or delete, one entry of an own goal. Check order is F-13 section 4.
+// `value` is undefined for a delete.
+async function changeEntry(db, user, goalId, entryId, body, deleting, now) {
+  const goal = await ownGoal(db, user, goalId);
+  if (!goal) return notFound;
+  if (!validId(entryId)) return entryNotFound;
+  const id = Number(entryId);
+  if (!await db.entry.findFirst({ where: { id, goalId: goal.id }, select: { id: true } })) return entryNotFound;
+  let value;
+  if (!deleting) {
+    const parsed = parseEntryValue(body);
+    if (!parsed.ok) return parsed;
+    value = parsed.value;
+    if (goal.template.kind === 'TIME' && !Number.isInteger(value)) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Minutes must be a whole number.' };
+  }
+  const template = { minValue: Number(goal.template.minValue), maxValue: Number(goal.template.maxValue), unit: goal.template.unit };
+  if (!deleting && (value < template.minValue || value > template.maxValue)) return { ok: false, status: 400, code: 'VALUE_OUT_OF_RANGE', message: `The value must be between ${template.minValue} and ${template.maxValue}.` };
+  return db.$transaction(async tx => {
+    // The same goal-row lock as create (F-08 section 8): the entry and the day total are read after it.
+    await tx.$queryRaw`SELECT id FROM "Goal" WHERE id = ${goal.id} FOR UPDATE`;
+    const row = await tx.entry.findFirst({ where: { id, goalId: goal.id } });
+    if (!row) return entryNotFound;
+    const entryDate = dateText(row.entryDate);
+    const [{ total }] = await tx.$queryRaw`SELECT COALESCE(SUM(value), 0)::text AS total FROM "Entry" WHERE goal_id = ${goal.id} AND entry_date = ${entryDate}::date AND id <> ${id}`;
+    const failure = checkChangedDayTotal({ entryDate, value, deleting }, template, Number(total), now);
+    if (failure) return { ok: false, ...failure };
+    if (deleting) { await tx.entry.delete({ where: { id } }); return { ok: true }; }
+    // Only the value changes; the saved time stays, so the entry keeps its place in the list (OP-13.2).
+    const updated = await tx.entry.update({ where: { id }, data: { value: value.toFixed(2) } });
+    return { ok: true, entry: toEntry(updated) };
+  });
+}
+
+export const editEntry = (db, user, goalId, entryId, body, now = new Date()) => changeEntry(db, user, goalId, entryId, body, false, now);
+export const deleteEntry = (db, user, goalId, entryId, now = new Date()) => changeEntry(db, user, goalId, entryId, undefined, true, now);
