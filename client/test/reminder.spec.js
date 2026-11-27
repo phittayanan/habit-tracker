@@ -112,7 +112,11 @@ test('TC-174: an ended goal shows its reminder with Remove only', async ({ page 
   await expect(sleep.getByRole('button', { name: 'Set reminder', exact: true })).toHaveCount(0);
   await expect(sleep.getByRole('button', { name: 'Change reminder', exact: true })).toHaveCount(0);
   await sleep.getByRole('button', { name: 'Remove reminder', exact: true }).click();
-  await expect(sleep.getByText('No reminder', { exact: true })).toBeVisible();
+  const line = sleep.getByText('No reminder', { exact: true });
+  await expect(line).toBeVisible();
+  // OP-17.7: an ended goal has no set button, so focus moves to the reminder line, reachable by script only.
+  await expect(line).toBeFocused();
+  await expect(line).toHaveAttribute('tabindex', '-1');
   await expect(sleep.getByRole('button', { name: /reminder/ })).toHaveCount(0);
   expect(await stored(e.id)).toBeNull();
 });
