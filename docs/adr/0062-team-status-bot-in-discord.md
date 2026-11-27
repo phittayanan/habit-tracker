@@ -6,6 +6,8 @@ Each student sets a status in Discord with a slash command: `/in` (working), `/a
 
 The bot is team tooling, not part of the habit-tracker product. Its code lives in the private repository `phittayanan/team-status-bot`, outside this repo's CI and deploy. It runs on GCP Cloud Run as its own service, apart from the app's deploy, with the Discord bot token and GitHub token in GCP Secret Manager and never in Git. phittayanan builds it and projectnewy reviews and merges it.
 
+Work on the bot is tracked by Issues in this repo, on board 12; the bot repo has no Issues of its own. A bot PR refers to its habit-tracker Issue ("Part of phittayanan/habit-tracker#N") and the habit-tracker PR closes it. So one Issue may have one PR in each repo, an exception to one Issue, one PR. The bot repo has no issue-link check, so the reviewer checks the link by hand.
+
 This lets the agent see whether the teammate is awake and working before it waits on a review.
 
 The bot commands, stored record and agent rules are specified in [team-status-bot docs/spec.md](https://github.com/phittayanan/team-status-bot/blob/main/docs/spec.md) (private repo).
