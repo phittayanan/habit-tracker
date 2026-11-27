@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 | Depends on | F-07 (a goal exists), F-01, F-02 |
 | Needed by | F-09, F-10 |
 | Author / reviewer | projectnewy / phittayanan |
-| Status | Revised for Lab 7 (Issue #139, ADR 0061): several entries per day with a day-total maximum. First version agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119); later changes re-checked and approved by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777). Not yet implemented |
+| Status | Revised for Lab 7 (Issue #139, ADR 0061): several entries per day with a day-total maximum. First version agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119); later changes re-checked and approved by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777). Implemented in Issue #140 ([evidence](../../labs/lab-07/implementation.md)) |
 
 ## 2. Behaviour and workflow
 

@@ -38,8 +38,8 @@ Test IDs (`TC-nn`) map to the list below. Auth tests exist under `server/test/` 
 | BR-08 | FR-08 | F-05 | later | TC-14, TC-15 | 2 | none yet |
 | BR-09 | FR-09 | F-06 | AC-06.1, AC-06.2 | TC-16 | 1 | #30, #36, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/37) |
 | BR-05, BR-06 | FR-10 | F-07 | AC-07.1 to AC-07.11 | TC-20, TC-21, TC-22, TC-53, TC-54, TC-55, TC-60, TC-74, TC-78 | 1 | #28, #38, #40, #74, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/41) |
-| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19 | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90 | 1 | #28, #38, #42, #9, #139 (Lab 7, not yet implemented) |
-| BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.10 | TC-31, TC-32, TC-59, TC-87, TC-88 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51), #139 (Lab 7, not yet implemented) |
+| BR-01, BR-02, BR-03, BR-04, BR-06 | FR-11 | F-08 | AC-08.1 to AC-08.19 | TC-23 to TC-30, TC-56, TC-58, TC-61, TC-82 to TC-86, TC-89, TC-90 | 1 | #28, #38, #42, #9, #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
+| BR-07 | FR-12 | F-09 | AC-09.1 to AC-09.10 | TC-31, TC-32, TC-59, TC-87, TC-88 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51), #139 (Lab 7), #140 ([implementation](labs/lab-07/implementation.md)) |
 | BR-10 | FR-13 | F-10 | AC-10.1, AC-10.2, AC-10.4 to AC-10.7 | TC-33, TC-34, TC-35, TC-57 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | BR-10 | FR-14 | F-10 | AC-10.3 | TC-34 | 1 | #28, #44, #9, [implementation](https://github.com/phittayanan/habit-tracker/pull/51) |
 | none | FR-15 | F-11 | later | TC-36 | 2 | none yet |
