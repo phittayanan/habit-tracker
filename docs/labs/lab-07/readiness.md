@@ -66,7 +66,7 @@ The change went from contract to production in under 14 hours (M1), the tests fa
 | User tests | Lab 6 UAT-01 to UAT-04 and EXP-1 PASS on `v1.3`, retests 4 of 4 PASS on `v1.4`. They were not run again on `v1.5`. On `v1.5`, UAT-02 step C9 (8 then 9 glasses, maximum 12) is still refused, but with "Only 4 glasses left for today." instead of the expected "An entry already exists for this day." | [Lab 6 resolution](../lab-06/resolution.md); [change-request.md](change-request.md) section 3 |
 | Post-deployment checks | 13 passed, 0 failed (changed behaviour, privacy and roles) | [release.md](release.md) section 4 |
 | Configuration and secrets | No environment variable changed. Secrets stay in Secret Manager; none are in Git. | [change-request.md](change-request.md) section 3; [Lab 5 deployment](../lab-05/deployment.md) |
-| Documentation | Contract, ADR 0061, implementation, release and this file are on `staging`. `README.md` describes several entries per day with the day total, and points to the Lab 5 deployment and the Lab 7 records (updated in this PR). | PR #143, #146, #162; this PR |
+| Documentation | Contract, ADR 0061, implementation, release and this file are on `staging`. `README.md` describes several entries per day with the day total, and points to the Lab 5 deployment and the Lab 7 records (updated in PR #163). | PR #143, #146, #162, #163 |
 | Deployment and smoke test | Deploy run success; migration job completed; smoke test passed (`/api/health`, `/api/ready`, build label) | [release.md](release.md) section 3 |
 
 **Decision: READY** for the maintained Sprint 1 scope (decided by phittayanan, 2026-11-27).
@@ -105,7 +105,7 @@ Each student answered in their own words: phittayanan in Thai, translated by Cla
 | A. Change request and contract | #139 / PR #143 | projectnewy | phittayanan |
 | B. Tests and implementation | #140 / PR #146 | phittayanan | projectnewy (changes requested, then approved) |
 | B. Release, deploy and post-deployment checks | #141, #148 / PR #149, #147, #162 | projectnewy | phittayanan |
-| C and D. Metrics, readiness, retrospective | #142 / this PR | phittayanan | projectnewy |
+| C and D. Metrics, readiness, retrospective | #142 / PR #163 | phittayanan | projectnewy |
 
 ## 6. AI use
 

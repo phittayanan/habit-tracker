@@ -124,7 +124,7 @@ a { color: #0b3d91; overflow-wrap: anywhere; }
 table.wide th { overflow-wrap: break-word; }
 table code.short, table a.short { overflow-wrap: break-word; }
 figure { margin: 6pt auto 10pt; break-inside: avoid; text-align: center; }
-figure img { max-width: 100%; max-height: 98mm; border: 1px solid #999; }
+figure img { max-width: 100%; max-height: 125mm; border: 1px solid #999; }
 figcaption { font-size: 10pt; margin-top: 3pt; text-align: left; }
 .part + .part { break-before: page; }
 `;
@@ -137,7 +137,8 @@ const toHtml = (md, id) => `<div class="part part-${id}">` + marked.parse(
 const out = join(here, 'dist');
 mkdirSync(out, { recursive: true });
 const work = mkdtempSync(join(tmpdir(), 'lab7-build-'));
-const browser = await chromium.launch(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {});
+// File access lets the page read the local screenshots into a canvas, to crop them (see cropScreenshots).
+const browser = await chromium.launch({ args: ['--allow-file-access-from-files'], ...(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {}) });
 try {
   const page = await browser.newPage();
   const render = async (html, pdfPath) => {
@@ -147,6 +148,31 @@ try {
     await page.evaluate(() => Promise.all([...document.images].map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; }))));
     const broken = await page.evaluate(() => [...document.images].filter(i => !i.naturalWidth).map(i => i.getAttribute('src')));
     if (broken.length) throw new Error(`Missing images: ${broken.join(', ')}`);
+    // The screenshots are mostly blank page, so the app text printed very small (PR #169 review). Each copy
+    // in the PDF is cropped to the box that holds every non-white pixel, ignoring the browser's scrollbar at
+    // the right edge, with a small margin. The files themselves are not changed.
+    await page.evaluate(async () => {
+      for (const img of [...document.images].filter(i => i.getAttribute('src').includes('evidence/img/'))) {
+        const { naturalWidth: w, naturalHeight: h } = img;
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
+        const px = ctx.getImageData(0, 0, w, h).data;
+        let x0 = w, y0 = h, x1 = -1, y1 = -1;
+        // A thin frame line at the edges and the scrollbar at the right are not content.
+        const edge = 6, right = w - 32;
+        for (let y = edge; y < h - edge; y++) for (let x = edge; x < right; x++) {
+          const i = (y * w + x) * 4;
+          if (px[i] < 235 || px[i + 1] < 235 || px[i + 2] < 235) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+        }
+        if (x1 < 0) continue;
+        const m = 12; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m);
+        if ((x1 - x0) * (y1 - y0) > 0.9 * w * h) continue;
+        const out = document.createElement('canvas'); out.width = x1 - x0 + 1; out.height = y1 - y0 + 1;
+        out.getContext('2d').drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+        img.src = out.toDataURL('image/png');
+        await img.decode();
+      }
+    });
     // The evidence registers end in a repository file name column. It squeezes the other columns, and the
     // evidence ID already names the file (evidence/<ID>-...), so the PDF leaves that column out.
     await page.evaluate(() => document.querySelectorAll('table').forEach(t => { if (t.rows[0].cells.length >= 6 && t.rows[0].cells[t.rows[0].cells.length - 1].textContent.trim() === 'File') [...t.rows].forEach(r => r.deleteCell(-1)); }));

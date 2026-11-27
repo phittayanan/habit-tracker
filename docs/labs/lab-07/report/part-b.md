@@ -4,7 +4,7 @@ The tests and code were written by phittayanan (Issue #140) and reviewed by proj
 
 ## B.1 Tests first, then code: commits, RED, GREEN and regression
 
-As merged (`docs/labs/lab-07/implementation.md`). The full output files it names are printed in B.2. The test changes themselves (setup and assertions) are in the Appendix, X.3.
+As merged (`docs/labs/lab-07/implementation.md`). The "Full output" files it names are in the repository; B.2 prints excerpts of them. The test changes themselves (setup and assertions) are in the Appendix, X.3.
 
 {{include:../implementation.md}}
 
@@ -12,7 +12,7 @@ As merged (`docs/labs/lab-07/implementation.md`). The full output files it names
 
 Excerpts of the saved output (`docs/labs/lab-07/evidence/`): the header with command and tested commit, the failing or the Lab 7 test lines, and the counts. The full output files are in the repository: [red-server.txt](https://github.com/phittayanan/habit-tracker/blob/a7dbbfb/docs/labs/lab-07/evidence/red-server.txt), [red-client.txt](https://github.com/phittayanan/habit-tracker/blob/a7dbbfb/docs/labs/lab-07/evidence/red-client.txt), [green-server.txt](https://github.com/phittayanan/habit-tracker/blob/a7dbbfb/docs/labs/lab-07/evidence/green-server.txt), [green-client.txt](https://github.com/phittayanan/habit-tracker/blob/a7dbbfb/docs/labs/lab-07/evidence/green-client.txt).
 
-RED, server suite on `761d87e` (new tests, old code), `cd server && npm test`. Every failure is the old one-entry rule (`ENTRY_ALREADY_EXISTS` or the unique index), not a compile error or a broken fixture:
+RED, server suite on `761d87e` (new tests, old code), `cd server && npm test`. Every failure comes from the missing new behaviour, not from a compile error or a broken fixture: the API tests get the old `409 ENTRY_ALREADY_EXISTS` or hit the old unique index; the unit tests of the day-total rule (TC-82, TC-83, TC-85, TC-90) find no such rule; TC-84 (b) finds that the request does not wait for the goal-row lock; TC-87 finds that each entry is compared with the target alone (B.1, section 2):
 
 {{text:red-server-excerpt.txt}}
 
@@ -42,7 +42,7 @@ As merged (`docs/labs/lab-07/release.md`). The screenshots it lists follow in B.
 
 ## B.5 Screenshots
 
-Manual checks in Chrome by projectnewy on the deployed revision `habit-tracker-00008-jgf` (`build b8d5acb`), 2026-11-27. Times are when Claude Code received each screenshot, by projectnewy's computer clock, which runs about 10 minutes ahead of GitHub (B.4, section 4). The browser's extension and profile area is masked. Each caption gives the evidence ID, time and result; the action, expected and actual results are in the tables of B.4, section 4.
+Manual checks in Chrome by projectnewy on the deployed revision `habit-tracker-00008-jgf` (`build b8d5acb`), 2026-11-27. Times are when Claude Code received each screenshot, by projectnewy's computer clock, which runs about 10 minutes ahead of GitHub (B.4, section 4). The browser's extension and profile area is masked. The copies in this PDF are cropped to the page content at build time (the files in `evidence/img/` are unchanged). Each caption gives the evidence ID, time and result; the action, expected and actual results are in the tables of B.4, section 4.
 
 ![E-pre-release, 15:27: Cloud SQL backup `before-lab7-release`, successful, before the merge at 15:57 (B.4, section 3).](../evidence/img/E-pre-release-backup-2026-11-27.png)
 
@@ -74,10 +74,10 @@ Manual checks in Chrome by projectnewy on the deployed revision `habit-tracker-0
 
 ![E-PD-08 (3 of 3): last goal.](../evidence/img/E-PD-08-participant2-goals-bottom.png)
 
-![E-PD-09, 16:53: Participant Two, `/api/goals/2/entries`: `GOAL_NOT_FOUND`. Pass.](../evidence/img/E-PD-09-participant2-goal-not-found.png)
+![E-PD-09, 16:53: Participant Two, `/api/goals/2/entries`: `GOAL_NOT_FOUND`. Pass. The account is not shown (B.4, section 4).](../evidence/img/E-PD-09-participant2-goal-not-found.png)
 
 ![E-PD-10, 16:53: Manager sees Templates only. Pass.](../evidence/img/E-PD-10-manager-home.png)
 
-![E-PD-11, 16:53: Manager, `/api/goals`: `FORBIDDEN`. Pass.](../evidence/img/E-PD-11-manager-goals-forbidden.png)
+![E-PD-11, 16:53: Manager, `/api/goals`: `FORBIDDEN`. Pass. The account is not shown (B.4, section 4).](../evidence/img/E-PD-11-manager-goals-forbidden.png)
 
-![E-PD-12, 16:53: Manager, `/api/goals/2/entries`: `FORBIDDEN`. Pass.](../evidence/img/E-PD-12-manager-entries-forbidden.png)
+![E-PD-12, 16:53: Manager, `/api/goals/2/entries`: `FORBIDDEN`. Pass. The account is not shown (B.4, section 4).](../evidence/img/E-PD-12-manager-entries-forbidden.png)
