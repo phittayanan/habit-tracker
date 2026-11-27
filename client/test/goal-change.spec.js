@@ -95,8 +95,14 @@ test('TC-159: keyboard alone opens, cancels, opens again and saves a change, wit
   await expect(open).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(box).toBeFocused();
+  // Every control of the open box is reached by Tab in order: number box, Save, Cancel.
+  await page.keyboard.press('Shift+Tab'); await expect(open).toBeFocused();
+  await page.keyboard.press('Tab'); await expect(box).toBeFocused();
   await page.keyboard.press('ControlOrMeta+a');
   await page.keyboard.type('6');
+  await page.keyboard.press('Tab'); await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeFocused();
+  await page.keyboard.press('Tab'); await expect(water.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
+  await page.keyboard.press('Shift+Tab'); await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(water.getByText('Daily target: 6 glasses', { exact: true })).toBeVisible();
   await expect(water.getByText('1 of 11 days met', { exact: true })).toBeVisible();

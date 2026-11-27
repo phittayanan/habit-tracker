@@ -138,6 +138,14 @@ test('TC-155: anonymous 401, Manager 403, another Participant and an unknown id 
     const res = await patch(id, { dailyTarget: 6 }, cookie);
     assert.equal(res.status, 404, `id ${id}`); assert.equal(res.body.error.code, 'GOAL_NOT_FOUND');
   }
+  // Section 4 order 3 before 4: a body that is not JSON still gets 404 on a goal that is not the caller's.
+  const raw = (id, cookie) => request(app).patch(`/api/goals/${id}`).set('Cookie', cookie).set('Content-Type', 'application/json').send('{"dailyTarget":');
+  for (const [id, cookie] of [[w.id, cookies.b], [2147483000, cookies.a]]) {
+    const res = await raw(id, cookie);
+    assert.equal(res.status, 404, `bad JSON on ${id}`); assert.equal(res.body.error.code, 'GOAL_NOT_FOUND');
+  }
+  const own = await raw(w.id, cookies.a);
+  assert.equal(own.status, 400); assert.equal(own.body.error.code, 'VALIDATION_ERROR');
   assert.deepEqual(await snapshot(), before);
   // TC-08 audits every protected route; the change route must be listed there.
   assert.deepEqual(protectedRoutes.find(route => route.method === 'patch' && route.path === '/api/goals/:id'),
