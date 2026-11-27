@@ -1,6 +1,6 @@
 # 0055. Review routing, card moves by the agent and one review format
 
-Status: agreed by phittayanan and projectnewy in Issue #55 (comments of 2026-11-16 and 2026-11-18); implemented in the PR for Issue #55, review by projectnewy pending
+Status: agreed by phittayanan and projectnewy in Issue #55 (comments of 2026-11-16 and 2026-11-18); implemented in the PR for Issue #55, review by projectnewy pending. The "What I checked" part of point 3 is superseded by ADR 0085 (Issue #170).
 
 ## Decision
 
