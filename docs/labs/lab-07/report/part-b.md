@@ -54,7 +54,7 @@ Release CI and deployment, excerpt of the log of deploy run 45969767744 (job `te
 
 ## B.5 Screenshots
 
-Manual checks in Chrome by projectnewy on the deployed revision `habit-tracker-00008-jgf` (`build b8d5acb`), 2026-11-27. Times are when Claude Code received each screenshot, by projectnewy's computer clock, which runs about 10 minutes ahead of GitHub (B.4, section 4). The browser's extension and profile area is masked. The copies in this PDF are cropped to the page content at build time (the files in `evidence/img/` are unchanged). Each caption gives the evidence ID, time and result; the action, expected and actual results are in the tables of B.4, section 4.
+Manual checks in Chrome by projectnewy on the deployed revision `habit-tracker-00008-jgf` (`build b8d5acb`), 2026-11-27. Times are when Claude Code received each screenshot, by projectnewy's computer clock, which runs about 10 minutes ahead of GitHub (B.4, section 4). The browser's extension and profile area is masked. The copies in this PDF are cropped to the page content at build time; for E-PD-09, E-PD-11 and E-PD-12 the copy shows the address bar and, under it, the response at twice its size (the files in `evidence/img/` are unchanged). Each caption gives the evidence ID, time and result; the action, expected and actual results are in the tables of B.4, section 4.
 
 ![E-pre-release, 15:27 (creation time shown by the Console, not a receipt time): Cloud SQL backup `before-lab7-release`, successful, before the merge at 15:57 (B.4, section 3).](../evidence/img/E-pre-release-backup-2026-11-27.png)
 

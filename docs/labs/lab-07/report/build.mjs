@@ -159,7 +159,10 @@ try {
         const px = ctx.getImageData(0, 0, w, h).data;
         const bright = (x, y) => { const i = (y * w + x) * 4; return px[i] > 150 && px[i + 1] > 150 && px[i + 2] > 150; };
         let sum = 0; for (let i = 0; i < px.length; i += 4) sum += px[i];
-        if (sum / (w * h) < 80) {
+        const apiShot = /E-PD-(09|11|12)-/.test(img.getAttribute('src'));
+        // Other dark screenshots (the E-PD-07 JSON pages, the backup console) are full of content: no crop.
+        if (sum / (w * h) < 80 && !apiShot) continue;
+        if (apiShot) {
           // A dark browser window showing an API response (E-PD-09, 11, 12). Its text lines are bands of
           // light pixels: the first band is the address bar, the last is the response. The PDF shows the
           // address bar at its own size and, under it, the response enlarged two times (PR #169 review).
@@ -183,18 +186,21 @@ try {
           await img.decode();
           continue;
         }
-        let x0 = w, y0 = h, x1 = -1, y1 = -1;
+        let x0 = w, y0 = h, x1 = -1, y1 = -1; const bars = new Set();
         // A thin frame line at the edges and the scrollbar at the right are not content, and neither is a
         // bar or line across nearly the whole width (the dark strip at the top of E-PD-01).
         const edge = 6, right = w - 32;
         const ink = (x, y) => { const i = (y * w + x) * 4; return px[i] < 235 || px[i + 1] < 235 || px[i + 2] < 235; };
         for (let y = edge; y < h - edge; y++) {
           let n = 0; for (let x = edge; x < right; x++) if (ink(x, y)) n++;
-          if (n > 0.6 * (right - edge)) continue;
+          if (n > 0.6 * (right - edge)) { bars.add(y); continue; }
           for (let x = edge; x < right; x++) if (ink(x, y)) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
         }
         if (x1 < 0) continue;
-        const m = 12; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m);
+        // The margin stops at a skipped bar, so the bar does not come back into the crop.
+        const m = 12; x0 = Math.max(0, x0 - m); x1 = Math.min(w - 1, x1 + m);
+        for (let k = 0; k < m && y0 > 0 && !bars.has(y0 - 1) && y0 - 1 >= edge; k++) y0--;
+        for (let k = 0; k < m && y1 < h - 1 && !bars.has(y1 + 1); k++) y1++;
         if ((x1 - x0) * (y1 - y0) > 0.9 * w * h) continue;
         const out = document.createElement('canvas'); out.width = x1 - x0 + 1; out.height = y1 - y0 + 1;
         out.getContext('2d').drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
