@@ -12,7 +12,8 @@ const password = randomBytes(24).toString('base64url');
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const day = n => new Date(Date.parse(`${today()}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 const asDate = text => new Date(`${text}T00:00:00Z`);
-const restartPort = 33140;
+// The main test port plus 8, so one TEST_SERVER_PORT per worktree covers both servers (ADR 0098).
+const restartPort = Number(process.env.TEST_SERVER_PORT || 33132) + 8;
 const restartUrl = `http://127.0.0.1:${restartPort}`;
 const clientDir = fileURLToPath(new URL('..', import.meta.url));
 function startApp() {
