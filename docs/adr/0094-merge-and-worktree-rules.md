@@ -9,7 +9,7 @@ On 2026-11-27 three open PRs (#173, #174, #176) changed the same files. Each mer
 - #176 against #173: `client/src/goals.jsx`, `docs/ai-use.md`, `docs/traceability.md`
 - #176 against #174: `docs/ai-use.md`, `docs/system-sds.md`, `docs/traceability.md`
 - #174 and #176 both added ADR 0086 and 0087. Git did not flag this because the file names differed.
-- Issue 153 waited for #168 (ADR 0087) without a "blocked by" link until 2026-11-27.
+- Issue 153 waited for #168 (the ADR then numbered 0087, now 0093) without a "blocked by" link until 2026-11-27.
 
 ADR 0057 lets each student work on more than one Issue at a time. One folder can hold only one checked-out branch, so parallel Issues in one folder means switching branches, and old worktrees from Claude sessions were left with `claude/...` branch names or no branch.
 
@@ -35,4 +35,4 @@ How `docs/ai-use.md` and `docs/traceability.md` are written (for example one fil
 
 ## Source
 
-Issue #177: the proposal of 2026-11-27, rule 5 added the same day, and projectnewy's comment of 2026-11-27 (14:29 UTC). projectnewy's reasons for the two additions: "will merge first" is a guess, so no PR should wait with no end (rule 4); a worktree separates files only, and the server and browser suites reset the test database, so two runs on one database can break each other's results (rule 5). projectnewy agreed that how `docs/ai-use.md` and `docs/traceability.md` are written stays out of this decision. Implementation owner phittayanan, reviewer and merger projectnewy.
+Issue #177: the proposal of 2026-11-27, rule 5 added the same day, and projectnewy's comment of 2026-11-27 (14:29 UTC). projectnewy's reasons for the two additions: "will merge first" is a guess, and D2 is due on 29 November (as stated in that comment), so no PR should wait with no end (rule 4); a worktree separates files only, and the server and browser suites reset the test database, so two runs on one database can break each other's results (rule 5). projectnewy agreed that how `docs/ai-use.md` and `docs/traceability.md` are written stays out of this decision. Implementation owner phittayanan, reviewer and merger projectnewy.
