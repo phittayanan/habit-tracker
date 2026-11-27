@@ -6,7 +6,8 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - One Issue -> one branch -> one PR. Branch from `staging` and name it `feat/|fix/|docs/|chore/<issue-number>-<slug>`.
 - Open the PR into `staging`. Only the release PR goes from `staging` into `main`, with a tag.
 - Commit titles use Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`, `refactor:`. GitHub's merge-commit titles are exempt.
-- Busy files (database schema, `package.json`, route index, `docs/ai-use.md`): before asking for review, check for another open PR on the same file and update your branch from `staging`; the PR that merges second fixes the conflict.
+- Busy files (ADR 0094): database schema, `package.json`, route index, `docs/ai-use.md`, plus every file an open PR also changes (shared docs such as `docs/traceability.md`, `docs/system-sds.md`, `docs/srs.md` included). When starting an Issue, name each overlap with its PR number. When an open PR on the same files is approved or will merge first, wait for it to merge, then update your branch from `staging` once; the PR that merges second fixes the conflicts, including renumbering a clashing ADR. If that PR is still not merged and your work waits on it, the two students may agree a new order in the thread.
+- One worktree per Issue (ADR 0094): each Issue gets its own git worktree folder and Claude session; never switch branches in a folder that holds another Issue's work. Its branch follows the name rule above (rename an auto-made `claude/...` branch before the first push). After the PR merges, remove the worktree and its local branch. Worktrees that run tests at the same time use separate test databases.
 - Never push to `main` or `staging`. Never force push. Push only your own branch.
 - Never merge or approve your own PR. The teammate reviews it, and the review must state a specific check, question, finding or reason ("LGTM" does not count).
 - Before asking the teammate for a review, read their status: `gh variable get TEAM_STATUS_<LOGIN>` (ADR 0062). If it is AFK, sleep or out, or missing, tell the author the status and how old it is; the author decides whether to send the request now or wait. Warn when a status is over 12 hours old.
@@ -20,8 +21,8 @@ Two students build this CPE 334 group project with Claude Code. The product live
 - No Issue, no work: if the task has no Issue, ask the human to create one.
 
 ## Decisions
-- Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record each decision as its own file in `docs/adr/` (`NNN-short-name.md`).
-- Work until blocked (ADR 0057): add a "blocked by" link when an Issue needs another merged first; after opening a PR, start your next own Issue that has no open "blocked by" Issue, branched from `staging`. At most 2 of your PRs wait for review at once; review the teammate's waiting PR before starting new work; never take the teammate's Issue unless they agree and the assignee changes.
+- Ask the human before any product or design decision (requirements, scope, UI, stack, data model). Do not decide it yourself or fill gaps with guesses. Record each decision as its own file in `docs/adr/` (`NNN-short-name.md`); take the next number free on `staging` and in every open PR, and recheck before asking for review (ADR 0094).
+- Work until blocked (ADR 0057, ADR 0094): add a "blocked by" link when an Issue needs another merged first, also when an ADR lets its PR open before the other merges; after opening a PR, start your next own Issue that has no open "blocked by" Issue, branched from `staging`. At most 2 of your PRs wait for review at once; review the teammate's waiting PR before starting new work; never take the teammate's Issue unless they agree and the assignee changes.
 
 ## Releases
 - After each release PR from `staging` into `main`, tag `main` `vS.N` (Sprint 1 = `v1.0`).

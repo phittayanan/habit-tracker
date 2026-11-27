@@ -1,6 +1,6 @@
 # 0094. Merge rules for busy files, ADR numbers, blocked by, staging updates and worktrees
 
-Status: proposed by phittayanan in Issue #177 (2026-11-27). Waiting for projectnewy to agree, change or refuse each rule in Issue #177. Not in force until both students agree and this file is updated to "agreed".
+Status: agreed by phittayanan and projectnewy in Issue #177 (proposal by phittayanan on 2026-11-27; projectnewy agreed to rules 1 to 3, and to rules 4 and 5 with one addition each, on 2026-11-27)
 
 ## Context
 
@@ -18,11 +18,12 @@ ADR 0057 lets each student work on more than one Issue at a time. One folder can
 1. **Busy files** are the ones `CLAUDE.md` lists plus every file an open PR also changes, shared docs (`docs/traceability.md`, `docs/system-sds.md`, `docs/srs.md`) included. When starting an Issue, name each overlap with its PR number.
 2. **ADR numbers:** before naming a new ADR, take the next number that is free on `staging` and in every open PR. Recheck before asking for review.
 3. **Blocked by:** when an Issue waits for another Issue, add the "blocked by" link, also when an ADR lets its PR open before the other merges.
-4. **When to update from `staging`:** when an open PR that changes the same files is approved or will merge first, wait for it to merge, then update once. The PR that merges second fixes the conflicts, including renumbering a clashing ADR.
+4. **When to update from `staging`:** when an open PR that changes the same files is approved or will merge first, wait for it to merge, then update once. The PR that merges second fixes the conflicts, including renumbering a clashing ADR. If that PR is still not merged and our work is waiting on it, the two of us may agree a new order in the thread.
 5. **One worktree per Issue** (for parallel work with no open blocker):
    - Each Issue gets its own git worktree folder and its own Claude session. Never switch branches inside a folder that holds another Issue's work.
    - The worktree's branch follows the `CLAUDE.md` name rule (`feat|fix|docs|chore/<issue-number>-<slug>`), branched from `staging`; rename an auto-made `claude/...` branch before the first push.
    - After the PR merges, remove that worktree and delete its local branch.
+   - Worktrees that run tests at the same time use separate test databases.
 
 ## Not changed
 
@@ -34,4 +35,4 @@ How `docs/ai-use.md` and `docs/traceability.md` are written (for example one fil
 
 ## Source
 
-Issue #177: the proposal of 2026-11-27 and rule 5 added the same day. projectnewy's answer: pending. Implementation owner phittayanan, reviewer and merger projectnewy.
+Issue #177: the proposal of 2026-11-27, rule 5 added the same day, and projectnewy's comment of 2026-11-27 (14:29 UTC). projectnewy's reasons for the two additions: "will merge first" is a guess, so no PR should wait with no end (rule 4); a worktree separates files only, and the server and browser suites reset the test database, so two runs on one database can break each other's results (rule 5). projectnewy agreed that how `docs/ai-use.md` and `docs/traceability.md` are written stays out of this decision. Implementation owner phittayanan, reviewer and merger projectnewy.
