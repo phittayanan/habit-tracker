@@ -42,7 +42,7 @@ Prototype screenshots (sample data, not saved; ADR 0063). The prototype week sta
 | Rule | Statement | Source |
 |---|---|---|
 | First screen | The Participant's first screen after login is this month's calendar at `/calendar` | SRS FR-15; ADR 0037, ADR 0073 |
-| Goals page kept | The Sprint 1 goals page at `/goals` stays unchanged except the display and input of Time values, and is reached from the menu item "Goals" | ADR 0065, ADR 0073 |
+| Goals page kept | The Sprint 1 goals page at `/goals` stays unchanged except the display and input of Time values and the Sprint 2 controls of F-13 and F-14 (ADR 0081, ADR 0084), and is reached from the menu item "Goals" | ADR 0065, ADR 0073 |
 | Months | ‹ goes back without limit; › stops at the current month (Asia/Bangkok) | ADR 0068 |
 | Days that open | Today and past days; never a future day | ADR 0069; SRS BR-01 |
 | Goals listed | Only goals whose start and end dates include the day | ADR 0069; SRS BR-01 |
@@ -188,7 +188,7 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | OP-11.11 | What happens to the Sprint 1 goals page | Decided by phittayanan (R1, answering projectnewy's blocking finding 1): kept unchanged at `/goals`; the calendar is the new first page `/calendar` (ADR 0073) |
 | OP-11.13 | Which Sprint 1 test steps may change for the new first page | Decided by phittayanan (R4, answering projectnewy's blocking finding 1 in the [review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): only the steps that lead to the goals page (address after login, opening "Goals", the menu list, the tab order); the goals-page checks stay (ADR 0073 point 4) |
 | OP-11.12 | What Done does at +0 | Decided by phittayanan (R2, answering projectnewy's finding 2): disabled, and the same for Check in (ADR 0074) |
-| OP-11.10 | Editing and deleting an entry from the card (F-13) | Not in this contract; F-13's contract (Issue #150) says where its controls go |
+| OP-11.10 | Editing and deleting an entry from the card (F-13) | In the day box or panel and on the goals page (ADR 0081; F-13 section 6). A card lists each entry with Edit and Delete once F-13 is built |
 
 ## 13. Revision history
 
@@ -197,3 +197,4 @@ Saving uses `POST /api/goals/:id/entries` unchanged (F-08 section 7).
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): first page `/calendar` and the Sprint 1 goals page kept (ADR 0073; sections 2, 3, 5, 9, 10, 12; AC-11.13, TC-130); Done and Check in disabled at +0 (ADR 0074; AC-11.6, AC-11.7, TC-113); projectnewy's agreement to ADR 0064 | pending (reviewer projectnewy) |
 | 2026-11-27 | Re-check of PR #167 ([review of 2a4b0e5](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087213487)): the Sprint 1 test steps that change for `/calendar` (ADR 0073 point 4; section 2, section 3, AC-11.13, TC-130, OP-11.13) | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #150: F-13 controls in the card (OP-11.10) and the F-13 and F-14 controls on the goals page (section 3; ADR 0081, ADR 0084) | pending (reviewer phittayanan) |

@@ -59,6 +59,8 @@ The 403 body is the one in F-02 section 7. A refused request stores and changes 
 - **Empty state**: "No templates yet". No New button, because a Participant cannot create (SDS 4.2: "the New button stays visible for the role that can create").
 - The list fits 375 px and 1280 px wide and works with the keyboard alone (NFR-05, NFR-06; TC-47, TC-48 run on this screen).
 
+Sprint 2 (ADR 0079): a Participant's existing goals on a retired template show its name and unit as before, with no extra label. This answers OP-06.2 and SRS A-5.
+
 ## 7. API
 
 Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025).
@@ -120,3 +122,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | 2026-11-07 | First draft (Issue #30) | pending |
 | 2026-11-07 | Review round 1 ([PR #31](https://github.com/phittayanan/habit-tracker/pull/31)): move AC-06.4 / TC-18 to F-04 as AC-04.7 / TC-18; record partner agreement on existing proposals | pending (partner re-check) |
 | 2026-11-08 | Issue #36 implementation evidence recorded in `docs/template-implementation-evidence.md`. No decided point was reopened. Edit refusal stays in F-04. | pending review |
+| 2026-11-27 | Issue #150: retired templates on existing goals (OP-06.2) | pending (reviewer phittayanan) |

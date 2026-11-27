@@ -59,6 +59,8 @@ Unknown body fields (for example `participantId` or `userId`) are stripped by th
 
 Boundaries: a target equal to `max_value` is accepted; a target equal to `min_value` is rejected, and a template whose minimum equals its maximum can take no goal (ADR 0054); `startDate` equal to `endDate` is accepted (a one-day goal); an end date in the past is accepted (the goal is Ended at once; decided, OP-07.2).
 
+Sprint 2: a goal on a retired template gets `409 TEMPLATE_RETIRED`, after all validation rows and before the other rule rows (F-05). Creating a goal also inserts its first `GoalTarget` row in the same transaction (F-14, ADR 0075).
+
 ## 5. Permissions
 
 | Caller | Create a goal | List goals |
@@ -182,6 +184,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-14 | Issue #74: a target must also be above the template's `min_value` (section 4 error table and boundaries, AC-07.11, TC-78); SRS A-4 revised; decided in ADR 0054 | projectnewy decided on 2026-11-14; phittayanan agreed in his review of PR #95 (https://github.com/phittayanan/habit-tracker/pull/95) |
 | 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-07.12; TC-128 | pending (reviewer projectnewy) |
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): Time target typed in minutes with an hours-and-minutes hint and shown in hours and minutes (AC-07.13, TC-131; ADR 0065 points 3 and 4) | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #150: retired-template refusal and first target version (section 4) | pending (reviewer phittayanan) |
 
 ## 14. Implementation evidence — Issue #40
 
