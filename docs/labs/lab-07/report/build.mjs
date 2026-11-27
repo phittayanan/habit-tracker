@@ -157,12 +157,41 @@ try {
         const c = document.createElement('canvas'); c.width = w; c.height = h;
         const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
         const px = ctx.getImageData(0, 0, w, h).data;
+        const bright = (x, y) => { const i = (y * w + x) * 4; return px[i] > 150 && px[i + 1] > 150 && px[i + 2] > 150; };
+        let sum = 0; for (let i = 0; i < px.length; i += 4) sum += px[i];
+        if (sum / (w * h) < 80) {
+          // A dark browser window showing an API response (E-PD-09, 11, 12). Its text lines are bands of
+          // light pixels: the first band is the address bar, the last is the response. The PDF shows the
+          // address bar at its own size and, under it, the response enlarged two times (PR #169 review).
+          const bands = []; let start = -1;
+          for (let y = 0; y <= h; y++) {
+            let on = false; if (y < h) for (let x = 0; x < w * 0.75 && !on; x++) on = bright(x, y);
+            if (on && start < 0) start = y; else if (!on && start >= 0) { bands.push([start, y - 1]); start = -1; }
+          }
+          if (bands.length < 2) continue;
+          const right = ([a, b]) => { let r = 0; for (let y = a; y <= b; y++) for (let x = 0; x < w * 0.75; x++) if (bright(x, y) && x > r) r = x; return r; };
+          const [bar, resp] = [bands[0], bands[bands.length - 1]];
+          const barBox = [0, 0, Math.min(w, right(bar) + 40), Math.min(h, bar[1] + 18)];
+          const respBox = [0, Math.max(0, resp[0] - 6), Math.min(w, right(resp) + 12), Math.min(h, resp[1] + 7) - Math.max(0, resp[0] - 6)];
+          const out = document.createElement('canvas'); const gap = 10;
+          out.width = Math.max(barBox[2], 2 * respBox[2]); out.height = barBox[3] + gap + 2 * respBox[3];
+          const o = out.getContext('2d'); o.fillStyle = '#111'; o.fillRect(0, 0, out.width, out.height);
+          o.drawImage(c, 0, 0, barBox[2], barBox[3], 0, 0, barBox[2], barBox[3]);
+          o.imageSmoothingEnabled = false;
+          o.drawImage(c, 0, respBox[1], respBox[2], respBox[3], 0, barBox[3] + gap, 2 * respBox[2], 2 * respBox[3]);
+          img.src = out.toDataURL('image/png');
+          await img.decode();
+          continue;
+        }
         let x0 = w, y0 = h, x1 = -1, y1 = -1;
-        // A thin frame line at the edges and the scrollbar at the right are not content.
+        // A thin frame line at the edges and the scrollbar at the right are not content, and neither is a
+        // bar or line across nearly the whole width (the dark strip at the top of E-PD-01).
         const edge = 6, right = w - 32;
-        for (let y = edge; y < h - edge; y++) for (let x = edge; x < right; x++) {
-          const i = (y * w + x) * 4;
-          if (px[i] < 235 || px[i + 1] < 235 || px[i + 2] < 235) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+        const ink = (x, y) => { const i = (y * w + x) * 4; return px[i] < 235 || px[i + 1] < 235 || px[i + 2] < 235; };
+        for (let y = edge; y < h - edge; y++) {
+          let n = 0; for (let x = edge; x < right; x++) if (ink(x, y)) n++;
+          if (n > 0.6 * (right - edge)) continue;
+          for (let x = edge; x < right; x++) if (ink(x, y)) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
         }
         if (x1 < 0) continue;
         const m = 12; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m);
