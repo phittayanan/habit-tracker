@@ -80,6 +80,8 @@ test('TC-38: edit then delete recompute the day total and days met; date, order 
     const [{ port }] = await Promise.race([once(child, 'message'), once(child, 'exit').then(() => { throw new Error('App exited before startup'); })]);
     const again = await request(`http://127.0.0.1:${port}`).get(`/api/goals/${w.id}/entries`).set('Cookie', cookies.a).expect(200);
     assert.deepEqual(again.body.entries, [{ id: e5.id, goalId: w.id, entryDate: day(-1), value: 4 }]);
+    const goals = await request(`http://127.0.0.1:${port}`).get('/api/goals').set('Cookie', cookies.a).expect(200);
+    assert.deepEqual(goals.body.goals.find(g => g.id === w.id).progress, { daysMet: 0, daysSoFar: 11 });
   } finally { child.kill('SIGTERM'); await once(child, 'exit'); }
 });
 

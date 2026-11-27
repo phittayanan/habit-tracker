@@ -96,8 +96,19 @@ test('TC-149: the goals page edits in place, keeps a rejected value, and asks be
   await expect(question).toHaveCount(0);
   expect(await values(w, day(-1))).toEqual([3, 4]);
   await del.click();
+  // While the delete runs, both buttons are disabled, focus stays in the question, and Escape does not cancel it.
+  let releaseDelete;
+  const heldDelete = new Promise(resolve => { releaseDelete = resolve; });
+  await page.route('**/api/goals/*/entries/*', async route => { await heldDelete; await route.continue(); });
   await question.getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(question.getByRole('button', { name: 'Delete', exact: true })).toBeDisabled();
+  await expect(question.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
+  expect(await question.evaluate(el => el.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(question).toBeVisible();
+  releaseDelete();
   await expect(question).toHaveCount(0);
+  await page.unroute('**/api/goals/*/entries/*');
   await expect(water.locator('.entry-text')).toHaveText([`${day(-1)}: 4 glasses`]);
   await page.reload();
   await expect(water.locator('.entry-text')).toHaveText([`${day(-1)}: 4 glasses`]);
@@ -126,11 +137,20 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await expect(box).toHaveValue('5');
   await box.fill('20');
   await water.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(water.getByRole('alert')).toHaveText('The value must be between 1 and 12.');
+  const row = water.locator('.entry-row').filter({ has: box });
+  await expect(row.getByRole('alert')).toHaveText('The value must be between 1 and 12.');
+  await expect(box).toHaveAttribute('aria-invalid', 'true');
+  await expect(box).toHaveAccessibleDescription('The value must be between 1 and 12.');
   await expect(box).toHaveValue('20');
   await box.fill('4');
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route('**/api/goals/*/entries/*', async route => { await held; await route.continue(); });
   await water.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(water.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  release();
   await expect(water.getByText('7 / 8 glasses', { exact: true })).toBeVisible();
+  await page.unroute('**/api/goals/*/entries/*');
   await expect(water.getByText('✓ met', { exact: true })).toHaveCount(0);
   await expect(water.locator('.entry-value')).toHaveText(['4', '3']);
 
@@ -210,7 +230,9 @@ test('TC-151: edit and delete by keyboard alone on both screens; focus moves int
   await page.keyboard.press('Enter');
   await expect(water.locator('.entry-text')).toHaveText([`${day(-1)}: 6 glasses`, `${day(-1)}: 3 glasses`]);
   const del = water.getByRole('button', { name: `Delete 3 glasses on ${day(-1)}`, exact: true });
-  await del.focus();
+  await water.getByRole('button', { name: `Edit 3 glasses on ${day(-1)}`, exact: true }).focus();
+  await page.keyboard.press('Tab');
+  await expect(del).toBeFocused();
   await page.keyboard.press('Enter');
   const question = ask(page, `Delete 3 glasses on ${day(-1)}?`);
   await expect(question.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
