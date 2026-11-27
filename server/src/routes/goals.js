@@ -1,10 +1,12 @@
 import express from 'express';
 import { requireRole, requireSession, sendError } from '../middleware/auth.js';
 import { parseGoalCreate, parseGoalId } from '../services/goal-rules.js';
-import { changeTarget, createGoal, listGoals } from '../services/goal.js';
+import { changeTarget, createGoal, listGoals, removeReminder, setReminder } from '../services/goal.js';
 export const goalRoutes = [
   ...['get', 'post'].map(method => ({ method, path: '/api/goals', roles: ['PARTICIPANT'] })),
   { method: 'patch', path: '/api/goals/:id', requestPath: '/api/goals/1', roles: ['PARTICIPANT'] },
+  // F-17 stored reminder (Issue #158).
+  ...['put', 'delete'].map(method => ({ method, path: '/api/goals/:id/reminder', requestPath: '/api/goals/1/reminder', roles: ['PARTICIPANT'] })),
 ];
 export function registerGoals(app, db) {
   app.get('/api/goals', requireSession(db), requireRole('PARTICIPANT'), async (req, res, next) => {
@@ -36,5 +38,16 @@ export function registerGoals(app, db) {
       if (!result.ok) return sendError(res, result.status, result.code, result.message);
       res.json({ goal: result.goal });
     } catch (error) { next(error); }
+  });
+  // F-17 stored reminder (Issue #158). Only time and weekdays are read; nothing is sent (BR-14).
+  app.put('/api/goals/:id/reminder', requireSession(db), requireRole('PARTICIPANT'), ownGoal, express.json(), async (req, res, next) => {
+    try {
+      const result = await setReminder(db, req.user, req.goalId, req.body);
+      if (!result.ok) return sendError(res, result.status, result.code, result.message);
+      res.json({ reminder: result.reminder });
+    } catch (error) { next(error); }
+  });
+  app.delete('/api/goals/:id/reminder', requireSession(db), requireRole('PARTICIPANT'), ownGoal, async (req, res, next) => {
+    try { await removeReminder(db, req.user, req.goalId); res.status(204).end(); } catch (error) { next(error); }
   });
 }

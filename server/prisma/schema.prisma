@@ -69,6 +69,7 @@ model Goal {
 
   entries       Entry[]
   targets       GoalTarget[]
+  reminder      GoalReminder?
 
   @@index([participantId, templateId, endDate])
 }
@@ -82,6 +83,14 @@ model GoalTarget {
   dailyTarget   Decimal  @map("daily_target") @db.Decimal(10, 2)
 
   @@unique([goalId, effectiveFrom])
+}
+
+// F-17 stored reminder (ADR 0086, ADR 0095): at most one per goal, deleted with its goal. Nothing is sent (BR-14).
+model GoalReminder {
+  goalId   Int      @id @map("goal_id")
+  goal     Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  time     String   @db.Char(5)
+  weekdays String[]
 }
 
 model Entry {
