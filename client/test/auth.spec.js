@@ -24,7 +24,7 @@ async function logIn(page, username = 'participant1') {
   await page.getByLabel('Username', { exact: true }).fill(username);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
-  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/goals$/);
+  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/calendar$/);
 }
 
 test('TC-65: rejected login retains username, clears password; login and logout destinations', async ({ page }) => {
@@ -43,7 +43,7 @@ test('TC-65: rejected login retains username, clears password; login and logout 
 
 test('TC-07: shared bar shows database identity and exact role menus on test-only page', async ({ page }) => {
   for (const [username, displayName, menu] of [
-    ['manager1', 'Manager One', ['Templates']], ['participant1', 'Participant One', ['Goals', 'Templates']],
+    ['manager1', 'Manager One', ['Templates']], ['participant1', 'Participant One', ['Calendar', 'Goals', 'Templates']],
   ]) {
     await logIn(page, username);
     await page.goto('/test/protected');
@@ -115,7 +115,9 @@ test('TC-47 / TC-48: approved width, no overflow, keyboard-only form/menu/logout
   await expect(page.getByRole('button', { name: 'Log in', exact: true })).toBeFocused();
   expect(await page.locator('form').evaluate(el => el.getBoundingClientRect().width)).toBeLessThanOrEqual(352);
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/\/goals$/);
+  await expect(page).toHaveURL(/\/calendar$/);
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Calendar', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Goals', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');

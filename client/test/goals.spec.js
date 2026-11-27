@@ -22,7 +22,11 @@ async function login(page, username = 'participant1') {
   await page.getByLabel('Username', { exact: true }).fill(username);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
-  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/goals$/);
+  if (username === 'manager1') { await expect(page).toHaveURL(/\/templates$/); return; }
+  // ADR 0073 point 4: a Participant lands on /calendar and opens the goals page from the menu.
+  await expect(page).toHaveURL(/\/calendar$/);
+  await page.getByRole('link', { name: 'Goals', exact: true }).click();
+  await expect(page).toHaveURL(/\/goals$/);
 }
 const newGoal = page => page.getByRole('link', { name: '+ New goal', exact: true });
 async function fill(page, target = '20') {
@@ -86,7 +90,8 @@ test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and can
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   // Start keyboard traversal from the document, independent of login focus restoration.
   await page.goto('/goals'); await expect(newGoal(page)).toBeVisible();
-  for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
+  // ADR 0073 point 4: the menu has Calendar before Goals, so one more Tab.
+  for (let i = 0; i < 5; i++) await page.keyboard.press('Tab');
   await expect(newGoal(page)).toBeFocused();
   expect(await newGoal(page).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
   await page.keyboard.press('Enter');

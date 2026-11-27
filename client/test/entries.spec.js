@@ -22,6 +22,9 @@ async function login(page) {
   await page.getByLabel('Username', { exact: true }).fill('participant1');
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
+  // ADR 0073 point 4: a Participant lands on /calendar and opens the goals page from the menu.
+  await expect(page).toHaveURL(/\/calendar$/);
+  await page.getByRole('link', { name: 'Goals', exact: true }).click();
   await expect(page).toHaveURL(/\/goals$/);
 }
 const save = page => page.getByRole('button', { name: 'Save entry', exact: true });

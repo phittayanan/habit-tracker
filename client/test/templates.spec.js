@@ -24,7 +24,7 @@ async function logIn(page, username) {
   await page.getByLabel('Username', { exact: true }).fill(username);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
-  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/goals$/);
+  await expect(page).toHaveURL(username === 'manager1' ? /\/templates$/ : /\/calendar$/);
 }
 
 function range(min, max) {
@@ -172,6 +172,8 @@ test('TC-47 / TC-48: template screens fit both widths and the keyboard completes
   await page.goto('/templates');
   await expect(page.getByRole('table')).toContainText('Keyboard');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Calendar', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Goals', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
