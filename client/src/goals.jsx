@@ -141,20 +141,23 @@ function Reminder({ goal, onUnauthenticated, onChange }) {
     finally { setBusy(false); }
   }
   const id = `reminder-${goal.id}`;
+  // The weekday message (F-17 section 4 order 5) describes the Weekdays group; any other message describes the time box.
+  const dayError = message === 'Choose at least one weekday, each only once.';
+  const timeError = Boolean(message) && !dayError;
   return <div className="reminder">
     <p>{reminderText(goal.reminder)}</p>
     {canSet ? <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${id}-form` : undefined} onClick={() => (open ? close() : show())}>{goal.reminder ? 'Change reminder' : 'Set reminder'}</button> : null}
     {open ? <form id={`${id}-form`} className="reminder-form" onSubmit={save} noValidate aria-label={`Reminder for ${goal.template.name}`}>
       <label htmlFor={`${id}-time`}>Reminder time</label>
-      <input id={`${id}-time`} ref={timeRef} name="time" type="text" placeholder="HH:MM" autoComplete="off" value={time} onChange={event => setTime(event.target.value)} aria-invalid={message ? true : undefined} aria-describedby={[`${id}-note`, message ? `${id}-error` : ''].filter(Boolean).join(' ')} />
-      <fieldset className="weekdays">
+      <input id={`${id}-time`} ref={timeRef} name="time" type="text" placeholder="HH:MM" autoComplete="off" value={time} onChange={event => setTime(event.target.value)} aria-invalid={timeError ? true : undefined} aria-describedby={[`${id}-note`, timeError ? `${id}-error` : ''].filter(Boolean).join(' ')} />
+      <fieldset className="weekdays" aria-describedby={dayError ? `${id}-error` : undefined}>
         <legend>Weekdays</legend>
         {WEEKDAYS.map(([code, name]) => <label key={code}><input type="checkbox" name="weekdays" value={code} checked={weekdays.includes(code)} onChange={event => toggle(code, event.target.checked)} />{name}</label>)}
       </fieldset>
       <p id={`${id}-note`}>The app only stores this. It sends nothing.</p>
       <div className="form-actions">
         <button type="submit" disabled={busy}>Save</button>
-        <button type="button" onClick={close}>Cancel</button>
+        <button type="button" disabled={busy} onClick={close}>Cancel</button>
       </div>
     </form> : null}
     {goal.reminder ? <button type="button" aria-describedby={`goal-${goal.id}-name`} disabled={busy} onClick={remove}>Remove reminder</button> : null}
