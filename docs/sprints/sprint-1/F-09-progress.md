@@ -13,7 +13,7 @@ Sprint 1 contract (Part E, Issue #28). Written before any code. Built only from 
 | Depends on | F-08 (entries exist), F-07, F-01, F-02 |
 | Needed by | Sprint 2 features F-11, F-13, F-14 |
 | Author / reviewer | projectnewy / phittayanan |
-| Status | Revised for Lab 7 (Issue #139, ADR 0061): a day is met by its day total. First version agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119); later changes from that review await the re-check. Not yet implemented |
+| Status | Revised for Lab 7 (Issue #139, ADR 0061): a day is met by its day total. First version agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119); later changes re-checked and approved by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777). Not yet implemented |
 
 ## 2. Behaviour and workflow
 
@@ -133,7 +133,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Brows
 | 2026-11-07 | Review round 1 (PR #29): fixed-clock citation dropped and test dates made relative to the Bangkok today (TC-32, TC-59); TC-59 has the Manager create the template through the UI and reads the page before and after the entry; OP-09.1 decided (Q5) | pending (partner re-check) |
 | 2026-11-10 | Issue #44 implementation evidence recorded in section 14 and `docs/progress-privacy-implementation-evidence.md`; requirements unchanged | projectnewy (author); teammate review pending |
 | 2026-11-27 | Lab 7, Issue #139: a day is met by its day total (BR-07; AC-09.1, AC-09.2, AC-09.6 revised, AC-09.9 and AC-09.10 added; TC-87, TC-88; ADR 0061). TC-31, TC-32 and TC-59 keep their expected results | projectnewy (author); agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
-| 2026-11-27 | Review of PR #143: the exactness example in AC-09.9 and TC-87 is now 0.7 + 0.1 against 0.8, because the old one could not fail; OP-09.4 | projectnewy (author); re-check by phittayanan pending |
+| 2026-11-27 | Review of PR #143: the exactness example in AC-09.9 and TC-87 is now 0.7 + 0.1 against 0.8, because the old one could not fail; OP-09.4 | projectnewy (author); re-checked by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777) |
 
 ## 14. Implementation evidence — Issue #44
 
