@@ -51,7 +51,7 @@ When a request breaks more than one rule, the first one in this table is returne
 
 Because row 4 comes before row 7, a value with more than 2 decimal places gets `VALIDATION_ERROR` even when it is also out of range. Example: 24.555 for a template with maximum 24 gets `400 VALIDATION_ERROR`, not `VALUE_OUT_OF_RANGE`.
 
-Sprint 2 (Issue #151, ADR 0065): row 4 also covers, on a goal whose template is `TIME`, a `value` with a fraction: `400 VALIDATION_ERROR` with "Minutes must be a whole number."
+Sprint 2 (Issue #151, ADR 0065): row 4 also covers, on a goal whose template is `TIME`, a `value` with a fraction: `400 VALIDATION_ERROR` with "Minutes must be a whole number." On the goals page a Time goal's record box takes minutes with the hours-and-minutes form beside it ("= 7 h 10 min"), and its entries and "Day total" show hours and minutes (ADR 0065 points 3 and 4).
 
 Unknown body fields are stripped and do not cause an error (decided, OP-07.7).
 
@@ -128,6 +128,7 @@ Errors: 400, 401, 403, 404, 409 as in section 4. The date is required in the API
 | AC-08.18 | The Lab 7 migration keeps every existing `Entry` row unchanged, removes the unique index and keeps "a goal with entries cannot be deleted" |
 | AC-08.19 | On a template that allows negative values, only the upper limit is checked on the day total: a negative entry inside the template range is accepted and lowers the total, and further entries are checked against the lowered total (OP-08.12) |
 | AC-08.20 | (Sprint 2) On a goal whose template is `TIME`, a value with a fraction gets `400 VALIDATION_ERROR` "Minutes must be a whole number." and nothing is stored; a whole number of minutes is accepted under the other rules |
+| AC-08.21 | (Sprint 2) On the goals page, a Time goal's record box shows the typed minutes as hours and minutes beside it, and its entries and day total show hours and minutes; the API values stay whole minutes |
 
 ## 10. Test specification
 
@@ -195,6 +196,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-27 | Review of PR #143: day-total message wording (section 4, TC-61, TC-82, OP-08.14); AC-08.19 and TC-90 for negative values; agreement recorded | projectnewy (author); re-checked by phittayanan in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777) |
 | 2026-11-27 | Issue #140: TC-61 names the template unit (hours) in its Given, as asked in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777); the expected result is unchanged | phittayanan (author); review in the Issue #140 PR |
 | 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-08.20; TC-127 | pending (reviewer projectnewy) |
+| 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): Time values on the goals page in hours and minutes, typed in minutes with a hint (AC-08.21, TC-131 in F-07; ADR 0065 points 3 and 4) | pending (reviewer projectnewy) |
 
 ## 14. Implementation evidence — Issue #42
 

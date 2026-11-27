@@ -53,7 +53,7 @@ Checks run in this order (SDS 2.2): session (401), role (403), validation (400),
 
 When a request breaks more than one row, the first one in this table is returned: all validation rows (schema, dates) come before the rule rows (`TARGET_ABOVE_TEMPLATE_MAX`, `TARGET_NOT_ABOVE_TEMPLATE_MIN`, `ACTIVE_GOAL_EXISTS`), whatever their order of listing in the request. Example: a target of 30.555 for a template with maximum 24 gets `400 VALIDATION_ERROR` (more than 2 decimal places), not `TARGET_ABOVE_TEMPLATE_MAX`. Example: target 25 for a template with maximum 24 and a missing `startDate` gets `400 VALIDATION_ERROR`, not `TARGET_ABOVE_TEMPLATE_MAX`.
 
-Sprint 2 (Issue #151, ADR 0065): on a `TIME` template a `dailyTarget` with a fraction gets `400 VALIDATION_ERROR` ("Target must be whole minutes."), a validation row, so it comes before the rule rows.
+Sprint 2 (Issue #151, ADR 0065): on a `TIME` template a `dailyTarget` with a fraction gets `400 VALIDATION_ERROR` ("Target must be whole minutes."), a validation row, so it comes before the rule rows. On the "+ New goal" form a Time template's target is typed in minutes with the hours-and-minutes form beside the box ("= 7 h"), and the goals page shows a Time target in hours and minutes (ADR 0065 points 3 and 4).
 
 Unknown body fields (for example `participantId` or `userId`) are stripped by the validation schema and do not cause an error (decided, OP-07.7).
 
@@ -124,6 +124,7 @@ Errors: 400, 401, 403, 409 as in section 4.
 | AC-07.10 | Goal creation locks the template row: while another transaction holds a `FOR UPDATE` lock on that template, `POST /api/goals` waits and completes only after the lock is released, and then reads the template's values as they are at that moment |
 | AC-07.11 | A target equal to the template's `min_value`, or below it, gets 400 `TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; a target 0.01 above the minimum is accepted. On a template whose minimum is 0 the rule changes nothing (Issue #74, ADR 0054) |
 | AC-07.12 | (Sprint 2) On a `TIME` template a target with a fraction gets `400 VALIDATION_ERROR` and nothing is stored; a whole-minute target inside the rules is accepted |
+| AC-07.13 | (Sprint 2) For a Time template the "+ New goal" form shows the typed minutes as hours and minutes beside the target box, and the goals page shows the target in hours and minutes |
 
 ## 10. Test specification
 
@@ -141,6 +142,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | TC-74 | AC-07.10 | API and database | A logged in; template T (min 0, max 24) | In the test, open a database transaction that runs `SELECT id FROM "Template" WHERE id = T FOR UPDATE` and keep it open. Start `POST /api/goals` for T (target 20, start `D`, end `D+30`) without waiting. After 500 ms check whether the request has finished. Update T's `max_value` to 10 inside the open transaction, then commit it | While the lock is held the request has not finished. After the commit it finishes with `400 TARGET_ABOVE_TEMPLATE_MAX` for a target of 20, because it read the template after the commit; no goal is stored |
 | TC-78 | AC-07.11 | API and unit | A logged in; template T (min 10, max 100); template S (min 0, max 24) | `POST /api/goals` for T with target 10, then 5, then 0.01, then 10.01; unit: the rule function with the same values; `POST /api/goals` for S with target 0, then 0.01 | T: 10, 5 and 0.01 each get `400 TARGET_NOT_ABOVE_TEMPLATE_MIN` and nothing is stored; 10.01 is accepted (201). S: 0 gets `400 VALIDATION_ERROR` (target must be above 0), 0.01 is accepted (201) |
 | TC-128 | AC-07.12 | API | A logged in; `TIME` template "Sleep" (0 to 720) | `POST /api/goals` with target 420.5, then 420 | 420.5 gets `400 VALIDATION_ERROR` with nothing stored; 420 gets 201 |
+| TC-131 | AC-07.13, AC-08.21 | Browser | A logged in; `TIME` template "Sleep" (0 to 720) | "+ New goal" on "Sleep", type target 420, read the hint, Save; on the goals page type 430 in the record box, read the hint, Save; read the entry and the day total | Hint "= 7 h"; target shown "7 h"; record hint "= 7 h 10 min"; the entry and "Day total: 7 h 10 min" in hours and minutes |
 
 ## 11. Definition of done
 
@@ -179,6 +181,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-10 | Issue #56: recorded projectnewy's acceptance of OP-07.3, OP-07.4, OP-07.6 and the ownership change (section 12, section 14); behaviour and requirements unchanged | projectnewy accepted on PR #41 (https://github.com/phittayanan/habit-tracker/pull/41#issuecomment-6724823769) |
 | 2026-11-14 | Issue #74: a target must also be above the template's `min_value` (section 4 error table and boundaries, AC-07.11, TC-78); SRS A-4 revised; decided in ADR 0054 | projectnewy decided on 2026-11-14; phittayanan agreed in his review of PR #95 (https://github.com/phittayanan/habit-tracker/pull/95) |
 | 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-07.12; TC-128 | pending (reviewer projectnewy) |
+| 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): Time target typed in minutes with an hours-and-minutes hint and shown in hours and minutes (AC-07.13, TC-131; ADR 0065 points 3 and 4) | pending (reviewer projectnewy) |
 
 ## 14. Implementation evidence — Issue #40
 

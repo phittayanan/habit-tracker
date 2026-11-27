@@ -29,7 +29,7 @@ Sprint 2 contract (Deliverable 2 Part B, [Issue #151](https://github.com/phittay
 |---|---|---|
 | Goals counted | Only the caller's goals whose start and end dates include the day | ADR 0069, ADR 0070 |
 | Met | A goal is met on a day when the sum of that day's entries is at least the target valid that day; equal counts as met. Sums are exact to 2 decimal places | SRS BR-07, BR-12; ADR 0061 |
-| Recorded | A goal is recorded on a day when it has at least one entry that day, whatever its value (an entry of 0 counts) | OP-12.2 |
+| Recorded | A goal is recorded on a day when it has at least one entry that day, whatever its value (an entry of 0 counts; only the typed row can save one, ADR 0074) | OP-12.2 |
 | `ALL_MET` (green, ✓) | Every counted goal is met | SRS BR-15; ADR 0045 |
 | `SOME_MET` (yellow, ½) | At least one counted goal is met and at least one is not, including a goal with nothing recorded | ADR 0046, ADR 0070 |
 | `NONE_MET` (red, ✗) | At least one counted goal is recorded and none is met | SRS BR-15; ADR 0070 |
