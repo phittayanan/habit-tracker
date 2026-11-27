@@ -69,6 +69,8 @@ export function CalendarPage({ onUnauthenticated }) {
   const [draft, setDraft] = useState(null);
   const [asking, setAsking] = useState(null);
   const [focusAfter, setFocusAfter] = useState(null);
+  // F-13: while an entry edit is saved, the box stays open and no other day or card opens (review of af245ef).
+  const [saving, setSaving] = useState(false);
   const dayButtons = useRef(new Map());
 
   async function read(month) {
@@ -99,6 +101,7 @@ export function CalendarPage({ onUnauthenticated }) {
   const goalOfDraft = draft && chosen?.goals.find(goal => goal.goalId === draft.goalId);
   // Run `then` now, or after the ADR 0067 question when an amount is unsaved.
   function whenSaved(then) {
+    if (saving) return;
     const text = unsavedText(draft, goalOfDraft);
     // Keep editing puts focus back where it was (keyboard use, NFR-06).
     if (text) setAsking({ text, then, back: document.activeElement });
@@ -136,7 +139,7 @@ export function CalendarPage({ onUnauthenticated }) {
   const showBox = chosen && (desktop || boxOpen);
 
   const box = showBox ? <DayBox item={chosen} today={shown.today} desktop={desktop} draft={draft} setDraft={setDraft}
-    whenSaved={whenSaved} onClose={closeBox} onSaved={reloadChosen} onUnauthenticated={onUnauthenticated} /> : null;
+    whenSaved={whenSaved} onClose={closeBox} onSaved={reloadChosen} onUnauthenticated={onUnauthenticated} saving={saving} setSaving={setSaving} /> : null;
   return <div className="calendar-layout">
     <section className="calendar" aria-labelledby="month-title">
       <div className="month-bar">
@@ -179,7 +182,7 @@ function Discard({ text, onKeep, onDiscard }) {
   </div>;
 }
 
-function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onSaved, onUnauthenticated }) {
+function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onSaved, onUnauthenticated, saving, setSaving }) {
   const id = useId();
   const close = useRef(null);
   useEffect(() => { if (!desktop) close.current?.focus(); }, [desktop]);
@@ -188,7 +191,7 @@ function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onS
     {item.date === today ? <p className="today-note">Today</p> : null}
     {item.goals.length === 0 ? <p>No goals on this day.</p> : <ul className="goal-cards">{item.goals.map(goal =>
       <GoalCard key={goal.goalId} goal={goal} date={item.date} today={today} draft={draft?.goalId === goal.goalId ? draft : null}
-        setDraft={setDraft} whenSaved={whenSaved} onSaved={onSaved} onUnauthenticated={onUnauthenticated} />)}</ul>}
+        setDraft={setDraft} whenSaved={whenSaved} onSaved={onSaved} onUnauthenticated={onUnauthenticated} setSaving={setSaving} />)}</ul>}
   </>;
   if (desktop) return <section className="day-panel" aria-labelledby={id}>{content}</section>;
   return <div className="backdrop" onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
@@ -202,13 +205,13 @@ function DayBox({ item, today, desktop, draft, setDraft, whenSaved, onClose, onS
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       }}>
-      <button type="button" className="close" ref={close} aria-label="Close" onClick={onClose}>✕</button>
+      <button type="button" className="close" ref={close} aria-label="Close" disabled={saving} onClick={onClose}>✕</button>
       {content}
     </div>
   </div>;
 }
 
-function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUnauthenticated }) {
+function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUnauthenticated, setSaving }) {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(null);
@@ -263,14 +266,14 @@ function GoalCard({ goal, date, today, draft, setDraft, whenSaved, onSaved, onUn
   async function saveEdit(value) {
     if (busy) return;
     const entryId = editing.entryId;
-    setBusy(true); say('');
+    setBusy(true); setSaving(true); say('');
     try {
       await editEntry(goal.goalId, entryId, value, onUnauthenticated);
       setDraft(null);
       await onSaved();
       focusEntry.current = `edit ${entryId}`;
     } catch (error) { say(error.message, entryId); }
-    finally { setBusy(false); }
+    finally { setBusy(false); setSaving(false); }
   }
   async function remove() {
     if (busy) return;
