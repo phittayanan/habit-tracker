@@ -229,8 +229,9 @@ test('TC-115: the typed row saves an exact amount; a rejected save shows the API
   await expect(water.getByLabel('Other amount', { exact: true })).toHaveValue('20');
   expect(await values(w, day(-1))).toEqual([2.5]);
   expect(await values(s, day(-1))).toEqual([430]);
-  // Minutes outside 0 to 59 are not sent; the typed values stay.
+  // Minutes outside 0 to 59 are not sent; the typed values stay. Water still holds an unsaved 20, so opening Sleep asks first.
   await sleep.getByRole('button', { name: '+ Check in Sleep', exact: true }).click();
+  await page.getByRole('alertdialog', { name: 'Discard 20 glasses?', exact: true }).getByRole('button', { name: 'Discard', exact: true }).click();
   await sleep.getByLabel('Hours', { exact: true }).fill('1');
   await sleep.getByLabel('Minutes', { exact: true }).fill('75');
   await sleep.getByRole('button', { name: 'Save', exact: true }).click();
