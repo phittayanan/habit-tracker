@@ -80,7 +80,8 @@ test('TC-36: calendar first after login, Monday first, panel for today; a day li
   await expect(panel.getByText('Today', { exact: true })).toBeVisible();
   await expect(goalNames(panel)).toHaveText(['Water', 'Sleep']);
   await expect(card(panel, 'Water').getByText('5 / 8 glasses', { exact: true })).toBeVisible();
-  await expect(card(panel, 'Water').getByText('2 · 3', { exact: true })).toBeVisible();
+  // F-13 (#154): the entries are a list with Edit and Delete; same values, same order.
+  await expect(card(panel, 'Water').locator('.entry-value')).toHaveText(['2', '3']);
   await expect(card(panel, 'Sleep').getByText('0 min / 7 h', { exact: true })).toBeVisible();
   await expect(card(panel, 'Water').getByText('✓ met', { exact: true })).toHaveCount(0);
   await expect(dayButton(page, day(0))).toHaveAttribute('aria-current', 'date');
@@ -160,7 +161,7 @@ test('TC-113: count − / + stops at +0 and at what fits; Done saves one entry',
   await done.click();
   await expect(water.getByText('12 / 8 glasses', { exact: true })).toBeVisible();
   await expect(water.getByText('✓ met', { exact: true })).toBeVisible();
-  await expect(water.getByText('2 · 10', { exact: true })).toBeVisible();
+  await expect(water.locator('.entry-value')).toHaveText(['2', '10']);
   expect(await values(w, day(0))).toEqual([10, 2]);
   // Nothing fits any more: no Check in, and the card says so.
   await expect(water.getByRole('button', { name: '+ Check in Water', exact: true })).toHaveCount(0);
