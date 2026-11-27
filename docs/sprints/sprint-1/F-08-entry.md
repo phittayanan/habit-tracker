@@ -76,6 +76,8 @@ Another Participant's goal gives 404 (SDS S-7). The acting user is always the se
 - Empty state for a goal with no entries: "No entries yet".
 - 375 px and 1280 px wide with no horizontal scroll; the boxes and Save work with the keyboard alone (NFR-05, NFR-06).
 
+Sprint 2 (F-13, ADR 0081): each entry also has "Edit" and "Delete". The entry text keeps its own element with the same wording, so the Sprint 1 checks stay; only a locator may become more exact. The F-08 statement that entries cannot be edited or deleted ends with F-13.
+
 ## 7. API
 
 Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Decimal values travel as JSON numbers (OP-07.8).
@@ -197,6 +199,7 @@ Dates in tests (decided on PR #29, OP-07.9): `D` is today in Asia/Bangkok. Tests
 | 2026-11-27 | Issue #140: TC-61 names the template unit (hours) in its Given, as asked in the [re-check of eda4c6b](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6083813777); the expected result is unchanged | phittayanan (author); review in the Issue #140 PR |
 | 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-08.20; TC-127 | pending (reviewer projectnewy) |
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): Time values on the goals page in hours and minutes, typed in minutes with a hint (AC-08.21, TC-131 in F-07; ADR 0065 points 3 and 4) | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #150: Edit and Delete on each entry (section 6) | pending (reviewer phittayanan) |
 
 ## 14. Implementation evidence — Issue #42
 

@@ -85,7 +85,7 @@ All dependencies are Sprint 1 features or earlier Sprint 2 features, so Sprint 2
 
 **Added work (Issue #151).** The day box needs a template kind, Count or Time, with Time in whole minutes (ADR 0064, ADR 0065). It revises F-03, F-04, F-07 and F-08 and is built in Issue #168, which F-11 (#155) waits for. The calendar is a new first page, `/calendar`; the Sprint 1 goals page stays at `/goals` (ADR 0073).
 
-**Data change.** The template kind column (ADR 0064, #168). Goal versions: each change of the daily target becomes a new row with an effective-from date, and the Sprint 1 `daily_target` column moves to the version rows (SDS 3.5, ADR 0011).
+**Data change.** The template kind column (ADR 0064, #168). Goal versions: each change of the daily target becomes a new row with an effective-from date, and the Sprint 1 `daily_target` column is kept and holds the latest target (SDS 3.5, ADR 0011, ADR 0075).
 
 **Tests planned.** TC-14, TC-15, TC-19 (F-05), TC-36 (F-11), TC-37 (F-12), TC-38 (F-13), TC-39 (F-14), TC-40 (F-15), TC-49 (non-colour signal on the calendar); the calendar contracts add TC-110 to TC-131 (Issue #151). NFR-05 and NFR-06 are checked on the new screens, and NFR-02 and NFR-03 are rechecked on each new endpoint (SRS 5.1). Feature contracts with AC and test IDs are written before each feature is built (`docs/assignment.md` 3.5).
 

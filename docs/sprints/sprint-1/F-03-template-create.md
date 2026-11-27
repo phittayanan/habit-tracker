@@ -72,6 +72,8 @@ Boundaries: a minimum just below the maximum (0 and 0.01) is accepted; negative 
 - A rejected request shows the API `message` next to the form and keeps the typed values. While the request runs Save is disabled. On 201 the table is shown with the new row.
 - The table and the form fit 375 px and 1280 px wide with no horizontal scroll, and work with the keyboard alone (NFR-05, NFR-06; TC-47, TC-48 run on these screens).
 
+Sprint 2 (F-05, ADR 0078, ADR 0079): each active row also has "Retire"; a retired row has no Edit or Retire button. This replaces "no Retire control" in AC-03.6 and TC-11; TC-11 changes only in that expectation.
+
 ## 7. API
 
 Errors use the body `{ "error": { "code": "...", "message": "..." } }` (ADR 0025). Field names are camelCase in the API (OP-07.3). Decimal values travel as JSON numbers (OP-07.8).
@@ -166,3 +168,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | 2026-11-26 | Issue #131, from the partner UAT finding #127: AC-03.3 lists a name or unit that contains a NUL character; TC-68 adds both cases | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; sections 3, 4, 6, 7, 8; AC-03.8, AC-03.9; TC-118, TC-119 | pending (reviewer projectnewy) |
 | 2026-11-27 | Review of PR #167 ([review of d4c72cb](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087108343)): a Time template's range shown in hours and minutes (section 6, AC-03.9, TC-119; ADR 0065 point 3) | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #150: "Retire" on active rows; AC-03.6 and TC-11 note (section 6) | pending (reviewer phittayanan) |

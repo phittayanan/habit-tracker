@@ -57,6 +57,8 @@ Unknown body fields are stripped and do not cause an error (decided on PR #29, O
 
 Boundaries: sending the template's own current name is accepted (not a duplicate); a template whose only goal is Ended is still used. The check "no goal uses it" and the update run in one transaction that first locks the template row (`SELECT ... FOR UPDATE`); goal creation takes the same lock (F-07 AC-07.10), so the two cannot interleave (OP-04.4).
 
+Sprint 2 (F-05, ADR 0079): an edit of a retired template gets `409 TEMPLATE_RETIRED`, after `TEMPLATE_NOT_FOUND` and before `TEMPLATE_IN_USE`, also when no goal uses it. A retired row has no Edit button. This answers OP-04.8.
+
 ## 5. Permissions
 
 | Caller | Edit a template |
@@ -154,3 +156,4 @@ Fixtures: each test starts from its own data with one Manager and Participant A 
 | 2026-11-10 | Implementation Issue #53, before the code: the edit locks the template row (sections 4 and 8, as OP-04.4 decided); TC-13 adds the edit-versus-goal race that F-07 OP-07.11 deferred to F-04; OP-04.9 lists the edit-page details as a proposal | pending (partner review of the Issue #53 PR) |
 | 2026-11-26 | Issue #131, from the partner UAT finding #127: AC-04.4 lists a name or unit that contains a NUL character; TC-71 adds both cases | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #151, ADR 0064 and ADR 0065: template kind (Count or Time) and whole minutes for Time; section 4 note; AC-04.8; TC-129 | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #150: retired templates cannot be edited (section 4; OP-04.8) | pending (reviewer phittayanan) |
