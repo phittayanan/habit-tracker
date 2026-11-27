@@ -123,7 +123,13 @@ test('TC-111: a future day cannot be opened; today and yesterday open the box', 
   await expect(todayBox).toHaveAttribute('aria-modal', 'true');
   await todayBox.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(dayButton(page, day(0))).toBeFocused();
+  // A tap outside with nothing unsaved closes at once (AC-11.5).
   await openDay(page, day(-1));
+  await page.mouse.click(5, 5);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(dayButton(page, day(-1))).toBeFocused();
 });
 
 test('TC-112: a day with no active goal says "No goals on this day."', async ({ page }) => {
@@ -159,6 +165,8 @@ test('TC-113: count − / + stops at +0 and at what fits; Done saves one entry',
   // Nothing fits any more: no Check in, and the card says so.
   await expect(water.getByRole('button', { name: '+ Check in Water', exact: true })).toHaveCount(0);
   await expect(water.getByText('Today is full (12 glasses).', { exact: true })).toBeVisible();
+  // The "+ Check in" button is gone, so focus goes to the card's "is full" text, not to the page.
+  await expect(water.getByText('Today is full (12 glasses).', { exact: true })).toBeFocused();
 });
 
 test('TC-114: time bar moves by 15 minutes with the arrow keys, never past what fits; Check in saves whole minutes', async ({ page }) => {
@@ -183,7 +191,6 @@ test('TC-114: time bar moves by 15 minutes with the arrow keys, never past what 
   await page.keyboard.press('ArrowLeft');
   await expect(bar).toHaveAttribute('aria-valuetext', '+30 min');
   await page.keyboard.press('ArrowRight');
-  // Pointer: a click on the bar also sets the amount, in 15-minute steps.
   await save.click();
   await expect(sleep.getByText('7 h 25 min / 7 h', { exact: true })).toBeVisible();
   expect(await values(s, day(0))).toEqual([400, 45]);
@@ -221,6 +228,17 @@ test('TC-115: the typed row saves an exact amount; a rejected save shows the API
   await expect(water.getByRole('alert')).toHaveText('The value must be between 1 and 12.');
   await expect(water.getByLabel('Other amount', { exact: true })).toHaveValue('20');
   expect(await values(w, day(-1))).toEqual([2.5]);
+  expect(await values(s, day(-1))).toEqual([430]);
+  // Minutes outside 0 to 59 are not sent; the typed values stay.
+  await sleep.getByRole('button', { name: '+ Check in Sleep', exact: true }).click();
+  await sleep.getByLabel('Hours', { exact: true }).fill('1');
+  await sleep.getByLabel('Minutes', { exact: true }).fill('75');
+  await sleep.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(sleep.getByRole('alert')).toHaveText('Minutes must be 0 to 59.');
+  await expect(sleep.getByLabel('Minutes', { exact: true })).toHaveValue('75');
+  await sleep.getByLabel('Minutes', { exact: true }).fill('7.5');
+  await sleep.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(sleep.getByRole('alert')).toHaveText('Minutes must be 0 to 59.');
   expect(await values(s, day(-1))).toEqual([430]);
 });
 
@@ -329,4 +347,73 @@ test('TC-47/TC-48: no horizontal scroll; open a day, check in by counter and typ
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(target).toBeFocused();
   }
+});
+
+const tabTo = async (page, locator, max = 30) => {
+  for (let i = 0; i < max && !(await locator.evaluate(el => el === document.activeElement)); i++) await page.keyboard.press('Tab');
+  await expect(locator).toBeFocused();
+};
+
+test('TC-47/TC-48: time bar, Check in and the Exact row, keyboard only', async ({ page }) => {
+  await login(page);
+  await tabTo(page, dayButton(page, day(0)), 80);
+  await page.keyboard.press('Enter');
+  const opened = box(page, day(0));
+  const sleep = card(opened, 'Sleep');
+  const open = sleep.getByRole('button', { name: '+ Check in Sleep', exact: true });
+  await tabTo(page, open);
+  await page.keyboard.press('Enter');
+  const bar = sleep.getByRole('slider');
+  await expect(bar).toBeFocused();
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+  await expect(bar).toHaveAttribute('aria-valuetext', '+30 min');
+  await tabTo(page, sleep.getByRole('button', { name: 'Check in', exact: true }), 5);
+  await page.keyboard.press('Enter');
+  await expect(sleep.getByText('30 min / 7 h', { exact: true })).toBeVisible();
+  await expect(open).toBeFocused();
+  await page.keyboard.press('Enter');
+  await tabTo(page, sleep.getByLabel('Hours', { exact: true }), 6);
+  await page.keyboard.type('6');
+  await page.keyboard.press('Tab');
+  await expect(sleep.getByLabel('Minutes', { exact: true })).toBeFocused();
+  await page.keyboard.type('15');
+  await page.keyboard.press('Enter');
+  await expect(sleep.getByText('6 h 45 min / 7 h', { exact: true })).toBeVisible();
+  expect(await values(s, day(0))).toEqual([30, 375]);
+  expect(await fits(page)).toBe(true);
+});
+
+test('TC-47/TC-48 with TC-116: Keep editing and Discard by keyboard; focus stays in the box', async ({ page }) => {
+  test.skip(!phone(), 'phone width');
+  await login(page);
+  await tabTo(page, dayButton(page, day(0)), 80);
+  await page.keyboard.press('Enter');
+  const opened = box(page, day(0));
+  const close = opened.getByRole('button', { name: 'Close', exact: true });
+  await expect(close).toBeFocused();
+  // Shift+Tab from the first control wraps to the last one inside the box.
+  await page.keyboard.press('Shift+Tab');
+  expect(await opened.evaluate(el => el.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Tab');
+  await expect(close).toBeFocused();
+  const water = card(opened, 'Water');
+  await tabTo(page, water.getByRole('button', { name: '+ Check in Water', exact: true }));
+  await page.keyboard.press('Enter');
+  const more = water.getByRole('button', { name: 'One more', exact: true });
+  await expect(more).toBeFocused();
+  await page.keyboard.press('Enter'); await page.keyboard.press('Enter');
+  await page.keyboard.press('Escape');
+  const ask = page.getByRole('alertdialog', { name: 'Discard +2 glasses?', exact: true });
+  await expect(ask.getByRole('button', { name: 'Keep editing', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(ask).toHaveCount(0);
+  await expect(more).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(ask).toBeVisible();
+  await page.keyboard.press('Tab');
+  await expect(ask.getByRole('button', { name: 'Discard', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(dayButton(page, day(0))).toBeFocused();
+  expect(await values(w, day(0))).toEqual([]);
 });
