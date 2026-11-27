@@ -17,6 +17,11 @@ enum TemplateState {
   RETIRED
 }
 
+enum TemplateKind {
+  COUNT
+  TIME
+}
+
 model User {
   id           Int        @id @default(autoincrement())
   username     String     @unique
@@ -44,6 +49,7 @@ model Template {
   minValue  Decimal       @map("min_value") @db.Decimal(10, 2)
   maxValue  Decimal       @map("max_value") @db.Decimal(10, 2)
   state     TemplateState @default(ACTIVE)
+  kind      TemplateKind  @default(COUNT)
   createdBy Int           @map("created_by")
   goals     Goal[]
   creator   User          @relation(fields: [createdBy], references: [id])

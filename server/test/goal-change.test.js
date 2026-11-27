@@ -59,7 +59,7 @@ test('TC-152: change to 5 then 6 keeps one version for today, old days keep 8, a
   const second = await patch(w.id, { dailyTarget: 6 });
   assert.equal(second.status, 200);
   assert.deepEqual(second.body.goal, { id: w.id, templateId: water.id, dailyTarget: 6, startDate: day(-10), endDate: day(10), state: 'ACTIVE',
-    template: { id: water.id, name: 'Water', unit: 'glasses', minValue: 1, maxValue: 12 } }, 'F-07 shape, no progress');
+    template: { id: water.id, name: 'Water', unit: 'glasses', kind: 'COUNT', minValue: 1, maxValue: 12 } }, 'F-07 shape (with kind from #168), no progress');
   assert.deepEqual((await versions(w.id)).map(({ from, target }) => ({ from, target })), [{ from: day(-10), target: 8 }, { from: day(0), target: 6 }]);
   assert.equal(Number((await db.goal.findUniqueOrThrow({ where: { id: w.id } })).dailyTarget), 6, 'daily_target holds the latest target');
   const shown = await listed(w.id);

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from './api.js';
+import { amountText, minutesHint } from './time-format.js';
 export function bangkokToday(instant = new Date()) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(instant);
 }
@@ -17,7 +18,7 @@ function byDay(entries) {
   return days;
 }
 // Whole hundredths add exactly; values have at most 2 decimal places.
-const dayTotal = entries => String(entries.reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100);
+const dayTotal = entries => entries.reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100;
 function EntryPanel({ goal, onUnauthenticated, onSaved }) {
   const [entries, setEntries] = useState(null);
   const [entryDate, setEntryDate] = useState(() => bangkokToday());
@@ -46,13 +47,14 @@ function EntryPanel({ goal, onUnauthenticated, onSaved }) {
   return <form className="entry-form" onSubmit={save} noValidate aria-label={`Entries for ${goal.template.name}`}>
     <label>Date<input name="entryDate" type="date" value={entryDate} onChange={event => setEntryDate(event.target.value)} /></label>
     <label>Value ({goal.template.unit})<input name="value" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} /></label>
+    {goal.template.kind === 'TIME' ? <p className="time-hint">{minutesHint(value)}</p> : null}
     <button type="submit" disabled={busy}>Save entry</button>
     {message && <p role="alert" className="error">{message}</p>}
     {entries === null && !message ? <p role="status">Loading…</p> : null}
     {entries?.length === 0 ? <p>No entries yet</p> : null}
     {entries?.length > 0 ? <ul className="entry-list">{byDay(entries).map(day => <li key={day.date}>
-      <ul>{day.entries.map(entry => <li key={entry.id}>{entry.entryDate}: {entry.value} {goal.template.unit}</li>)}</ul>
-      <p className="day-total">Day total: {dayTotal(day.entries)} {goal.template.unit}</p>
+      <ul>{day.entries.map(entry => <li key={entry.id}>{entry.entryDate}: {amountText(entry.value, goal.template)}</li>)}</ul>
+      <p className="day-total">Day total: {amountText(dayTotal(day.entries), goal.template)}</p>
     </li>)}</ul> : null}
   </form>;
 }
@@ -110,7 +112,7 @@ export function GoalList({ navigate, onUnauthenticated }) {
     {goals?.length === 0 ? <p>No goals yet</p> : null}
     {goals?.length > 0 ? <ul className="goal-list">{goals.map(goal => <li key={goal.id}>
       <h2 id={`goal-${goal.id}-name`}>{goal.template.name}</h2>
-      <p>Daily target: {goal.dailyTarget} {goal.template.unit}</p>
+      <p>Daily target: {amountText(goal.dailyTarget, goal.template)}</p>
       {goal.state === 'ACTIVE' ? <TargetChange goal={goal} onUnauthenticated={onUnauthenticated} onSaved={load} /> : null}
       <p>{goal.startDate} – {goal.endDate}</p>
       <p>{goal.state === 'ACTIVE' ? 'Active' : 'Ended'}</p>
@@ -158,6 +160,7 @@ export function GoalForm({ navigate, onUnauthenticated }) {
       </select>
       <label>Daily target<input name="dailyTarget" type="number" step="any" inputMode="decimal" value={dailyTarget} onChange={event => setDailyTarget(event.target.value)} aria-describedby="goal-unit" /></label>
       <p id="goal-unit" className="goal-unit">{selected?.unit || ''}</p>
+      {selected?.kind === 'TIME' ? <p className="time-hint">{minutesHint(dailyTarget)}</p> : null}
       <label>Start date<input name="startDate" type="date" value={startDate} onChange={event => setStartDate(event.target.value)} /></label>
       <label>End date<input name="endDate" type="date" value={endDate} onChange={event => setEndDate(event.target.value)} /></label>
       <div className="form-actions">

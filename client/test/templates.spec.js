@@ -46,7 +46,7 @@ test('TC-11: manager template page shows every state, New and Edit, and no Retir
   await page.reload();
   const table = page.getByRole('table');
   await expect(table).toBeVisible();
-  await expect(table.getByRole('columnheader')).toHaveText(['Name', 'Unit', 'Range', 'State', 'Edit']);
+  await expect(table.getByRole('columnheader')).toHaveText(['Name', 'Kind', 'Unit', 'Range', 'State', 'Edit']);
   const rows = table.getByRole('row');
   await expect(rows).toHaveCount(3);
   await expect(rows.nth(1)).toContainText('Sleep');
@@ -142,6 +142,9 @@ test('TC-47 / TC-48: template screens fit both widths and the keyboard completes
   await page.keyboard.press('Tab');
   await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
   await page.keyboard.type('Keyboard');
+  // Sprint 2 (Issue #168): the Kind choice sits between Name and Unit.
+  await page.keyboard.press('Tab');
+  await expect(page.getByLabel('Kind', { exact: true })).toBeFocused();
   for (const [label, value] of [['Unit', 'minutes'], ['Minimum', '1'], ['Maximum', '3']]) {
     await page.keyboard.press('Tab');
     await expect(page.getByLabel(label, { exact: true })).toBeFocused();
@@ -265,7 +268,7 @@ test('TC-47 / TC-48: the edit form fits both widths and the keyboard alone opens
   for (const control of await page.locator('button, nav a, main a, main input').all()) {
     expect(await control.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   }
-  for (const label of ['Unit', 'Minimum', 'Maximum']) {
+  for (const label of ['Kind', 'Unit', 'Minimum', 'Maximum']) {
     await page.keyboard.press('Tab');
     await expect(page.getByLabel(label, { exact: true })).toBeFocused();
   }
@@ -285,7 +288,7 @@ test('TC-47 / TC-48: the edit form fits both widths and the keyboard alone opens
   expect(editFocused).toBe(true);
   await page.keyboard.press('Enter');
   await expect(page.getByLabel('Name', { exact: true })).toBeFocused();
-  for (let i = 0; i < 5; i += 1) await page.keyboard.press('Tab');
+  for (let i = 0; i < 6; i += 1) await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Cancel', exact: true })).toBeFocused();
   expect(await page.getByRole('link', { name: 'Cancel', exact: true }).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
   await page.keyboard.press('Enter');

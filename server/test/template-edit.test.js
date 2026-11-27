@@ -19,7 +19,7 @@ const patch = (id, body, cookie = cookies.manager) => {
 const template = data => db.template.create({ data: { createdBy: manager.id, ...data } });
 const stored = async id => {
   const row = await db.template.findUniqueOrThrow({ where: { id } });
-  return { name: row.name, unit: row.unit, minValue: Number(row.minValue), maxValue: Number(row.maxValue), state: row.state };
+  return { name: row.name, unit: row.unit, minValue: Number(row.minValue), maxValue: Number(row.maxValue), state: row.state, kind: row.kind };
 };
 const goal = (templateId, startDate, endDate, dailyTarget = 5) => request(app).post('/api/goals').set('Cookie', cookies.a)
   .send({ templateId, dailyTarget, startDate, endDate });
@@ -44,13 +44,13 @@ test('TC-12: a manager edits an unused template with two partial edits and the l
   const reading = await template({ name: 'Reading', unit: 'pages', minValue: 0, maxValue: 500 });
   const first = await patch(reading.id, { unit: 'pages read', maxValue: 300, state: 'RETIRED', createdBy: a.id, id: 999 });
   assert.equal(first.status, 200);
-  assert.deepEqual(first.body, { template: { id: reading.id, name: 'Reading', unit: 'pages read', minValue: 0, maxValue: 300, state: 'ACTIVE' } });
+  assert.deepEqual(first.body, { template: { id: reading.id, name: 'Reading', unit: 'pages read', minValue: 0, maxValue: 300, state: 'ACTIVE', kind: 'COUNT' } });
   const second = await patch(reading.id, { name: 'Reading time', minValue: 1 });
   assert.equal(second.status, 200);
-  assert.deepEqual(second.body, { template: { id: reading.id, name: 'Reading time', unit: 'pages read', minValue: 1, maxValue: 300, state: 'ACTIVE' } });
+  assert.deepEqual(second.body, { template: { id: reading.id, name: 'Reading time', unit: 'pages read', minValue: 1, maxValue: 300, state: 'ACTIVE', kind: 'COUNT' } });
   const listed = await request(createApp({ db })).get('/api/templates').set('Cookie', cookies.manager);
   assert.equal(listed.status, 200);
-  assert.deepEqual(listed.body.templates, [{ id: reading.id, name: 'Reading time', unit: 'pages read', minValue: 1, maxValue: 300, state: 'ACTIVE' }]);
+  assert.deepEqual(listed.body.templates, [{ id: reading.id, name: 'Reading time', unit: 'pages read', minValue: 1, maxValue: 300, state: 'ACTIVE', kind: 'COUNT' }]);
   assert.equal((await db.template.findUniqueOrThrow({ where: { id: reading.id } })).createdBy, manager.id);
 });
 
@@ -189,10 +189,10 @@ test('TC-72: range before duplicate name, own name accepted, rejected edits chan
   const both = await patch(walk.id, { name: 'Swim', minValue: 100 });
   assert.equal(both.status, 400);
   assert.equal(both.body.error.code, 'MIN_NOT_BELOW_MAX');
-  assert.deepEqual(await stored(walk.id), { name: 'Walk', unit: 'km', minValue: 0, maxValue: 100, state: 'ACTIVE' });
+  assert.deepEqual(await stored(walk.id), { name: 'Walk', unit: 'km', minValue: 0, maxValue: 100, state: 'ACTIVE', kind: 'COUNT' });
   const own = await patch(walk.id, { name: 'Walk', unit: 'steps' });
   assert.equal(own.status, 200);
-  assert.deepEqual(own.body.template, { id: walk.id, name: 'Walk', unit: 'steps', minValue: 0, maxValue: 100, state: 'ACTIVE' });
+  assert.deepEqual(own.body.template, { id: walk.id, name: 'Walk', unit: 'steps', minValue: 0, maxValue: 100, state: 'ACTIVE', kind: 'COUNT' });
   const trimmed = await patch(walk.id, { name: '  Walking  ' });
   assert.equal(trimmed.body.template.name, 'Walking');
 });
