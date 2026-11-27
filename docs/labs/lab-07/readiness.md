@@ -78,7 +78,7 @@ Open items:
 | Item | Risk | Owner | Action |
 |---|---|---|---|
 | Rollback to `v1.4` is not safe after the migration | `v1.4` code would accept same-day entries without the day-total check | projectnewy | Fix forward with a new release; do not roll back the app alone |
-| UAT-02 step C9 expects the old message "An entry already exists for this day." | A re-run on `v1.5` fails on the message, although the entry is still refused | phittayanan | Change the expected message of C9 to "Only 4 glasses left for today." before the Final delivery UAT re-run |
+| UAT-02 step C9 expects the old message "An entry already exists for this day." | A re-run on `v1.5` fails on the message, although the entry is still refused | phittayanan | Done in Issue #165 (2026-11-27): C9 now expects "Only 4 glasses left for today.", with a revision note; run on the deployed `v1.5` (`build b8d5acb`) showed that message |
 
 ## 3. Technical debt
 
