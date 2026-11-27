@@ -13,14 +13,15 @@ import { PrismaClient } from '@prisma/client';
 if (!process.env.TEST_DATABASE_URL || process.env.TEST_DATABASE_URL === process.env.DATABASE_URL) throw new Error('Separate disposable test database required.');
 const run = promisify(execFile);
 const prismaDir = fileURLToPath(new URL('../prisma/', import.meta.url));
-const prismaBin = fileURLToPath(new URL('../node_modules/.bin/prisma', import.meta.url));
+// The CLI runs through Node, not the .bin shim, so execFile also works on Windows (review of PR #146).
+const prismaCli = fileURLToPath(new URL('../node_modules/prisma/build/index.js', import.meta.url));
 const LAST_V14_MIGRATION = '20261109000100_entry';
 
 test('TC-89: the Lab 7 migration keeps every entry row, removes the unique goal+day index and keeps delete-restrict', async () => {
   const schemaName = `tc89_${randomBytes(4).toString('hex')}`;
   const url = new URL(process.env.TEST_DATABASE_URL); url.searchParams.set('schema', schemaName);
   const dir = await mkdtemp(join(tmpdir(), 'tc89-'));
-  const migrate = () => run(prismaBin, ['migrate', 'deploy', '--schema', join(dir, 'schema.prisma')], { env: { ...process.env, DATABASE_URL: url.href } });
+  const migrate = () => run(process.execPath, [prismaCli, 'migrate', 'deploy', '--schema', join(dir, 'schema.prisma')], { env: { ...process.env, DATABASE_URL: url.href } });
   const db = new PrismaClient({ datasources: { db: { url: url.href } } });
   try {
     // 1. Only the migrations that v1.4 shipped.
