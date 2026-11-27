@@ -34,6 +34,18 @@ Added beyond the contract's steps, under the same test numbers: the refusal orde
 2. In the dialog, focus starts on "Cancel".
 3. While the request runs, "Cancel" and Escape are disabled too, so that nothing looks like a cancel of a request already sent.
 4. A rejected request shows the API message inside the open dialog.
-5. After a successful retire the row has no button left, and focus is not moved to another control.
+5. After a successful retire the row has no button left, and focus is not moved to another control. Changed after the review, see below.
+
+## After the review of 16a615e (PR #179)
+
+phittayanan approved with one finding: after a successful retire, focus fell to the page body. projectnewy chose to move it to the row's "Retired" cell (ADR 0095, which replaces choice 5; contract section 6 and TC-143 updated in 947de5e).
+
+| Step | Result |
+|---|---|
+| TC-143 with the new focus expectation, before the fix (e39b9b4), 375 px and 1280 px | 2 failed: the cell was not focused |
+| `npm test` in `client/` after the fix (a8aabec) | 68 passed |
+| `npm test` in `server/` (a8aabec) | 123 tests, 123 pass, 0 fail, 0 skipped |
+
+Screen reader behaviour was not tested.
 
 Not done: no deploy; the screens were not checked by a person; Claude Code looked at screenshots at 375 px and 1280 px.
