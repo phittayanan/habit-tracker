@@ -68,8 +68,20 @@ model Goal {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp(3)
 
   entries       Entry[]
+  targets       GoalTarget[]
 
   @@index([participantId, templateId, endDate])
+}
+
+// F-14 target versions (ADR 0075, ADR 0077, ADR 0092). Goal.dailyTarget always holds the latest target.
+model GoalTarget {
+  id            Int      @id @default(autoincrement())
+  goalId        Int      @map("goal_id")
+  goal          Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  effectiveFrom DateTime @map("effective_from") @db.Date
+  dailyTarget   Decimal  @map("daily_target") @db.Decimal(10, 2)
+
+  @@unique([goalId, effectiveFrom])
 }
 
 model Entry {

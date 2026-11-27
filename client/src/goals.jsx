@@ -58,6 +58,47 @@ function EntryPanel({ goal, onUnauthenticated, onSaved }) {
     </li>)}</ul> : null}
   </form>;
 }
+// F-14 (ADR 0084): change the daily target in place on the goals page, for a goal that has not ended.
+function TargetChange({ goal, onUnauthenticated, onSaved }) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const buttonRef = useRef(null);
+  const inputRef = useRef(null);
+  useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
+  function show() { setValue(String(goal.dailyTarget)); setMessage(''); setOpen(true); }
+  function close() { setOpen(false); setMessage(''); buttonRef.current?.focus(); }
+  async function save(event) {
+    event.preventDefault(); if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      await api(`/api/goals/${goal.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        dailyTarget: value.trim() === '' ? undefined : Number(value),
+      }) }, onUnauthenticated);
+      // Reload the list so the target and "N of M days met" are recomputed by the server.
+      await onSaved?.();
+      close();
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  const notStarted = goal.startDate > bangkokToday();
+  const inputId = `target-${goal.id}`;
+  return <div className="target-change">
+    <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${inputId}-form` : undefined} onClick={() => (open ? close() : show())}>Change target</button>
+    {open ? <form id={`${inputId}-form`} className="target-form" onSubmit={save} noValidate aria-label={`Change target for ${goal.template.name}`}>
+      <label htmlFor={inputId}>New daily target ({goal.template.unit})</label>
+      <input id={inputId} ref={inputRef} name="dailyTarget" type="number" step="any" inputMode="decimal" value={value} onChange={event => setValue(event.target.value)} aria-invalid={message ? true : undefined} aria-describedby={[goal.template.kind === 'TIME' && minutesHint(value) ? `${inputId}-hint` : '', `${inputId}-note`, message ? `${inputId}-error` : ''].filter(Boolean).join(' ')} />
+      {goal.template.kind === 'TIME' ? <p id={`${inputId}-hint`} className="time-hint">{minutesHint(value)}</p> : null}
+      <p id={`${inputId}-note`}>{notStarted ? `Applies from ${goal.startDate}.` : 'Applies from today. Earlier days keep their target.'}</p>
+      <div className="form-actions">
+        <button type="submit" disabled={busy}>Save</button>
+        <button type="button" onClick={close}>Cancel</button>
+      </div>
+      {message && <p id={`${inputId}-error`} role="alert" className="error">{message}</p>}
+    </form> : null}
+  </div>;
+}
 export function GoalList({ navigate, onUnauthenticated }) {
   const [goals, setGoals] = useState(null);
   const [message, setMessage] = useState('');
@@ -71,8 +112,9 @@ export function GoalList({ navigate, onUnauthenticated }) {
     {goals === null && !message ? <p role="status">Loading…</p> : null}
     {goals?.length === 0 ? <p>No goals yet</p> : null}
     {goals?.length > 0 ? <ul className="goal-list">{goals.map(goal => <li key={goal.id}>
-      <h2>{goal.template.name}</h2>
+      <h2 id={`goal-${goal.id}-name`}>{goal.template.name}</h2>
       <p>Daily target: {amountText(goal.dailyTarget, goal.template)}</p>
+      {goal.state === 'ACTIVE' ? <TargetChange goal={goal} onUnauthenticated={onUnauthenticated} onSaved={load} /> : null}
       <p>{goal.startDate} – {goal.endDate}</p>
       <p>{goal.state === 'ACTIVE' ? 'Active' : 'Ended'}</p>
       <p>{goal.progress.daysMet} of {goal.progress.daysSoFar} days met</p>

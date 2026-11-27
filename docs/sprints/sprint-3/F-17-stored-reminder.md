@@ -131,7 +131,7 @@ Errors use the ADR 0025 body.
 | OP-17.1 | One reminder, removable; which goals; where it is set | Decided by projectnewy (ADR 0086 to ADR 0088); phittayanan agreed in the review of 95c47f8 (PR #174) |
 | OP-17.2 | `HH:MM` 24-hour in Asia/Bangkok; weekday codes and Monday-first order | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
 | OP-17.3 | Check order, codes and messages; remove without a question; 204 when there is none; screen texts; table and column names; how "no outbound call" is tested | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 95c47f8 (PR #174) |
-| OP-17.4 | Whether the goals inside `GET /api/calendar` carry `reminder` (question 3 of the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219)) | Decided by projectnewy on 2026-11-27: no; only the goal objects of the goal endpoints do (section 7); phittayanan's review pending |
+| OP-17.4 | Whether the goals inside `GET /api/calendar` carry `reminder` (question 3 of the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219)) | Decided by projectnewy on 2026-11-27: no; only the goal objects of the goal endpoints do (section 7); phittayanan agreed in the [approval of 33f4fbc](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089420416) of PR #174 |
 
 ## 13. Revision history
 
