@@ -41,7 +41,7 @@ issue() { # record ID, Issue number: the body as filed
   comment 'RQ-142' 142 7215799301; comment 'RA-142' 142 7215873068
 } > records.md
 # Old and new contract text: the accepted Sprint 1 release against the merged revised contract (PR 143).
-git -C "$TOP" diff --no-color v1.4 c4ba749 -- docs/srs.md docs/system-sds.md docs/features.md docs/adr/0008-one-entry-per-day.md \
+git -C "$TOP" diff --no-color --unified=1 v1.4 c4ba749 -- docs/srs.md docs/system-sds.md docs/features.md docs/adr/0008-one-entry-per-day.md \
   docs/sprints/sprint-1/README.md docs/sprints/sprint-1/F-08-entry.md docs/sprints/sprint-1/F-09-progress.md > spec-diff.txt
 # The new and revised tests (RED commit) and the implementation (GREEN commit), without the test files.
 git -C "$TOP" show --no-color --format='commit %H%nDate: %ad%n%n    %s%n' --date=iso 761d87e > test-diff.txt

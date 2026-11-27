@@ -115,6 +115,9 @@ tr { break-inside: avoid; }
 code { font-family: "Courier New", Courier, monospace; font-size: 9.5pt; overflow-wrap: anywhere; }
 pre { background: #f4f4f4; border: 0.5pt solid #ccc; padding: 5pt; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 9.5pt; }
 pre code { font-size: 9pt; }
+/* The appendix is reference evidence: its records, diffs and logs use smaller print than Parts 0 to D. */
+.part-X pre { font-size: 7.5pt; padding: 3pt; line-height: 1.2; }
+.part-X pre code { font-size: 7.5pt; }
 a { color: #0b3d91; overflow-wrap: anywhere; }
 /* In a table, a word breaks only if it cannot fit: with "anywhere" a narrow column shrank to one character.
    Code and links with a long unbroken token keep "anywhere", or their table would be wider than the page. */
@@ -127,7 +130,7 @@ figcaption { font-size: 10pt; margin-top: 3pt; text-align: left; }
 `;
 const footer = '<div style="width:100%;font-family:Times New Roman,serif;font-size:10pt;text-align:center;color:#555"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
-const toHtml = md => '<div class="part">' + marked.parse(
+const toHtml = (md, id) => `<div class="part part-${id}">` + marked.parse(
   md.replace(/^!\[([^\]]+)\]\(([^)]+)\)$/gm, (_, cap, src) =>
     `<figure><img src="${src}" alt="${cap.replace(/"/g, '&quot;')}"><figcaption>${marked.parseInline(cap)}</figcaption></figure>`)) + '</div>';
 
@@ -162,15 +165,15 @@ try {
   const ranges = {};
   let next = 1;
   for (const s of sources) {
-    const count = await render(toHtml(withPages(s.text, {})), join(work, `${s.id}.pdf`));
+    const count = await render(toHtml(withPages(s.text, {}), s.id), join(work, `${s.id}.pdf`));
     ranges[s.id] = count === 1 ? `${next}` : `${next}–${next + count - 1}`;
     next += count;
   }
-  const finalText = sources.map(s => withPages(s.text, ranges));
-  const open = [...new Set(finalText.join('\n').match(/\{\{[A-Za-z0-9_:]+\}\}/g) ?? [])];
+  const finalText = sources.map(s => ({ id: s.id, text: withPages(s.text, ranges) }));
+  const open = [...new Set(finalText.map(f => f.text).join('\n').match(/\{\{[A-Za-z0-9_:]+\}\}/g) ?? [])];
   if (process.env.LAB7_FINAL && open.length) throw new Error(`Unfilled placeholders: ${open.join(', ')}`);
   const pdfPath = join(out, outName);
-  const total = await render(finalText.map(toHtml).join('\n'), pdfPath);
+  const total = await render(finalText.map(f => toHtml(f.text, f.id)).join('\n'), pdfPath);
   if (total !== next - 1) throw new Error(`Page ranges are wrong: the parts add up to ${next - 1} pages, the PDF has ${total}`);
   if (process.env.LAB7_PNG) { await page.setViewportSize({ width: 794, height: 1123 }); await page.screenshot({ path: join(out, 'preview.png'), fullPage: true }); }
   console.log(`${pdfPath}: ${total} pages; ${Object.entries(ranges).map(([k, v]) => `${k}=${v}`).join(' ')}`);
