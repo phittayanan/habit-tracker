@@ -52,3 +52,41 @@ test('TC-56: parse accepts only a real date and a number within Decimal(10, 2)',
   assert.equal(parseEntryCreate({ entryDate: '2026-11-05', value: -0.5 }).ok, true);
   assert.equal(parseEntryCreate({ entryDate: '2026-11-05', value: 99999999.99 }).ok, true);
 });
+
+// Lab 7 (Issue #140): the day-total rule. The last argument is the stored day total of that goal and day.
+const hours = { minValue: 0, maxValue: 24, unit: 'hours' };
+const dayCheck = (entryDate, value, stored, tpl = hours, now = at('2026-11-10T05:00:00Z')) => checkEntryRules({ entryDate, value }, goal, tpl, now, stored);
+const full = (message) => ({ status: 409, code: 'DAILY_TOTAL_ABOVE_MAX', message });
+
+test('TC-82 (unit): the day total may reach the maximum but not pass it; the message says what is left', () => {
+  assert.deepEqual(dayCheck('2026-11-10', 4.01, 20), full('Only 4 hours left for today.'));
+  assert.equal(dayCheck('2026-11-10', 4, 20), null);
+  assert.deepEqual(dayCheck('2026-11-10', 0.01, 24), full('Today is full (24 hours).'));
+  assert.equal(dayCheck('2026-11-10', 0, 24), null);
+  assert.deepEqual(dayCheck('2026-11-05', 5, 20), full('Only 4 hours left for 2026-11-05.'));
+  assert.deepEqual(dayCheck('2026-11-05', 1, 24), full('2026-11-05 is full (24 hours).'));
+  assert.equal(dayCheck('2026-11-10', 24, 0), null);
+});
+
+test('TC-83 (unit): the day total is exact to 2 decimal places (0.1 + 0.2 fits a maximum of 0.3)', () => {
+  const small = { minValue: 0, maxValue: 0.3, unit: 'litres' };
+  assert.equal(0.1 + 0.2 > 0.3, true, 'binary floating point would refuse this');
+  assert.equal(dayCheck('2026-11-10', 0.2, 0.1, small), null);
+  assert.deepEqual(dayCheck('2026-11-10', 0.01, 0.3, small), full('Today is full (0.3 litres).'));
+  assert.deepEqual(dayCheck('2026-11-10', 0.3, 0.1, small), full('Only 0.2 litres left for today.'));
+});
+
+test('TC-85 (unit): the day-total rule is checked after the date and range rules', () => {
+  assert.equal(dayCheck('2026-11-10', 25, 24).code, 'VALUE_OUT_OF_RANGE');
+  assert.equal(dayCheck('2026-11-11', 1, 24).code, 'ENTRY_DATE_IN_FUTURE');
+  assert.equal(dayCheck('2026-10-31', 1, 24).code, 'ENTRY_DATE_OUTSIDE_GOAL');
+  assert.equal(dayCheck('2026-11-10', 1, 24).code, 'DAILY_TOTAL_ABOVE_MAX');
+});
+
+test('TC-90 (unit): with negative values only the upper limit is checked on the day total', () => {
+  const signed = { minValue: -5, maxValue: 24, unit: 'hours' };
+  assert.equal(dayCheck('2026-11-10', -5, 24, signed), null);
+  assert.equal(dayCheck('2026-11-10', 5, 19, signed), null);
+  assert.equal(dayCheck('2026-11-10', -5, -100, signed), null);
+  assert.equal(dayCheck('2026-11-10', 0.01, 24, signed).code, 'DAILY_TOTAL_ABOVE_MAX');
+});

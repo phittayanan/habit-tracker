@@ -49,10 +49,27 @@ test('TC-23 / TC-61: Bangkok default date, saved value with unit, API message an
   await expect(page.getByText(`${today()}: 7.5 hours`, { exact: true })).toBeVisible();
   expect(await db.entry.count()).toBe(1);
   await page.unroute('**/api/goals/*/entries');
-  await page.getByLabel('Value (hours)', { exact: true }).fill('6');
+  // Revised, Lab 7 (before: a second entry showed "An entry already exists for this day.").
+  await page.getByLabel('Value (hours)', { exact: true }).fill('17');
   await save(page).click();
-  await expect(page.getByRole('alert')).toHaveText('An entry already exists for this day.');
-  await expect(page.getByLabel('Value (hours)', { exact: true })).toHaveValue('6');
+  await expect(page.getByRole('alert')).toHaveText('Only 16.5 hours left for today.');
+  await expect(page.getByLabel('Value (hours)', { exact: true })).toHaveValue('17');
+  expect(await db.entry.count()).toBe(1);
+});
+
+test('TC-86: several entries of one day are listed newest saved first with the day total, also after a reload', async ({ page }) => {
+  await login(page);
+  for (const value of ['3', '4.5']) {
+    await page.getByLabel('Value (hours)', { exact: true }).fill(value);
+    await save(page).click();
+    await expect(page.getByText(`${today()}: ${value} hours`, { exact: true })).toBeVisible();
+  }
+  for (const reload of [false, true]) {
+    if (reload) await page.reload();
+    await expect(page.locator('.entry-list li li')).toHaveText([`${today()}: 4.5 hours`, `${today()}: 3 hours`]);
+    await expect(page.getByText('Day total: 7.5 hours', { exact: true })).toBeVisible();
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
 test('TC-27 / AC-08.12: the date box default follows the Asia/Bangkok date at 23:59:59 and 00:00:00, with the browser in Los Angeles', async ({ page }) => {

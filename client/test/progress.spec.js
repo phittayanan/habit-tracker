@@ -123,3 +123,31 @@ test('TC-59: Manager creates a template, Participant sets a goal, records a day 
   } finally { await stopApp(app); }
 });
 });
+
+test.describe('TC-88 with a real app restart', () => {
+  test.use({ baseURL: restartUrl });
+  test('TC-88: a day becomes met when a second entry brings the total to the target, also after a restart', async ({ page }) => {
+    const template = await db.template.create({ data: { name: 'Stretching', unit: 'minutes', minValue: 0, maxValue: 120, createdBy: manager.id } });
+    await db.goal.create({ data: { participantId: a.id, templateId: template.id, dailyTarget: 30, startDate: asDate(day(0)), endDate: asDate(day(10)) } });
+    let app = startApp();
+    try {
+      await waitUntilAnswering();
+      await login(page, 'participant1');
+      await expect(page.getByText('0 of 1 days met', { exact: true })).toBeVisible();
+      await page.getByLabel('Value (minutes)', { exact: true }).fill('10');
+      await page.getByRole('button', { name: 'Save entry', exact: true }).click();
+      await expect(page.getByText('Day total: 10 minutes', { exact: true })).toBeVisible();
+      await expect(page.getByText('0 of 1 days met', { exact: true })).toBeVisible();
+      await page.getByLabel('Value (minutes)', { exact: true }).fill('20');
+      await page.getByRole('button', { name: 'Save entry', exact: true }).click();
+      await expect(page.getByText('1 of 1 days met', { exact: true })).toBeVisible();
+      await expect(page.getByText('Day total: 30 minutes', { exact: true })).toBeVisible();
+      await stopApp(app);
+      app = startApp();
+      await waitUntilAnswering();
+      await page.reload();
+      await expect(page.getByText('1 of 1 days met', { exact: true })).toBeVisible();
+      await expect(page.getByText('Day total: 30 minutes', { exact: true })).toBeVisible();
+    } finally { await stopApp(app); }
+  });
+});
