@@ -74,5 +74,5 @@ model Entry {
   value     Decimal  @db.Decimal(10, 2)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
 
-  @@unique([goalId, entryDate])
+  @@index([goalId, entryDate])
 }

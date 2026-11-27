@@ -32,3 +32,16 @@ test('TC-31: only entries inside the counted days are used; a decimal target is 
   const rows = [{ entryDate: '2026-11-02', value: 7.5 }, { entryDate: '2026-11-03', value: 7.49 }, { entryDate: '2026-12-01', value: 99 }, { entryDate: '2026-10-31', value: 99 }];
   assert.deepEqual(computeProgress(goal, rows, '2026-11-05'), { daysMet: 1, daysSoFar: 5 });
 });
+
+test('TC-87: several entries on one day are added exactly before the comparison, and the day counts once', () => {
+  const first = { startDate: '2026-11-01', endDate: '2026-11-30', dailyTarget: 30 };
+  const rows = [
+    { entryDate: '2026-11-01', value: 10 }, { entryDate: '2026-11-01', value: 20 },
+    { entryDate: '2026-11-02', value: 10 }, { entryDate: '2026-11-02', value: 19.99 },
+    { entryDate: '2026-11-03', value: 30 }, { entryDate: '2026-11-03', value: 5 },
+  ];
+  assert.deepEqual(computeProgress(first, rows, '2026-11-10'), { daysMet: 2, daysSoFar: 10 });
+  const second = { startDate: '2026-11-01', endDate: '2026-11-30', dailyTarget: 0.8 };
+  assert.equal(0.7 + 0.1 >= 0.8, false, 'a binary floating point sum would miss the target');
+  assert.deepEqual(computeProgress(second, [{ entryDate: '2026-11-01', value: 0.7 }, { entryDate: '2026-11-01', value: 0.1 }], '2026-11-10'), { daysMet: 1, daysSoFar: 10 });
+});

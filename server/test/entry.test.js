@@ -81,16 +81,92 @@ test('TC-28: value limits over the API, each accepted value on its own day', asy
   await post(g6, { entryDate: day(-14), value: 24 }).expect(201);
 });
 
-test('TC-29: a second entry for the same day is 409, also for two requests at once; the first value stays', async () => {
+test('TC-29: (revised, Lab 7) a second entry for the same day within the maximum is stored; the first stays unchanged', async () => {
   const goal = await goalFor(a, template, -9, 20);
-  await post(goal, { entryDate: day(0), value: 3 }).expect(201);
-  const again = await post(goal, { entryDate: day(0), value: 9 });
-  assert.equal(again.status, 409); assert.equal(again.body.error.code, 'ENTRY_ALREADY_EXISTS');
-  const row = await db.entry.findFirstOrThrow({ where: { goalId: goal.id } });
-  assert.equal(Number(row.value), 3);
-  const responses = await Promise.all([post(goal, { entryDate: day(-1), value: 4 }), post(goal, { entryDate: day(-1), value: 5 })]);
+  const first = await post(goal, { entryDate: day(0), value: 3 }).expect(201);
+  const second = await post(goal, { entryDate: day(0), value: 9 });
+  assert.equal(second.status, 201);
+  const listed = await request(app).get(`/api/goals/${goal.id}/entries`).set('Cookie', cookies.a).expect(200);
+  assert.deepEqual(listed.body.entries.map(e => e.value), [9, 3]);
+  assert.deepEqual(listed.body.entries[1], first.body.entry);
+});
+
+const dayTotal = async (goal, date) => Number((await db.entry.aggregate({ where: { goalId: goal.id, entryDate: asDate(date) }, _sum: { value: true } }))._sum.value ?? 0);
+
+test('TC-82: the day total may reach the maximum but not pass it, per goal and per day', async () => {
+  const g = await goalFor(a, template, -9, 20);
+  const h = await goalFor(a, other, -9, 20);
+  await db.entry.create({ data: { goalId: g.id, entryDate: asDate(day(0)), value: 20 } });
+  const over = await post(g, { entryDate: day(0), value: 4.01 });
+  assert.equal(over.status, 409);
+  assert.deepEqual(over.body, { error: { code: 'DAILY_TOTAL_ABOVE_MAX', message: 'Only 4 hours left for today.' } });
+  assert.equal(await db.entry.count({ where: { goalId: g.id } }), 1);
+  await post(g, { entryDate: day(0), value: 4 }).expect(201);
+  const fullDay = await post(g, { entryDate: day(0), value: 0.01 });
+  assert.equal(fullDay.status, 409);
+  assert.deepEqual(fullDay.body, { error: { code: 'DAILY_TOTAL_ABOVE_MAX', message: 'Today is full (24 hours).' } });
+  await post(g, { entryDate: day(0), value: 0 }).expect(201);
+  assert.equal(await dayTotal(g, day(0)), 24);
+  await post(g, { entryDate: day(-1), value: 24 }).expect(201);
+  await post(h, { entryDate: day(0), value: 50 }).expect(201);
+  const past = await post(g, { entryDate: day(-1), value: 1 });
+  assert.equal(past.body.error.message, `${day(-1)} is full (24 hours).`);
+});
+
+test('TC-83: the day total is exact to 2 decimal places', async () => {
+  const small = await db.template.create({ data: { name: 'Water', unit: 'litres', minValue: 0, maxValue: 0.3, createdBy: manager.id } });
+  const goal = await goalFor(a, small, -9, 20, 0.1);
+  await post(goal, { entryDate: day(0), value: 0.1 }).expect(201);
+  await post(goal, { entryDate: day(0), value: 0.2 }).expect(201);
+  const r = await post(goal, { entryDate: day(0), value: 0.01 });
+  assert.equal(r.status, 409); assert.equal(r.body.error.code, 'DAILY_TOTAL_ABOVE_MAX');
+  assert.equal(await dayTotal(goal, day(0)), 0.3);
+});
+
+test('TC-84 (a): two requests at once that fit one at a time but not together give one 201 and one 409', async () => {
+  const goal = await goalFor(a, template, -9, 20);
+  await db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 20 } });
+  const responses = await Promise.all([post(goal, { entryDate: day(0), value: 3 }), post(goal, { entryDate: day(0), value: 3 })]);
   assert.deepEqual(responses.map(r => r.status).sort(), [201, 409]);
-  assert.equal(await db.entry.count({ where: { goalId: goal.id } }), 2);
+  assert.equal(responses.find(r => r.status === 409).body.error.code, 'DAILY_TOTAL_ABOVE_MAX');
+  assert.equal(await dayTotal(goal, day(0)), 23);
+});
+
+test('TC-84 (b): a request waits for a held goal-row lock and then counts the entry committed meanwhile', async () => {
+  const goal = await goalFor(a, template, -9, 20);
+  await db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 20 } });
+  let pending;
+  await db.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Goal" WHERE id = ${goal.id} FOR UPDATE`;
+    let finished = false;
+    pending = post(goal, { entryDate: day(0), value: 3 }).then(r => { finished = true; return r; });
+    await new Promise(resolve => setTimeout(resolve, 500));
+    assert.equal(finished, false, 'the request must wait for the goal-row lock');
+    await tx.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 2 } });
+  }, { timeout: 10000 });
+  const r = await pending;
+  assert.equal(r.status, 409); assert.equal(r.body.error.code, 'DAILY_TOTAL_ABOVE_MAX');
+  assert.equal(await dayTotal(goal, day(0)), 22);
+});
+
+test('TC-85: validation, date and range errors come before the day-total error', async () => {
+  const goal = await goalFor(a, template, -9, 20);
+  await db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 24 } });
+  for (const [body, code] of [[{ entryDate: day(0), value: 25 }, 'VALUE_OUT_OF_RANGE'], [{ entryDate: day(1), value: 1 }, 'ENTRY_DATE_IN_FUTURE'],
+    [{ entryDate: day(0), value: 1.555 }, 'VALIDATION_ERROR'], [{ entryDate: day(0), value: 1 }, 'DAILY_TOTAL_ABOVE_MAX']]) {
+    const r = await post(goal, body);
+    assert.equal(r.body.error?.code, code, JSON.stringify(body));
+  }
+  assert.equal(await db.entry.count(), 1);
+});
+
+test('TC-90: with negative values only the upper limit is checked on the day total', async () => {
+  const signed = await db.template.create({ data: { name: 'Balance', unit: 'hours', minValue: -5, maxValue: 24, createdBy: manager.id } });
+  const goal = await goalFor(a, signed, -9, 20);
+  const statuses = [];
+  for (const value of [24, -5, 5, 0.01]) statuses.push((await post(goal, { entryDate: day(0), value })).status);
+  assert.deepEqual(statuses, [201, 201, 201, 409]);
+  assert.equal(await dayTotal(goal, day(0)), 24);
 });
 
 test('TC-56 / TC-08: validation, roles, ownership and both endpoints', async () => {
@@ -129,6 +205,11 @@ test('Entry list is newest date first and only for the owner', async () => {
   for (const n of [-3, 0, -5]) await post(goal, { entryDate: day(n), value: 1 + Math.abs(n) }).expect(201);
   const r = await request(app).get(`/api/goals/${goal.id}/entries`).set('Cookie', cookies.a).expect(200);
   assert.deepEqual(r.body.entries.map(e => e.entryDate), [day(0), day(-3), day(-5)]);
+  // TC-29 / OP-08.10 (Lab 7): within one date, newest saved first, also when saved in the same millisecond.
+  const at = new Date();
+  for (const value of [1, 2, 3]) await db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(-4)), value, createdAt: at } });
+  const again = await request(app).get(`/api/goals/${goal.id}/entries`).set('Cookie', cookies.a).expect(200);
+  assert.deepEqual(again.body.entries.filter(e => e.entryDate === day(-4)).map(e => e.value), [3, 2, 1]);
   assert.equal((await request(app).get(`/api/goals/${goal.id}/entries`).set('Cookie', cookies.b)).status, 404);
 });
 
@@ -143,11 +224,12 @@ test('TC-58: the entry survives an app restart (new process, new connection)', a
   } finally { child.kill('SIGTERM'); await once(child, 'exit'); }
 });
 
-test('Entry migration: unique goal+day and restrict-on-delete are enforced by the database', async () => {
+test('TC-89 (schema): the goal+day index is not unique, and a goal with entries cannot be deleted', async () => {
   const goal = await goalFor(a, template, -9, 20);
   const columns = await db.$queryRaw`SELECT column_name::text AS name FROM information_schema.columns WHERE table_name = 'Entry' ORDER BY column_name`;
   assert.deepEqual(columns.map(r => r.name), ['created_at', 'entry_date', 'goal_id', 'id', 'value']);
   await db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 1 } });
-  await assert.rejects(db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 2 } }));
+  await db.entry.create({ data: { goalId: goal.id, entryDate: asDate(day(0)), value: 2 } });
+  assert.equal(await db.entry.count({ where: { goalId: goal.id } }), 2);
   await assert.rejects(db.goal.delete({ where: { id: goal.id } }), 'a goal with entries cannot be deleted');
 });
