@@ -90,7 +90,8 @@ test('TC-47 / TC-48: goals screens fit and keyboard alone opens, submits and can
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   // Start keyboard traversal from the document, independent of login focus restoration.
   await page.goto('/goals'); await expect(newGoal(page)).toBeVisible();
-  for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
+  // ADR 0073 point 4: the menu has Calendar before Goals, so one more Tab.
+  for (let i = 0; i < 5; i++) await page.keyboard.press('Tab');
   await expect(newGoal(page)).toBeFocused();
   expect(await newGoal(page).evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
   await page.keyboard.press('Enter');

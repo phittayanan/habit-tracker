@@ -47,8 +47,11 @@ async function login(page, username = 'participant1') {
 }
 const title = page => page.locator('.month-title');
 async function goToMonth(page, date) {
-  for (let i = 0; i < 3 && (await title(page).textContent()) !== monthTitle(date); i++) {
+  for (let i = 0; i < 3; i++) {
+    const shown = await title(page).textContent();
+    if (shown === monthTitle(date)) break;
     await page.getByRole('button', { name: 'Previous month', exact: true }).click();
+    await expect(title(page)).not.toHaveText(shown);
   }
   await expect(title(page)).toHaveText(monthTitle(date));
 }
@@ -312,8 +315,11 @@ test('TC-47/TC-48: no horizontal scroll; open a day, check in by counter and typ
   await expect(water.getByText('2 / 8 glasses', { exact: true })).toBeVisible();
   await expect(open).toBeFocused();
   await page.keyboard.press('Enter');
+  await expect(more).toBeFocused();
   for (let i = 0; i < 6 && !(await water.getByLabel('Other amount', { exact: true }).evaluate(el => el === document.activeElement)); i++) await page.keyboard.press('Tab');
+  await expect(water.getByLabel('Other amount', { exact: true })).toBeFocused();
   await page.keyboard.type('1.5');
+  await expect(water.getByLabel('Other amount', { exact: true })).toHaveValue('1.5');
   await page.keyboard.press('Enter');
   await expect(water.getByText('3.5 / 8 glasses', { exact: true })).toBeVisible();
   expect(await values(w, day(0))).toEqual([2, 1.5]);
