@@ -119,6 +119,7 @@ Errors use the ADR 0025 body.
 | TC-156 | AC-14.7 | API and database | A database at the `v1.5` migrations with goals and entries | Apply the migration; compare the rows and the progress | `Goal` rows identical; one version per goal from its start date; same progress |
 | TC-157 | AC-14.8 | API and database | One goal created through the API; one inserted without a version row | Read both; change the second to 6 | The first has one row; the second uses `daily_target`, then has the old target from its start date and 6 from today |
 | TC-158 | AC-14.9 | Browser | A on the goals page; also an ended goal | Change W to 13 (rejected), then 6 | Message and 13 kept; then "Daily target: 6 glasses" and updated days met; no button on the ended goal |
+| TC-158 (TIME) | AC-14.9 | Browser | A `TIME` goal, target 480 | Open the box; type 420, then 420.5 and Save, then 430 and Save | "= 8 h" on open and "= 7 h" for 420, both read with the box; 420.5: "Target must be whole minutes." and 420.5 kept; then "Daily target: 7 h 10 min" (section 6, ADR 0065, ADR 0093) |
 | TC-159 | AC-14.9 | Browser | 375 px and 1280 px | Change the target by keyboard only | No horizontal scroll; every control reachable |
 
 TC-123 (F-12) runs once this feature is merged.
@@ -148,3 +149,4 @@ TC-123 (F-12) runs once this feature is merged.
 | 2026-11-27 | [Review of 507ba1c](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6087598169) of PR #171: phittayanan agreed to the decisions and drafted points (section 12) | pending (reviewer phittayanan) |
 | 2026-11-27 | Issue #153: ADR 0092 (versions deleted with their goal) and ADR 0093 (`TIME` check after #168) | phittayanan; projectnewy reviews the #153 PR |
 | 2026-11-27 | [Review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176: projectnewy agreed to ADR 0092, ADR 0093 (first numbered 0086 and 0087) and OP-14.5, and chose no range hint | phittayanan and projectnewy |
+| 2026-11-27 | Issue #153: TC-158 (TIME) row for the section 6 hint, added with the `TIME` part (ADR 0093) after the independent check | pending (reviewer projectnewy) |
