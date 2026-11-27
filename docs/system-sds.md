@@ -106,6 +106,7 @@ erDiagram
 | min_value | decimal | not null | Per entry |
 | max_value | decimal | not null, `min_value < max_value` | Database check (BR-03). Limits each entry, and also the total of one goal's day (BR-04, ADR 0061) |
 | state | `ACTIVE` or `RETIRED` | not null, default `ACTIVE` | Retire is built in Sprint 2 (FR-08); the column exists from the start |
+| kind | `COUNT` or `TIME` | not null, default `COUNT` | Sprint 2 (ADR 0064). A `TIME` template has unit `minutes` and whole-number values (ADR 0065) |
 | created_by | reference to User | not null | The Manager who created it |
 | created_at | timestamp | not null | |
 
@@ -163,6 +164,7 @@ Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed 
 | 2 | Goal versions: each change of the daily target is a new row with an effective-from date, so earlier days keep the old target. The Sprint 1 `daily_target` column then moves to the version rows | ADR 0011, BR-12 |
 | 2 | Entry edit and delete | Rule: ADR 0009, BR-11. Sprint: SRS FR-17 (ADR 0009 gives no sprint) |
 | 2 | Template retire (the `state` column is already there) | Rule: ADR 0017. Sprint: SRS FR-08 and features O-4 |
+| 2 | Template kind, `COUNT` or `TIME` (an additive column; existing rows become `COUNT`) | ADR 0064, ADR 0065; Issue #151 |
 | 3 | Reminder time and weekdays per goal (stored, nothing is sent) | Rule: ADR 0016, BR-14. Sprint: ADR 0021 |
 | 3 | Streaks: computed from entries and goal versions, never stored | Rule: ADR 0015. Sprint: ADR 0021 |
 
@@ -188,9 +190,9 @@ One layout for everyone: a top bar with the user's name, the role's menu items a
 | Goals page: the Participant's goals with computed progress. A plain page in Sprint 1 | Participant | 1 | FR-10, FR-12; SRS A-3 |
 | New goal form: template dropdown, daily target, start and end dates | Participant | 1 | FR-10, ADR 0049 |
 | Record a day: a number box with the unit shown, per goal | Participant | 1 | FR-11, ADR 0039 |
-| Month calendar with a side panel for the chosen day (today at start): every goal with a number box. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). SRS FR-15 and features F-11 still list the streak and get a one-line fix in a separate PR | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021 |
-| Calendar colours: green all met, yellow some met, red none met, grey nothing recorded | Participant | 2 | FR-16, ADR 0040, ADR 0045, ADR 0046 |
-| Calendar and List switch (list is newest first, for the same month) | Participant | 2 | FR-19, ADR 0041, ADR 0048 |
+| Month calendar (Monday first, month arrows) with the chosen day (today at start) in a side panel on desktop and a centre box on phone: every goal active that day with a Check in input by template kind (− / + or a 15-minute bar) and a typed row. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). Contract: `docs/sprints/sprint-2/F-11-month-calendar.md` | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021, ADR 0063 to ADR 0069 |
+| Calendar colours: green all met, yellow some met, red none met, grey nothing recorded, each with a sign; today live | Participant | 2 | FR-16, ADR 0040, ADR 0045, ADR 0046, ADR 0070 |
+| Calendar and List switch (list is grouped by day, newest first, for the same month) | Participant | 2 | FR-19, ADR 0041, ADR 0048, ADR 0071 |
 | Goal detail page with the best streak | Participant | 3 | FR-20, ADR 0042 |
 | Reminder settings on a goal | Participant | 3 | FR-21 |
 
@@ -235,8 +237,7 @@ Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature 
 | `GET /api/goals/:id/entries` | List the entries of the caller's goal | 1 | FR-12, FR-13 |
 | `PATCH` and `DELETE /api/goals/:id/entries/:entryId` | Edit or delete an entry | 2 | FR-17 |
 | `PATCH /api/goals/:id` | Change the daily target from today on | 2 | FR-18 |
-| `GET /api/calendar?month=YYYY-MM` | The caller's day colours for a month, over all goals | 2 | FR-15, FR-16 |
-| `GET /api/entries?month=YYYY-MM` | The caller's entries for a month, newest first (the List view) | 2 | FR-19 |
+| `GET /api/calendar?month=YYYY-MM` | The caller's month: per day the state (colour) and, per goal active that day, the target, total, met and entries. Serves the calendar, the day box and the List; `GET /api/entries?month` was dropped (ADR 0072) | 2 | FR-15, FR-16, FR-19 |
 | `GET /api/goals/:id` | One goal with its current and best streak (detail page) | 3 | FR-20 |
 | `PUT /api/goals/:id/reminder` | Store a reminder time and weekdays on a goal | 3 | FR-21 |
 
@@ -351,6 +352,7 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 | Database sessions, 8 hours, bcrypt | 0027, 0028, 0029 |
 | Fixed Asia/Bangkok day | 0006 |
 | Free-text unit with a per-entry range | 0007 |
+| Template kind Count or Time; Time in whole minutes | 0064, 0065 |
 | Several entries per day, day total capped at the template maximum | 0061 (replaces 0008) |
 | Daily-target goal with start and end dates; one active goal per template | 0010 |
 | Goal state from dates, not stored | 0012 |
@@ -396,3 +398,4 @@ The SRS and `docs/features.md` need a one-line change for each of these two; bot
 |---|---|---|
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: `max_value` also caps the day total and the `Entry` index is not unique (3.2); BR-04 and BR-07 enforcement (3.4); status codes and error example (4.3); decision list | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
+| 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072 | pending (reviewer projectnewy) |
