@@ -128,8 +128,8 @@ TC-122 (F-12) runs once this feature is merged.
 |---|---|---|
 | OP-13.1 | Value only; both places (F-11 OP-11.10); delete confirmation; day-total cap | Decided by projectnewy (ADR 0080 to ADR 0083); phittayanan agreed in the review of 507ba1c (PR #171) |
 | OP-13.2 | An edit keeps the entry's saved time and order | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
-| OP-13.4 | Wording of the ADR 0067 question for an unsaved edit in the day box | Proposed by Claude Code in #154: ask only when the typed value differs from the stored one, "Discard the edit to 4 glasses?" (ADR 0101); chosen by phittayanan on 2026-11-27 |
 | OP-13.3 | Codes (`ENTRY_NOT_FOUND`, 204), messages, check order, in-place editing, labels, and ADR 0067 applying to an unsaved edit | Drafted by Claude Code; accepted by projectnewy on 2026-11-27; phittayanan agreed in the review of 507ba1c (PR #171) |
+| OP-13.4 | Wording of the ADR 0067 question for an unsaved edit in the day box | Proposed by Claude Code in #154: ask only when the typed value differs from the stored one, "Discard the edit to 4 glasses?" (ADR 0101); chosen by phittayanan on 2026-11-27 |
 
 ## 13. Revision history
 

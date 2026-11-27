@@ -182,6 +182,20 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
     await expect(page.getByRole('region', { name: heading(day(-2)), exact: true })).toBeVisible();
   }
   await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  // A cleared edit box is nothing unsaved either: it closes at once (ADR 0101).
+  opened = await openDay(page, day(-1));
+  water = card(opened, 'Water');
+  await water.getByRole('button', { name: `Edit 4 glasses on ${day(-1)}`, exact: true }).click();
+  await water.getByLabel('New value (glasses)', { exact: true }).fill('');
+  if (phone()) {
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+  } else {
+    await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+    await expect(page.getByRole('region', { name: heading(day(-2)), exact: true })).toBeVisible();
+  }
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  expect(await values(w, day(-1))).toEqual([4]);
   expect(await fits(page)).toBe(true);
 });
 
