@@ -161,7 +161,7 @@ Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed 
 ### 3.5 Planned additions (later sprints)
 | Sprint | Addition | Source |
 |---|---|---|
-| 2 | Goal versions: each change of the daily target is a new row with an effective-from date, so earlier days keep the old target. They are rows of a new table `GoalTarget`; the `daily_target` column is kept and holds the latest target, and the migration is additive (ADR 0075; F-14 section 8) | ADR 0011, ADR 0075, BR-12 |
+| 2 | Goal versions: each change of the daily target is a new row with an effective-from date, so earlier days keep the old target. They are rows of a new table `GoalTarget`; the `daily_target` column is kept and holds the latest target, and the migration is additive (ADR 0075; F-14 section 8). Versions are deleted with their goal (ADR 0092) | ADR 0011, ADR 0075, ADR 0092, BR-12 |
 | 2 | Entry edit and delete | Rule: ADR 0009, BR-11. Sprint: SRS FR-17 (ADR 0009 gives no sprint) |
 | 2 | Template retire (the `state` column is already there) | Rule: ADR 0017. Sprint: SRS FR-08 and features O-4 |
 | 2 | Template kind, `COUNT` or `TIME` (an additive column; existing rows become `COUNT`) | ADR 0064, ADR 0065; Issue #151 |
@@ -359,6 +359,7 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 | Progress as days met | 0013 |
 | Template edit only while unused; retire | 0017 |
 | Target versions with `daily_target` kept; which goals change | 0075 to 0077, 0084 |
+| Versions deleted with their goal; the `TIME` check of a change after #168 | 0092, 0093 |
 | Permanent retire and its screens | 0078, 0079 |
 | Entry edit and delete | 0080 to 0083 |
 | No sharing; a Manager sees templates only | 0019 |
@@ -403,3 +404,4 @@ The SRS and `docs/features.md` need a one-line change for each of these two; bot
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: `max_value` also caps the day total and the `Entry` index is not unique (3.2); BR-04 and BR-07 enforcement (3.4); status codes and error example (4.3); decision list | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072; after the PR #167 review, `/calendar` and the kept goals page (4.1, ADR 0073) | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #150: goal versions in `GoalTarget` with `daily_target` kept (3.5); decision list (8.1). ADR 0075 to ADR 0084 | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #153: versions deleted with their goal (3.5); decision list (8.1). ADR 0092, ADR 0093 | phittayanan; projectnewy agreed in the [review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176 |

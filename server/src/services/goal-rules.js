@@ -25,6 +25,18 @@ const schema = z.object({
   startDate: date,
   endDate: date,
 });
+// F-14: PATCH /api/goals/:id. The id is checked first (404), the body after the goal is found (section 4).
+export function parseGoalId(text) {
+  return /^[1-9]\d{0,9}$/.test(text) && Number(text) <= 2147483647 ? Number(text) : null;
+}
+const changeSchema = z.object({ dailyTarget: schema.shape.dailyTarget });
+export function parseTargetChange(body) {
+  const parsed = changeSchema.safeParse(body ?? {});
+  if (!parsed.success) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Daily target must be above 0, at most 99,999,999.99, with at most 2 decimal places.' };
+  return { ok: true, data: { dailyTarget: parsed.data.dailyTarget } };
+}
+// ADR 0076: the later of today and the start date.
+export const effectiveFrom = (startDate, today) => today > startDate ? today : startDate;
 export function parseGoalCreate(body) {
   const parsed = schema.safeParse(body ?? {});
   if (!parsed.success) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Choose a template, a valid daily target and valid start and end dates.' };
