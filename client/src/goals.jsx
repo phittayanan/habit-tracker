@@ -7,6 +7,17 @@ function follow(event, navigate, path) {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault(); navigate(path);
 }
+// Entries come newest date first; consecutive entries of one date form that day (OP-08.10, OP-08.11).
+function byDay(entries) {
+  const days = [];
+  for (const entry of entries) {
+    if (days.at(-1)?.date === entry.entryDate) days.at(-1).entries.push(entry);
+    else days.push({ date: entry.entryDate, entries: [entry] });
+  }
+  return days;
+}
+// Whole hundredths add exactly; values have at most 2 decimal places.
+const dayTotal = entries => String(entries.reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100);
 function EntryPanel({ goal, onUnauthenticated, onSaved }) {
   const [entries, setEntries] = useState(null);
   const [entryDate, setEntryDate] = useState(() => bangkokToday());
@@ -25,7 +36,8 @@ function EntryPanel({ goal, onUnauthenticated, onSaved }) {
       const body = await api(`/api/goals/${goal.id}/entries`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
         entryDate, value: value.trim() === '' ? undefined : Number(value),
       }) }, onUnauthenticated);
-      setEntries(list => [body.entry, ...(list || [])].sort((x, y) => (x.entryDate < y.entryDate ? 1 : -1)));
+      // Newest date first; the sort is stable, so the new entry stays first within its date (OP-08.10).
+      setEntries(list => [body.entry, ...(list || [])].sort((x, y) => (x.entryDate === y.entryDate ? 0 : x.entryDate < y.entryDate ? 1 : -1)));
       setValue('');
       onSaved?.();
     } catch (error) { setMessage(error.message); }
@@ -38,7 +50,10 @@ function EntryPanel({ goal, onUnauthenticated, onSaved }) {
     {message && <p role="alert" className="error">{message}</p>}
     {entries === null && !message ? <p role="status">Loading…</p> : null}
     {entries?.length === 0 ? <p>No entries yet</p> : null}
-    {entries?.length > 0 ? <ul className="entry-list">{entries.map(entry => <li key={entry.id}>{entry.entryDate}: {entry.value} {goal.template.unit}</li>)}</ul> : null}
+    {entries?.length > 0 ? <ul className="entry-list">{byDay(entries).map(day => <li key={day.date}>
+      <ul>{day.entries.map(entry => <li key={entry.id}>{entry.entryDate}: {entry.value} {goal.template.unit}</li>)}</ul>
+      <p className="day-total">Day total: {dayTotal(day.entries)} {goal.template.unit}</p>
+    </li>)}</ul> : null}
   </form>;
 }
 export function GoalList({ navigate, onUnauthenticated }) {
