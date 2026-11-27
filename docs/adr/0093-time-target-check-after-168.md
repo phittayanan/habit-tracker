@@ -1,6 +1,6 @@
-# 0087. The whole-minutes check of a target change waits for the template kind
+# 0093. The whole-minutes check of a target change waits for the template kind
 
-Status: chosen by phittayanan on 2026-11-27 in the Claude Code session for [Issue #153](https://github.com/phittayanan/habit-tracker/issues/153), from two options Claude Code proposed. projectnewy, the F-14 contract author and owner of #168, sees it in the #153 PR review.
+Status: chosen by phittayanan on 2026-11-27 in the Claude Code session for [Issue #153](https://github.com/phittayanan/habit-tracker/issues/153), from two options Claude Code proposed. projectnewy, the F-14 contract author and owner of #168, agreed in the [review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176. Numbered 0092 and 0093 there, because PR #174 uses 0086 to 0091.
 
 ## Decision
 

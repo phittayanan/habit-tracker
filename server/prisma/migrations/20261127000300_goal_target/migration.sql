@@ -7,7 +7,7 @@ CREATE TABLE "GoalTarget" (
   "daily_target" DECIMAL(10,2) NOT NULL,
   CONSTRAINT "GoalTarget_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "GoalTarget_positive_target" CHECK ("daily_target" > 0),
-  -- ADR 0086: versions go with their goal; Entry keeps ON DELETE RESTRICT.
+  -- ADR 0092: versions go with their goal; Entry keeps ON DELETE RESTRICT.
   CONSTRAINT "GoalTarget_goal_id_fkey" FOREIGN KEY ("goal_id") REFERENCES "Goal"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- ADR 0077: one version per goal and effective date.

@@ -126,7 +126,7 @@ test('TC-154: ended goals, bad values and out-of-range targets are refused in co
   assert.deepEqual([row.templateId, row.participantId, row.startDate.toISOString().slice(0, 10), row.endDate.toISOString().slice(0, 10), Number(row.dailyTarget)], [water.id, a.id, day(-10), day(10), 9]);
 });
 
-test.todo('TC-154 (d): a fraction on a TIME goal gets 400 VALIDATION_ERROR (added once Template.kind from #168 is in staging, ADR 0087)');
+test.todo('TC-154 (d): a fraction on a TIME goal gets 400 VALIDATION_ERROR (added once Template.kind from #168 is in staging, ADR 0093)');
 
 test('TC-155: anonymous 401, Manager 403, another Participant and an unknown id 404; nothing changes; the route is audited', async () => {
   const before = await snapshot();

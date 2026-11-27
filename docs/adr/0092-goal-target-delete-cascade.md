@@ -1,6 +1,6 @@
-# 0086. Target versions are deleted with their goal
+# 0092. Target versions are deleted with their goal
 
-Status: chosen by phittayanan on 2026-11-27 in the Claude Code session for [Issue #153](https://github.com/phittayanan/habit-tracker/issues/153), from two options Claude Code proposed. projectnewy, the F-14 contract author, sees it in the #153 PR review.
+Status: chosen by phittayanan on 2026-11-27 in the Claude Code session for [Issue #153](https://github.com/phittayanan/habit-tracker/issues/153), from two options Claude Code proposed. projectnewy, the F-14 contract author, agreed in the [review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176. Numbered 0092 and 0093 there, because PR #174 uses 0086 to 0091.
 
 ## Decision
 

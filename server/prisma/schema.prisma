@@ -67,7 +67,7 @@ model Goal {
   @@index([participantId, templateId, endDate])
 }
 
-// F-14 target versions (ADR 0075, ADR 0077, ADR 0086). Goal.dailyTarget always holds the latest target.
+// F-14 target versions (ADR 0075, ADR 0077, ADR 0092). Goal.dailyTarget always holds the latest target.
 model GoalTarget {
   id            Int      @id @default(autoincrement())
   goalId        Int      @map("goal_id")
