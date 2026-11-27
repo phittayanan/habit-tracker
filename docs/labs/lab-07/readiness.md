@@ -96,7 +96,7 @@ Each student answered in their own words: phittayanan in Thai, translated by Cla
 |---|---|---|
 | What helped? | Running the tests in CI. | Reviewing the contract and the code before merging caught real problems: a decimal example in the contract that could not fail, and TC-89 passing CI but failing on Windows. |
 | What hurt? | Our working hours did not match, so sometimes a PR was opened and it was not clear whether a review was needed. | Work waited in a chain of reviews, and extra rounds came from docs/ai-use.md merge conflicts and from the sync PR that the release needed before it could be merged. |
-| What will change? | We set up a team status in Discord, with the agent connected, so we can talk there. Next time I check the teammate's status there before asking for a review. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
+| What will change? | Four of my PRs on 2026-11-27 needed changes for claims that did not match their sources or for missed sheet items. Before I ask for a review, a second AI agent that has not seen the work will check each factual claim against its file or log and the PR against the sheet or Issue checklist. | Before asking for review, I will check the new tests on Windows as well as CI and confirm that each boundary example would fail on the bug it targets; before each release I will check that staging contains main and open the sync PR first. |
 
 ## 5. Contribution
 
