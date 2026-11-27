@@ -34,7 +34,7 @@ The full version table, with the merge commits and the unrelated changes in the 
 The sheet asks for instructor/TA approval, approver and date before implementation. The instructor removed that step for Lab 7 in a post to the class group:
 
 > "Announcement. Lab 7 Spec Sheet Change. You need not get Instructor or TA Approval for your change request to Sprint 1. Think of a good change to Sprint 1 among yourselves, but do try to make it a complex enough added feature and not just a trivial change."
-> Suthep Madarasmi (group admin), posted about 2026-11-25 (shown as "2 days ago" on 2026-11-27).
+> The course instructor (group admin), posted about 2026-11-25 (shown as "2 days ago" on 2026-11-27).
 
 Issue #139 records the same: "Instructor/TA approval is not required, per the instructor's announcement changing the Lab 7 spec sheet" (Appendix CR-139). In place of an instructor approval, the change request and revised contract were reviewed and approved by the teammate in PR #143 before any test or code (Part A, A.4).
 
