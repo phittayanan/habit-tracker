@@ -134,6 +134,7 @@ Errors use the ADR 0025 body.
 | OP-17.4 | Whether the goals inside `GET /api/calendar` carry `reminder` (question 3 of the [review of 95c47f8](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089036219)) | Decided by projectnewy on 2026-11-27: no; only the goal objects of the goal endpoints do (section 7); phittayanan agreed in the [approval of 33f4fbc](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089420416) of PR #174 |
 | OP-17.5 | What happens to a reminder when its goal row is deleted (section 8) | Decided by phittayanan on 2026-11-27 (#158): deleted with the goal, `ON DELETE CASCADE` (ADR 0095); pending projectnewy in the #158 PR |
 | OP-17.6 | `GET /api/calendar` (TC-43) is built in #155, not yet on `staging` when #158 starts | Decided by phittayanan on 2026-11-27 (#158): #158 is blocked by #155; the calendar step is committed failing and passes after #155 merges (ADR 0096); pending projectnewy in the #158 PR |
+| OP-17.7 | Screen details section 6 leaves open: the time box is a text box labelled "Reminder time" with the hint `HH:MM` (a time picker shows AM/PM in some browser languages); the checkbox group is named "Weekdays"; order in a card: the reminder line, "Set reminder" or "Change reminder", the open box, then "Remove reminder"; after a save or removal focus returns to the set or change button | Drafted by Claude Code in #158; pending phittayanan and projectnewy |
 
 ## 13. Revision history
 
