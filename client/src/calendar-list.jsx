@@ -1,4 +1,4 @@
-// F-15 List view (Issue #156; contract docs/sprints/sprint-2/F-15-calendar-list.md, ADR 0071, ADR 0103).
+// F-15 List view (Issue #156; contract docs/sprints/sprint-2/F-15-calendar-list.md, ADR 0071, ADR 0104).
 // It shows the month the calendar shows, from the same GET /api/calendar read (ADR 0072).
 import React, { useId } from 'react';
 import { DAY_STATES } from './day-states.js';

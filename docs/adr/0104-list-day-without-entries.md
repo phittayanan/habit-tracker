@@ -1,4 +1,4 @@
-# 0103. A List day with no entry shows only "No entries"
+# 0104. A List day with no entry shows only "No entries"
 
 Status: chosen by projectnewy on 2026-11-27 in the session for [Issue #156](https://github.com/phittayanan/habit-tracker/issues/156). To be agreed by phittayanan in the review of the #156 PR. Makes ADR 0071 precise.
 

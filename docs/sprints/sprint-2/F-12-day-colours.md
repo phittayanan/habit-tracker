@@ -119,4 +119,4 @@ Fixtures as F-11 section 10 (goals W, count target 8; S, time target 420).
 | Date | Change | Approved by |
 |---|---|---|
 | 2026-11-27 | First draft (Issue #151) | pending (reviewer projectnewy) |
-| 2026-11-27 | Issue #156: its PR opens before #154, with TC-122 "not run, waits for #154" (ADR 0104; sections 10, 11); the chosen day has a border (ADR 0105; section 6) | projectnewy; phittayanan in the #156 PR review |
+| 2026-11-27 | Issue #156: the chosen day has a border (ADR 0105; section 6) | projectnewy; phittayanan in the #156 PR review |

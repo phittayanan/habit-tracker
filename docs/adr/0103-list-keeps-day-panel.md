@@ -1,4 +1,4 @@
-# 0102. On desktop the day panel stays while the List is shown
+# 0103. On desktop the day panel stays while the List is shown
 
 Status: chosen by projectnewy on 2026-11-27 in the session for [Issue #156](https://github.com/phittayanan/habit-tracker/issues/156). To be agreed by phittayanan in the review of the #156 PR.
 

@@ -1,5 +1,5 @@
 // F-12 day colours and the F-15 Calendar / List switch (Issue #156): TC-40, TC-49, TC-117, TC-125,
-// and TC-47/TC-48 on the List, at 375 px and 1280 px (playwright.config.js projects). ADR 0101 to ADR 0105.
+// and TC-47/TC-48 on the List, at 375 px and 1280 px (playwright.config.js projects). ADR 0102 to ADR 0105.
 import { test, expect } from '@playwright/test';
 import { PrismaClient } from '../../server/node_modules/@prisma/client/default.js';
 import bcrypt from '../../server/node_modules/bcryptjs/index.js';
@@ -246,7 +246,7 @@ test('F-15 section 4: when the month read fails, the List shows the API message 
   await expect(list(page)).toBeVisible();
 });
 
-test('ADR 0102: on desktop the panel stays with the List, and a save there updates the List', async ({ page }) => {
+test('ADR 0103: on desktop the panel stays with the List, and a save there updates the List', async ({ page }) => {
   test.skip(phone(), 'desktop width');
   await twoGoals(c, day(-2));
   await login(page);
