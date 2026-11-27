@@ -237,7 +237,7 @@ Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature 
 | `GET /api/goals/:id/entries` | List the entries of the caller's goal | 1 | FR-12, FR-13 |
 | `PATCH` and `DELETE /api/goals/:id/entries/:entryId` | Edit or delete an entry | 2 | FR-17 |
 | `PATCH /api/goals/:id` | Change the daily target from today on | 2 | FR-18 |
-| `GET /api/calendar?month=YYYY-MM` | The caller's month: per day the state (colour) and, per goal active that day, the target, total, met and entries. Serves the calendar, the day box and the List; `GET /api/entries?month` was dropped (ADR 0072) | 2 | FR-15, FR-16, FR-19 |
+| `GET /api/calendar?month=YYYY-MM` | The caller's month: per day the state (colour) and, per goal active that day, the target, total, met and entries. Serves the calendar, the day box and the List; `GET /api/entries?month` was dropped (ADR 0072). Built in Issue #155 with `state` `null` on every day; Issue #156 fills it (ADR 0097) | 2 | FR-15, FR-16, FR-19 |
 | `GET /api/goals/:id` | One goal with its current and best streak (detail page) | 3 | FR-20 |
 | `PUT /api/goals/:id/reminder` | Store a reminder time and weekdays on a goal; `DELETE` on the same path removes it (ADR 0086) | 3 | FR-21 |
 
