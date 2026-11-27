@@ -1,6 +1,6 @@
 # 0055. Review routing, card moves by the agent and one review format
 
-Status: agreed by phittayanan and projectnewy in Issue #55 (comments of 2026-11-16 and 2026-11-18); implemented in the PR for Issue #55, review by projectnewy pending
+Status: agreed by phittayanan and projectnewy in Issue #55 (comments of 2026-11-16 and 2026-11-18); implemented in the PR for Issue #55, review by projectnewy pending. The "What I checked" part of point 3 is superseded by ADR 0085 (Issue #170).
 
 ## Decision
 
@@ -16,7 +16,7 @@ Status: agreed by phittayanan and projectnewy in Issue #55 (comments of 2026-11-
    | Fix pushed, review re-requested | PR Review | agent |
    | Issue closed | Done | board automation; the agent fixes a miss |
 
-3. A review uses one format: "What I checked" (numbered, each with the commit or file and the result), then "Findings", each finding with one label:
+3. A review uses one format (the "What I checked" part is superseded by [ADR 0085](0085-shorter-review-format.md); the labels stay): "What I checked" (numbered, each with the commit or file and the result), then "Findings", each finding with one label:
 
    | Label | Meaning |
    |---|---|
