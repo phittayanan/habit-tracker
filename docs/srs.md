@@ -163,7 +163,7 @@ No ADR settles these. Each is left open and needs a decision before the requirem
 | A-7 | Whether email verification is excluded for the whole project. Only self-registration and password recovery are (ADR 0004). | 1.3 |
 | A-8 | NFR numbers: the width and keyboard targets are proposed here, not agreed. | NFR-05, NFR-06 |
 | A-9 | Seeded account names and the way their passwords are shared privately (not in the repository). | FR-01 |
-| A-10 | What a goal's detail page shows besides the best streak (ADR 0042 names the page, not its content). | FR-20 |
+| A-10 | Decided (ADR 0091): a short summary of the goal. The question was: what a goal's detail page shows besides the best streak (ADR 0042 names the page, not its content). | FR-20 |
 | A-11 | Sprint 1 limit: a wrong entry cannot be fixed until editing (FR-17) arrives in Sprint 2. Since ADR 0061 a later entry on the same day adds to the day total; it does not replace the wrong one. | BR-04, FR-11, FR-17 |
 
 ### 6.4 Questions for the TA (open)
@@ -190,3 +190,4 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
 | 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases; after the PR #167 review, FR-15 names the kept goals page (ADR 0073) | pending (reviewer projectnewy) |
 | 2026-11-27 | Issue #150: FR-08 permanent retire; A-5 decided | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #157: A-10 decided | pending (reviewer phittayanan) |
