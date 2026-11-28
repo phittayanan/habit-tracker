@@ -1,11 +1,7 @@
 # Part A. Sprint 1 continuity and change status {#part-a}
 
-<!-- PENDING: PR #186 (Issue #159, owner projectnewy). Copy docs/deliverable-2/part-a-continuity.md here after it merges, with the J-1 to J-7 results on v2.1. -->
+<!-- source: docs/deliverable-2/part-a-continuity.md (Issue #159, PR #186, owner projectnewy), included as it is in the repository. -->
 
-**PENDING (PR #186).** Contents required by D2 §3.1 and §4.1:
+This part is `docs/deliverable-2/part-a-continuity.md` (Issue #159, PR #186; owner projectnewy, reviewer phittayanan). The record gaps named at the end of its section 4 were fixed in Issue #161: the "Approved Changes" rows of `docs/traceability.md` and the SRS revision history now cite the approving reviews, B-06 to B-08 have rows, ADR 0053's status line cites the approval of PR #92, and the #127 row of the Lab 6 findings shows its triage.
 
-- Accepted Sprint 1 tag and commit; the Sprint 1 journey re-run on `v2.1` with its result (J-1 to J-7).
-- Change and defect register: ID, source, affected requirement or feature, accepted decision, status, fix release and re-test.
-- Approved baseline revisions with reasons (the Approved Changes table of `docs/traceability.md`).
-- Status of the relevant Lab 5 to Lab 7 findings.
-- A short Sprint 1 continuity demo: captioned screenshots (D2 §4.2).
+<!-- include: docs/deliverable-2/part-a-continuity.md -->

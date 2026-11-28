@@ -2,7 +2,7 @@
 
 Deliverable 2 Parts B, C and D, [Issue #161](https://github.com/phittayanan/habit-tracker/issues/161). Owner: phittayanan. Reviewer and merger: projectnewy. Values read from the repository and GitHub on 2026-11-28 (Asia/Bangkok). Drafted by Claude Code; the layout and the meaning of each state were chosen by phittayanan on 2026-11-28.
 
-**DRAFT.** PR #200 (Issue #199, part of #160: the `v2.1` record, the readiness decision and the plan to 13 December) is merged into `staging` (`e087c29`) and used below. Places still marked **PENDING** wait for PR #186 (Issue #159, Part A).
+PR #200 (Issue #199, part of #160: the `v2.1` record, the readiness decision and the plan to 13 December) and PR #186 (Issue #159, Part A) are merged into `staging` (`e087c29`, `7973740`) and used below.
 
 ## States
 
@@ -63,5 +63,5 @@ Owners, reviewers and target dates are the students' plan in [`readiness-and-pla
 | Rule coverage from CI | NFR-08, TC-51 | local run only (100% line coverage of the rule files on `9b09bfe`) | Decide whether CI produces the coverage report that NFR-08 names | plan row "Hardening" (it names NFR-08 rule coverage) |
 | Timed clean-clone run | NFR-07, TC-50 | last run in Lab 5 on `ad3300a` | Repeat on the final release | not in the plan yet |
 | Outside user test on a Sprint 2 or Sprint 3 version | Sprint 2 and 3 AC | not run; last on `v1.3` and `v1.4` (Lab 6) ([readiness](readiness-and-plan.md) section 1) | The students decide whether one is run | not in the plan |
-| Sprint 1 continuity on `v2.1` and the change register | J-1 to J-7; CR-nn | J-1 to J-7 run on the deployed `v2.1`: 7 of 7 passed ([v2.1 record](v2.1-release.md) section 5); register **PENDING**: PR #186 | Finish and merge PR #186 | plan row "Sprint 1 continuity and change register" |
+| Sprint 1 continuity on `v2.1` and the change register | J-1 to J-7; CR-nn | J-1 to J-7 run on the deployed `v2.1`: 7 of 7 passed ([v2.1 record](v2.1-release.md) section 5); change register in [Part A](part-a-continuity.md) section 3 | None for Part A; its open items (for example CR-13, CR-14, CR-25) keep their status there | plan row "Sprint 1 continuity and change register" |
 | Final release, README, report, video | FD | not started | As in the plan | plan rows "Final release" to "Demo video" |

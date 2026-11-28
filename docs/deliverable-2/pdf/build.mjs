@@ -7,13 +7,48 @@
 // longer change. It fails if a referenced heading has no page or the numbers do not settle.
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname } from 'node:path';
+import { join, dirname, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Marked } from 'marked';
 import { chromium } from 'playwright';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = ['front.md', 'part-a.md', 'part-b.md', 'part-c.md', 'part-d.md', 'part-e.md', 'appendix.md'].map(f => readFileSync(join(here, f), 'utf8')).join('\n\n').replace(/\r\n/g, '\n');
+// A line `<!-- include: docs/path.md -->` (or `docs/path.md#Section title` for one level-2 section) is
+// replaced by that repository file, so the PDF holds the documents themselves and keeps one source.
+// The file's own title is dropped, its headings move down two levels (they never start a Part or
+// enter the contents), relative links become GitHub links and relative images resolve from here.
+const repo = join(here, '..', '..', '..');
+const github = 'https://github.com/phittayanan/habit-tracker/blob/staging/';
+function include(spec) {
+  const [file, section] = spec.split('#');
+  let text = readFileSync(join(repo, file), 'utf8').replace(/\r\n/g, '\n');
+  if (section) {
+    const lines = text.split('\n');
+    const start = lines.findIndex(l => l.replace(/^##\s+/, '') === section && /^## /.test(l));
+    if (start < 0) throw new Error(`Section not found: ${spec}`);
+    const end = lines.findIndex((l, i) => i > start && /^#{1,2} /.test(l));
+    text = lines.slice(start + 1, end < 0 ? undefined : end).join('\n');
+  } else {
+    text = text.replace(/^# .*\n/, '');
+  }
+  const dir = dirname(join(repo, file));
+  let fence = false;
+  return text.split('\n').map(line => {
+    if (/^```/.test(line)) { fence = !fence; return line; }
+    if (fence) return line;
+    line = line.replace(/^(#{1,4}) /, (_, h) => '#'.repeat(h.length + 2) + ' ');
+    line = line.replace(/(!?)\[([^\]]*)\]\((?!https?:|#|mailto:)([^)\s]+)\)/g, (_, bang, label, target) => {
+      const [path, anchor] = target.split('#');
+      const abs = join(dir, path);
+      if (bang) return `![${label}](${relative(here, abs)})`;
+      return `[${label}](${github}${relative(repo, abs)}${anchor ? '#' + anchor : ''})`;
+    });
+    return line;
+  }).join('\n');
+}
+const source = ['front.md', 'part-a.md', 'part-b.md', 'part-c.md', 'part-d.md', 'part-e.md', 'appendix.md']
+  .map(f => readFileSync(join(here, f), 'utf8')).join('\n\n').replace(/\r\n/g, '\n')
+  .replace(/^<!-- include: (\S+?) -->$/gm, (_, spec) => include(spec.replace(/_/g, ' ')));
 const out = join(here, 'dist');
 const slug = t => t.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -152,7 +187,7 @@ function destinationPages(pdf) {
 }
 
 mkdirSync(out, { recursive: true });
-const work = mkdtempSync(join(tmpdir(), 'd1-build-'));
+const work = mkdtempSync(join(tmpdir(), 'd2-build-'));
 const browser = await chromium.launch();
 const page = await browser.newPage();
 async function render(pages, total, path) {
