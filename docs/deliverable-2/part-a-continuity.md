@@ -49,7 +49,7 @@ Two approved changes alter what a tester sees. A Participant now starts on `/cal
 | J-6 | Access: a Participant cannot create or edit a template; another Participant cannot read the goal (404); a Manager and an anonymous caller cannot read goals (403, 401) | `participant2`: no New, Edit or Retire on Templates; `/templates/new` not available; entries of goal 12: 404 `GOAL_NOT_FOUND`. `manager1` on goals: 403 `FORBIDDEN`. Signed out: 401 | Pass, **with a limit** (below) |
 | J-7 | After logout, protected pages and requests need a new sign-in | `/goals`, `/calendar` and `/templates` showed the login page; signed-out reads of goals, calendar, templates and goal entries: 401 | Pass |
 
-**Limit on J-6.** For "a Participant cannot create or edit a template", only the Participant's screens were checked on the deployed app. No create or edit request was sent as a Participant, so the server's refusal of those requests was not exercised in production. The release CI runs the automated tests; that is not a production result.
+**Limit on J-6.** For "a Participant cannot create or edit a template", only the Participant's screens were checked on the deployed app. No create or edit request was sent as a Participant, so the server's refusal of those requests was not exercised in production. The rule has automated API tests: TC-17 (a Participant's create request) and TC-18 (edit) expect 403 and no change. They are in the server suite that passed 161 of 161 in the release CI. That is not a production result.
 
 **Also not checked on the deployed app** in this run: keyboard-only use, data after a restart of the service, and `participant1`'s older entries after the checks (the older goals and their progress were read and were unchanged).
 
