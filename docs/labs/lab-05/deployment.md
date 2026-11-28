@@ -322,6 +322,34 @@ All runs are kept (R-10).
 
 The run on `daaafc2` is the green run on the Issue #50 PR into `staging` (C-01, staging side). The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
 
+### 8.4 Server tests on Windows (Issue #164, ADR 0106)
+
+`.github/workflows/ci-windows.yml`, workflow name "Server tests (Windows)", one job with the id `server-tests-windows`. It runs the server tests on Windows because TC-89 passed the Linux job in PR #146 and failed on Windows; only the review found it.
+
+| Item | Choice |
+|---|---|
+| Triggers | `pull_request` into `main` and into `staging`; `workflow_dispatch` (manual). Not `workflow_call`: it is its own file so that `deploy.yml`, which reuses `ci-docker.yml`, does not wait for it (ADR 0106) |
+| Runner | `windows-2025`, not `windows-latest`, so the image changes only when we change the label |
+| Database | PostgreSQL 16 from the action `ikalnytskyi/action-setup-postgres` `v9`, pinned to commit `325155bfd7807b2a21ac9c2c7bb9b9a6eacc44df` (Windows runners cannot run service containers). The user `ci` with the same throw-away password as the Linux job; the application database and a separate test database |
+| Steps | Checkout, Node.js 24, PostgreSQL 16, print the server version, client `npm ci` and `npm run build`, then in `server/`: `npm ci`, `npx prisma generate`, create the test database, `prisma migrate deploy` on both databases, seed with generated passwords, `npm test`. No browser tests and no Docker build (out of scope of #164) |
+| Required check | **Not yet.** projectnewy asked that it becomes required only after the `v2.1` release; [Issue #194](https://github.com/phittayanan/habit-tracker/issues/194) adds it to the `staging` ruleset then. Until then a failing Windows job shows on the PR but does not block the merge, so the reviewer must read it |
+
+Three things differ from the Linux job, each found in a run below:
+
+1. `psql` gets the password in the URI and `-w`, not from `PGPASSWORD`: on Windows the setup action clears `PGPASSWORD` through `GITHUB_ENV`, which overrides the job's `env`, and `psql` then waited for a password until the job timeout.
+2. `psql` options come before the URI: `psql` on Windows ignored the `-c` that came after it.
+3. `npx prisma generate` runs after `npm ci`: without it the seed stopped with "@prisma/client did not initialize yet".
+
+#### Runs
+
+All runs are kept (R-10). The red runs used the temporary branch `chore/164-windows-ci-red`: this job, TC-89 as it was before the Windows fix `f8736c9`, and a push trigger for that branch only. The branch was deleted after the last red run.
+
+| Run | Commit | Result |
+|---|---|---|
+| [46117726915](https://github.com/phittayanan/habit-tracker/actions/runs/46117726915) | `473a615` (red branch) | Cancelled by the 30-minute job timeout: PostgreSQL 16 was set up, then `psql` waited for a password (point 1). No test ran |
+| [46120070627](https://github.com/phittayanan/habit-tracker/actions/runs/46120070627) | `801f702` (red branch) | Failed before the tests: the seed stopped with "@prisma/client did not initialize yet" (point 3), and `psql` ignored its `-c` (point 2) |
+| [46120341678](https://github.com/phittayanan/habit-tracker/actions/runs/46120341678) | `fa07b53` (red branch) | **Red, as intended.** PostgreSQL `16.16`; server suite 151 tests, 150 passed, 1 failed: TC-89, `spawn ...\node_modules\.bin\prisma ENOENT`, the Windows failure that `f8736c9` fixed |
+
 ## 9. First deployment (Lab 5 step 5, Issue #64)
 
 Done by hand in Cloud Shell on 13 Nov 2026 (00:00 to 00:35, +07), one command at a time, with the resource names in section 5. The kit's `deploy/deploy.sh` was not run: it still uses the TokTickIT names and secrets. The scripts in `deploy/` (`deploy.sh`, `release.sh`, `teardown.sh` and their tests) still use the `toktickit` names; step 7 (Issue #66) has to use the names in section 5.
