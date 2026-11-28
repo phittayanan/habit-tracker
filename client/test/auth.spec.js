@@ -42,6 +42,8 @@ test('TC-65: rejected login retains username, clears password; login and logout 
 });
 
 test('TC-07: shared bar shows database identity and exact role menus on test-only page', async ({ page }) => {
+  // Issue #192: a slow logout makes the race between Log out and the next login happen on every run.
+  await page.route('**/api/auth/logout', async route => { await new Promise(resolve => setTimeout(resolve, 1000)); await route.continue(); });
   for (const [username, displayName, menu] of [
     ['manager1', 'Manager One', ['Templates']], ['participant1', 'Participant One', ['Calendar', 'Goals', 'Templates']],
   ]) {
@@ -51,6 +53,7 @@ test('TC-07: shared bar shows database identity and exact role menus on test-onl
     await expect(page.getByRole('navigation').getByRole('link')).toHaveText(menu);
     await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
     await page.getByRole('button', { name: 'Log out' }).click();
+    await expect(page).toHaveURL(/\/login$/);
   }
 });
 
