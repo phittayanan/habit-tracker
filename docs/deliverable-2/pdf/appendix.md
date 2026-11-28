@@ -65,12 +65,12 @@ ADR 0002 to ADR 0049 are listed in the Deliverable 1 PDF. These were added since
 
 ## Contributions {#contributions}
 
-Pull requests merged into `staging` on 27 and 28 Nov 2026 (Lab 7 release work, Sprint 2, Sprint 3 and the D2 records), by author. Every one was approved and merged by the other student. PR #202 (this PDF's Issue #161) is still open.
+All 30 pull requests merged into `staging` on 27 and 28 Nov 2026, Asia/Bangkok (Lab 6 and Lab 7 work, Sprint 2, Sprint 3 and the D2 records), by author; read with `gh pr list --state merged --base staging`. Every one was approved and merged by the other student. PR #202 (this PDF's Issue #161) is still open.
 
-| Student | Sprint 2 and 3 contracts | Feature code | Releases and records | Team rules, tests and CI |
+| Student | Contracts | Feature code | Releases and records | Team rules, tests and CI |
 |---|---|---|---|---|
-| phittayanan | Calendar contracts F-11, F-12, F-15 and template kind (PR #167) | F-14 goal change (PR #176), F-11 calendar (PR #180), F-13 entry edit and delete (PR #184), F-17 reminder (PR #183) | Lab 7 metrics and readiness (PR #163), Lab 7 report (PR #169), UAT-02 update (PR #175); D2 Part D and the PDF (#161, PR #202, open) | Review format (PR #172), merge and worktree rules (PR #178), TC-07 fix (PR #193), Windows CI (PR #197, PR #201) |
-| projectnewy | Rules contracts F-05, F-13, F-14 (PR #171); Sprint 3 contracts F-16, F-17 (PR #174) | template kind (PR #173), F-05 retire (PR #179), F-12 and F-15 colours and List (PR #185) | Lab 7 release (PR #162), `v2.0` records (PR #191), `v2.1` records, readiness and plan (PR #200), D2 Part A (PR #186); syncs of `main` (PR #149, PR #188, PR #196); release PRs #189 and #198 | ADR numbers and test ports (PR #182) |
+| phittayanan | Calendar contracts F-11, F-12, F-15 and template kind (PR #167) | Lab 7 several entries per day (PR #146), F-14 goal change (PR #176), F-11 calendar (PR #180), F-13 entry edit and delete (PR #184), F-17 reminder (PR #183) | Lab 7 metrics and readiness (PR #163), Lab 7 report (PR #169), UAT-02 update (PR #175); D2 Part D and the PDF (#161, PR #202, open) | Team status bot, ADR 0062 (PR #145), review format (PR #172), merge and worktree rules (PR #178), TC-07 fix (PR #193), Windows CI (PR #197, PR #201) |
+| projectnewy | Lab 7 contract for several entries per day (PR #143); rules contracts F-05, F-13, F-14 (PR #171); Sprint 3 contracts F-16, F-17 (PR #174) | template kind (PR #173), F-05 retire (PR #179), F-12 and F-15 colours and List (PR #185) | Lab 6 evidence PDF (PR #137), Lab 7 release (PR #162), `v2.0` records (PR #191), `v2.1` records, readiness and plan (PR #200), D2 Part A (PR #186); syncs of `main` (PR #149, PR #188, PR #196); release PRs #189 and #198 | ADR numbers and test ports (PR #182) |
 
 ## AI use {#ai-use}
 

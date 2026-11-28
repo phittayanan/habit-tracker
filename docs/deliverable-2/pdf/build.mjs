@@ -7,7 +7,7 @@
 // longer change. It fails if a referenced heading has no page or the numbers do not settle.
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname, relative } from 'node:path';
+import { join, dirname, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Marked } from 'marked';
 import { chromium } from 'playwright';
@@ -19,6 +19,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 // enter the contents), relative links become GitHub links and relative images resolve from here.
 const repo = join(here, '..', '..', '..');
 const github = 'https://github.com/phittayanan/habit-tracker/blob/staging/';
+// Paths in the page and in links always use "/", also on Windows where relative() returns "\\".
+const posix = path => path.split(sep).join('/');
 function include(spec) {
   const [file, section] = spec.split('#');
   let text = readFileSync(join(repo, file), 'utf8').replace(/\r\n/g, '\n');
@@ -40,15 +42,21 @@ function include(spec) {
     line = line.replace(/(!?)\[([^\]]*)\]\((?!https?:|#|mailto:)([^)\s]+)\)/g, (_, bang, label, target) => {
       const [path, anchor] = target.split('#');
       const abs = join(dir, path);
-      if (bang) return `![${label}](${relative(here, abs)})`;
-      return `[${label}](${github}${relative(repo, abs)}${anchor ? '#' + anchor : ''})`;
+      if (bang) return `![${label}](${posix(relative(here, abs))})`;
+      return `[${label}](${github}${posix(relative(repo, abs))}${anchor ? '#' + anchor : ''})`;
     });
     return line;
   }).join('\n');
 }
+// Check: an included link or image path never keeps a Windows separator.
+function assertPosix(text) {
+  const bad = [...text.matchAll(/\]\(([^)]*\\[^)]*)\)/g)].map(m => m[1]);
+  if (bad.length) throw new Error(`Backslash in a link or image path: ${bad.join(', ')}`);
+  return text;
+}
 const source = ['front.md', 'part-a.md', 'part-b.md', 'part-c.md', 'part-d.md', 'part-e.md', 'appendix.md']
   .map(f => readFileSync(join(here, f), 'utf8')).join('\n\n').replace(/\r\n/g, '\n')
-  .replace(/^<!-- include: (\S+?) -->$/gm, (_, spec) => include(spec.replace(/_/g, ' ')));
+  .replace(/^<!-- include: (\S+?) -->$/gm, (_, spec) => assertPosix(include(spec.replace(/_/g, ' '))));
 const out = join(here, 'dist');
 const slug = t => t.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
