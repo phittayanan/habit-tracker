@@ -1,5 +1,5 @@
 // F-13 entry edit and delete (Issue #154; contract docs/sprints/sprint-2/F-13-entry-edit-delete.md): TC-149 to TC-151,
-// at 375 px and 1280 px (playwright.config.js projects). The calendar colour of AC-13.9 waits for F-12 (#156).
+// at 375 px and 1280 px (playwright.config.js projects). TC-150 also checks the calendar colour of AC-13.9 (added in #156).
 import { test, expect } from '@playwright/test';
 import { PrismaClient } from '../../server/node_modules/@prisma/client/default.js';
 import bcrypt from '../../server/node_modules/bcryptjs/index.js';
@@ -36,6 +36,9 @@ test.beforeEach(async () => {
   await db.entry.create({ data: { goalId: s.id, entryDate: asDate(day(-1)), value: 45, createdAt: new Date(t - 1000) } });
 });
 test.afterAll(() => db.$disconnect());
+// From #156 a day button is named by its date and the F-12 state words.
+const dayButton = (page, date) => page.getByRole('button', { name: new RegExp(`^${label(date)}(, (all goals met|some goals met|no goal met|nothing recorded))?$`) });
+const colourOf = locator => locator.evaluate(el => getComputedStyle(el).backgroundColor);
 const phone = () => test.info().project.name === '375px';
 const fits = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 async function login(page) {
@@ -57,7 +60,7 @@ async function openDay(page, date) {
     await page.getByRole('button', { name: 'Previous month', exact: true }).click();
     await expect(page.locator('.month-title')).not.toHaveText(shown);
   }
-  await page.getByRole('button', { name: label(date), exact: true }).click();
+  await dayButton(page, date).click();
   const box = page.getByRole(phone() ? 'dialog' : 'region', { name: heading(date), exact: true });
   await expect(box).toBeVisible();
   return box;
@@ -134,6 +137,11 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await expect(water.getByText('8 / 8 glasses', { exact: true })).toBeVisible();
   await expect(water.getByText('✓ met', { exact: true })).toBeVisible();
   await expect(water.locator('.entry-value')).toHaveText(['5', '3']);
+  // The day button is behind the phone box, so it is read by its class there.
+  const cell = page.locator('table.month button.day').filter({ has: page.locator('span:first-child', { hasText: new RegExp(`^${Number(day(-1).slice(8))}$`) }) });
+  await expect(cell).toHaveAttribute('aria-label', `${label(day(-1))}, some goals met`);
+  await expect(opened.locator('.state-chip')).toHaveText('½ Some goals met');
+  expect(await colourOf(cell)).toBe('rgb(246, 231, 168)');
   await water.getByRole('button', { name: `Edit 5 glasses on ${day(-1)}`, exact: true }).click();
   const box = water.getByLabel('New value (glasses)', { exact: true });
   await expect(box).toHaveValue('5');
@@ -155,7 +163,7 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   if (phone()) {
     await expect(page.getByRole('button', { name: 'Close', exact: true })).toBeDisabled();
     await page.keyboard.press('Escape');
-  } else await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+  } else await dayButton(page, day(-2)).click();
   await expect(page.getByRole('alertdialog')).toHaveCount(0);
   await expect(opened).toBeVisible();
   release();
@@ -163,6 +171,10 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await page.unroute('**/api/goals/*/entries/*');
   await expect(water.getByText('✓ met', { exact: true })).toHaveCount(0);
   await expect(water.locator('.entry-value')).toHaveText(['4', '3']);
+  await expect(cell).toHaveAttribute('aria-label', `${label(day(-1))}, no goal met`);
+  await expect(cell.locator('.day-sign')).toHaveText('✗');
+  await expect(opened.locator('.state-chip')).toHaveText('✗ No goal met');
+  await expect.poll(() => colourOf(cell)).toBe('rgb(243, 196, 196)');
 
   const del = water.getByRole('button', { name: `Delete 3 glasses on ${day(-1)}`, exact: true });
   await del.click();
@@ -191,13 +203,13 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
   await water.getByRole('button', { name: `Edit 4 glasses on ${day(-1)}`, exact: true }).click();
   await water.getByLabel('New value (glasses)', { exact: true }).fill('6');
   if (phone()) await page.keyboard.press('Escape');
-  else await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+  else await dayButton(page, day(-2)).click();
   const discard = ask(page, 'Discard the edit to 6 glasses?');
   await expect(discard).toBeVisible();
   await discard.getByRole('button', { name: 'Keep editing', exact: true }).click();
   await expect(water.getByLabel('New value (glasses)', { exact: true })).toHaveValue('6');
   if (phone()) await page.keyboard.press('Escape');
-  else await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+  else await dayButton(page, day(-2)).click();
   await discard.getByRole('button', { name: 'Discard', exact: true }).click();
   expect(await values(w, day(-1))).toEqual([4]);
   // The same value typed again is nothing unsaved: it closes at once.
@@ -208,7 +220,7 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).toHaveCount(0);
   } else {
-    await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+    await dayButton(page, day(-2)).click();
     await expect(page.getByRole('region', { name: heading(day(-2)), exact: true })).toBeVisible();
   }
   await expect(page.getByRole('alertdialog')).toHaveCount(0);
@@ -221,7 +233,7 @@ test('TC-150: the day box edits and deletes; the card and sign update; an unsave
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).toHaveCount(0);
   } else {
-    await page.getByRole('button', { name: label(day(-2)), exact: true }).click();
+    await dayButton(page, day(-2)).click();
     await expect(page.getByRole('region', { name: heading(day(-2)), exact: true })).toBeVisible();
   }
   await expect(page.getByRole('alertdialog')).toHaveCount(0);

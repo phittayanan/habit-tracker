@@ -1,0 +1,92 @@
+# Server tests on Windows (Issue #164, ADR 0106).
+# Runs the server tests (`npm test` in server/) against PostgreSQL 16 on a Windows
+# runner, because TC-89 once passed the Linux CI and failed on Windows (PR #146).
+# Its own file, not ci-docker.yml: deploy.yml reuses ci-docker.yml, and deploys must
+# not wait for this job (ADR 0106). Browser tests and the Docker build stay Linux only.
+# Do not rename the job id `server-tests-windows`: it becomes a required check after v2.1.
+name: Server tests (Windows)
+
+on:
+  pull_request:
+    branches: [main, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer run on the same ref cancels the older one.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server-tests-windows:
+    runs-on: windows-2025
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: bash
+
+    # Throw-away login for the PostgreSQL that the setup step starts inside this job;
+    # it is not a project secret. Two databases: the tests refuse a TEST_DATABASE_URL
+    # equal to DATABASE_URL.
+    env:
+      DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker?schema=public
+      TEST_DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker_test?schema=public
+      # For psql; its options go before this URI, because psql on Windows ignores options
+      # after it (run 46120070627). No PGPASSWORD: on Windows the setup action clears it through GITHUB_ENV,
+      # which overrides this job env, and psql then waits for a password until the timeout
+      # (run 46117726915). The password is in the URI, and -w makes psql fail instead of asking.
+      PSQL_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      # Windows runners cannot run service containers, so PostgreSQL 16 runs as a
+      # Windows program (ADR 0106). The user `ci` is the server's superuser.
+      - name: Setup PostgreSQL 16
+        uses: ikalnytskyi/action-setup-postgres@325155bfd7807b2a21ac9c2c7bb9b9a6eacc44df # v9
+        with:
+          username: ci
+          password: ci_throwaway
+          database: habit_tracker
+          postgres-version: "16"
+
+      - name: Show the PostgreSQL version
+        run: psql -w -tA -c 'SHOW server_version' "$PSQL_URL"
+        timeout-minutes: 2
+
+      # The server's production-serving test needs client/dist/index.html.
+      - name: Install and build client
+        working-directory: ./client
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install, migrate, seed and test server
+        working-directory: ./server
+        run: |
+          npm ci
+          # On Windows npm ci leaves the Prisma client ungenerated ("@prisma/client did not
+          # initialize yet", run 46120070627), so generate it explicitly.
+          npx prisma generate
+          psql -w -c 'CREATE DATABASE habit_tracker_test' "$PSQL_URL"
+          npx prisma migrate deploy
+          DATABASE_URL="$TEST_DATABASE_URL" npx prisma migrate deploy
+          # Seed passwords are generated for this run only and masked in the log.
+          SEED_MANAGER_PASSWORD="$(openssl rand -hex 16)"
+          SEED_PARTICIPANT_PASSWORD="$(openssl rand -hex 16)"
+          echo "::add-mask::$SEED_MANAGER_PASSWORD"
+          echo "::add-mask::$SEED_PARTICIPANT_PASSWORD"
+          export SEED_MANAGER_PASSWORD SEED_PARTICIPANT_PASSWORD
+          npm run prisma:seed
+          npm test

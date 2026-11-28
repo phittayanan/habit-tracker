@@ -1,4 +1,5 @@
 import { computeProgress } from './progress-rules.js';
+import { parseReminder, toReminder } from './reminder-rules.js';
 import { bangkokToday, goalState, targetWithinMaximum, targetAboveMinimum, hasActiveGoal, parseTargetChange, effectiveFrom } from './goal-rules.js';
 const dateText = value => value.toISOString().slice(0, 10);
 const dateValue = text => new Date(`${text}T00:00:00Z`);
@@ -8,11 +9,13 @@ export function toGoal(row, today) {
     startDate: dateText(row.startDate), endDate: dateText(row.endDate), state: goalState(dateText(row.endDate), today),
     template: { id: row.template.id, name: row.template.name, unit: row.template.unit, kind: row.template.kind,
       minValue: Number(row.template.minValue), maxValue: Number(row.template.maxValue) },
+    // F-17 (section 7): the stored reminder, or null when the goal has none.
+    reminder: toReminder(row.reminder),
   };
 }
 export async function listGoals(db, user, now = new Date()) {
   const today = bangkokToday(now);
-  const rows = await db.goal.findMany({ where: { participantId: user.id }, include: { template: true, targets: true }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] });
+  const rows = await db.goal.findMany({ where: { participantId: user.id }, include: { template: true, targets: true, reminder: true }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] });
   const entries = rows.length ? await db.entry.findMany({ where: { goalId: { in: rows.map(row => row.id) } }, select: { goalId: true, entryDate: true, value: true } }) : [];
   return rows.map(row => {
     const goal = toGoal(row, today);
@@ -56,7 +59,7 @@ export async function changeTarget(db, user, goalId, body) {
     const parsed = parseTargetChange(body);
     if (!parsed.ok) return parsed;
     const target = parsed.data.dailyTarget;
-    const row = await tx.goal.findUniqueOrThrow({ where: { id: goalId }, include: { template: true } });
+    const row = await tx.goal.findUniqueOrThrow({ where: { id: goalId }, include: { template: true, reminder: true } });
     // Section 4 order 4, a validation row before the ended check (ADR 0065, ADR 0093). A used template cannot change kind.
     if (row.template.kind === 'TIME' && !Number.isInteger(target)) return { ok: false, status: 400, code: 'VALIDATION_ERROR', message: 'Target must be whole minutes.' };
     // Today is read after the lock, as goal creation does, so a wait across Bangkok midnight uses the new day.
@@ -76,7 +79,27 @@ export async function changeTarget(db, user, goalId, body) {
     await tx.goalTarget.upsert({ where: { goalId_effectiveFrom: { goalId, effectiveFrom: dateValue(from) } },
       create: { goalId, effectiveFrom: dateValue(from), dailyTarget: target.toFixed(2) }, update: { dailyTarget: target.toFixed(2) } });
     // ADR 0075: daily_target always holds the latest target.
-    const updated = await tx.goal.update({ where: { id: goalId }, data: { dailyTarget: target.toFixed(2) }, include: { template: true } });
+    const updated = await tx.goal.update({ where: { id: goalId }, data: { dailyTarget: target.toFixed(2) }, include: { template: true, reminder: true } });
     return { ok: true, goal: toGoal(updated, today) };
   });
+}
+
+// F-17 PUT /api/goals/:id/reminder. The route has already answered 404 for a goal that is not the caller's (section 4 order 3).
+// Checks continue in section 4 order: body (400), then ended (409). Saving again replaces the one reminder (ADR 0086).
+export async function setReminder(db, user, goalId, body) {
+  const parsed = parseReminder(body);
+  if (!parsed.ok) return parsed;
+  return db.$transaction(async tx => {
+    // The goal-row lock serializes reminder saves with each other and with target changes of the goal.
+    const [locked] = await tx.$queryRaw`SELECT end_date AS "endDate" FROM "Goal" WHERE id = ${goalId} AND participant_id = ${user.id} FOR UPDATE`;
+    if (!locked) return goalNotFound;
+    // ADR 0087: set or change while the end date is today or later; today is read after the lock.
+    if (goalState(dateText(locked.endDate), bangkokToday()) === 'ENDED') return { ok: false, status: 409, code: 'GOAL_ENDED', message: 'This goal has ended and cannot be changed.' };
+    const row = await tx.goalReminder.upsert({ where: { goalId }, create: { goalId, ...parsed.data }, update: parsed.data });
+    return { ok: true, reminder: toReminder(row) };
+  });
+}
+// F-17 DELETE /api/goals/:id/reminder: also on an ended goal (ADR 0087); none to remove is still a success (OP-17.3).
+export async function removeReminder(db, user, goalId) {
+  await db.goalReminder.deleteMany({ where: { goalId, goal: { participantId: user.id } } });
 }

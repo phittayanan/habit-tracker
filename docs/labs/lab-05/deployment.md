@@ -112,7 +112,7 @@ Set up on 13 Nov 2026. phittayanan ran the GitHub settings and every Google Clou
 | Attribute condition of the provider | Accepts only a token whose subject is this repository (by its numeric repository and owner IDs) in environment `demo`, branch `refs/heads/main`, and whose workflow file is `.github/workflows/deploy.yml`. A pull request, a fork or another workflow cannot log in |
 | Deployer service account | `habit-tracker-deployer`; no key file (`gcloud iam service-accounts keys list` returned "Listed 0 items.", read by phittayanan) |
 | Roles of the deployer | `roles/run.developer` on the project; `roles/artifactregistry.writer` on the repository `habit-tracker`; `roles/iam.serviceAccountUser` on `habit-tracker-runner`; `roles/iam.workloadIdentityUser` on the deployer itself, granted to the repository (by its ID) through the pool |
-| Ruleset `require-ci` | Active, no bypass, on `main` and `staging`: status check `test-and-docker` (GitHub Actions) is required, and "require branches to be up to date before merging" is on. It sits next to `protect-main-and-staging` (pull request with 1 approval, merge commit only, no deletion or force push) and `staging-requires-issue-link` (check `pr-issue-link` on `staging`) |
+| Ruleset `require-ci` | Active, no bypass, on `main` and `staging`: status check `test-and-docker` (GitHub Actions) is required, and "require branches to be up to date before merging" is on. It sits next to `protect-main-and-staging` (pull request with 1 approval, merge commit only, no deletion or force push) and `staging-requires-issue-link` (check `pr-issue-link` on `staging`; since 28 Nov 2026 also `server-tests-windows`, section 8.4) |
 | C-02 proof (R-06) | [PR #76](https://github.com/phittayanan/habit-tracker/pull/76) into `main` from the temporary branch `test/prove-gate`, tested commit `511c1ca`: [run 43396969194](https://github.com/phittayanan/habit-tracker/actions/runs/43396969194) failed on the one test `C-02 proof`; the PR page showed `test-and-docker` as Required and failing, the merge button disabled and "Merging is blocked". The PR was closed without merging and the branch deleted; the failed run is kept (R-10) |
 | Evidence | Screenshots of the blocked merge and of the ruleset are in the Issue #65 comment of 14 Nov 2026 (Figures 1 to 3), not in the repository |
 | In use | The keyless login worked in [run 43439782760](https://github.com/phittayanan/habit-tracker/actions/runs/43439782760) (release 1), in the rollback run 43463075320 and in the roll-forward run 43463355931 (section 6) |
@@ -321,6 +321,49 @@ All runs are kept (R-10).
 | [43182003625](https://github.com/phittayanan/habit-tracker/actions/runs/43182003625) | `daaafc2` (this branch after merging `staging` with the Issue #62 fix, PR #72) | **Green.** All steps passed: deploy-script checks, client build, server suite 82 of 82, browser tests 44 passed, Docker build (`docker build`, not pushed) |
 
 The run on `daaafc2` is the green run on the Issue #50 PR into `staging` (C-01, staging side). The run on a PR into `main` is added by the first release PR after this workflow is on `staging`.
+
+### 8.4 Server tests on Windows (Issue #164, ADR 0106)
+
+`.github/workflows/ci-windows.yml`, workflow name "Server tests (Windows)", one job with the id `server-tests-windows`. It runs the server tests on Windows because TC-89 passed the Linux job in PR #146 and failed on Windows; only the review found it.
+
+| Item | Choice |
+|---|---|
+| Triggers | `pull_request` into `main` and into `staging`; `workflow_dispatch` (manual). Not `workflow_call`: it is its own file so that `deploy.yml`, which reuses `ci-docker.yml`, does not wait for it (ADR 0106) |
+| Runner | `windows-2025`, not `windows-latest`, so the image changes only when we change the label |
+| Database | PostgreSQL 16 from the action `ikalnytskyi/action-setup-postgres` `v9`, pinned to commit `325155bfd7807b2a21ac9c2c7bb9b9a6eacc44df` (Windows runners cannot run service containers). The user `ci` with the same throw-away password as the Linux job; the application database and a separate test database |
+| Steps | Checkout, Node.js 24, PostgreSQL 16, print the server version, client `npm ci` and `npm run build`, then in `server/`: `npm ci`, `npx prisma generate`, create the test database, `prisma migrate deploy` on both databases, seed with generated passwords, `npm test`. No browser tests and no Docker build (out of scope of #164), and no deploy-script checks or Python setup (they test `deploy/` scripts, not the server, and stay in the Linux job) |
+| Required check | **Yes, on `staging` only, since 28 Nov 2026** ([Issue #194](https://github.com/phittayanan/habit-tracker/issues/194)). projectnewy asked that it becomes required only after the `v2.1` release, tagged on 28 Nov 2026. `main` keeps its own checks: a release PR into `main` runs the job, but it is not a required check there, so a Windows failure alone does not block that merge. See "Required on `staging`" below |
+
+Three things differ from the Linux job, each found in a run below:
+
+1. `psql` gets the password in the URI and `-w`, not from `PGPASSWORD`: on Windows the setup action clears `PGPASSWORD` through `GITHUB_ENV`, which overrides the job's `env`, and `psql` then waited for a password until the job timeout.
+2. `psql` options come before the URI: `psql` on Windows ignored the `-c` that came after it.
+3. `npx prisma generate` runs after `npm ci`: without it the seed stopped with "@prisma/client did not initialize yet".
+
+#### Runs
+
+All runs are kept (R-10). The red runs used the temporary branch `chore/164-windows-ci-red`: this job, TC-89 as it was before the Windows fix `f8736c9`, and a push trigger for that branch only. The branch was deleted after the last red run.
+
+| Run | Commit | Result |
+|---|---|---|
+| [46117726915](https://github.com/phittayanan/habit-tracker/actions/runs/46117726915) | `473a615` (red branch) | Cancelled by the 30-minute job timeout: PostgreSQL 16 was set up, then `psql` waited for a password (point 1). No test ran |
+| [46120070627](https://github.com/phittayanan/habit-tracker/actions/runs/46120070627) | `801f702` (red branch) | Failed before the tests: the seed stopped with "@prisma/client did not initialize yet" (point 3), and `psql` ignored its `-c` (point 2) |
+| [46120341678](https://github.com/phittayanan/habit-tracker/actions/runs/46120341678) | `fa07b53` (red branch) | **Red, as intended.** PostgreSQL `16.16`; server suite 151 tests, 150 passed, 1 failed: TC-89, `spawn ...\node_modules\.bin\prisma ENOENT`, the Windows failure that `f8736c9` fixed |
+| [46120992781](https://github.com/phittayanan/habit-tracker/actions/runs/46120992781) | `71d2a2b` (PR #197, current TC-89) | **Green.** PostgreSQL `16.16`; server suite 161 tests, 161 passed, TC-89 included |
+
+#### Required on `staging` (Issue #194)
+
+On 28 Nov 2026, after `v2.1` was tagged on `main` (`9b09bfe`), phittayanan added the status check `server-tests-windows` (source GitHub Actions) to the ruleset `staging-requires-issue-link` in the GitHub settings. Nothing else in the ruleset was changed. No AI agent changed a ruleset. The check went into this ruleset and not into `require-ci` because `require-ci` covers both `main` and `staging`, and `main` is out of scope of #194. `staging-requires-issue-link` covers `staging` only. phittayanan chose this ruleset from the agent's proposal.
+
+Readback by the agent with `gh api` on 28 Nov 2026, after the change:
+
+| Branch | Ruleset (id) | Required checks | Up to date before merging |
+|---|---|---|---|
+| `staging` | `require-ci` (27187219) | `test-and-docker` | on |
+| `staging` | `staging-requires-issue-link` (26717869), updated 2026-11-28 16:13 +07:00 | `pr-issue-link`, `server-tests-windows` | off, unchanged |
+| `main` | `require-ci` (27187219) | `test-and-docker` | on |
+
+Each check names GitHub Actions as its source (app id 15368). Both rulesets are active and have no bypass actors. `gh api repos/phittayanan/habit-tracker/rules/branches/staging` lists the three checks above, and the same call for `main` lists `test-and-docker` only. The PR of Issue #194 is the first PR into `staging` that shows `server-tests-windows` as Required.
 
 ## 9. First deployment (Lab 5 step 5, Issue #64)
 
