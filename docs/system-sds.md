@@ -165,7 +165,7 @@ Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed 
 | 2 | Entry edit and delete | Rule: ADR 0009, BR-11. Sprint: SRS FR-17 (ADR 0009 gives no sprint) |
 | 2 | Template retire (the `state` column is already there) | Rule: ADR 0017. Sprint: SRS FR-08 and features O-4 |
 | 2 | Template kind, `COUNT` or `TIME` (an additive column; existing rows become `COUNT`) | ADR 0064, ADR 0065; Issue #151 |
-| 3 | Reminder time and weekdays per goal (stored, nothing is sent) | Rule: ADR 0016, BR-14. Sprint: ADR 0021 |
+| 3 | Reminder time and weekdays per goal (stored, nothing is sent), in a new table `GoalReminder` with one row per goal; the migration is additive, and the reminder is deleted with its goal (ADR 0099; F-17 section 8) | Rule: ADR 0016, BR-14, ADR 0086, ADR 0099. Sprint: ADR 0021 |
 | 3 | Streaks: computed from entries and goal versions, never stored | Rule: ADR 0015. Sprint: ADR 0021 |
 
 Progress and streaks are computed from entries each time, so an edit needs no extra update step (ADR 0009). Calendar colours are computed the same way (BR-15).
@@ -363,6 +363,7 @@ Sprint 1 itself needs only the local setup: install, migrate, seed, run and test
 | Permanent retire and its screens | 0078, 0079, 0095 |
 | Entry edit and delete | 0080 to 0083 |
 | One removable reminder per goal, on the goals page | 0086 to 0088 |
+| A reminder is deleted with its goal | 0099 |
 | Streak display and the goal detail page | 0089 to 0091 |
 | No sharing; a Manager sees templates only | 0019 |
 | Sprint 1 is the handout slice; later split | 0020, 0021 |
@@ -408,3 +409,4 @@ The SRS and `docs/features.md` need a one-line change for each of these two; bot
 | 2026-11-27 | Issue #150: goal versions in `GoalTarget` with `daily_target` kept (3.5); decision list (8.1). ADR 0075 to ADR 0084 | pending (reviewer phittayanan) |
 | 2026-11-27 | Issue #153: versions deleted with their goal (3.5); decision list (8.1). ADR 0092, ADR 0093 | phittayanan; projectnewy agreed in the [review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176 |
 | 2026-11-27 | Issue #157: detail page and reminder screens (4.1), reminder removal (4.4), decision list (8.1). ADR 0086 to ADR 0091 | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #158: `GoalReminder` table, deleted with its goal (3.5); decision list (8.1). ADR 0099 | pending (reviewer projectnewy) |
