@@ -34,7 +34,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker?schema=public
       TEST_DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker_test?schema=public
-      # For psql. No PGPASSWORD: on Windows the setup action clears it through GITHUB_ENV,
+      # For psql; its options go before this URI, because psql on Windows ignores options
+      # after it (run 46120070627). No PGPASSWORD: on Windows the setup action clears it through GITHUB_ENV,
       # which overrides this job env, and psql then waits for a password until the timeout
       # (run 46117726915). The password is in the URI, and -w makes psql fail instead of asking.
       PSQL_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker
@@ -61,7 +62,7 @@ jobs:
           postgres-version: "16"
 
       - name: Show the PostgreSQL version
-        run: psql -w "$PSQL_URL" -tAc 'SHOW server_version'
+        run: psql -w -tA -c 'SHOW server_version' "$PSQL_URL"
         timeout-minutes: 2
 
       # The server's production-serving test needs client/dist/index.html.
@@ -75,7 +76,10 @@ jobs:
         working-directory: ./server
         run: |
           npm ci
-          psql -w "$PSQL_URL" -c 'CREATE DATABASE habit_tracker_test'
+          # On Windows npm ci leaves the Prisma client ungenerated ("@prisma/client did not
+          # initialize yet", run 46120070627), so generate it explicitly.
+          npx prisma generate
+          psql -w -c 'CREATE DATABASE habit_tracker_test' "$PSQL_URL"
           npx prisma migrate deploy
           DATABASE_URL="$TEST_DATABASE_URL" npx prisma migrate deploy
           # Seed passwords are generated for this run only and masked in the log.
