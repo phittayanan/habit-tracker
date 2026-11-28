@@ -22,7 +22,7 @@ Deliverable 2 Part E, [Issue #160](https://github.com/phittayanan/habit-tracker/
 | Item | Risk | Proposed action |
 |---|---|---|
 | A rollback does not undo a migration | Going back to an older tag keeps the new tables; the older code does not know newer rules (see the v2.0 record) | Fix forward; keep a backup before each release with a migration |
-| `server-tests-windows` is not a required check | A Windows failure does not block a merge | #194 |
+| `server-tests-windows` is required on `staging` only (since 2026-11-28, after `v2.1`; [#194](https://github.com/phittayanan/habit-tracker/issues/194), PR #201) | On a release PR into `main`, a Windows failure alone does not block the merge | Read its result on each release PR |
 | Not checked on the deployed app | Keyboard-only use, some cross-account API requests, concurrent requests, a service restart | Decide which to run before the final release (#27) |
 | OBS-1 has no Issue | It can be forgotten | projectnewy opens its Issue and it is fixed before the final release (section 3) |
 | UI and usability are not good enough yet for people outside the team (phittayanan, [review of 6230d71](https://github.com/phittayanan/habit-tracker/pull/200)) | The app is not ready for real users | A "UI and usability for real users" part of #27 (section 3) |
@@ -55,7 +55,7 @@ Facts that bear on it: the automated suites and the checks listed above passed, 
 |---|---|---|---|---|---|---|
 | Sprint 1 continuity and change register with the `v2.1` re-run ([#159](https://github.com/phittayanan/habit-tracker/issues/159), PR #186) | D2 Part A | projectnewy | phittayanan | #160 | Fill in J-1 to J-7, resolve the conflict, ask for review | 29 Nov |
 | Current documents, status tables and D2 PDF ([#161](https://github.com/phittayanan/habit-tracker/issues/161)) | D2 Parts D and submission | phittayanan | projectnewy | #159, #160 | Update the documents; each student adds their ID only in the PDF | 29 Nov |
-| Windows job as a required check ([#194](https://github.com/phittayanan/habit-tracker/issues/194)) | CI | phittayanan | projectnewy | `v2.1` (done) | Change the `staging` ruleset and record it | 30 Nov |
+| Windows job as a required check on `staging` ([#194](https://github.com/phittayanan/habit-tracker/issues/194)) | CI | phittayanan | projectnewy | `v2.1` (done) | None: done in PR #201, recorded in [deployment.md section 8.4](../labs/lab-05/deployment.md) | Done 28 Nov |
 | OBS-1, the message that stays after a discard | F-11 | projectnewy | phittayanan | none | Open its Issue by this date; fix it before the final release | 30 Nov (Issue) |
 | F-16 streaks: open the code Issue | FR-20, BR-13 | phittayanan | projectnewy | contract (#157) | Create the Issue | 30 Nov |
 | F-16 streaks: tests, code, review | AC-16.1 to AC-16.9; TC-41, TC-42, TC-160 to TC-166 | phittayanan | projectnewy | F-08, F-09, F-11, F-13, F-14 (built) | Failing tests first, then code | 8 Dec |
