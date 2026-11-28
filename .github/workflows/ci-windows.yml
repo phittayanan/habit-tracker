@@ -34,7 +34,10 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker?schema=public
       TEST_DATABASE_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker_test?schema=public
-      PGPASSWORD: ci_throwaway
+      # For psql. No PGPASSWORD: on Windows the setup action clears it through GITHUB_ENV,
+      # which overrides this job env, and psql then waits for a password until the timeout
+      # (run 46117726915). The password is in the URI, and -w makes psql fail instead of asking.
+      PSQL_URL: postgresql://ci:ci_throwaway@localhost:5432/habit_tracker
 
     steps:
       - name: Checkout repository
@@ -58,7 +61,8 @@ jobs:
           postgres-version: "16"
 
       - name: Show the PostgreSQL version
-        run: psql -h localhost -U ci -d habit_tracker -tAc 'SHOW server_version'
+        run: psql -w "$PSQL_URL" -tAc 'SHOW server_version'
+        timeout-minutes: 2
 
       # The server's production-serving test needs client/dist/index.html.
       - name: Install and build client
@@ -71,7 +75,7 @@ jobs:
         working-directory: ./server
         run: |
           npm ci
-          psql -h localhost -U ci -d habit_tracker -c 'CREATE DATABASE habit_tracker_test'
+          psql -w "$PSQL_URL" -c 'CREATE DATABASE habit_tracker_test'
           npx prisma migrate deploy
           DATABASE_URL="$TEST_DATABASE_URL" npx prisma migrate deploy
           # Seed passwords are generated for this run only and masked in the log.
