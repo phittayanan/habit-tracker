@@ -1,8 +1,8 @@
 # Deliverable 2 Part A: Sprint 1 continuity and change status
 
-**DRAFT.** Issue [#159](https://github.com/phittayanan/habit-tracker/issues/159). Owner: projectnewy. Reviewer and merger: phittayanan. Records read on 2026-11-28 (Asia/Bangkok), last with the repository at `staging` `66ed3c1`.
+Issue [#159](https://github.com/phittayanan/habit-tracker/issues/159). Owner: projectnewy. Reviewer and merger: phittayanan. Records read on 2026-11-28 (Asia/Bangkok), last with the repository at `staging` `e087c29`.
 
-**Not final.** The candidate `v2.1` is released and the Sprint 1 journey was run on it (section 2). The record of that run is still under review in [PR #200](https://github.com/phittayanan/habit-tracker/pull/200). This Issue stays open until this document is reviewed and merged.
+The candidate `v2.1` is released ([#160](https://github.com/phittayanan/habit-tracker/issues/160), closed on 2026-11-28), and the Sprint 1 journey was run on it (section 2). The run is also recorded in the [`v2.1` release record](v2.1-release.md).
 
 ## 1. Accepted Sprint 1 versions
 
@@ -55,7 +55,7 @@ Two approved changes alter what a tester sees. A Participant now starts on `/cal
 
 **Data added.** The template `PD-v21 Count` and `participant1`'s goal 12 with one entry stay on the app, which cannot delete them. Before any check data was added, the data read after the migration showed no difference from the reading before the release, apart from the new `reminder` field (`null`).
 
-**Evidence.** The record of this run is section 5 of the `v2.1` release record in [PR #200](https://github.com/phittayanan/habit-tracker/pull/200) (open at the time of writing). Full-resolution screenshots, with names that start `J-01` to `J-07`, are kept outside Git by projectnewy.
+**Evidence.** [`v2.1` release record](v2.1-release.md), section 5. Screenshots with names that start `J-01` to `J-07` are kept outside Git by projectnewy.
 
 ### 2.3 Earlier user tests
 
@@ -104,7 +104,7 @@ The register covers deployment, user-test and maintenance findings from Lab 5 to
 | ID | Source | Affected requirement or feature | Accepted decision | Status | Fix release | Re-test outcome |
 |---|---|---|---|---|---|---|
 | CR-12 | Lab 7 debt 1 ([readiness](../labs/lab-07/readiness.md) section 3): CI runs on Linux only | NFR-09; CI | Add a Windows server-test job ([#164](https://github.com/phittayanan/habit-tracker/issues/164), [ADR 0106](../adr/0106-windows-ci-postgres.md), [PR #197](https://github.com/phittayanan/habit-tracker/pull/197)); make it required on `staging` after `v2.1` ([#194](https://github.com/phittayanan/habit-tracker/issues/194)) | Resolved for server tests. Required on `staging` only, not on `main`; no browser tests on Windows | Job in `v2.1`; the required check is a repository setting made after the release | The job failed on the old TC-89 ([run 46120341678](https://github.com/phittayanan/habit-tracker/actions/runs/46120341678)) and passed on newer code, 161 of 161 ([run 46120992781](https://github.com/phittayanan/habit-tracker/actions/runs/46120992781)); see [deployment.md](../labs/lab-05/deployment.md) 8.4 |
-| CR-13 | Lab 7 debt 2 and [release](../labs/lab-07/release.md) section 3: a rollback to `v1.4` after the migration is not safe | BR-04; deployment | Fix forward; write a runbook and back up before a release with a migration | **Open.** Backups were taken before `v1.5`, `v2.0` and `v2.1`; no fix-forward runbook was found | Pending | Not applicable; no rollback of `v1.5`, `v2.0` or `v2.1` is recorded |
+| CR-13 | Lab 7 debt 2 and [release](../labs/lab-07/release.md) section 3: a rollback to `v1.4` after the migration is not safe | BR-04; deployment | Fix forward; write a runbook and back up before a release with a migration | **Open.** Backups were taken before `v1.5`, `v2.0` and `v2.1`; no fix-forward runbook was found. The [`v2.1` readiness review](readiness-and-plan.md) keeps "fix forward" and a backup before a release with a migration | Pending | Not applicable; no rollback of `v1.5`, `v2.0` or `v2.1` is recorded |
 | CR-14 | Lab 7 debt 3: business rules are checked by hand after a deploy | Smoke test | Add one API check of the day-total rule (priority low) | **Open**; no Issue found, and `deploy/` has not changed since `v1.5` | Pending | Not run |
 | CR-15 | Lab 7 [release](../labs/lab-07/release.md) sections 3 and 4: entries saved during the migration window, and existing rows against a reading taken before, were not checked | Data after the `v1.5` migration | No decision recorded | **Not verified** | None | Not run |
 | CR-16 | [Lab 5 Part 1](../labs/lab-05/evidence/part-1.md) and the PR #95 review: a login timeout at 375 px in the browser suite, once in each of two first CI runs | Browser tests (TC-07 area) | Accepted for PR #95; open an Issue if it appears again | **Open**, cause not known | None | Both passed on the next run of the same code; this does not show the cause is fixed. CR-24 later explained one TC-07 timeout; it is not shown that the same cause produced these |
@@ -115,7 +115,7 @@ The register covers deployment, user-test and maintenance findings from Lab 5 to
 | CR-21 | Deliverable 1 Part F.6, limitation 6: repeated failed logins are not limited | F-01 | Not in Sprint 1 scope | Listed as a limitation; no later decision recorded | None | Not applicable |
 | CR-22 | Review of [PR #132](https://github.com/phittayanan/habit-tracker/pull/132): a NUL character in a name gets the length message | F-03, F-04 message | No change: the contract asks for no new message ([resolution](../labs/lab-06/resolution.md) section 5) | Accepted limitation | None | Not applicable |
 | CR-23 | Partner observation in [#130](https://github.com/phittayanan/habit-tracker/issues/130), not reported as a defect: `maxValue` 100000000 gets the "at most 2 decimal places" message | F-03, F-04 message | No decision recorded (the answer on #130 says the item was noted) | Observation | None | Not run |
-| CR-25 | OBS-1 in the post-deployment checks of `v2.0` ([record](v2.0-release.md) section 5): after a rejected value was discarded, its message stayed on the calendar card with no input open. No effect on data was seen | F-11 calendar card; not yet compared with the contract | The plan in [PR #200](https://github.com/phittayanan/habit-tracker/pull/200) (not merged) gives it to projectnewy: open an Issue, then fix it before the final release | **Open**; no Issue yet | Pending | Not checked again on `v2.1` |
+| CR-25 | OBS-1 in the post-deployment checks of `v2.0` ([record](v2.0-release.md) section 5): after a rejected value was discarded, its message stayed on the calendar card with no input open. No effect on data was seen | F-11 calendar card; not yet compared with the contract | [Agreed plan](readiness-and-plan.md) section 3: owner projectnewy; open an Issue by 30 Nov and fix it before the final release | **Open**; no Issue yet | Pending | Not checked again on `v2.1` |
 
 Related records that are not defects: the partner's synthetic `UAT-*` and `EXP-*` test records stay on the deployed app by decision ([#130](https://github.com/phittayanan/habit-tracker/issues/130)); a roll-forward of the same commit overwrites its image tag, and a rollback does not undo a migration ([deployment.md](../labs/lab-05/deployment.md) 6.4 and 6.7).
 
@@ -145,14 +145,13 @@ The source is "Approved Changes" in [traceability.md](../traceability.md), plus 
 
 **Record gaps for [#161](https://github.com/phittayanan/habit-tracker/issues/161) (not changed here).** In `traceability.md`, the rows of B-10, B-14, B-15 and B-16 still show a pending agreement, although the reviews above record it. The SRS revision history still shows "pending" for #151, #150 and #157. The B-06, B-07 and B-08 changes have no row in "Approved Changes". [findings.md](../labs/lab-06/findings.md) still shows #127 as not yet triaged.
 
-[PR #202](https://github.com/phittayanan/habit-tracker/pull/202) (draft, #161) changes `traceability.md` and the SRS; it was not checked here. Check this table again before #159 closes.
+[PR #202](https://github.com/phittayanan/habit-tracker/pull/202) (draft, #161) changes `traceability.md` and the SRS and is not merged; its changes are not covered here.
 
-## 5. Before #159 closes
+## 5. Checks before #159 closes
 
-- [x] `v2.0` and `v2.1` are tagged and `v2.1` is deployed.
-- [x] Section 2 holds the results of the run on `v2.1`, with its limit.
-- [x] CR-12, CR-19 and CR-20 are updated from what was released; CR-24 and CR-25 are added.
-- [ ] [PR #200](https://github.com/phittayanan/habit-tracker/pull/200) is merged; then section 2.2 and CR-25 link to its files on `staging`.
-- [ ] Section 4 includes any revision approved after this update.
-- [ ] For the PDF (#161): captioned screenshots of the run are embedded, not only named.
-- [ ] phittayanan has reviewed this document.
+- `v2.0` and `v2.1` are tagged, `v2.1` is deployed, and #160 is closed.
+- Section 2 holds the results of the run on `v2.1`, with its limit.
+- CR-12, CR-19 and CR-20 follow what was released; CR-24 and CR-25 are added.
+- Section 4 was compared with `traceability.md` on `staging` `e087c29`.
+
+**For the D2 PDF ([#161](https://github.com/phittayanan/habit-tracker/issues/161)).** The PDF needs captioned screenshots of the run on `v2.1`. This document names them but does not embed them.
