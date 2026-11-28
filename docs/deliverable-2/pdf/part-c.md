@@ -18,7 +18,7 @@
 | Tests on `9b09bfe` | TC-43, TC-168 to TC-175 pass in CI run 46124923270 (`reminder.test.js`, `reminder-rules.test.js`, `reminder.spec.js` at 375 px and 1280 px) |
 | Deployed checks on `v2.1` | R-01 to R-11, 11 of 11 passed (Part E, `v2.1` record section 5) |
 
-**Screenshots (PENDING: the students' choice of source).** Set, change and remove a reminder on the deployed `v2.1` (R-04, R-06, R-08) were captured by projectnewy; the captures are kept outside Git (`v2.1` record section 7).
+**Screenshots (PENDING: projectnewy's captures, asked for in PR #202).** Set, change and remove a reminder on the deployed `v2.1` (R-04, R-06, R-08) were captured by projectnewy; the captures are kept outside Git (`v2.1` record section 7).
 
 ## C.3 Remaining-work table {#c-3}
 

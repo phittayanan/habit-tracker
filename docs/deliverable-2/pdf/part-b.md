@@ -29,7 +29,7 @@ Screenshots from the F-12 and F-15 build (Issue #156), local development build b
 
 ![Figure B-2. F-15 List (AC-15.1 to AC-15.3, AC-15.5). Same account and data. Steps: press List. Expected: the month's days newest first, each with its sign and words and one row per goal with total / target, ✓ when met, the entries in brackets, Time in hours and minutes, and "No entries" for a day without entries. Actual: as expected (for example Fri 27 Nov ✓ all met, Sleep 7 h 10 min / 7 h ✓; Tue 24 Nov "No entries").](../../sprints/sprint-2/img/f15-built-1280-list.png)
 
-**To add (PENDING: the students' choice of source).** A rule rejection with saved data on a Sprint 2 feature, for example F-13's refused edit above the day cap (check C-13 or C-14 on `v2.0`, 409 `Only 9 reps left for today.`). Those captures are kept outside Git by projectnewy ([v2.0 record](https://github.com/phittayanan/habit-tracker/blob/staging/docs/deliverable-2/v2.0-release.md) section 7). Backend evidence of the access rules is in Part E.2 (TC-121) and in the deployed checks E-01 to E-06 of `v2.0`.
+**To add (PENDING: projectnewy's captures, asked for in PR #202).** A rule rejection with saved data on a Sprint 2 feature, for example F-13's refused edit above the day cap (check C-13 or C-14 on `v2.0`, 409 `Only 9 reps left for today.`). Those captures are kept outside Git by projectnewy ([v2.0 record](https://github.com/phittayanan/habit-tracker/blob/staging/docs/deliverable-2/v2.0-release.md) section 7). Backend evidence of the access rules is in Part E.2 (TC-121) and in the deployed checks E-01 to E-06 of `v2.0`.
 
 ## B.4 Issue and PR chains {#b-4}
 
