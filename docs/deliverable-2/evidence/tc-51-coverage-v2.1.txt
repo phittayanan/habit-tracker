@@ -1,0 +1,48 @@
+TC-51 (AC-SYS.4, NFR-08) rule coverage on v2.1, commit 9b09bfef47733b365d1af9bb8aa4950f228f0d3c
+Run by Claude Code for Issue #161 on 2026-11-28, macOS, Node v26.8.1 (CI uses Node 24), PostgreSQL 16 in a temporary Docker container, 8 migrations on an empty test database.
+Command (in server/): node --experimental-test-coverage --test --test-concurrency=1 test/*.test.js
+
+ℹ tests 161
+ℹ suites 0
+ℹ pass 161
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+
+ℹ start of coverage report
+ℹ ----------------------------------------------------------------------
+ℹ file                  | line % | branch % | funcs % | uncovered lines
+ℹ ----------------------------------------------------------------------
+ℹ ..                    |        |          |         | 
+ℹ  client               |        |          |         | 
+ℹ   src                 |        |          |         | 
+ℹ    time-format.js     |  82.35 |    85.71 |   33.33 | 12-14
+ℹ prisma                |        |          |         | 
+ℹ  seed.js              |  93.48 |    80.00 |  100.00 | 40-42
+ℹ src                   |        |          |         | 
+ℹ  app.js               |  95.74 |    92.31 |  100.00 | 43-44
+ℹ  middleware           |        |          |         | 
+ℹ   auth.js             | 100.00 |   100.00 |  100.00 | 
+ℹ  routes               |        |          |         | 
+ℹ   auth.js             | 100.00 |   100.00 |  100.00 | 
+ℹ   calendar.js         | 100.00 |    83.33 |  100.00 | 
+ℹ   entries.js          | 100.00 |    78.26 |  100.00 | 
+ℹ   goals.js            | 100.00 |    78.57 |  100.00 | 
+ℹ   templates.js        | 100.00 |    83.33 |  100.00 | 
+ℹ  services             |        |          |         | 
+ℹ   auth.js             | 100.00 |   100.00 |  100.00 | 
+ℹ   calendar.js         | 100.00 |    94.44 |  100.00 | 
+ℹ   day-state-rules.js  | 100.00 |   100.00 |  100.00 | 
+ℹ   entry-rules.js      | 100.00 |    97.62 |  100.00 | 
+ℹ   entry.js            | 100.00 |    98.04 |  100.00 | 
+ℹ   goal-rules.js       | 100.00 |    97.30 |  100.00 | 
+ℹ   goal.js             | 100.00 |    94.34 |  100.00 | 
+ℹ   progress-rules.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   reminder-rules.js   | 100.00 |   100.00 |  100.00 | 
+ℹ   session.js          | 100.00 |   100.00 |  100.00 | 
+ℹ   template.js         | 100.00 |    95.29 |   91.30 | 
+ℹ ----------------------------------------------------------------------
+ℹ all files             |  99.20 |    94.11 |   97.53 | 
+ℹ ----------------------------------------------------------------------
+ℹ end of coverage report

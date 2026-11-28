@@ -2,6 +2,8 @@
 
 Part C of Deliverable 1 (Issue #6). The design is built from the ADRs (`docs/adr/`) and the requirements in `docs/srs.md`. Each section cites its source. Where no ADR or SRS line settles a point, the design gives a **proposal** and lists it in section 8.2. On PR #23 phittayanan answered the open points S-1 to S-14; those answers are recorded in 8.2 as decided, and S-15 to S-17 are new and still open. Nothing here changes a requirement or an ADR. Per-feature detail (exact request and response shapes, acceptance criteria) belongs to the Sprint 1 contracts (Part E).
 
+**Status at `v2.1`** (commit `9b09bfe`, 2026-11-28; Deliverable 2 Part D, Issue #161): everything in this document is built except the Sprint 3 streaks (F-16): the goal detail page `/goals/:id`, `GET /api/goals/:id` and the streak values. Sections 3.1, 3.2, 3.5, 4.1 and 4.4 mark what is built. Schema at `v2.1`: 8 Prisma migrations, all additive (3.6).
+
 ## 1. Overview
 
 ### 1.1 What this document covers
@@ -67,7 +69,7 @@ The Lab 5 kit expects a `client/` folder and a `server/` folder, each with `pack
 ## 3. Data Design
 
 ### 3.1 Entities
-Sprint 1 entities are User, Session, Template, Goal and Entry. Later sprints add to them (3.5). The key type and decimal precision are decided (S-2); the relationships and constraints come from the SRS and ADRs.
+Sprint 1 entities are User, Session, Template, Goal and Entry. Later sprints add to them (3.5): at `v2.1` the tables GoalTarget (Sprint 2, F-14) and GoalReminder (Sprint 3, F-17) and the Template column `kind` (Sprint 2) are built. The key type and decimal precision are decided (S-2); the relationships and constraints come from the SRS and ADRs.
 
 ```mermaid
 erDiagram
@@ -76,6 +78,8 @@ erDiagram
   USER ||--o{ TEMPLATE : "creates (Manager)"
   TEMPLATE ||--o{ GOAL : "used by"
   GOAL ||--o{ ENTRY : "has"
+  GOAL ||--|{ GOALTARGET : "target versions (Sprint 2)"
+  GOAL ||--o| GOALREMINDER : "reminder (Sprint 3)"
 ```
 
 ### 3.2 Fields and constraints
@@ -133,6 +137,21 @@ The goal's state (Active or Ended) is not a column. It is computed from the date
 | created_at | timestamp | not null | |
 | | | index (goal_id, entry_date), not unique | Several entries per goal and day (BR-04, ADR 0061). The service locks the goal row (`SELECT ... FOR UPDATE`), sums the day, checks the maximum and inserts in one transaction, so two requests at once cannot take the day total above it |
 
+**GoalTarget** (Sprint 2, F-14; ADR 0075, ADR 0077, ADR 0092; migration `20261127000300_goal_target`)
+| Field | Type | Constraint | Note |
+|---|---|---|---|
+| id | integer | primary key | |
+| goal_id | reference to Goal | not null, on delete cascade | Versions are deleted with their goal (ADR 0092) |
+| effective_from | date | not null; unique with `goal_id` | One version per goal and date; a second change on the same day replaces it (ADR 0077) |
+| daily_target | decimal(10, 2) | not null, greater than 0 (database check) | The target in force from `effective_from`. The migration gave every existing goal one version from its start date |
+
+**GoalReminder** (Sprint 3, F-17; ADR 0086, ADR 0099; migration `20261127000400_goal_reminder`)
+| Field | Type | Constraint | Note |
+|---|---|---|---|
+| goal_id | reference to Goal | primary key, on delete cascade | One reminder per goal; deleted with its goal (ADR 0099) |
+| time | text, 5 characters | not null, `HH:MM` from 00:00 to 23:59 (database check) | Stored and shown; nothing is sent (ADR 0016) |
+| weekdays | list of text | not null, at least one, each `MON` to `SUN` (database checks) | |
+
 Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed precision; the scale is set in the contracts (S-2, decided).
 
 ### 3.3 Ownership links
@@ -159,14 +178,16 @@ Decimal columns (`min_value`, `max_value`, `daily_target`, `value`) use a fixed 
 | BR-15 calendar day colour (Sprint 2) | Computed from the day's entries | TC-37 |
 
 ### 3.5 Planned additions (later sprints)
-| Sprint | Addition | Source |
-|---|---|---|
-| 2 | Goal versions: each change of the daily target is a new row with an effective-from date, so earlier days keep the old target. They are rows of a new table `GoalTarget`; the `daily_target` column is kept and holds the latest target, and the migration is additive (ADR 0075; F-14 section 8). Versions are deleted with their goal (ADR 0092) | ADR 0011, ADR 0075, ADR 0092, BR-12 |
-| 2 | Entry edit and delete | Rule: ADR 0009, BR-11. Sprint: SRS FR-17 (ADR 0009 gives no sprint) |
-| 2 | Template retire (the `state` column is already there) | Rule: ADR 0017. Sprint: SRS FR-08 and features O-4 |
-| 2 | Template kind, `COUNT` or `TIME` (an additive column; existing rows become `COUNT`) | ADR 0064, ADR 0065; Issue #151 |
-| 3 | Reminder time and weekdays per goal (stored, nothing is sent), in a new table `GoalReminder` with one row per goal; the migration is additive, and the reminder is deleted with its goal (ADR 0099; F-17 section 8) | Rule: ADR 0016, BR-14, ADR 0086, ADR 0099. Sprint: ADR 0021 |
-| 3 | Streaks: computed from entries and goal versions, never stored | Rule: ADR 0015. Sprint: ADR 0021 |
+The last column is the state at `v2.1` (Issue #161).
+
+| Sprint | Addition | Source | At `v2.1` |
+|---|---|---|---|
+| 2 | Goal versions: each change of the daily target is a new row with an effective-from date, so earlier days keep the old target. They are rows of a new table `GoalTarget`; the `daily_target` column is kept and holds the latest target, and the migration is additive (ADR 0075; F-14 section 8). Versions are deleted with their goal (ADR 0092) | ADR 0011, ADR 0075, ADR 0092, BR-12 | built (#153, `v2.0`) |
+| 2 | Entry edit and delete | Rule: ADR 0009, BR-11. Sprint: SRS FR-17 (ADR 0009 gives no sprint) | built (#154, `v2.0`) |
+| 2 | Template retire (the `state` column is already there) | Rule: ADR 0017. Sprint: SRS FR-08 and features O-4 | built (#152, `v2.0`) |
+| 2 | Template kind, `COUNT` or `TIME` (an additive column; existing rows become `COUNT`) | ADR 0064, ADR 0065; Issue #151 | built (#168, `v2.0`) |
+| 3 | Reminder time and weekdays per goal (stored, nothing is sent), in a new table `GoalReminder` with one row per goal; the migration is additive, and the reminder is deleted with its goal (ADR 0099; F-17 section 8) | Rule: ADR 0016, BR-14, ADR 0086, ADR 0099. Sprint: ADR 0021 | built (#158, `v2.1`) |
+| 3 | Streaks: computed from entries and goal versions, never stored | Rule: ADR 0015. Sprint: ADR 0021 | **not built** (F-16) |
 
 Progress and streaks are computed from entries each time, so an edit needs no extra update step (ADR 0009). Calendar colours are computed the same way (BR-15).
 
@@ -193,7 +214,7 @@ One layout for everyone: a top bar with the user's name, the role's menu items a
 | Month calendar at `/calendar`, the Participant's first page (Monday first, month arrows) with the chosen day (today at start) in a side panel on desktop and a centre box on phone: every goal active that day with a Check in input by template kind (− / + or a 15-minute bar) and a typed row. The streak is not shown in Sprint 2; it comes in Sprint 3 with FR-20 (decided on PR #23). Contract: `docs/sprints/sprint-2/F-11-month-calendar.md` | Participant | 2 | FR-15, ADR 0037, ADR 0047, ADR 0021, ADR 0063 to ADR 0069 |
 | Calendar colours: green all met, yellow some met, red none met, grey nothing recorded, each with a sign; today live | Participant | 2 | FR-16, ADR 0040, ADR 0045, ADR 0046, ADR 0070 |
 | Calendar and List switch (list is grouped by day, newest first, for the same month) | Participant | 2 | FR-19, ADR 0041, ADR 0048, ADR 0071 |
-| Goal detail page at `/goals/:id`: a short summary with the best streak (ADR 0091; F-16) | Participant | 3 | FR-20, ADR 0042 |
+| Goal detail page at `/goals/:id`: a short summary with the best streak (ADR 0091; F-16). **Not built at `v2.1`** | Participant | 3 | FR-20, ADR 0042 |
 | Reminder on each goal of the goals page: show, set, change, remove (ADR 0086 to ADR 0088; F-17) | Participant | 3 | FR-21 |
 
 Sprint 1 does not build the calendar; the calendar becomes the Participant's first screen in Sprint 2 (SRS A-3), on its own page `/calendar`, and the goals page stays (ADR 0073). The look is plain, with colour only on the calendar (ADR 0044). Desktop is designed first, and the screens also work at 375 px wide (ADR 0038, NFR-05).
@@ -218,7 +239,7 @@ Exact wording of the messages is set in each feature contract.
 - **Dates and numbers:** dates are `YYYY-MM-DD` strings (Asia/Bangkok dates); values are numbers.
 
 ### 4.4 Endpoints (baseline, S-9)
-Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature contracts; rows for Sprint 2 and 3 are outlines. Roles are in section 5.
+Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature contracts. Roles are in section 5. At `v2.1` every row is built except `GET /api/goals/:id` (F-16, Sprint 3); the 19 built routes are checked by the route audit TC-08.
 
 | Method and path | Purpose | Sprint | FR |
 |---|---|---|---|
@@ -238,7 +259,7 @@ Accepted as a baseline on PR #23. Exact paths and shapes are set in the feature 
 | `PATCH` and `DELETE /api/goals/:id/entries/:entryId` | Edit or delete an entry | 2 | FR-17 |
 | `PATCH /api/goals/:id` | Change the daily target from today on | 2 | FR-18 |
 | `GET /api/calendar?month=YYYY-MM` | The caller's month: per day the state (colour) and, per goal active that day, the target, total, met and entries. Serves the calendar, the day box and the List; `GET /api/entries?month` was dropped (ADR 0072). Built in Issue #155 with `state` `null` on every day; Issue #156 fills it (ADR 0097) | 2 | FR-15, FR-16, FR-19 |
-| `GET /api/goals/:id` | One goal with its current and best streak (detail page) | 3 | FR-20 |
+| `GET /api/goals/:id` | One goal with its current and best streak (detail page). **Not built at `v2.1`** | 3 | FR-20 |
 | `PUT /api/goals/:id/reminder` | Store a reminder time and weekdays on a goal; `DELETE` on the same path removes it (ADR 0086) | 3 | FR-21 |
 
 ## 5. Roles and Permissions
@@ -405,8 +426,9 @@ The SRS and `docs/features.md` need a one-line change for each of these two; bot
 |---|---|---|
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: `max_value` also caps the day total and the `Entry` index is not unique (3.2); BR-04 and BR-07 enforcement (3.4); status codes and error example (4.3); decision list | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
-| 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072; after the PR #167 review, `/calendar` and the kept goals page (4.1, ADR 0073) | pending (reviewer projectnewy) |
-| 2026-11-27 | Issue #150: goal versions in `GoalTarget` with `daily_target` kept (3.5); decision list (8.1). ADR 0075 to ADR 0084 | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #151: `Template.kind` (3.2, 3.5); Sprint 2 calendar, colours and List screens (4.1); one `GET /api/calendar` endpoint replaces `GET /api/entries?month` (4.4); decision list (8.1). ADR 0063 to ADR 0072; after the PR #167 review, `/calendar` and the kept goals page (4.1, ADR 0073) | projectnewy, [review of 5cb03fd](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087285792) of PR #167 |
+| 2026-11-27 | Issue #150: goal versions in `GoalTarget` with `daily_target` kept (3.5); decision list (8.1). ADR 0075 to ADR 0084 | phittayanan, [review of 32c04e0](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6088317635) of PR #171 |
 | 2026-11-27 | Issue #153: versions deleted with their goal (3.5); decision list (8.1). ADR 0092, ADR 0093 | phittayanan; projectnewy agreed in the [review of 136c4b3](https://github.com/phittayanan/habit-tracker/pull/176#pullrequestreview-6089019427) of PR #176 |
-| 2026-11-27 | Issue #157: detail page and reminder screens (4.1), reminder removal (4.4), decision list (8.1). ADR 0086 to ADR 0091 | pending (reviewer phittayanan) |
-| 2026-11-27 | Issue #158: `GoalReminder` table, deleted with its goal (3.5); decision list (8.1). ADR 0099 | pending (reviewer projectnewy) |
+| 2026-11-27 | Issue #157: detail page and reminder screens (4.1), reminder removal (4.4), decision list (8.1). ADR 0086 to ADR 0091 | phittayanan, [review of 4010b68](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089586014) of PR #174 |
+| 2026-11-27 | Issue #158: `GoalReminder` table, deleted with its goal (3.5); decision list (8.1). ADR 0099 | projectnewy, [review of 3714141](https://github.com/phittayanan/habit-tracker/pull/183#pullrequestreview-6096383972) of PR #183 |
+| 2026-11-28 | Issue #161: status line at `v2.1`; GoalTarget and GoalReminder fields from the migrations and the entity diagram (3.1, 3.2); built marks (3.5, 4.1, 4.4). No design changed | pending (reviewer projectnewy) |

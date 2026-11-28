@@ -1,0 +1,29 @@
+TC-51 (AC-SYS.4, NFR-08) unit-only rule coverage on v2.1, commit 9b09bfef47733b365d1af9bb8aa4950f228f0d3c
+Run by Claude Code for Issue #161 on 2026-11-28 after projectnewy's review of PR #202 (review 6097636396), macOS, Node v26.8.1. No database is needed: the five *-rules test files hold only unit tests.
+Command (in server/): node --experimental-test-coverage --test --test-concurrency=1 test/*-rules.test.js
+Not loaded by this run: server/src/services/template.js (BR-03 minimumBelowMaximum); its unit test TC-10 sits in test/template.test.js with API tests, so it is covered only in the whole-suite run (tc-51-coverage-v2.1.txt).
+
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+
+ℹ start of coverage report
+ℹ ---------------------------------------------------------------------
+ℹ file                 | line % | branch % | funcs % | uncovered lines
+ℹ ---------------------------------------------------------------------
+ℹ src                  |        |          |         | 
+ℹ  services            |        |          |         | 
+ℹ   calendar.js        |  62.03 |   100.00 |   68.75 | 13-19 57-79
+ℹ   day-state-rules.js | 100.00 |   100.00 |  100.00 | 
+ℹ   entry-rules.js     |  81.94 |   100.00 |   75.00 | 32-35 64-72
+ℹ   goal-rules.js      |  86.67 |   100.00 |   75.00 | 30-31 34-37
+ℹ   progress-rules.js  | 100.00 |   100.00 |  100.00 | 
+ℹ   reminder-rules.js  | 100.00 |   100.00 |   80.00 | 
+ℹ ---------------------------------------------------------------------
+ℹ all files            |  80.48 |   100.00 |   78.43 | 
+ℹ ---------------------------------------------------------------------
+ℹ end of coverage report

@@ -1,6 +1,6 @@
 # 0053. The seed keeps existing templates and still sets the passwords
 
-Status: decided by projectnewy on 2026-11-14 for implementation in Issue #79; review by phittayanan pending
+Status: decided by projectnewy on 2026-11-14 for implementation in Issue #79; phittayanan approved PR #92, which holds this ADR, on 2026-11-14 ([review of c6454fd](https://github.com/phittayanan/habit-tracker/pull/92#pullrequestreview-5895432567)). This status line was brought up to date in Issue #161
 
 ## Decision
 
