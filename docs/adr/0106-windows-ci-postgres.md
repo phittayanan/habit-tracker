@@ -1,6 +1,6 @@
 # 0106. The Windows CI job gets PostgreSQL 16 from a pinned action, in its own workflow, required only after v2.1
 
-Status: option A proposed by phittayanan and agreed by projectnewy in [Issue #164](https://github.com/phittayanan/habit-tracker/issues/164) on 2026-11-28, with the condition that the job becomes a required check only after the `v2.1` release. The runner label, the separate workflow file and the follow-up Issue for the required check were chosen by phittayanan on 2026-11-28 in the Claude Code session for #164.
+Status: option A proposed by phittayanan in [Issue #164](https://github.com/phittayanan/habit-tracker/issues/164) on 2026-11-27 and agreed by projectnewy there on 2026-11-28, with the condition that the job becomes a required check only after the `v2.1` release. The runner label, the separate workflow file and the follow-up Issue for the required check were chosen by phittayanan on 2026-11-28 in the Claude Code session for #164.
 
 ## Context
 
