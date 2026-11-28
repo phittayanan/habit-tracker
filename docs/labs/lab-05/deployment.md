@@ -349,6 +349,7 @@ All runs are kept (R-10). The red runs used the temporary branch `chore/164-wind
 | [46117726915](https://github.com/phittayanan/habit-tracker/actions/runs/46117726915) | `473a615` (red branch) | Cancelled by the 30-minute job timeout: PostgreSQL 16 was set up, then `psql` waited for a password (point 1). No test ran |
 | [46120070627](https://github.com/phittayanan/habit-tracker/actions/runs/46120070627) | `801f702` (red branch) | Failed before the tests: the seed stopped with "@prisma/client did not initialize yet" (point 3), and `psql` ignored its `-c` (point 2) |
 | [46120341678](https://github.com/phittayanan/habit-tracker/actions/runs/46120341678) | `fa07b53` (red branch) | **Red, as intended.** PostgreSQL `16.16`; server suite 151 tests, 150 passed, 1 failed: TC-89, `spawn ...\node_modules\.bin\prisma ENOENT`, the Windows failure that `f8736c9` fixed |
+| [46120992781](https://github.com/phittayanan/habit-tracker/actions/runs/46120992781) | `71d2a2b` (PR #197, current TC-89) | **Green.** PostgreSQL `16.16`; server suite 161 tests, 161 passed, TC-89 included |
 
 ## 9. First deployment (Lab 5 step 5, Issue #64)
 
