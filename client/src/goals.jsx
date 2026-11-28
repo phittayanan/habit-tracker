@@ -161,6 +161,73 @@ function TargetChange({ goal, onUnauthenticated, onSaved }) {
     </form> : null}
   </div>;
 }
+// F-17 stored reminder (ADR 0086 to ADR 0088): show, set, change and remove in place on the goals page. Nothing is sent (BR-14).
+const WEEKDAYS = [['MON', 'Mon'], ['TUE', 'Tue'], ['WED', 'Wed'], ['THU', 'Thu'], ['FRI', 'Fri'], ['SAT', 'Sat'], ['SUN', 'Sun']];
+export const reminderText = reminder => (reminder
+  ? `Reminder: ${reminder.time} on ${WEEKDAYS.filter(([code]) => reminder.weekdays.includes(code)).map(([, name]) => name).join(', ')}`
+  : 'No reminder');
+function Reminder({ goal, onUnauthenticated, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [time, setTime] = useState('');
+  const [weekdays, setWeekdays] = useState([]);
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const buttonRef = useRef(null);
+  const timeRef = useRef(null);
+  const lineRef = useRef(null);
+  const focusButton = useRef(false);
+  useEffect(() => { if (open) timeRef.current?.focus(); }, [open]);
+  // After a save or a removal the button is re-rendered with a new name; focus goes back to it.
+  // An ended goal has no such button, so focus goes to the reminder line instead (OP-17.7).
+  useEffect(() => { if (focusButton.current) { focusButton.current = false; (buttonRef.current || lineRef.current)?.focus(); } });
+  const canSet = goal.state === 'ACTIVE';
+  function show() { setTime(goal.reminder?.time || ''); setWeekdays(goal.reminder?.weekdays || []); setMessage(''); setOpen(true); }
+  function close() { setOpen(false); setMessage(''); buttonRef.current?.focus(); }
+  function toggle(code, checked) { setWeekdays(list => (checked ? [...list, code] : list.filter(item => item !== code))); }
+  async function save(event) {
+    event.preventDefault(); if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      const body = await api(`/api/goals/${goal.id}/reminder`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ time, weekdays }) }, onUnauthenticated);
+      setOpen(false); focusButton.current = true;
+      onChange(body.reminder);
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  async function remove() {
+    if (busy) return;
+    setBusy(true); setMessage('');
+    try {
+      await api(`/api/goals/${goal.id}/reminder`, { method: 'DELETE' }, onUnauthenticated);
+      setOpen(false); focusButton.current = true;
+      onChange(null);
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(false); }
+  }
+  const id = `reminder-${goal.id}`;
+  // The weekday message (F-17 section 4 order 5) describes the Weekdays group; any other message describes the time box.
+  const dayError = message === 'Choose at least one weekday, each only once.';
+  const timeError = Boolean(message) && !dayError;
+  return <div className="reminder">
+    <p ref={lineRef} tabIndex={-1}>{reminderText(goal.reminder)}</p>
+    {canSet ? <button type="button" ref={buttonRef} aria-describedby={`goal-${goal.id}-name`} aria-expanded={open} aria-controls={open ? `${id}-form` : undefined} onClick={() => (open ? close() : show())}>{goal.reminder ? 'Change reminder' : 'Set reminder'}</button> : null}
+    {open ? <form id={`${id}-form`} className="reminder-form" onSubmit={save} noValidate aria-label={`Reminder for ${goal.template.name}`}>
+      <label htmlFor={`${id}-time`}>Reminder time</label>
+      <input id={`${id}-time`} ref={timeRef} name="time" type="text" placeholder="HH:MM" autoComplete="off" value={time} onChange={event => setTime(event.target.value)} aria-invalid={timeError ? true : undefined} aria-describedby={[`${id}-note`, timeError ? `${id}-error` : ''].filter(Boolean).join(' ')} />
+      <fieldset className="weekdays" aria-describedby={dayError ? `${id}-error` : undefined}>
+        <legend>Weekdays</legend>
+        {WEEKDAYS.map(([code, name]) => <label key={code}><input type="checkbox" name="weekdays" value={code} checked={weekdays.includes(code)} onChange={event => toggle(code, event.target.checked)} />{name}</label>)}
+      </fieldset>
+      <p id={`${id}-note`}>The app only stores this. It sends nothing.</p>
+      <div className="form-actions">
+        <button type="submit" disabled={busy}>Save</button>
+        <button type="button" disabled={busy} onClick={close}>Cancel</button>
+      </div>
+    </form> : null}
+    {goal.reminder ? <button type="button" aria-describedby={`goal-${goal.id}-name`} disabled={busy} onClick={remove}>Remove reminder</button> : null}
+    {message ? <p id={`${id}-error`} role="alert" className="error">{message}</p> : null}
+  </div>;
+}
 export function GoalList({ navigate, onUnauthenticated }) {
   const [goals, setGoals] = useState(null);
   const [message, setMessage] = useState('');
@@ -180,6 +247,7 @@ export function GoalList({ navigate, onUnauthenticated }) {
       <p>{goal.startDate} – {goal.endDate}</p>
       <p>{goal.state === 'ACTIVE' ? 'Active' : 'Ended'}</p>
       <p>{goal.progress.daysMet} of {goal.progress.daysSoFar} days met</p>
+      <Reminder goal={goal} onUnauthenticated={onUnauthenticated} onChange={reminder => setGoals(list => list.map(item => (item.id === goal.id ? { ...item, reminder } : item)))} />
       <EntryPanel goal={goal} onUnauthenticated={onUnauthenticated} onSaved={load} />
     </li>)}</ul> : null}
   </>;
