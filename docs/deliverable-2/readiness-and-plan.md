@@ -26,6 +26,7 @@ Deliverable 2 Part E, [Issue #160](https://github.com/phittayanan/habit-tracker/
 | Not checked on the deployed app | Keyboard-only use, some cross-account API requests, concurrent requests, a service restart | Decide which to run before the final release (#27) |
 | OBS-1 has no Issue | It can be forgotten | projectnewy opens its Issue and it is fixed before the final release (section 3) |
 | UI and usability are not good enough yet for people outside the team (phittayanan, [review of 6230d71](https://github.com/phittayanan/habit-tracker/pull/200)) | The app is not ready for real users | A "UI and usability for real users" part of #27 (section 3) |
+| Tight end of the plan (phittayanan, [review of cfa8798](https://github.com/phittayanan/habit-tracker/pull/200)): one day between the UI and usability work (10 Dec) and the final release (11 Dec); the report and video are due on the Final Project Delivery due day | Little time to fix anything found late | The dates are accepted with this risk in view |
 | Test data on the running app | Test templates and goals show in the demo accounts and cannot be deleted in the app | Say so in the demo and the report |
 | The running service and database cost money while kept for grading | Budget | Keep running until the end of grading, then follow [deployment.md section 9.3](../labs/lab-05/deployment.md) |
 
@@ -49,7 +50,7 @@ Facts that bear on it: the automated suites and the checks listed above passed, 
 2. The final release, then the report and the video on that version.
 3. A habit-helper agent comes last, as an optional add-on with its own Issue, contract and ADR, started only after the ready-for-users release. It is not part of the required scope, and nothing about its design is decided here.
 
-**Owners, reviewers and the order** were proposed by phittayanan in the [review of 6230d71](https://github.com/phittayanan/habit-tracker/pull/200) and agreed by projectnewy. **The dates between 29 November and 13 December are the team's own targets, not course dates.** Claude Code drafted them (UI and usability follows the #27 date) and projectnewy accepted them; phittayanan confirms them by reviewing this change.
+**Owners, reviewers and the order** were proposed by phittayanan in the [review of 6230d71](https://github.com/phittayanan/habit-tracker/pull/200) and agreed by projectnewy; the README owner and reviewer were proposed in the [review of cfa8798](https://github.com/phittayanan/habit-tracker/pull/200) and accepted by projectnewy. **The dates between 29 November and 13 December are the team's own targets, not course dates.** Claude Code drafted them (UI and usability follows the #27 date); projectnewy accepted them, and so did phittayanan in the review of cfa8798.
 
 | Work | Requirement / AC / tests | Owner | Reviewer | Depends on | Next action | Target date |
 |---|---|---|---|---|---|---|
@@ -62,7 +63,7 @@ Facts that bear on it: the automated suites and the checks listed above passed, 
 | UI and usability for real users, a new part of [#27](https://github.com/phittayanan/habit-tracker/issues/27) | no requirement ID yet; its Issues define the scope | shared; projectnewy splits #27 | the other student | the split of #27 | Write what "ready for people outside the team" must include, as Issues; ask before any UI design decision | 10 Dec |
 | Hardening ([#27](https://github.com/phittayanan/habit-tracker/issues/27)): failure handling, authorization, regression tests, defect fixes; NFR-08 rule coverage and the NFR rechecks | NFR-08; SRS 5.1 | shared; projectnewy splits #27 | the other student | F-16 for the last rechecks | Split #27 now; keep each Issue small because of the exams | 10 Dec |
 | Final release to `main`, deploy, backup if there is a migration, post-deployment and regression checks | FD; Lab 5 process | projectnewy | phittayanan | the rows above | Release PR, checks, tag | 11 Dec |
-| README and setup summary | FD | to be agreed | the other student | final release | Update against the released tag | 13 Dec |
+| README and setup summary | FD | projectnewy | phittayanan | final release | Update against the released tag | 13 Dec |
 | Final report (FD PDF) | FD | phittayanan assembles | projectnewy | final release | Assemble against the released tag | 13 Dec |
 | Demo video | FD (requires both presenting) | both | none | final release | Record on the released version | 13 Dec |
 | Habit-helper agent (optional, last) | none yet | to be agreed | to be agreed | the ready-for-users release | Own Issue, contract and ADR first | not set |
