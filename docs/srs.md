@@ -2,6 +2,8 @@
 
 Part A of Deliverable 1 (Issue #4). Every requirement cites the ADR it comes from. Where no ADR settles a point, it is listed in section 6.3 as an open point for the students. Nothing here is decided beyond the ADRs.
 
+**Status at `v2.1`** (commit `9b09bfe`, 2026-11-28; Deliverable 2 Part D, Issue #161): FR-01 to FR-19 and FR-21 to FR-23 are built, and their planned tests pass in the release CI. FR-20 (streaks, Sprint 3) is not built; its tests are not written. Every NFR has a result at `v2.1` except NFR-07 (the timed clean-clone run, not repeated since Lab 5); NFR-08's coverage is a local run, not CI. Per-requirement results: `docs/traceability.md`, "Results at `v2.1`".
+
 ## 1. Introduction
 
 ### 1.1 Purpose
@@ -19,7 +21,7 @@ In scope for the product (all three sprints):
 - A browser UI built around one month calendar (ADR 0037 to ADR 0049).
 - Private participant data (ADR 0019).
 
-Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026) is the handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Sprint 2 (due 29 Nov): goal changes and history. Sprint 3 (due 13 Dec): streaks, reminders, summaries and hardening.
+Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026 in the handout; 15 Nov 2026 on LEB2, read 2026-11-10) is the handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Sprint 2 (due 29 Nov): goal changes and history. Sprint 3 (due 13 Dec): streaks, reminders, summaries and hardening.
 
 ### 1.3 Scope Exclusions
 - Medical diagnosis and treatment advice (course brief, GWS §6.8).
@@ -147,7 +149,7 @@ Areas are security and privacy, usability and accessibility, and maintainability
 - One `staging` branch for all sprints (ADR 0001).
 
 ### 6.2 Decisions recorded
-All design decisions are in `docs/adr/` (ADR 0002 to 0049), agreed by both students. The requirements above cite them by number.
+All design decisions are in `docs/adr/`. ADR 0002 to ADR 0049 are the baseline agreed by both students for Deliverable 1; ADR 0050 to ADR 0106 were added through Labs 5 to 7 and Sprints 2 and 3, each in the PR of its Issue; the Approved Changes table of `docs/traceability.md` records who agreed to the ones that change requirements or scope. The requirements above cite them by number.
 
 ### 6.3 Assumptions and open points for the students
 No ADR settles these. Each is left open and needs a decision before the requirement is final.
@@ -188,6 +190,7 @@ The team cannot settle these. They are open points in the handouts (`docs/design
 |---|---|---|
 | 2026-11-07 to 2026-11-26 | Earlier changes are recorded in Git history and in the Approved Changes table of `docs/traceability.md` | see there |
 | 2026-11-27 | Lab 7, Issue #139, ADR 0061: definitions of Entry and Day met (1.4); BR-04 and BR-07; source of FR-11; A-11 | projectnewy; agreed by phittayanan in the [review of 6f27fac](https://github.com/phittayanan/habit-tracker/pull/143#pullrequestreview-6079956119) |
-| 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases; after the PR #167 review, FR-15 names the kept goals page (ADR 0073) | pending (reviewer projectnewy) |
-| 2026-11-27 | Issue #150: FR-08 permanent retire; A-5 decided | pending (reviewer phittayanan) |
-| 2026-11-27 | Issue #157: A-10 decided | pending (reviewer phittayanan) |
+| 2026-11-27 | Issue #151, ADR 0063 to ADR 0072: template kind in FR-05; FR-15 phone box and kind inputs; FR-19 grouped by day; BR-15 edge cases; after the PR #167 review, FR-15 names the kept goals page (ADR 0073) | projectnewy, [review of 5cb03fd](https://github.com/phittayanan/habit-tracker/pull/167#pullrequestreview-6087285792) of PR #167 |
+| 2026-11-27 | Issue #150: FR-08 permanent retire; A-5 decided | phittayanan, [review of 32c04e0](https://github.com/phittayanan/habit-tracker/pull/171#pullrequestreview-6088317635) of PR #171 |
+| 2026-11-27 | Issue #157: A-10 decided | phittayanan, [review of 4010b68](https://github.com/phittayanan/habit-tracker/pull/174#pullrequestreview-6089586014) of PR #174 |
+| 2026-11-28 | Issue #161: status line at `v2.1`; Sprint 1 due date with its LEB2 source (1.2); ADR range (6.2). No requirement changed | pending (reviewer projectnewy) |

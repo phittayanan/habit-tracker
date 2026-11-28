@@ -26,6 +26,32 @@ Part B of Deliverable 1 (Issue #5). Each feature groups SRS requirements (`docs/
 
 Every FR-01 to FR-23 appears in exactly one feature. Every BR-01 to BR-15 appears in at least one; BR-03, BR-06 and BR-08 are shared by the rows shown.
 
+## Status at `v2.1`
+
+Issue #161, read 2026-11-28. States: **planned** (contract only), **in progress** (code Issue started, not merged), **implemented** (merged into `staging`), **tested** (its planned tests pass on the version named), **accepted** (in a tag on `main` whose release PR the other student approved). Test results per requirement: `docs/traceability.md`, "Results at `v2.1`". Sprint 2 and Sprint 3 detail: `docs/deliverable-2/status.md`.
+
+| Feature | Sprint | Contract | Build Issue and PR | State at `v2.1` | Accepted in |
+|---|---|---|---|---|---|
+| F-01 Login, logout and session | 1 | `sprints/sprint-1/` (#30) | #32, PR #34 | accepted | `v1.0`; NUL-username fix `v1.4` |
+| F-02 Role layout and endpoint protection | 1 | `sprints/sprint-1/` (#30) | #32, PR #34 | accepted | `v1.0` |
+| F-03 Template creation and Manager list | 1; kind 2 | `sprints/sprint-1/` (#30); kind #151 | #36, PR #37; kind #168, PR #173 | accepted | `v1.0`; kind `v2.0` |
+| F-04 Template edit | 1 | `sprints/sprint-1/` (#30) | #53, PR #54 | accepted | `v1.0` |
+| F-05 Template retire | 2 | `sprints/sprint-2/F-05-template-retire.md` (#150) | #152, PR #179 | accepted | `v2.0` |
+| F-06 Participant template view and write refusal | 1 | `sprints/sprint-1/` (#30) | #36, PR #37 | accepted | `v1.0` |
+| F-07 Goal creation | 1 | `sprints/sprint-1/` (#28) | #40, PR #41 | accepted | `v1.0`; TC-78 rule `v1.3` |
+| F-08 Daily entry recording | 1 | `sprints/sprint-1/` (#28) | #42, PR #43; several per day #140, PR #146 | accepted | `v1.0`; several per day `v1.5` |
+| F-09 Progress (days met) | 1 | `sprints/sprint-1/` (#28) | #44, PR #51 | accepted | `v1.0` |
+| F-10 Participant data privacy | 1 | `sprints/sprint-1/` (#28) | #44, PR #51 | accepted | `v1.0` |
+| F-11 Month calendar and side panel | 2 | `sprints/sprint-2/F-11-month-calendar.md` (#151) | #155, PR #180 | accepted | `v2.0` |
+| F-12 Calendar day colours | 2 | `sprints/sprint-2/F-12-day-colours.md` (#151) | #156, PR #185 | accepted | `v2.0` |
+| F-13 Entry edit and delete | 2 | `sprints/sprint-2/F-13-entry-edit-delete.md` (#150) | #154, PR #184 | accepted | `v2.0` |
+| F-14 Goal change | 2 | `sprints/sprint-2/F-14-goal-change.md` (#150) | #153, PR #176 | accepted | `v2.0` |
+| F-15 Calendar and List history | 2 | `sprints/sprint-2/F-15-calendar-list.md` (#151) | #156, PR #185 | accepted | `v2.0` |
+| F-16 Streaks | 3 | `sprints/sprint-3/F-16-streaks.md` (#157) | no code Issue yet | **planned** | not released |
+| F-17 Stored reminder | 3 | `sprints/sprint-3/F-17-stored-reminder.md` (#157) | #158, PR #183 | accepted | `v2.1` |
+
+"Accepted" here is the team's release acceptance. No outside user test has run on `v2.0` or `v2.1`.
+
 ## Cross-cutting requirements
 
 These NFRs apply to many features or to the system as a whole. Each links to the features it constrains or to a named system responsibility, with the sprint that sets it up and the sprint that verifies it.
@@ -44,7 +70,7 @@ These NFRs apply to many features or to the system as a whole. Each links to the
 
 ## Acceptance Criteria
 
-Acceptance criteria (AC) are not written here. Part B asks for no AC on later-sprint features, and the Sprint 1 AC belong to each feature's contract (Part E, with stable AC IDs and planned test IDs). Until those contracts exist, the AC column in `docs/traceability.md` points to Part E.
+Acceptance criteria (AC) are not written here; each feature's AC are in its contract, with stable AC IDs and planned test IDs: Sprint 1 in `docs/sprints/sprint-1/`, Sprint 2 in `docs/sprints/sprint-2/`, Sprint 3 in `docs/sprints/sprint-3/`. Every feature F-01 to F-17 has a contract at `v2.1`. The AC column of `docs/traceability.md` lists them.
 
 ## Open points for the students
 
