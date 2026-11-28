@@ -59,9 +59,9 @@ Owners, reviewers and target dates are the students' plan in [`readiness-and-pla
 | F-16 streaks | FR-20, BR-13, AC-16.1 to AC-16.9, TC-41, TC-42, TC-160 to TC-166 | planned | Open the code Issue; failing tests first, then code, review, release | plan rows "F-16 streaks" |
 | OBS-1, a rejected-entry message that stays on a calendar card | F-11 | observed on `v2.0`; no Issue | Open its Issue; compare with the F-11 contract; fix before the final release | plan row "OBS-1" |
 | UI and usability for people outside the team | no requirement ID yet | not started | Define it as Issues under #27; ask the students before any UI decision | plan row "UI and usability for real users" |
-| Hardening, NFR rechecks | NFR-02 to NFR-08; #27 | in progress through each feature's tests | Split #27 into Issues | plan row "Hardening" |
-| Rule coverage from CI | NFR-08, TC-51 | local run only (100% line coverage of the rule files on `9b09bfe`) | Decide whether CI produces the coverage report that NFR-08 names | plan row "Hardening" (it names NFR-08 rule coverage) |
-| Timed clean-clone run | NFR-07, TC-50 | last run in Lab 5 on `ad3300a` | Repeat on the final release | not in the plan yet |
+| Hardening, NFR rechecks | NFR-02, NFR-03, NFR-05, NFR-06, NFR-08 (the rechecks SRS 5.1 plans); #27 | in progress through each feature's tests | Split #27 into Issues | plan row "Hardening" |
+| Rule coverage from CI | NFR-08, TC-51 | local runs only on `9b09bfe`: unit files 81.94% to 100% per rule file, `template.js` not loaded; whole suite 100% | Decide whether CI produces the coverage report that NFR-08 names | plan row "Hardening" (it names NFR-08 rule coverage) |
+| Timed clean-clone run | NFR-07, TC-50 | last run in Lab 5 on `ad3300a` | Repeat on the final release | not in the plan: SRS 5.1 plans no NFR-07 run after Lab 5 |
 | Outside user test on a Sprint 2 or Sprint 3 version | Sprint 2 and 3 AC | not run; last on `v1.3` and `v1.4` (Lab 6) ([readiness](readiness-and-plan.md) section 1) | The students decide whether one is run | not in the plan |
 | Sprint 1 continuity on `v2.1` and the change register | J-1 to J-7; CR-nn | J-1 to J-7 run on the deployed `v2.1`: 7 of 7 passed ([v2.1 record](v2.1-release.md) section 5); change register in [Part A](part-a-continuity.md) section 3 | None for Part A; its open items (for example CR-13, CR-14, CR-25) keep their status there | plan row "Sprint 1 continuity and change register" |
 | Final release, README, report, video | FD | not started | As in the plan | plan rows "Final release" to "Demo video" |

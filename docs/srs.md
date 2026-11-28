@@ -21,7 +21,7 @@ In scope for the product (all three sprints):
 - A browser UI built around one month calendar (ADR 0037 to ADR 0049).
 - Private participant data (ADR 0019).
 
-Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026 in the handout; 15 Nov 2026 on LEB2, read 2026-11-10) is the handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Sprint 2 (due 29 Nov): goal changes and history. Sprint 3 (due 13 Dec): streaks, reminders, summaries and hardening.
+Sprint allocation (ADR 0020, ADR 0021): Sprint 1 (due 8 Nov 2026 in the handout; 15 Nov 2026 on LEB2, checked 2026-11-09 as recorded in `docs/assignment.md`) is the handout's example only: a Manager defines a template; a Participant selects it, sets a goal, records daily activity and sees computed progress, with the entry rules and access restrictions enforced. Sprint 2 (due 29 Nov): goal changes and history. Sprint 3 (due 13 Dec): streaks, reminders, summaries and hardening.
 
 ### 1.3 Scope Exclusions
 - Medical diagnosis and treatment advice (course brief, GWS §6.8).

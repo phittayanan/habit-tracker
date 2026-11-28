@@ -1,12 +1,12 @@
 # Part D. Updated requirements and test traceability {#part-d}
 
-<!-- source: docs/srs.md, docs/features.md, docs/system-sds.md, docs/traceability.md as merged with PR #202 -->
+<!-- source: docs/srs.md, docs/features.md, docs/system-sds.md, docs/traceability.md as changed by PR #202 -->
 
 The current documents as they are in the repository. Each starts with its status at `v2.1`.
 
 ## D.1 Results matrix and gaps {#d-1}
 
-The matrix below is the "Results at `v2.1`" section of `docs/traceability.md`; the other sections of that file follow in D.5. TC-51 evidence: `docs/deliverable-2/evidence/tc-51-coverage-v2.1.txt`.
+The matrix below is the "Results at `v2.1`" section of `docs/traceability.md`; the other sections of that file follow in D.5. TC-51 evidence: `docs/deliverable-2/evidence/tc-51-coverage-v2.1-unit.txt` (unit files) and `tc-51-coverage-v2.1.txt` (whole suite).
 
 <!-- include: docs/traceability.md#Results_at_`v2.1`_(Deliverable_2_Part_D) -->
 

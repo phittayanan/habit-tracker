@@ -23,7 +23,8 @@
 | Browser suite, CI (Linux) | `npm test` in `client/` (Playwright, 375 px and 1280 px) | `9b09bfe` | 126 passed, 0 failed, 6 skipped (cases written for one width, skipped at the other) |
 | Docker build, CI | `docker build` of the root `Dockerfile` | `9b09bfe` | success |
 | Server suite, CI (Windows) | the same server command | `d5f968b` (same tree as `9b09bfe`) | 161 of 161 passed |
-| Rule coverage, local (TC-51) | `node --experimental-test-coverage --test --test-concurrency=1 test/*.test.js` | `9b09bfe` | 161 of 161 passed; rule files 100% line coverage |
+| Rule coverage, local (TC-51), unit files only | `node --experimental-test-coverage --test --test-concurrency=1 test/*-rules.test.js` | `9b09bfe` | 33 of 33 passed; line coverage `entry-rules.js` 81.94%, `goal-rules.js` 86.67%, the other three rule files 100%; `template.js` not loaded |
+| Rule coverage, local (TC-51), whole server suite | `node --experimental-test-coverage --test --test-concurrency=1 test/*.test.js` | `9b09bfe` | 161 of 161 passed; every rule file 100%, `template.js` included |
 
 **Excerpt 1: a cross-feature rule (F-12 with F-14), `server/test/calendar.test.js` at `v2.1`.** Setup: Water has target 8 from 30 days ago and Sleep 420 minutes; the Water target is changed to 6 from today. Both days get Water 7 and Sleep 420. A past day is judged against the target valid that day, so two days ago Water (7 of 8) is missed and today it (7 of 6) is met.
 
@@ -91,5 +92,7 @@ From `README.md` and `docs/labs/lab-05/deployment.md` section 7. Synthetic data 
 <!-- include: docs/deliverable-2/v2.0-release.md -->
 
 ## E.5 Readiness review and plan to 13 December {#e-5}
+
+The plan below was written on 2026-11-28 before PR #186 merged; its first row (Sprint 1 continuity and change register, #159) is now done: PR #186 is merged and #159 is closed.
 
 <!-- include: docs/deliverable-2/readiness-and-plan.md -->

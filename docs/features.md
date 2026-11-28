@@ -35,11 +35,11 @@ Issue #161, read 2026-11-28. States: **planned** (contract only), **in progress*
 | F-01 Login, logout and session | 1 | `sprints/sprint-1/` (#30) | #32, PR #34 | accepted | `v1.0`; NUL-username fix `v1.4` |
 | F-02 Role layout and endpoint protection | 1 | `sprints/sprint-1/` (#30) | #32, PR #34 | accepted | `v1.0` |
 | F-03 Template creation and Manager list | 1; kind 2 | `sprints/sprint-1/` (#30); kind #151 | #36, PR #37; kind #168, PR #173 | accepted | `v1.0`; kind `v2.0` |
-| F-04 Template edit | 1 | `sprints/sprint-1/` (#30) | #53, PR #54 | accepted | `v1.0` |
+| F-04 Template edit | 1; kind 2 | `sprints/sprint-1/` (#30); kind #151 | #53, PR #54; kind #168, PR #173 | accepted | `v1.0`; kind `v2.0` |
 | F-05 Template retire | 2 | `sprints/sprint-2/F-05-template-retire.md` (#150) | #152, PR #179 | accepted | `v2.0` |
 | F-06 Participant template view and write refusal | 1 | `sprints/sprint-1/` (#30) | #36, PR #37 | accepted | `v1.0` |
-| F-07 Goal creation | 1 | `sprints/sprint-1/` (#28) | #40, PR #41 | accepted | `v1.0`; TC-78 rule `v1.3` |
-| F-08 Daily entry recording | 1 | `sprints/sprint-1/` (#28) | #42, PR #43; several per day #140, PR #146 | accepted | `v1.0`; several per day `v1.5` |
+| F-07 Goal creation | 1; Time target 2 | `sprints/sprint-1/` (#28); kind #151 | #40, PR #41; kind #168, PR #173 | accepted | `v1.0`; TC-78 rule `v1.3`; Time target `v2.0` |
+| F-08 Daily entry recording | 1; Time value 2 | `sprints/sprint-1/` (#28); kind #151 | #42, PR #43; several per day #140, PR #146; kind #168, PR #173 | accepted | `v1.0`; several per day `v1.5`; Time value `v2.0` |
 | F-09 Progress (days met) | 1 | `sprints/sprint-1/` (#28) | #44, PR #51 | accepted | `v1.0` |
 | F-10 Participant data privacy | 1 | `sprints/sprint-1/` (#28) | #44, PR #51 | accepted | `v1.0` |
 | F-11 Month calendar and side panel | 2 | `sprints/sprint-2/F-11-month-calendar.md` (#151) | #155, PR #180 | accepted | `v2.0` |
