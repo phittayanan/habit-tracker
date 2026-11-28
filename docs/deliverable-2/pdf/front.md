@@ -1,4 +1,4 @@
-<!-- Deliverable 2 PDF source (Issue #161). OUTLINE: sections marked PENDING wait for PR #186 (#159) and PR #200 (#160).
+<!-- Deliverable 2 PDF source (Issue #161). OUTLINE: sections marked PENDING wait for PR #186 (#159). PR #200 (#160) is merged and used.
 Build: npm ci, npx playwright install chromium, npm run build. Output: dist/deliverable-2.pdf (not committed). build.mjs fills the page numbers.
 Student IDs are never written in these files: each student types their own ID into the built PDF before the LEB2 submission. The LEB2 Submit click is the students'. -->
 
@@ -13,7 +13,7 @@ Student IDs are never written in these files: each student types their own ID in
 | Repository | https://github.com/phittayanan/habit-tracker |
 | Submission deadline | 29 Nov 2026 23:59 (LEB2, read 2026-11-28) |
 | Submitted release | Tag `v2.1` (annotated) on commit `9b09bfe`, the merge of the release PR #198 from `staging` into `main`. Sprint 2 release: tag `v2.0` on `f510619` (PR #189) |
-| Deployed URL and version | https://habit-tracker-rfi4eg2u4q-as.a.run.app, page label `build 9b09bfe`, Cloud Run revision `habit-tracker-00010-qsv` (PENDING: confirm from the `v2.1` record, PR #200) |
+| Deployed URL and version | https://habit-tracker-rfi4eg2u4q-as.a.run.app, page label `build 9b09bfe`, Cloud Run revision `habit-tracker-00010-qsv` (v2.1 record section 1) |
 
 | Student | Student ID | GitHub |
 |---|---|---|
@@ -30,7 +30,7 @@ One row per rubric part. Page numbers refer to this PDF.
 | B. Sprint 2 contracts and working increment | 25 | {{pages:part-b}} | F-05, F-11 to F-15, template kind; AC-05.x, AC-11.x to AC-15.x; TC-110 to TC-159 | `docs/sprints/sprint-2/`; `docs/deliverable-2/status.md`; evidence files |
 | C. Sprint 3 contracts and working progress | 15 | {{pages:part-c}} | F-16, F-17; AC-16.x, AC-17.x; TC-160 to TC-175 | `docs/sprints/sprint-3/`; `docs/deliverable-2/status.md` |
 | D. Updated requirements and test traceability | 10 | {{pages:part-d}} | BR-01 to BR-15, FR-01 to FR-23, NFR-01 to NFR-09; F-01 to F-17 | `docs/srs.md`, `docs/features.md`, `docs/system-sds.md`, `docs/traceability.md` |
-| E. Integrated release candidate | 15 | {{pages:part-e}} | `v2.0`, `v2.1`; deploy runs; post-deployment checks; readiness; plan to 13 Dec | `docs/deliverable-2/v2.0-release.md`; PENDING: `v2.1-release.md`, `readiness-and-plan.md` (PR #200) |
+| E. Integrated release candidate | 15 | {{pages:part-e}} | `v2.0`, `v2.1`; deploy runs; post-deployment checks; readiness; plan to 13 Dec | `docs/deliverable-2/v2.0-release.md`, `v2.1-release.md`, `readiness-and-plan.md` |
 | Appendices | | {{pages:appendix}} | sources, ADR list, AI use, contributions | `docs/adr/`, `docs/ai-use.md` |
 
 ### Sources

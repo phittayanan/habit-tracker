@@ -56,12 +56,12 @@ Issue #161. One row per requirement: requirement → feature → sprint → AC (
 
 | Gap | Affected IDs | State | Where it is planned |
 |---|---|---|---|
-| F-16 streaks not built; 9 planned tests not written | FR-20, BR-13, AC-16.1 to AC-16.9, TC-41, TC-42, TC-160 to TC-166 | Open | Plan to 13 Dec, PR #200 (PENDING until #200 merges) |
-| NFR-08 asks for "a coverage report from CI"; CI produces none, so TC-51 is a local run | NFR-08, TC-51 | Open | Hardening, #27 (PENDING: owner and date from PR #200) |
+| F-16 streaks not built; 9 planned tests not written | FR-20, BR-13, AC-16.1 to AC-16.9, TC-41, TC-42, TC-160 to TC-166 | Open | plan row "F-16 streaks", [readiness-and-plan.md](deliverable-2/readiness-and-plan.md) section 3 |
+| NFR-08 asks for "a coverage report from CI"; CI produces none, so TC-51 is a local run | NFR-08, TC-51 | Open | plan row "Hardening" (#27), [readiness-and-plan.md](deliverable-2/readiness-and-plan.md) section 3 |
 | TC-50 (timed clean clone) not repeated since Lab 5 | NFR-07 | Open | not planned yet |
-| No outside user test on `v2.0` or `v2.1` | all Sprint 2 and Sprint 3 AC | Open | PENDING: D2 Part A, PR #186 |
-| Checks not run on the deployed app (keyboard-only, cross-account writes, concurrency) | NFR-03, NFR-06 | Automated suites only | [v2.0 record](deliverable-2/v2.0-release.md) section 5 |
-| OBS-1: a rejected-entry message stays on a calendar card after the draft is discarded (`v2.0`) | F-11 | No Issue yet | Plan to 13 Dec, PR #200 |
+| No outside user test on `v2.0` or `v2.1` | all Sprint 2 and Sprint 3 AC | Open | not in the plan; [readiness-and-plan.md](deliverable-2/readiness-and-plan.md) section 1 |
+| Checks not run on the deployed app (keyboard-only, cross-account writes, concurrency) | NFR-03, NFR-06 | Automated suites only | [v2.0 record](deliverable-2/v2.0-release.md) and [v2.1 record](deliverable-2/v2.1-release.md), section 5 each |
+| OBS-1: a rejected-entry message stays on a calendar card after the draft is discarded (`v2.0`) | F-11 | No Issue yet | plan row "OBS-1", [readiness-and-plan.md](deliverable-2/readiness-and-plan.md) section 3 |
 | TC-75 to TC-77 have no requirement ID (Lab 5 technical checks); TC-79 and TC-80 are defined nowhere (TC-80 was renamed TC-75) | none | Known, kept | none |
 
 ## BR -> FR
